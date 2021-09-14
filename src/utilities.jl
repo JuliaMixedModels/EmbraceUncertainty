@@ -34,4 +34,3 @@ function stripcodechunks(
     close(iobody)
     close(iochnk)
 end
-

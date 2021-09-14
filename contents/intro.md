@@ -3,14 +3,16 @@ A Simple, Linear, Mixed-effects Model {#chap:ExamLMM}
 
 In this book we describe the theory behind a type of statistical model
 called *mixed-effects* models and the practice of fitting and analyzing
-such models using the package for . These models are used in many
-different disciplines. Because the descriptions of the models can vary
+such models using the [`MixedModels`](https://github.com/JuliaStats/MixedModels.jl)
+package for [Julia](https://julialang.org).
+These models are used in many different disciplines.
+Because the descriptions of the models can vary
 markedly between disciplines, we begin by describing what mixed-effects
 models are and by exploring a very simple example of one type of mixed
 model, the *linear mixed model*.
 
-This simple example allows us to illustrate the use of the function in
-the package for fitting such models and for analyzing the fitted model.
+This simple example allows us to illustrate the use of the `LinearMixedModel` type in
+the `MixedModels` package for fitting such models and for analyzing the fitted model.
 We also describe methods of assessing the precision of the parameter
 estimates and of visualizing the conditional distribution of the random
 effects, given the observed data.
@@ -21,88 +23,113 @@ Mixed-effects Models {#sec:memod}
 Mixed-effects models, like many other types of statistical models,
 describe a relationship between a *response* variable and some of the
 *covariates* that have been measured or observed along with the
-response. In mixed-effects models at least one of the covariates is a
+response.
+In mixed-effects models at least one of the covariates is a
 *categorical* covariate representing experimental or observational
-"units" in the data set. In the example from the chemical industry that
-is given in this chapter, the observational unit is the batch of an
-intermediate product used in production of a dye. In medical and social
-sciences the observational units are often the human or animal subjects
-in the study. In agriculture the experimental units may be the plots of
+"units" in the data set.
+In the example from the chemical industry that is given in this chapter,
+the observational unit is the batch of an
+intermediate product used in production of a dye.
+In medical and social sciences the observational units are often the human or animal subjects
+in the study.
+In agriculture the experimental units may be the plots of
 land or the specific plants being studied.
 
 In all of these cases the categorical covariate or covariates are
-observed at a set of discrete *levels*. We may use numbers, such as
+observed at a set of discrete *levels*.
+We may use numbers, such as
 subject identifiers, to designate the particular levels that we observed
-but these numbers are simply labels. The important characteristic of a
+but these numbers are simply labels.
+The important characteristic of a
 categorical covariate is that, at each observed value of the response,
 the covariate takes on the value of one of a set of distinct levels.
 
 Parameters associated with the particular levels of a covariate are
-sometimes called the "effects" of the levels. If the set of possible
+sometimes called the "effects" of the levels.
+If the set of possible
 levels of the covariate is fixed and reproducible we model the covariate
-using *fixed-effects* parameters. If the levels that we observed
+using *fixed-effects* parameters.
+If the levels that we observed
 represent a random sample from the set of all possible levels we
 incorporate *random effects* in the model.
 
 There are two things to notice about this distinction between
-fixed-effects parameters and random effects. First, the names are
+fixed-effects parameters and random effects.
+First, the names are
 misleading because the distinction between fixed and random is more a
 property of the levels of the categorical covariate than a property of
-the effects associated with them. Secondly, we distinguish between
+the effects associated with them.
+Secondly, we distinguish between
 "fixed-effects parameters", which are indeed parameters in the
 statistical model, and "random effects", which, strictly speaking, are
-not parameters. As we will see shortly, random effects are unobserved
+not parameters.
+As we will see shortly, random effects are unobserved
 random variables.
 
 To make the distinction more concrete, suppose that we wish to model the
 annual reading test scores for students in a school district and that
 the covariates recorded with the score include a student identifier and
-the student's gender. Both of these are categorical covariates. The
-levels of the gender covariate, male and female, are fixed. If we
+the student's gender.
+Both of these are categorical covariates.
+The
+levels of the gender covariate, male and female, are fixed.
+If we
 consider data from another school district or we incorporate scores from
-earlier tests, we will not change those levels. On the other hand, the
+earlier tests, we will not change those levels.
+On the other hand, the
 students whose scores we observed would generally be regarded as a
 sample from the set of all possible students whom we could have
-observed. Adding more data, either from more school districts or from
+observed.
+Adding more data, either from more school districts or from
 results on previous or subsequent tests, will increase the number of
 distinct levels of the student identifier.
 
 *Mixed-effects models* or, more simply, *mixed models* are statistical
 models that incorporate both fixed-effects parameters and random
-effects. Because of the way that we will define random effects, a model
+effects.
+Because of the way that we will define random effects, a model
 with random effects always includes at least one fixed-effects
-parameter. Thus, any model with random effects is a mixed model.
+parameter.
+Thus, any model with random effects is a mixed model.
 
 We characterize the statistical model in terms of two random variables:
 a $q$-dimensional vector of random effects represented by the random
-variable $\bc B$ and an $n$-dimensional response vector represented by
-the random variable $\bc Y$. (We use upper-case "script" characters to
+variable $\mathcal{B}$ and an $n$-dimensional response vector represented by
+the random variable $\mathcal{Y}$.
+(We use upper-case "script" characters to
 denote random variables. The corresponding lower-case upright letter
-denotes a particular value of the random variable.) We observe the
-value, $\vec y$, of $\bc Y$. We do not observe the value, $\vec b$, of
-$\bc B$.
+denotes a particular value of the random variable.)
+We observe the
+value, $\mathbf{y}$, of $\mathcal{Y}$. We do not observe the value, $\mathbf{b}$, of
+$\mathcal{B}$.
 
 When formulating the model we describe the unconditional distribution of
-$\bc B$ and the conditional distribution, $(\bc
-  Y|\bc B=\vec b)$. The descriptions of the distributions involve the
-form of the distribution and the values of certain parameters. We use
+$\mathcal{B}$ and the conditional distribution,
+$(\mathcal{Y}|\mathcal{B}=\mathbf{b})$.
+The descriptions of the distributions involve the
+form of the distribution and the values of certain parameters.
+We use
 the observed values of the response and the covariates to estimate these
 parameters and to make inferences about them.
 
-That's the big picture. Now let's make this more concrete by describing
+That's the big picture.
+Now let's make this more concrete by describing
 a particular, versatile class of mixed models called linear mixed models
-and by studying a simple example of such a model. First we describe the
-data in the example.
+and by studying a simple example of such a model.
+First we describe the data in the example.
 
 The `Dyestuff` and `Dyestuff2` Data {#sec:DyestuffData}
 -----------------------------------
 
-Models with random effects have been in use for a long time. The first
+Models with random effects have been in use for a long time.
+The first
 edition of the classic book, *Statistical Methods in Research and
 Production*, edited by O.L. Davies, was published in 1947 and contained
 examples of the use of random effects to characterize batch-to-batch
-variability in chemical processes. The data from one of these examples
-are available as the data in the package. In this section we describe
+variability in chemical processes.
+The data from one of these examples
+are available as the data in the package.
+In this section we describe
 and plot these data and introduce a second example, the data, described
 in @box73:_bayes_infer_statis_analy.
 
@@ -123,10 +150,12 @@ coming from
 
 To access these data within we must first attach the package to our
 session using
-
-Note that the symbol in the line shown is the prompt in and not part of
-what the user types. The package must be attached before any of the data
-sets or functions in the package can be used. If typing this line
+```jl
+sc("using MixedModels")
+```
+The package must be attached before any of the data
+sets or functions in the package can be used.
+If typing this line
 results in an error report stating that there is no package by this name
 then you must first install the package.
 
@@ -134,38 +163,81 @@ In what follows, we will assume that the package has been installed and
 that it has been attached to the session before any of the code shown
 has been run.
 
-The function in provides a concise description of the structure of the
+The `describe` function in the
+[`DataFrames`](https://github.com/JuliaData/DataFrames.jl)
+package provides a concise description of the structure of the
 data
+```jl
+sco("dyestuff = MixedModels.dataset(:dyestuff)")
+```
+The output indicates that this dataset is a `Table` read from a file in the
+[`Arrow`](https://arrow.apache.org) data format.
 
-from which we see that it consists of $30$ observations of the , the
-response variable, and of the covariate, , which is a categorical
-variable stored as a object. If the labels for the factor levels are
-arbitrary, as they are here, we will use letters instead of numbers for
-the labels. That is, we label the batches as through rather than through
-. When the labels are letters it is clear that the variable is
-categorical. When the labels are numbers a categorical covariate can be
+A `Table` is a simplified tabular form from the
+[`Tables`](https://github.com/JuliaData/Tables.jl) package.
+It is often convenient to convert the read-only table form to a `DataFrame`
+```jl
+sc("dyestuff = DataFrame(dyestuff)")
+```
+```jl
+sco("describe(dyestuff)")
+```
+from which we see that it consists of $30$ observations of the `yield`, the
+response variable, and of the covariate, `batch`, which is a categorical
+variable whose levels are character strings.
+```jl
+sco("typeof(dyestuff.batch)")
+```
+```jl
+sco("levels(dyestuff.batch)")
+```
+If the labels for the factor levels are arbitrary, as they are here,
+we will use letters instead of numbers for the labels.
+That is, we label the batches as `"A"` through `"F"` rather than
+`1` through `6`.
+When the labels are letters it is clear that the variable is
+categorical.
+When the labels are numbers a categorical covariate can be
 mistaken for a numeric covariate, with unintended consequences.
 
-It is a good practice to apply to any data frame the first time you work
+It is a good practice to apply `describe` to any data frame the first time you work
 with it and to check carefully that any categorical variables are indeed
 represented as factors.
 
 The data in a data frame are viewed as a table with columns
-corresponding to variables and rows to observations. The functions and
-print the first or last few rows (the default value of "few" happens to
-be $6$ but we can specify another value if we so choose)
+corresponding to variables and rows to observations.
+The functions `first` and `last` the first or last few rows
+```jl
+sco("first(dyestuff, 7)")
+```
+```jl
+sco("last(dyestuff, 7)")
+```
+or we could tabulate the data using `DataFrames.groupby` and the `@combine` macro from the
+[`DataFrameMacros`](https://github.com/jkrumbiegel/DataFrameMacros.jl) package.
+```jl
+sc("""
+@combine(groupby(dyestuff, :batch),
+    :mean_yield = mean(:yield),
+    :n = length(:yield),
+)
+"""
+)
+```
 
-or we could ask for a of the data
-
-Although the does show us an important property of the data, namely that
+```jl
+EU.dyestufftable()
+```
+Although @tbl:mean_yield does show us an important property of the data, namely that
 there are exactly $5$ observations on each batch --- a property that we
 will describe by saying that the data are *balanced* with respect to ---
-we usually learn much more about the structure of such data from plots
-like Fig. [\[fig:Dyestuffdot\]](#fig:Dyestuffdot){reference-type="ref"
-reference="fig:Dyestuffdot"} than we do from numerical summaries.
+we usually learn much more about the structure of such data from plots like
+```jl
+EU.dyestuffdataplot()
+```
+than we do from numerical summaries.
 
-In Fig. [\[fig:Dyestuffdot\]](#fig:Dyestuffdot){reference-type="ref"
-reference="fig:Dyestuffdot"} we can see that there is considerable
+In @fig:dyestuffdata we can see that there is considerable
 variability in yield, even for preparations from the same batch, but
 there is also noticeable batch-to-batch variability. For example, four
 of the five preparations from batch F provided lower yields than did any
@@ -435,22 +507,22 @@ reference="chap:computational"} we revisit these definitions providing
 derivations and more explanation.
 
 As mentioned in , a mixed model incorporates two random variables:
-$\bc B$, the $q$-dimensional vector of random effects, and $\bc Y$, the
+$\mathcal{B}$, the $q$-dimensional vector of random effects, and $\mathcal{Y}$, the
 $n$-dimensional response vector. In a linear mixed model the
-unconditional distribution of $\bc B$ and the conditional distribution,
-$(\bc Y|\bc B=\vec b)$, are both multivariate Gaussian (or "normal")
+unconditional distribution of $\mathcal{B}$ and the conditional distribution,
+$(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, are both multivariate Gaussian (or "normal")
 distributions, $$\label{eq:LMMdist}
   \begin{aligned}
-    (\bc Y|\bc B=\vec b)&\sim\mathcal{N}(\vec X\vec\beta+\vec Z\vec
-    b,\sigma^2\vec I)\\
+    (\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mathcal{N}(\mathbf{X}\vec\beta+\mathbf{Z}\vec
+    b,\sigma^2\mathbf{I})\\
     \bc{B}&\sim\mathcal{N}(\vec0,\Sigma_\theta) .
-  \end{aligned}$$ The *conditional mean* of $\bc Y$, given
-$\bc B=\vec b$, is the *linear predictor*,
-$\vec X\vec\beta+\vec Z\vec b$, which depends on the $p$-dimensional
-*fixed-effects parameter*, $\vec \beta$, and on $\vec b$. The *model
-matrices*, $\vec X$ and $\vec Z$, of dimension $n\times p$ and
+  \end{aligned}$$ The *conditional mean* of $\mathcal{Y}$, given
+$\mathcal{B}=\mathbf{b}$, is the *linear predictor*,
+$\mathbf{X}\vec\beta+\mathbf{Z}\mathbf{b}$, which depends on the $p$-dimensional
+*fixed-effects parameter*, $\mathbf{\beta}$, and on $\mathbf{b}$. The *model
+matrices*, $\mathbf{X}$ and $\mathbf{Z}$, of dimension $n\times p$ and
 $n\times q$, respectively, are determined from the formula for the model
-and the values of covariates. Although the matrix $\vec Z$ can be large
+and the values of covariates. Although the matrix $\mathbf{Z}$ can be large
 (i.e. both $n$ and $q$ can be large), it is sparse (i.e. most of the
 elements in the matrix are zero).
 
@@ -460,51 +532,51 @@ and generating the symmetric $q\times q$ variance-covariance matrix,
 $\Sigma_\theta$, according to $$\label{eq:relcovfac}
   \Sigma_\theta=\sigma^2\Lambda_\theta\Lambda_\theta\trans .$$ The
 *spherical random effects*, $\bc U\sim\mathcal{N}(\vec
-0,\sigma^2\vec I_q)$, determine $\bc B$ according to
-$$\bc B=\Lambda_\theta\bc U .$$
+0,\sigma^2\mathbf{I}_q)$, determine $\mathcal{B}$ according to
+$$\mathcal{B}=\Lambda_\theta\bc U .$$
 
 The *penalized residual sum of squares* (PRSS),
-$$r^2(\vec\theta,\vec\beta,\vec u)=\|\vec y -\vec X\vec\beta -\vec
-    Z\Lambda_\theta\vec u\|^2+\|\vec u\|^2,$$ is the sum of the residual
+$$r^2(\vec\theta,\vec\beta,\mathbf{u})=\|\mathbf{y} -\mathbf{X}\vec\beta -\vec
+    Z\Lambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2,$$ is the sum of the residual
 sum of squares, measuring fidelity of the model to the data, and a
-penalty on the size of $\vec u$, measuring the complexity of the model.
-Minimizing $r^2$ with respect to $\vec u$,
-$$r^2_{\beta,\theta} =\min_{\vec u}\left\{\|\vec y -\vec X\vec\beta -\vec
-    Z\Lambda_\theta\vec u\|^2+\|\vec u\|^2\right\}$$ is a direct (i.e.
+penalty on the size of $\mathbf{u}$, measuring the complexity of the model.
+Minimizing $r^2$ with respect to $\mathbf{u}$,
+$$r^2_{\beta,\theta} =\min_{\mathbf{u}}\left\{\|\mathbf{y} -\mathbf{X}\vec\beta -\vec
+    Z\Lambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2\right\}$$ is a direct (i.e.
 non-iterative) computation during which we calculate the *sparse
-Cholesky factor*, $\vec L_\theta$, which is a lower triangular
+Cholesky factor*, $\mathbf{L}_\theta$, which is a lower triangular
 $q\times q$ matrix satisfying $$\label{eq:sparseCholesky1}
-  \vec L_\theta\vec L_\theta\trans=
-  \Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta+\vec I_q .$$
-where $\vec I_q$ is the $q\times q$ *identity matrix*.
+  \mathbf{L}_\theta\mathbf{L}_\theta\trans=
+  \Lambda_\theta\trans\mathbf{Z}\trans\mathbf{Z}\Lambda_\theta+\mathbf{I}_q .$$
+where $\mathbf{I}_q$ is the $q\times q$ *identity matrix*.
 
 The *deviance* (negative twice the log-likelihood) of the parameters,
-given the data, $\vec y$, is $$\label{eq:LMMdeviance}
-  d(\vec\theta,\vec\beta,\sigma|\vec y)
-  =n\log(2\pi\sigma^2)+\log(|\vec L_\theta|^2)+\frac{r^2_{\beta,\theta}}{\sigma^2}.$$
-where $|\vec L_\theta|$ denotes the *determinant* of $\vec
-L_\theta$. Because $\vec L_\theta$ is triangular, its determinant is the
+given the data, $\mathbf{y}$, is $$\label{eq:LMMdeviance}
+  d(\vec\theta,\vec\beta,\sigma|\mathbf{y})
+  =n\log(2\pi\sigma^2)+\log(|\mathbf{L}_\theta|^2)+\frac{r^2_{\beta,\theta}}{\sigma^2}.$$
+where $|\mathbf{L}_\theta|$ denotes the *determinant* of $\vec
+L_\theta$. Because $\mathbf{L}_\theta$ is triangular, its determinant is the
 product of its diagonal elements.
 
-Because the conditional mean, $\vec\mu_{\bc Y|\bc B=\vec b}=\vec
-X\vec\beta+\vec Z\Lambda_\theta\vec u$, is a linear function of both
-$\vec\beta$ and $\vec u$, minimization of the PRSS with respect to both
-$\vec\beta$ and $\vec u$ to produce
-$$r^2_\theta =\min_{\vec\beta,\vec u}\left\{\|\vec y -\vec X\vec\beta -\vec
-    Z\Lambda_\theta\vec u\|^2+\|\vec u\|^2\right\}$$ is also a direct
-calculation. The values of $\vec u$ and $\vec\beta$ that provide this
+Because the conditional mean, $\vec\mu_{\mathcal{Y}|\mathcal{B}=\mathbf{b}}=\vec
+X\vec\beta+\mathbf{Z}\Lambda_\theta\mathbf{u}$, is a linear function of both
+$\vec\beta$ and $\mathbf{u}$, minimization of the PRSS with respect to both
+$\vec\beta$ and $\mathbf{u}$ to produce
+$$r^2_\theta =\min_{\vec\beta,\mathbf{u}}\left\{\|\mathbf{y} -\mathbf{X}\vec\beta -\vec
+    Z\Lambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2\right\}$$ is also a direct
+calculation. The values of $\mathbf{u}$ and $\vec\beta$ that provide this
 minimum are called, respectively, the *conditional mode*,
-$\tilde{\vec u}_\theta$, of the spherical random effects and the
+$\tilde{\mathbf{u}}_\theta$, of the spherical random effects and the
 conditional estimate, $\widehat{\vec\beta}_\theta$, of the fixed
 effects. At the conditional estimate of the fixed effects the deviance
 is $$\label{eq:LMMprdev}
-  d(\vec\theta,\widehat{\beta}_\theta,\sigma|\vec y)
-  =n\log(2\pi\sigma^2)+\log(|\vec L_\theta|^2)+\frac{r^2_\theta}{\sigma^2}.$$
+  d(\vec\theta,\widehat{\beta}_\theta,\sigma|\mathbf{y})
+  =n\log(2\pi\sigma^2)+\log(|\mathbf{L}_\theta|^2)+\frac{r^2_\theta}{\sigma^2}.$$
 Minimizing this expression with respect to $\sigma^2$ produces the
 conditional estimate $$\widehat{\sigma^2}_\theta=\frac{r^2_\theta}{n}$$
 which provides the *profiled deviance*, $$\label{eq:LMMprofdev}
-  \tilde{d}(\vec\theta|\vec y)=d(\vec\theta,\widehat{\beta}_\theta,\widehat{\sigma}_\theta|\vec y)
-  =\log(|\vec L_\theta|^2)+n\left[1 +
+  \tilde{d}(\vec\theta|\mathbf{y})=d(\vec\theta,\widehat{\beta}_\theta,\widehat{\sigma}_\theta|\mathbf{y})
+  =\log(|\mathbf{L}_\theta|^2)+n\left[1 +
     \log\left(\frac{2\pi r^2_\theta}{n}\right)\right],$$ a function of
 $\vec\theta$ alone.
 
@@ -513,13 +585,13 @@ that minimizes the profiled
 deviance ([\[eq:LMMprofdev\]](#eq:LMMprofdev){reference-type="ref"
 reference="eq:LMMprofdev"}). We determine this value by numerical
 optimization. In the process of evaluating
-$\tilde{d}(\widehat{\vec\theta}|\vec y)$ we determine
+$\tilde{d}(\widehat{\vec\theta}|\mathbf{y})$ we determine
 $\widehat{\vec\beta}=\widehat{\vec\beta}_{\widehat\theta}$,
-$\tilde{\vec u}_{\widehat{\theta}}$ and $r^2_{\widehat{\theta}}$, from
+$\tilde{\mathbf{u}}_{\widehat{\theta}}$ and $r^2_{\widehat{\theta}}$, from
 which we can evaluate
 $\widehat{\sigma}=\sqrt{r^2_{\widehat{\theta}}/n}$.
 
-The elements of the conditional mode of $\bc B$, evaluated at the
+The elements of the conditional mode of $\mathcal{B}$, evaluated at the
 parameter estimates,
 $$\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$$
 are sometimes called the *best linear unbiased predictors* or BLUPs of
@@ -532,7 +604,7 @@ and in what sense are these the "best"?) and prefer the term
 
 The optional argument, , in a call to produces output showing the
 progress of the iterative optimization of
-$\tilde{d}(\vec\theta|\vec y)$.
+$\tilde{d}(\vec\theta|\mathbf{y})$.
 
 The algorithm converges after 17 function evaluations to a profiled
 deviance of at $\theta=$. In this model the scalar parameter $\theta$ is
@@ -560,15 +632,15 @@ reference="fig:fm01Lambdaimage"}).
 Especially for large sparse matrices, the image conveys the structure
 more compactly than does the printed representation.
 
-In this simple model $\Lambda=\theta\vec I_6$ is a multiple of the
-identity matrix and the $30\times 6$ model matrix $\vec Z$, whose
+In this simple model $\Lambda=\theta\mathbf{I}_6$ is a multiple of the
+identity matrix and the $30\times 6$ model matrix $\mathbf{Z}$, whose
 transpose is shown in
 Fig. [\[fig:fm01Ztimage\]](#fig:fm01Ztimage){reference-type="ref"
 reference="fig:fm01Ztimage"}, consists of the indicator columns for .
 Because the data are balanced with respect to , the Cholesky factor,
-$\vec L$ is also a multiple of the identity (use to check if you wish).
-The vector $\vec u$ is available in . The vector $\vec\beta$ and the
-model matrix $\vec X$ are available as and .
+$\mathbf{L}$ is also a multiple of the identity (use to check if you wish).
+The vector $\mathbf{u}$ is available in . The vector $\vec\beta$ and the
+model matrix $\mathbf{X}$ are available as and .
 
 Assessing the Variability of the Parameter Estimates {#sec:variability}
 ----------------------------------------------------
@@ -747,7 +819,7 @@ Assessing the Random Effects {#sec:assessRE}
 ----------------------------
 
 In we mentioned that what are sometimes called the BLUPs (or best linear
-unbiased predictors) of the random effects, $\bc B$, are the conditional
+unbiased predictors) of the random effects, $\mathcal{B}$, are the conditional
 modes evaluated at the parameter estimates, calculated as
 $\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$.
 
@@ -756,12 +828,12 @@ random effects. It can be helpful to think of them this way but it can
 also be misleading. As we have stated, the random effects are not,
 strictly speaking, parameters---they are unobserved random variables. We
 don't estimate the random effects in the same sense that we estimate
-parameters. Instead, we consider the conditional distribution of $\bc B$
-given the observed data, $(\bc B|\bc Y=\vec y)$.
+parameters. Instead, we consider the conditional distribution of $\mathcal{B}$
+given the observed data, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
 
-Because the unconditional distribution, $\bc B\sim\mathcal{N}(\vec
+Because the unconditional distribution, $\mathcal{B}\sim\mathcal{N}(\vec
 0,\Sigma_\theta)$ is continuous, the conditional distribution, $(\bc
-B|\bc Y=\vec y)$ will also be continuous. In general, the mode of a
+B|\mathcal{Y}=\mathbf{y})$ will also be continuous. In general, the mode of a
 probability density is the point of maximum density, so the phrase
 "conditional mode" refers to the point at which this conditional density
 is maximized. Because this definition relates to the probability model,
@@ -771,17 +843,16 @@ would be no purpose in forming the parameter estimates), so we use the
 estimated values of the parameters to evaluate the conditional modes.
 
 Those who are familiar with the multivariate Gaussian distribution may
-recognize that, because both $\bc B$ and $(\bc Y|\bc B=\vec b)$ are
-multivariate Gaussian, $(\bc B|\bc Y=\vec y)$ will also be multivariate
+recognize that, because both $\mathcal{B}$ and $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$ are
+multivariate Gaussian, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$ will also be multivariate
 Gaussian and the conditional mode will also be the conditional mean of
-$\bc B$, given $\bc Y=\vec y$. This is the case for a linear mixed model
+$\mathcal{B}$, given $\mathcal{Y}=\mathbf{y}$. This is the case for a linear mixed model
 but it does not carry over to other forms of mixed models. In the
-general case all we can say about $\tilde{\vec
-  u}$ or $\tilde{\vec b}$ is that they maximize a conditional density,
+general case all we can say about $\tilde{\mathbf{u}}$ or $\tilde{\mathbf{b}}$ is that they maximize a conditional density,
 which is why we use the term "conditional mode" to describe these
 values. We will only use the term "conditional mean" and the symbol,
-$\vec\mu$, in reference to $\mathrm{E}(\bc Y|\bc B=\vec b)$, which is
-the conditional mean of $\bc Y$ given $\bc B$, and an important part of
+$\vec\mu$, in reference to $\mathrm{E}(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, which is
+the conditional mean of $\mathcal{Y}$ given $\mathcal{B}$, and an important part of
 the formulation of all types of mixed-effects models.
 
 The extractor returns the conditional modes.
@@ -803,7 +874,7 @@ of the vertical bar is , as it is here, we describe the term as a
 *simple, scalar, random-effects term*. The designation "scalar" means
 there will be exactly one random effect generated for each level of the
 grouping factor. A simple, scalar term generates a block of indicator
-columns --- the indicators for the grouping factor --- in $\vec Z$.
+columns --- the indicators for the grouping factor --- in $\mathbf{Z}$.
 Because there is only one random-effects term in this model and because
 that term is a simple, scalar term, the model matrix $\vec
 Z$ for this model is the indicator matrix for the levels of .
@@ -817,8 +888,8 @@ grouping factors. In more complex models a particular grouping factor
 may occur in more than one term, in which case the elements of the list
 are associated with the grouping factors, not the terms.
 
-Given the data, $\vec y$, and the parameter estimates, we can evaluate a
-measure of the dispersion of $(\bc B|\bc Y=\vec y)$. In the case of a
+Given the data, $\mathbf{y}$, and the parameter estimates, we can evaluate a
+measure of the dispersion of $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$. In the case of a
 linear mixed model, this is the conditional standard deviation, from
 which we can obtain a prediction interval. The extractor takes an
 optional argument, , which adds these dispersion measures as an
@@ -849,19 +920,19 @@ especially considering the word "simple" in its title (it's the model
 that is simple, not the material). A summary may be in order.
 
 A mixed-effects model incorporates fixed-effects parameters and random
-effects, which are unobserved random variables, $\bc B$. In a linear
-mixed model, both the unconditional distribution of $\bc B$ and the
-conditional distribution, $(\bc Y|\bc B=\vec b)$, are multivariate
+effects, which are unobserved random variables, $\mathcal{B}$. In a linear
+mixed model, both the unconditional distribution of $\mathcal{B}$ and the
+conditional distribution, $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, are multivariate
 Gaussian distributions. Furthermore, this conditional distribution is a
 spherical Gaussian with mean, $\vec\mu$, determined by the linear
-predictor, $\vec Z\vec b+\vec X\vec\beta$. That is,
-$$(\bc Y|\bc B=\vec b)\sim
-  \mathcal{N}(\vec Z\vec b+\vec X\vec\beta, \sigma^2\vec I_n) .$$ The
-unconditional distribution of $\bc B$ has mean $\vec 0$ and a
+predictor, $\mathbf{Z}\mathbf{b}+\mathbf{X}\vec\beta$. That is,
+$$(\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim
+  \mathcal{N}(\mathbf{Z}\mathbf{b}+\mathbf{X}\vec\beta, \sigma^2\mathbf{I}_n) .$$ The
+unconditional distribution of $\mathcal{B}$ has mean $\mathbf{0}$ and a
 parameterized $q\times q$ variance-covariance matrix, $\Sigma_\theta$.
 
 In the models we considered in this chapter, $\Sigma_\theta$, is a
-simple multiple of the identity matrix, $\vec I_6$. This matrix is
+simple multiple of the identity matrix, $\mathbf{I}_6$. This matrix is
 always a multiple of the identity in models with just one random-effects
 term that is a simple, scalar term. The reason for introducing all the
 machinery that we did is to allow for more general model specifications.
@@ -890,22 +961,22 @@ Notation {#notation .unnumbered}
 
 #### Random Variables {#random-variables .unnumbered}
 
-$\bc Y$
+$\mathcal{Y}$
 
 :   The responses ($n$-dimensional Gaussian)
 
-$\bc B$
+$\mathcal{B}$
 
 :   The random effects on the original scale ($q$-dimensional Gaussian
-    with mean $\vec 0$)
+    with mean $\mathbf{0}$)
 
 $\bc U$
 
 :   The orthogonal random effects ($q$-dimensional spherical Gaussian)
 
 Values of these random variables are denoted by the corresponding
-bold-face, lower-case letters: $\vec y$, $\vec b$ and $\vec u$. We
-observe $\vec y$. We do not observe $\vec b$ or $\vec u$.
+bold-face, lower-case letters: $\mathbf{y}$, $\mathbf{b}$ and $\mathbf{u}$. We
+observe $\mathbf{y}$. We do not observe $\mathbf{b}$ or $\mathbf{u}$.
 
 #### Parameters in the Probability Model {#parameters-in-the-probability-model .unnumbered}
 
@@ -923,61 +994,61 @@ $\sigma$
 
 :   The (scalar) common scale parameter, $\sigma>0$. It is called the
     common scale parameter because it is incorporated in the
-    variance-covariance matrices of both $\bc Y$ and $\bc U$.
+    variance-covariance matrices of both $\mathcal{Y}$ and $\bc U$.
 
 The parameter $\vec\theta$ determines the $q\times q$ lower triangular
 matrix $\Lambda_\theta$, called the *relative covariance factor*, which,
 in turn, determines the $q\times q$ sparse, symmetric semidefinite
 variance-covariance matrix
 $\Sigma_\theta=\sigma^2\Lambda_\theta\Lambda_\theta\trans$ that defines
-the distribution of $\bc B$.
+the distribution of $\mathcal{B}$.
 
 #### Model Matrices {#model-matrices .unnumbered}
 
-$\vec X$
+$\mathbf{X}$
 
 :   Fixed-effects model matrix of size $n\times p$.
 
-$\vec Z$
+$\mathbf{Z}$
 
 :   Random-effects model matrix of size $n\times q$.
 
 #### Derived Matrices {#derived-matrices .unnumbered}
 
-$\vec L_\theta$
+$\mathbf{L}_\theta$
 
 :   The sparse, lower triangular Cholesky factor of
-    $\Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta+\vec I_q$
+    $\Lambda_\theta\trans\mathbf{Z}\trans\mathbf{Z}\Lambda_\theta+\mathbf{I}_q$
 
 In
 Chap. [\[chap:computational\]](#chap:computational){reference-type="ref"
 reference="chap:computational"} this definition will be modified to
 allow for a *fill-reducing permutation* of the rows and columns of
-$\Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta$.
+$\Lambda_\theta\trans\mathbf{Z}\trans\mathbf{Z}\Lambda_\theta$.
 
 #### Vectors {#vectors .unnumbered}
 
 In addition to the parameter vectors already mentioned, we define
 
-$\vec y$
+$\mathbf{y}$
 
 :   the $n$-dimensional observed response vector
 
 $\vec\gamma$
 
 :   the $n$-dimension linear predictor,
-    $$\vec\gamma=\vec X\vec\beta+\vec Z\vec b=\vec Z\Lambda_\theta\vec u+\vec X\vec\beta$$
+    $$\vec\gamma=\mathbf{X}\vec\beta+\mathbf{Z}\mathbf{b}=\mathbf{Z}\Lambda_\theta\mathbf{u}+\mathbf{X}\vec\beta$$
 
 $\vec\mu$
 
-:   the $n$-dimensional conditional mean of $\bc Y$ given $\bc B=\vec b$
-    (or, equivalently, given $\bc U=\vec u$)
-    $$\vec\mu=\mathrm{E}[\bc Y|\bc B=\vec b]=\mathrm{E}[\bc Y|\bc U=\vec u]$$
+:   the $n$-dimensional conditional mean of $\mathcal{Y}$ given $\mathcal{B}=\mathbf{b}$
+    (or, equivalently, given $\bc U=\mathbf{u}$)
+    $$\vec\mu=\mathrm{E}[\mathcal{Y}|\mathcal{B}=\mathbf{b}]=\mathrm{E}[\mathcal{Y}|\bc U=\mathbf{u}]$$
 
 $\tilde{u}_\theta$
 
 :   the $q$-dimensional conditional mode (the value at which the
-    conditional density is maximized) of $\bc U$ given $\bc Y=\vec y$.
+    conditional density is maximized) of $\bc U$ given $\mathcal{Y}=\mathbf{y}$.
 
 Exercises {#intro_exercises .unnumbered}
 ---------
