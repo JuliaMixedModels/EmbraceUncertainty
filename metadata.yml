@@ -1,6 +1,6 @@
 ---
-title: Julia Mixed Models: "Embrace Uncertainty: Fitting Mixed-Effects Models with Julia"
-subtitle: ""
+title: "Embrace Uncertainty"
+subtitle: "Fitting Mixed-Effects Models with Julia"
 book: true
 author: "Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, & Douglas Bates"
 
