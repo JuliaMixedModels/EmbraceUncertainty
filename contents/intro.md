@@ -1,0 +1,1029 @@
+A Simple, Linear, Mixed-effects Model {#chap:ExamLMM}
+=====================================
+
+In this book we describe the theory behind a type of statistical model
+called *mixed-effects* models and the practice of fitting and analyzing
+such models using the package for . These models are used in many
+different disciplines. Because the descriptions of the models can vary
+markedly between disciplines, we begin by describing what mixed-effects
+models are and by exploring a very simple example of one type of mixed
+model, the *linear mixed model*.
+
+This simple example allows us to illustrate the use of the function in
+the package for fitting such models and for analyzing the fitted model.
+We also describe methods of assessing the precision of the parameter
+estimates and of visualizing the conditional distribution of the random
+effects, given the observed data.
+
+Mixed-effects Models {#sec:memod}
+--------------------
+
+Mixed-effects models, like many other types of statistical models,
+describe a relationship between a *response* variable and some of the
+*covariates* that have been measured or observed along with the
+response. In mixed-effects models at least one of the covariates is a
+*categorical* covariate representing experimental or observational
+"units" in the data set. In the example from the chemical industry that
+is given in this chapter, the observational unit is the batch of an
+intermediate product used in production of a dye. In medical and social
+sciences the observational units are often the human or animal subjects
+in the study. In agriculture the experimental units may be the plots of
+land or the specific plants being studied.
+
+In all of these cases the categorical covariate or covariates are
+observed at a set of discrete *levels*. We may use numbers, such as
+subject identifiers, to designate the particular levels that we observed
+but these numbers are simply labels. The important characteristic of a
+categorical covariate is that, at each observed value of the response,
+the covariate takes on the value of one of a set of distinct levels.
+
+Parameters associated with the particular levels of a covariate are
+sometimes called the "effects" of the levels. If the set of possible
+levels of the covariate is fixed and reproducible we model the covariate
+using *fixed-effects* parameters. If the levels that we observed
+represent a random sample from the set of all possible levels we
+incorporate *random effects* in the model.
+
+There are two things to notice about this distinction between
+fixed-effects parameters and random effects. First, the names are
+misleading because the distinction between fixed and random is more a
+property of the levels of the categorical covariate than a property of
+the effects associated with them. Secondly, we distinguish between
+"fixed-effects parameters", which are indeed parameters in the
+statistical model, and "random effects", which, strictly speaking, are
+not parameters. As we will see shortly, random effects are unobserved
+random variables.
+
+To make the distinction more concrete, suppose that we wish to model the
+annual reading test scores for students in a school district and that
+the covariates recorded with the score include a student identifier and
+the student's gender. Both of these are categorical covariates. The
+levels of the gender covariate, male and female, are fixed. If we
+consider data from another school district or we incorporate scores from
+earlier tests, we will not change those levels. On the other hand, the
+students whose scores we observed would generally be regarded as a
+sample from the set of all possible students whom we could have
+observed. Adding more data, either from more school districts or from
+results on previous or subsequent tests, will increase the number of
+distinct levels of the student identifier.
+
+*Mixed-effects models* or, more simply, *mixed models* are statistical
+models that incorporate both fixed-effects parameters and random
+effects. Because of the way that we will define random effects, a model
+with random effects always includes at least one fixed-effects
+parameter. Thus, any model with random effects is a mixed model.
+
+We characterize the statistical model in terms of two random variables:
+a $q$-dimensional vector of random effects represented by the random
+variable $\bc B$ and an $n$-dimensional response vector represented by
+the random variable $\bc Y$. (We use upper-case "script" characters to
+denote random variables. The corresponding lower-case upright letter
+denotes a particular value of the random variable.) We observe the
+value, $\vec y$, of $\bc Y$. We do not observe the value, $\vec b$, of
+$\bc B$.
+
+When formulating the model we describe the unconditional distribution of
+$\bc B$ and the conditional distribution, $(\bc
+  Y|\bc B=\vec b)$. The descriptions of the distributions involve the
+form of the distribution and the values of certain parameters. We use
+the observed values of the response and the covariates to estimate these
+parameters and to make inferences about them.
+
+That's the big picture. Now let's make this more concrete by describing
+a particular, versatile class of mixed models called linear mixed models
+and by studying a simple example of such a model. First we describe the
+data in the example.
+
+The `Dyestuff` and `Dyestuff2` Data {#sec:DyestuffData}
+-----------------------------------
+
+Models with random effects have been in use for a long time. The first
+edition of the classic book, *Statistical Methods in Research and
+Production*, edited by O.L. Davies, was published in 1947 and contained
+examples of the use of random effects to characterize batch-to-batch
+variability in chemical processes. The data from one of these examples
+are available as the data in the package. In this section we describe
+and plot these data and introduce a second example, the data, described
+in @box73:_bayes_infer_statis_analy.
+
+### The `Dyestuff` Data {#sec:dyestuff}
+
+The data are described in @davies72:_statis_method_in_resear_and_produc
+[Table 6.3, p. 131], the fourth edition of the book mentioned above, as
+coming from
+
+> an investigation to find out how much the variation from batch to
+> batch in the quality of an intermediate product (H-acid) contributes
+> to the variation in the yield of the dyestuff (Naphthalene Black 12B)
+> made from it. In the experiment six samples of the intermediate,
+> representing different batches of works manufacture, were obtained,
+> and five preparations of the dyestuff were made in the laboratory from
+> each sample. The equivalent yield of each preparation as grams of
+> standard colour was determined by dye-trial.
+
+To access these data within we must first attach the package to our
+session using
+
+Note that the symbol in the line shown is the prompt in and not part of
+what the user types. The package must be attached before any of the data
+sets or functions in the package can be used. If typing this line
+results in an error report stating that there is no package by this name
+then you must first install the package.
+
+In what follows, we will assume that the package has been installed and
+that it has been attached to the session before any of the code shown
+has been run.
+
+The function in provides a concise description of the structure of the
+data
+
+from which we see that it consists of $30$ observations of the , the
+response variable, and of the covariate, , which is a categorical
+variable stored as a object. If the labels for the factor levels are
+arbitrary, as they are here, we will use letters instead of numbers for
+the labels. That is, we label the batches as through rather than through
+. When the labels are letters it is clear that the variable is
+categorical. When the labels are numbers a categorical covariate can be
+mistaken for a numeric covariate, with unintended consequences.
+
+It is a good practice to apply to any data frame the first time you work
+with it and to check carefully that any categorical variables are indeed
+represented as factors.
+
+The data in a data frame are viewed as a table with columns
+corresponding to variables and rows to observations. The functions and
+print the first or last few rows (the default value of "few" happens to
+be $6$ but we can specify another value if we so choose)
+
+or we could ask for a of the data
+
+Although the does show us an important property of the data, namely that
+there are exactly $5$ observations on each batch --- a property that we
+will describe by saying that the data are *balanced* with respect to ---
+we usually learn much more about the structure of such data from plots
+like Fig. [\[fig:Dyestuffdot\]](#fig:Dyestuffdot){reference-type="ref"
+reference="fig:Dyestuffdot"} than we do from numerical summaries.
+
+In Fig. [\[fig:Dyestuffdot\]](#fig:Dyestuffdot){reference-type="ref"
+reference="fig:Dyestuffdot"} we can see that there is considerable
+variability in yield, even for preparations from the same batch, but
+there is also noticeable batch-to-batch variability. For example, four
+of the five preparations from batch F provided lower yields than did any
+of the preparations from batches C and E.
+
+This plot, and essentially all the other plots in this book, were
+created using Deepayan Sarkar's package for . In @sarkar08:_lattic he
+describes how one would create such a plot. Because this book was
+created using Sweave [@lmucs-papers:Leisch:2002], the exact code used to
+create the plot, as well as the code for all the other figures and
+calculations in the book, is available on the web site for the book. In
+we review some of the principles of lattice graphics, such as reordering
+the levels of the factor by increasing mean response, that enhance the
+informativeness of the plot. At this point we will concentrate on the
+information conveyed by the plot and not on how the plot is created.
+
+In we will use mixed models to quantify the variability in yield between
+batches. For the time being let us just note that the particular batches
+used in this experiment are a selection or sample from the set of all
+batches that we wish to consider. Furthermore, the extent to which one
+particular batch tends to increase or decrease the mean yield of the
+process --- in other words, the "effect" of that particular batch on the
+yield --- is not as interesting to us as is the extent of the
+variability between batches. For the purposes of designing, monitoring
+and controlling a process we want to predict the yield from future
+batches, taking into account the batch-to-batch variability and the
+within-batch variability. Being able to estimate the extent to which a
+particular batch in the past increased or decreased the yield is not
+usually an important goal for us. We will model the effects of the
+batches as random effects rather than as fixed-effects parameters.
+
+### The `Dyestuff2` Data {#sec:dyestuff2}
+
+The data are simulated data presented in
+@box73:_bayes_infer_statis_analy [Table 5.1.4, p. 247] where the authors
+state
+
+> These data had to be constructed for although examples of this sort
+> undoubtedly occur in practice they seem to be rarely published.
+
+The structure and summary
+
+are intentionally similar to those of the data. As the batch-to-batch
+variability in these data is small compared to the within-batch
+variability. In some approaches to mixed models it can be difficult to
+fit models to such data. Paradoxically, small "variance components" can
+be more difficult to estimate than large variance components.
+
+The methods we will present are not compromised when estimating small
+variance components.
+
+Fitting Linear Mixed Models {#sec:FittingLMMs}
+---------------------------
+
+Before we formally define a linear mixed model, let's go ahead and fit
+models to these data sets using . Like most model-fitting functions in ,
+takes, as its first two arguments, a *formula* specifying the model and
+the *data* with which to evaluate the formula. This second argument, ,
+is optional but recommended. It is usually the name of a data frame,
+such as those we examined in the last section. Throughout this book all
+model specifications will be given in this formula/data format.
+
+We will explain the structure of the formula after we have considered an
+example.
+
+### A Model For the `Dyestuff` Data {#sec:DyestuffLMM}
+
+We fit a model to the data allowing for an overall level of the and for
+an additive random effect for each level of
+
+In the first line we call the function to fit a model with formula
+
+applied to the data and assign the result to the name . (The name is
+arbitrary. I happen to use names that start with , indicating "fitted
+model".)
+
+As is customary in , there is no output shown after this assignment. We
+have simply saved the fitted model as an object named . In the second
+line we display some information about the fitted model by applying to .
+In later examples we will condense these two steps into one but here it
+helps to emphasize that we save the result of fitting a model then apply
+various *extractor* functions to the fitted model to get a brief summary
+of the model fit or to obtain the values of some of the estimated
+quantities.
+
+#### Details of the Printed Display {#sec:printedDetails}
+
+The printed display of a model fit with has four major sections: a
+description of the model that was fit, some statistics characterizing
+the model fit, a summary of properties of the random effects and a
+summary of the fixed-effects parameter estimates. We consider each of
+these sections in turn.
+
+The description section states that this is a linear mixed model in
+which the parameters have been estimated as those that minimize the REML
+criterion (described in ). The and arguments are displayed for later
+reference. If other, optional arguments affecting the fit, such as a
+specification, were used, they too will be displayed here.
+
+For models fit by the REML criterion the only statistic describing the
+model fit is the value of the REML criterion itself. An alternative set
+of parameter estimates, the maximum likelihood estimates (MLEs), are
+obtained by specifying the optional argument .
+
+(Notice that this code fragment also illustrates a way to condense the
+assignment and the display of the fitted model into a single step. The
+redundant set of parentheses surrounding the assignment causes the
+result of the assignment to be displayed. We will use this device often
+in what follows.)
+
+The display of a model fit by maximum likelihood (ML) provides several
+other model-fit statistics such as Akaike's Information Criterion
+() [@saka:ishi:kita:1986], Schwarz's Bayesian Information Criterion
+() [@schw:1978], the log-likelihood () at the parameter estimates, and
+the deviance (negative twice the log-likelihood) at the parameter
+estimates. These are all statistics related to the model fit and are
+used to compare different models fit to the same data.
+
+At this point the important thing to note is that the default estimation
+criterion is the REML criterion. Generally the REML estimates of
+variance components are preferred to the ML estimates. When comparing
+models, however, we will use *likelihood ratio tests*, for which the
+test statistic is the difference in the deviance of the fitted models.
+(Recall that the deviance is negative twice the log-likelihood, hence a
+ratio of likelihoods corresponds to the difference in deviance values.)
+Therefore, when building and assessing models we will often use maximum
+likelihood fits. As described in , the function that performs a
+likelihood-ratio test will accept models fit by REML but it adds an
+extra step of refitting the models to obtain the maximum likelihood
+estimates (MLEs).
+
+The third section is the table of estimates of parameters associated
+with the random effects. There are two sources of variability in the
+model we have fit, a batch-to-batch variability in the level of the
+response and the residual or per-observation variability --- also called
+the within-batch variability. The name "residual" is used in statistical
+modeling to denote the part of the variability that cannot be explained
+or modeled with the other terms. It is the variation in the observed
+data that is "left over" after we have determined the estimates of the
+parameters in the other parts of the model.
+
+Some of the variability in the response is associated with the
+fixed-effects terms. In this model there is only one such term, labeled
+as the . The name "intercept", which is better suited to models based on
+straight lines written in a slope/intercept form, should be understood
+to represent an overall "typical" or mean level of the response in this
+case. (In case you are wondering about the parentheses around the name,
+they are included so that you can't accidentally create a variable with
+a name that conflicts with this name.) The line labeled in the random
+effects table shows that the random effects added to the term, one for
+each level of the factor, are modeled as random variables whose
+unconditional variance is estimated as g$^2$ in the REML fit and as
+g$^2$ in the ML fit. The corresponding standard deviations are g for the
+REML fit and g for the ML fit.
+
+Note that the last column in the random effects summary table is the
+estimate of the variability expressed as a standard deviation rather
+than as a variance. These are provided because it is usually easier to
+visualize standard deviations, which are on the scale of the response,
+than it is to visualize the magnitude of a variance. The values in this
+column are a simple re-expression (the square root) of the estimated
+variances. Do not confuse them with the standard errors of the variance
+estimators, which are not given here. In we explain why we do not
+provide standard errors of variance estimates.
+
+The line labeled in this table gives the estimate of the variance of the
+residuals (also in g$^2$) and its corresponding standard deviation. For
+the REML fit the estimated standard deviation of the residuals is g and
+for the ML fit it is also g. (Generally these estimates do not need to
+be equal. They happen to be equal in this case because of the simple
+model form and the balanced data set.)
+
+The last line in the random effects table states the number of
+observations to which the model was fit and the number of levels of any
+"grouping factors" for the random effects. In this case we have a single
+random effects term, , in the model formula and the grouping factor for
+that term is . There will be a total of six random effects, one for each
+level of .
+
+The final part of the printed display gives the estimates and standard
+errors of any fixed-effects parameters in the model. The only
+fixed-effects term in the model formula is the , denoting a constant
+which, as explained above, is labeled as . For both the REML and the ML
+estimation criterion the estimate of this parameter is g (equality is
+again a consequence of the simple model and balanced data set). The
+standard error of the intercept estimate is g for the REML fit and g for
+the ML fit.
+
+### A Model For the `Dyestuff2` Data {#sec:Dyestuff2LMM}
+
+Fitting a similar model to the data produces an estimate
+$\widehat{\sigma}_1=0$ in both the REML
+
+and the ML fits.
+
+(Note the use of the function to re-fit a model changing some of the
+arguments. In a case like this, where the call to fit the original model
+is not very complicated, the use of is not that much simpler than
+repeating the original call to with extra arguments. For complicated
+model fits it can be.)
+
+An estimate of $0$ for $\sigma_1$ does not mean that there is no
+variation between the groups. Indeed
+Fig. [\[fig:Dyestuff2dot\]](#fig:Dyestuff2dot){reference-type="ref"
+reference="fig:Dyestuff2dot"} shows that there is some small amount of
+variability between the groups. The estimate, $\widehat{\sigma}_1=0$,
+simply indicates that the level of "between-group" variability is not
+sufficient to warrant incorporating random effects in the model.
+
+The important point to take away from this example is that we must allow
+for the estimates of variance components to be zero. We describe such a
+model as being degenerate, in the sense that it corresponds to a linear
+model in which we have removed the random effects associated with .
+Degenerate models can and do occur in practice. Even when the final
+fitted model is not degenerate, we must allow for such models when
+determining the parameter estimates through numerical optimization.
+
+To reiterate, the model corresponds to the linear model
+
+because the random effects are inert, in the sense that they have a
+variance of zero, and hence can be removed.
+
+Notice that the estimate of $\sigma$ from the linear model (called the
+in the summary) corresponds to the estimate in the REML fit () but not
+that from the ML fit (). The fact that the REML estimates of variance
+components in mixed models generalize the estimate of the variance used
+in linear models, in the sense that these estimates coincide in the
+degenerate case, is part of the motivation for the use of the REML
+criterion for fitting mixed-effects models.
+
+### Further Assessment of the Fitted Models {#sec:furtherassess}
+
+The parameter estimates in a statistical model represent our "best
+guess" at the unknown values of the model parameters and, as such, are
+important results in statistical modeling. However, they are not the
+whole story. Statistical models characterize the variability in the data
+and we must assess the effect of this variability on the parameter
+estimates and on the precision of predictions made from the model.
+
+In we introduce a method of assessing variability in parameter estimates
+using the "profiled deviance" and in we show methods of characterizing
+the conditional distribution of the random effects given the data.
+Before we get to these sections, however, we should state in some detail
+the probability model for linear mixed-effects and establish some
+definitions and notation. In particular, before we can discuss profiling
+the deviance, we should define the deviance. We do that in the next
+section.
+
+The Linear Mixed-effects Probability Model {#sec:Probability}
+------------------------------------------
+
+In explaining some of parameter estimates related to the random effects
+we have used terms such as "unconditional distribution" from the theory
+of probability. Before proceeding further we clarify the linear
+mixed-effects probability model and define several terms and concepts
+that will be used throughout the book. Readers who are more interested
+in practical results than in the statistical theory should feel free to
+skip this section.
+
+### Definitions and Results {#sec:definitions}
+
+In this section we provide some definitions and formulas without
+derivation and with minimal explanation, so that we can use these terms
+in what follows. In
+Chap. [\[chap:computational\]](#chap:computational){reference-type="ref"
+reference="chap:computational"} we revisit these definitions providing
+derivations and more explanation.
+
+As mentioned in , a mixed model incorporates two random variables:
+$\bc B$, the $q$-dimensional vector of random effects, and $\bc Y$, the
+$n$-dimensional response vector. In a linear mixed model the
+unconditional distribution of $\bc B$ and the conditional distribution,
+$(\bc Y|\bc B=\vec b)$, are both multivariate Gaussian (or "normal")
+distributions, $$\label{eq:LMMdist}
+  \begin{aligned}
+    (\bc Y|\bc B=\vec b)&\sim\mathcal{N}(\vec X\vec\beta+\vec Z\vec
+    b,\sigma^2\vec I)\\
+    \bc{B}&\sim\mathcal{N}(\vec0,\Sigma_\theta) .
+  \end{aligned}$$ The *conditional mean* of $\bc Y$, given
+$\bc B=\vec b$, is the *linear predictor*,
+$\vec X\vec\beta+\vec Z\vec b$, which depends on the $p$-dimensional
+*fixed-effects parameter*, $\vec \beta$, and on $\vec b$. The *model
+matrices*, $\vec X$ and $\vec Z$, of dimension $n\times p$ and
+$n\times q$, respectively, are determined from the formula for the model
+and the values of covariates. Although the matrix $\vec Z$ can be large
+(i.e. both $n$ and $q$ can be large), it is sparse (i.e. most of the
+elements in the matrix are zero).
+
+The *relative covariance factor*, $\Lambda_\theta$, is a $q\times q$
+matrix, depending on the *variance-component parameter*, $\vec\theta$,
+and generating the symmetric $q\times q$ variance-covariance matrix,
+$\Sigma_\theta$, according to $$\label{eq:relcovfac}
+  \Sigma_\theta=\sigma^2\Lambda_\theta\Lambda_\theta\trans .$$ The
+*spherical random effects*, $\bc U\sim\mathcal{N}(\vec
+0,\sigma^2\vec I_q)$, determine $\bc B$ according to
+$$\bc B=\Lambda_\theta\bc U .$$
+
+The *penalized residual sum of squares* (PRSS),
+$$r^2(\vec\theta,\vec\beta,\vec u)=\|\vec y -\vec X\vec\beta -\vec
+    Z\Lambda_\theta\vec u\|^2+\|\vec u\|^2,$$ is the sum of the residual
+sum of squares, measuring fidelity of the model to the data, and a
+penalty on the size of $\vec u$, measuring the complexity of the model.
+Minimizing $r^2$ with respect to $\vec u$,
+$$r^2_{\beta,\theta} =\min_{\vec u}\left\{\|\vec y -\vec X\vec\beta -\vec
+    Z\Lambda_\theta\vec u\|^2+\|\vec u\|^2\right\}$$ is a direct (i.e.
+non-iterative) computation during which we calculate the *sparse
+Cholesky factor*, $\vec L_\theta$, which is a lower triangular
+$q\times q$ matrix satisfying $$\label{eq:sparseCholesky1}
+  \vec L_\theta\vec L_\theta\trans=
+  \Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta+\vec I_q .$$
+where $\vec I_q$ is the $q\times q$ *identity matrix*.
+
+The *deviance* (negative twice the log-likelihood) of the parameters,
+given the data, $\vec y$, is $$\label{eq:LMMdeviance}
+  d(\vec\theta,\vec\beta,\sigma|\vec y)
+  =n\log(2\pi\sigma^2)+\log(|\vec L_\theta|^2)+\frac{r^2_{\beta,\theta}}{\sigma^2}.$$
+where $|\vec L_\theta|$ denotes the *determinant* of $\vec
+L_\theta$. Because $\vec L_\theta$ is triangular, its determinant is the
+product of its diagonal elements.
+
+Because the conditional mean, $\vec\mu_{\bc Y|\bc B=\vec b}=\vec
+X\vec\beta+\vec Z\Lambda_\theta\vec u$, is a linear function of both
+$\vec\beta$ and $\vec u$, minimization of the PRSS with respect to both
+$\vec\beta$ and $\vec u$ to produce
+$$r^2_\theta =\min_{\vec\beta,\vec u}\left\{\|\vec y -\vec X\vec\beta -\vec
+    Z\Lambda_\theta\vec u\|^2+\|\vec u\|^2\right\}$$ is also a direct
+calculation. The values of $\vec u$ and $\vec\beta$ that provide this
+minimum are called, respectively, the *conditional mode*,
+$\tilde{\vec u}_\theta$, of the spherical random effects and the
+conditional estimate, $\widehat{\vec\beta}_\theta$, of the fixed
+effects. At the conditional estimate of the fixed effects the deviance
+is $$\label{eq:LMMprdev}
+  d(\vec\theta,\widehat{\beta}_\theta,\sigma|\vec y)
+  =n\log(2\pi\sigma^2)+\log(|\vec L_\theta|^2)+\frac{r^2_\theta}{\sigma^2}.$$
+Minimizing this expression with respect to $\sigma^2$ produces the
+conditional estimate $$\widehat{\sigma^2}_\theta=\frac{r^2_\theta}{n}$$
+which provides the *profiled deviance*, $$\label{eq:LMMprofdev}
+  \tilde{d}(\vec\theta|\vec y)=d(\vec\theta,\widehat{\beta}_\theta,\widehat{\sigma}_\theta|\vec y)
+  =\log(|\vec L_\theta|^2)+n\left[1 +
+    \log\left(\frac{2\pi r^2_\theta}{n}\right)\right],$$ a function of
+$\vec\theta$ alone.
+
+The MLE of $\vec\theta$, written $\widehat{\vec\theta}$, is the value
+that minimizes the profiled
+deviance ([\[eq:LMMprofdev\]](#eq:LMMprofdev){reference-type="ref"
+reference="eq:LMMprofdev"}). We determine this value by numerical
+optimization. In the process of evaluating
+$\tilde{d}(\widehat{\vec\theta}|\vec y)$ we determine
+$\widehat{\vec\beta}=\widehat{\vec\beta}_{\widehat\theta}$,
+$\tilde{\vec u}_{\widehat{\theta}}$ and $r^2_{\widehat{\theta}}$, from
+which we can evaluate
+$\widehat{\sigma}=\sqrt{r^2_{\widehat{\theta}}/n}$.
+
+The elements of the conditional mode of $\bc B$, evaluated at the
+parameter estimates,
+$$\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$$
+are sometimes called the *best linear unbiased predictors* or BLUPs of
+the random effects. Although it has an appealing acronym, I don't find
+the term particularly instructive (what is a "linear unbiased predictor"
+and in what sense are these the "best"?) and prefer the term
+"conditional mode", which is explained in .
+
+### Matrices and Vectors in the Fitted Model Object {#sec:FittedModel}
+
+The optional argument, , in a call to produces output showing the
+progress of the iterative optimization of
+$\tilde{d}(\vec\theta|\vec y)$.
+
+The algorithm converges after 17 function evaluations to a profiled
+deviance of at $\theta=$. In this model the scalar parameter $\theta$ is
+the ratio $\sigma_1/\sigma$.
+
+The actual values of many of the matrices and vectors defined above are
+available as *slots* of the fitted model object. In general the object
+returned by a model-fitting function from the package has three
+upper-level slots: , consisting of information related to the random
+effects, , consisting of information related to the fixed effects, and ,
+consisting of information related to the response.
+
+In practice we rarely access the slots of a fitted model object
+directly, preferring instead to use some of the *accessor functions*
+that, as the name implies, provide access to some of the properties of
+the model. However, in this section we will access some of the slots
+directly for the purposes of illustration.
+
+For example, $\Lambda_{\widehat{\theta}}$ is retrieved by as
+
+Often we will show the structure of sparse matrices as an image
+(Fig. [\[fig:fm01Lambdaimage\]](#fig:fm01Lambdaimage){reference-type="ref"
+reference="fig:fm01Lambdaimage"}).
+
+Especially for large sparse matrices, the image conveys the structure
+more compactly than does the printed representation.
+
+In this simple model $\Lambda=\theta\vec I_6$ is a multiple of the
+identity matrix and the $30\times 6$ model matrix $\vec Z$, whose
+transpose is shown in
+Fig. [\[fig:fm01Ztimage\]](#fig:fm01Ztimage){reference-type="ref"
+reference="fig:fm01Ztimage"}, consists of the indicator columns for .
+Because the data are balanced with respect to , the Cholesky factor,
+$\vec L$ is also a multiple of the identity (use to check if you wish).
+The vector $\vec u$ is available in . The vector $\vec\beta$ and the
+model matrix $\vec X$ are available as and .
+
+Assessing the Variability of the Parameter Estimates {#sec:variability}
+----------------------------------------------------
+
+In this section we show how to create a *profile deviance* object from a
+fitted linear mixed model and how to use this object to evaluate
+confidence intervals on the parameters. We also discuss the construction
+and interpretation of *profile zeta* plots for the parameters. In
+Chap. [\[chap:ProfPairs\]](#chap:ProfPairs){reference-type="ref"
+reference="chap:ProfPairs"} we discuss the use of the deviance profiles
+to produce likelihood contours for pairs of parameters.
+
+### Confidence Intervals on the Parameters {#sec:profdevconf}
+
+The mixed-effects model fit as or has three parameters for which we
+obtained estimates. These parameters are $\sigma_1$, the standard
+deviation of the random effects, $\sigma$, the standard deviation of the
+residual or "per-observation" noise term and $\beta_0$, the
+fixed-effects parameter that is labeled as .
+
+The function systematically varies the parameters in a model, assessing
+the best possible fit that can be obtained with one parameter fixed at a
+specific value and comparing this fit to the *globally optimal fit*,
+which is the original model fit that allowed all the parameters to vary.
+The models are compared according to the change in the deviance, which
+is the *likelihood ratio test* (LRT) statistic. We apply a *signed
+square root* transformation to this statistic and plot the resulting
+function, called $\zeta$, versus the parameter value. A $\zeta$ value
+can be compared to the quantiles of the *standard normal distribution*,
+$\bc Z\sim\mathcal{N}(0,1)$. For example, a 95% profile deviance
+confidence interval on the parameter consists of those values for which
+$-1.960 < \zeta < 1.960$.
+
+Because the process of profiling a fitted model, which involves
+re-fitting the model many times, can be computationally intensive, one
+should exercise caution with complex models fit to very large data sets.
+Because the statistic of interest is a likelihood ratio, the model is
+re-fit according to the maximum likelihood criterion, even if the
+original fit is a REML fit. Thus, there is a slight advantage in
+starting with an ML fit.
+
+Plots of $\zeta$ versus the parameter being profiled
+(Fig. [\[fig:fm01prof\]](#fig:fm01prof){reference-type="ref"
+reference="fig:fm01prof"}) are obtained with
+
+We will refer to such plots as *profile zeta* plots. I usually adjust
+the aspect ratio of the panels in profile zeta plots to, say, and
+frequently set the layout so the panels form a single row (, in this
+case).
+
+The vertical lines in the panels delimit the 50%, 80%, 90%, 95% and 99%
+confidence intervals, when these intervals can be calculated. Numerical
+values of the endpoints are returned by the extractor.
+
+By default the 95% confidence interval is returned. The optional
+argument, , is used to obtain other confidence levels.
+
+Notice that the lower bound on the 99% confidence interval for
+$\sigma_1$ is not defined. Also notice that we profile $\log(\sigma)$
+instead of $\sigma$, the residual standard deviation.
+
+A plot of $|\zeta|$, the absolute value of $\zeta$, versus the parameter
+(Fig. [\[fig:fm01absprof\]](#fig:fm01absprof){reference-type="ref"
+reference="fig:fm01absprof"}), obtained by adding the optional argument
+to the call to , can be more effective for visualizing the confidence
+intervals.
+
+### Interpreting the Profile Zeta Plot {#sec:interpprofzeta}
+
+A profile zeta plot, such as
+Fig. [\[fig:fm01prof\]](#fig:fm01prof){reference-type="ref"
+reference="fig:fm01prof"}, shows us the sensitivity of the model fit to
+changes in the value of particular parameters. Although this is not
+quite the same as describing the distribution of an estimator, it is a
+similar idea and we will use some of the terminology from distributions
+when describing these plots. Essentially we view the patterns in the
+plots as we would those in a normal probability plot of data values or
+of residuals from a model.
+
+Ideally the profile zeta plot will be close to a straight line over the
+region of interest, in which case we can perform reliable statistical
+inference based on the parameter's estimate, its standard error and
+quantiles of the standard normal distribution. We will describe such a
+situation as providing a good normal approximation for inference. The
+common practice of quoting a parameter estimate and its standard error
+assumes that this is always the case.
+
+In Fig. [\[fig:fm01prof\]](#fig:fm01prof){reference-type="ref"
+reference="fig:fm01prof"} the profile zeta plot for $\log(\sigma)$ is
+reasonably straight so $\log(\sigma)$ has a good normal approximation.
+But this does not mean that there is a good normal approximation for
+$\sigma^2$ or even for $\sigma$. As shown in
+Fig. [\[fig:sigmaprof\]](#fig:sigmaprof){reference-type="ref"
+reference="fig:sigmaprof"} the profile zeta plot for $\log(\sigma)$ is
+slightly skewed, that for $\sigma$ is moderately skewed and the profile
+zeta plot for $\sigma^2$ is highly skewed. Deviance-based confidence
+intervals on $\sigma^2$ are quite asymmetric, of the form "estimate
+minus a little, plus a lot".
+
+This should not come as a surprise to anyone who learned in an
+introductory statistics course that, given a random sample of data
+assumed to come from a Gaussian distribution, we use a $\chi^2$
+distribution, which can be quite skewed, to form a confidence interval
+on $\sigma^2$. Yet somehow there is a widespread belief that the
+distribution of variance estimators in much more complex situations
+should be well approximated by a normal distribution. It is nonsensical
+to believe that. In most cases summarizing the precision of a variance
+component estimate by giving an approximate standard error is woefully
+inadequate.
+
+The pattern in the profile plot for $\beta_0$ is sigmoidal (i.e. an
+elongated "S"-shape). The pattern is symmetric about the estimate but
+curved in such a way that the profile-based confidence intervals are
+wider than those based on a normal approximation. We characterize this
+pattern as symmetric but over-dispersed (relative to a normal
+distribution). Again, this pattern is not unexpected. Estimators of the
+coefficients in a linear model without random effects have a
+distribution which is a scaled Student's T distribution. That is, they
+follow a symmetric distribution that is over-dispersed relative to the
+normal.
+
+The pattern in the profile zeta plot for $\sigma_1$ is more complex.
+
+Fig. [\[fig:sigma1prof\]](#fig:sigma1prof){reference-type="ref"
+reference="fig:sigma1prof"} shows the profile zeta plot on the scale of
+$\log(\sigma_1)$, $\sigma_1$ and $\sigma_1^2$. Notice that the profile
+zeta plot for $\log(\sigma_1)$ is very close to linear to the right of
+the estimate but flattens out on the left. That is, $\sigma_1$ behaves
+like $\sigma$ in that its profile zeta plot is more-or-less a straight
+line on the logarithmic scale, except when $\sigma_1$ is close to zero.
+The model loses sensitivity to values of $\sigma_1$ that are close to
+zero. If, as in this case, zero is within the "region of interest" then
+we should expect that the profile zeta plot will flatten out on the left
+hand side.
+
+Notice that the profile zeta plot of $\sigma_1^2$ in
+Fig. [\[fig:sigma1prof\]](#fig:sigma1prof){reference-type="ref"
+reference="fig:sigma1prof"} is dramatically skewed. If reporting the
+estimate, $\widehat{\sigma^2}_1$, and its standard error, as many
+statistical software packages do, were to be an adequate description of
+the variability in this estimate then this profile zeta plot should be a
+straight line. It's nowhere close to being a straight line in this and
+in many other model fits, which is why we don't report standard errors
+for variance estimates.
+
+### Deriving densities from the profile {#sec:profDens}
+
+In the profile zeta plots we show $\zeta$ as a function of a parameter.
+We can use the function shown there, which we will call the *profile
+zeta function*, to generate a corresponding distribution by setting the
+cumulative distribution function (c.d.f) to be $\Phi(\zeta)$ where
+$\Phi$ is the c.d.f. of the standard normal distribution. From this we
+can derive a density.
+
+This is not quite the same as evaluating the distribution of the
+estimator of the parameter, which for mixed-effects models can be very
+difficult, but it gives us a good indication of what the distribution of
+the estimator would be.
+Fig. [\[fig:fm01dens\]](#fig:fm01dens){reference-type="ref"
+reference="fig:fm01dens"},
+
+shows the densities corresponding to the profiles in
+Fig. [\[fig:fm01prof\]](#fig:fm01prof){reference-type="ref"
+reference="fig:fm01prof"}. We see that the density for $\sigma_1$ is
+quite skewed.
+
+If we had plotted the densities corresponding to the profiles of the
+variance components instead, we would get
+Fig. [\[fig:fm01vardens\]](#fig:fm01vardens){reference-type="ref"
+reference="fig:fm01vardens"}
+
+which, of course, just accentuates the skewness in the distribution of
+these variance components.
+
+Assessing the Random Effects {#sec:assessRE}
+----------------------------
+
+In we mentioned that what are sometimes called the BLUPs (or best linear
+unbiased predictors) of the random effects, $\bc B$, are the conditional
+modes evaluated at the parameter estimates, calculated as
+$\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$.
+
+These values are often considered as some sort of "estimates" of the
+random effects. It can be helpful to think of them this way but it can
+also be misleading. As we have stated, the random effects are not,
+strictly speaking, parameters---they are unobserved random variables. We
+don't estimate the random effects in the same sense that we estimate
+parameters. Instead, we consider the conditional distribution of $\bc B$
+given the observed data, $(\bc B|\bc Y=\vec y)$.
+
+Because the unconditional distribution, $\bc B\sim\mathcal{N}(\vec
+0,\Sigma_\theta)$ is continuous, the conditional distribution, $(\bc
+B|\bc Y=\vec y)$ will also be continuous. In general, the mode of a
+probability density is the point of maximum density, so the phrase
+"conditional mode" refers to the point at which this conditional density
+is maximized. Because this definition relates to the probability model,
+the values of the parameters are assumed to be known. In practice, of
+course, we don't know the values of the parameters (if we did there
+would be no purpose in forming the parameter estimates), so we use the
+estimated values of the parameters to evaluate the conditional modes.
+
+Those who are familiar with the multivariate Gaussian distribution may
+recognize that, because both $\bc B$ and $(\bc Y|\bc B=\vec b)$ are
+multivariate Gaussian, $(\bc B|\bc Y=\vec y)$ will also be multivariate
+Gaussian and the conditional mode will also be the conditional mean of
+$\bc B$, given $\bc Y=\vec y$. This is the case for a linear mixed model
+but it does not carry over to other forms of mixed models. In the
+general case all we can say about $\tilde{\vec
+  u}$ or $\tilde{\vec b}$ is that they maximize a conditional density,
+which is why we use the term "conditional mode" to describe these
+values. We will only use the term "conditional mean" and the symbol,
+$\vec\mu$, in reference to $\mathrm{E}(\bc Y|\bc B=\vec b)$, which is
+the conditional mean of $\bc Y$ given $\bc B$, and an important part of
+the formulation of all types of mixed-effects models.
+
+The extractor returns the conditional modes.
+
+Applying to the result of
+
+shows that the value is a list of data frames. In this case the list is
+of length 1 because there is only one random-effects term, , in the
+model and, hence, only one grouping factor, , for the random effects.
+There is only one column in this data frame because the random-effects
+term, , is a simple, scalar term.
+
+To make this more explicit, random-effects terms in the model formula
+are those that contain the vertical bar () character. The variable is
+the grouping factor for the random effects generated by this term. An
+expression for the grouping factor, usually just the name of a variable,
+occurs to the right of the vertical bar. If the expression on the left
+of the vertical bar is , as it is here, we describe the term as a
+*simple, scalar, random-effects term*. The designation "scalar" means
+there will be exactly one random effect generated for each level of the
+grouping factor. A simple, scalar term generates a block of indicator
+columns --- the indicators for the grouping factor --- in $\vec Z$.
+Because there is only one random-effects term in this model and because
+that term is a simple, scalar term, the model matrix $\vec
+Z$ for this model is the indicator matrix for the levels of .
+
+In the next chapter we fit models with multiple simple, scalar terms
+and, in subsequent chapters, we extend random-effects terms beyond
+simple, scalar terms. When we have only simple, scalar terms in the
+model, each term has a unique grouping factor and the elements of the
+list returned by can be considered as associated with terms or with
+grouping factors. In more complex models a particular grouping factor
+may occur in more than one term, in which case the elements of the list
+are associated with the grouping factors, not the terms.
+
+Given the data, $\vec y$, and the parameter estimates, we can evaluate a
+measure of the dispersion of $(\bc B|\bc Y=\vec y)$. In the case of a
+linear mixed model, this is the conditional standard deviation, from
+which we can obtain a prediction interval. The extractor takes an
+optional argument, , which adds these dispersion measures as an
+attribute of the result. (The name stands for "conditional variance",
+previously misnomed "posterior variance").
+
+We can plot these prediction intervals using
+
+(Fig. [\[fig:fm01preddot\]](#fig:fm01preddot){reference-type="ref"
+reference="fig:fm01preddot"}), which provides linear spacing of the
+levels on the y axis, or using
+
+(Fig. [\[fig:fm01predqq\]](#fig:fm01predqq){reference-type="ref"
+reference="fig:fm01predqq"}), where the intervals are plotted with
+spacing determined by quantiles of the standard normal distribution.
+
+The dotplot is preferred when there are only a few levels of the
+grouping factor, as in this case. When there are hundreds or thousands
+of random effects the form is preferred because it focuses attention on
+the "important few" at the extremes and de-emphasizes the "trivial many"
+that are close to zero.
+
+Chapter Summary {#sec:ChIntroSummary}
+---------------
+
+A considerable amount of material has been presented in this chapter,
+especially considering the word "simple" in its title (it's the model
+that is simple, not the material). A summary may be in order.
+
+A mixed-effects model incorporates fixed-effects parameters and random
+effects, which are unobserved random variables, $\bc B$. In a linear
+mixed model, both the unconditional distribution of $\bc B$ and the
+conditional distribution, $(\bc Y|\bc B=\vec b)$, are multivariate
+Gaussian distributions. Furthermore, this conditional distribution is a
+spherical Gaussian with mean, $\vec\mu$, determined by the linear
+predictor, $\vec Z\vec b+\vec X\vec\beta$. That is,
+$$(\bc Y|\bc B=\vec b)\sim
+  \mathcal{N}(\vec Z\vec b+\vec X\vec\beta, \sigma^2\vec I_n) .$$ The
+unconditional distribution of $\bc B$ has mean $\vec 0$ and a
+parameterized $q\times q$ variance-covariance matrix, $\Sigma_\theta$.
+
+In the models we considered in this chapter, $\Sigma_\theta$, is a
+simple multiple of the identity matrix, $\vec I_6$. This matrix is
+always a multiple of the identity in models with just one random-effects
+term that is a simple, scalar term. The reason for introducing all the
+machinery that we did is to allow for more general model specifications.
+
+The maximum likelihood estimates of the parameters are obtained by
+minimizing the deviance. For linear mixed models we can minimize the
+profiled deviance, which is a function of $\vec\theta$ only, thereby
+considerably simplifying the optimization problem.
+
+To assess the precision of the parameter estimates, we profile the
+deviance function with respect to each parameter and apply a signed
+square root transformation to the likelihood ratio test statistic,
+producing a profile zeta function for each parameter. These functions
+provide likelihood-based confidence intervals for the parameters.
+Profile zeta plots allow us to visually assess the precision of
+individual parameters. Density plots derived from the profile zeta
+function provide another way of examining the distribution of the
+estimators of the parameters.
+
+Prediction intervals from the conditional distribution of the random
+effects, given the observed data, allow us to assess the precision of
+the random effects.
+
+Notation {#notation .unnumbered}
+--------
+
+#### Random Variables {#random-variables .unnumbered}
+
+$\bc Y$
+
+:   The responses ($n$-dimensional Gaussian)
+
+$\bc B$
+
+:   The random effects on the original scale ($q$-dimensional Gaussian
+    with mean $\vec 0$)
+
+$\bc U$
+
+:   The orthogonal random effects ($q$-dimensional spherical Gaussian)
+
+Values of these random variables are denoted by the corresponding
+bold-face, lower-case letters: $\vec y$, $\vec b$ and $\vec u$. We
+observe $\vec y$. We do not observe $\vec b$ or $\vec u$.
+
+#### Parameters in the Probability Model {#parameters-in-the-probability-model .unnumbered}
+
+$\vec\beta$
+
+:   The $p$-dimension fixed-effects parameter vector.
+
+$\vec\theta$
+
+:   The variance-component parameter vector. Its (unnamed) dimension is
+    typically very small. Dimensions of 1, 2 or 3 are common in
+    practice.
+
+$\sigma$
+
+:   The (scalar) common scale parameter, $\sigma>0$. It is called the
+    common scale parameter because it is incorporated in the
+    variance-covariance matrices of both $\bc Y$ and $\bc U$.
+
+The parameter $\vec\theta$ determines the $q\times q$ lower triangular
+matrix $\Lambda_\theta$, called the *relative covariance factor*, which,
+in turn, determines the $q\times q$ sparse, symmetric semidefinite
+variance-covariance matrix
+$\Sigma_\theta=\sigma^2\Lambda_\theta\Lambda_\theta\trans$ that defines
+the distribution of $\bc B$.
+
+#### Model Matrices {#model-matrices .unnumbered}
+
+$\vec X$
+
+:   Fixed-effects model matrix of size $n\times p$.
+
+$\vec Z$
+
+:   Random-effects model matrix of size $n\times q$.
+
+#### Derived Matrices {#derived-matrices .unnumbered}
+
+$\vec L_\theta$
+
+:   The sparse, lower triangular Cholesky factor of
+    $\Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta+\vec I_q$
+
+In
+Chap. [\[chap:computational\]](#chap:computational){reference-type="ref"
+reference="chap:computational"} this definition will be modified to
+allow for a *fill-reducing permutation* of the rows and columns of
+$\Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta$.
+
+#### Vectors {#vectors .unnumbered}
+
+In addition to the parameter vectors already mentioned, we define
+
+$\vec y$
+
+:   the $n$-dimensional observed response vector
+
+$\vec\gamma$
+
+:   the $n$-dimension linear predictor,
+    $$\vec\gamma=\vec X\vec\beta+\vec Z\vec b=\vec Z\Lambda_\theta\vec u+\vec X\vec\beta$$
+
+$\vec\mu$
+
+:   the $n$-dimensional conditional mean of $\bc Y$ given $\bc B=\vec b$
+    (or, equivalently, given $\bc U=\vec u$)
+    $$\vec\mu=\mathrm{E}[\bc Y|\bc B=\vec b]=\mathrm{E}[\bc Y|\bc U=\vec u]$$
+
+$\tilde{u}_\theta$
+
+:   the $q$-dimensional conditional mode (the value at which the
+    conditional density is maximized) of $\bc U$ given $\bc Y=\vec y$.
+
+Exercises {#exercises .unnumbered}
+---------
+
+These exercises and several others in this book use data sets from the
+package for . You will need to ensure that this package is installed
+before you can access the data sets.
+
+To load a particular data set,
+
+either attach the package
+
+or load just the one data set
+
+[\[prS1\]]{#prS1 label="prS1"} Check the documentation, the structure ()
+and a summary of the data
+(Fig. [\[fig:Raildot\]](#fig:Raildot){reference-type="ref"
+reference="fig:Raildot"}) from the package. Note that if you used to
+access this data set (i.e. you did not attach the whole package) then
+you must use
+
+to display the documentation for it.
+
+Fit a model with as the response and a simple, scalar random-effects
+term for the variable . Use the REML criterion, which is the default.
+Create a dotplot of the conditional modes of the random effects.
+
+Refit the model using maximum likelihood. Check the parameter estimates
+and, in the case of the fixed-effects parameter, its standard error. In
+what ways have the parameter estimates changed? Which parameter
+estimates have not changed?
+
+Profile the fitted model and construct 95% profile-based confidence
+intervals on the parameters. Is the confidence interval on $\sigma_1$
+close to being symmetric about the estimate? Is the corresponding
+interval on $\log(\sigma_1)$ close to being symmetric about its
+estimate?
+
+Create the profile zeta plot for this model. For which parameters are
+there good normal approximations?
+
+Plot the prediction intervals on the random effects from this model. Do
+any of these prediction intervals contain zero? Consider the relative
+magnitudes of $\widehat{\sigma_1}$ and $\widehat{\sigma}$ in this model
+compared to those in model for the data. Should these ratios of
+$\sigma_1/\sigma$ lead you to expect a different pattern of prediction
+intervals in this plot than those in
+Fig. [\[fig:fm01preddot\]](#fig:fm01preddot){reference-type="ref"
+reference="fig:fm01preddot"}?

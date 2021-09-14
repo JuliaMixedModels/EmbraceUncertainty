@@ -1,0 +1,20 @@
+[projects]
+
+  [projects.default]
+  contents = [
+    "intro",
+    "multiple",
+    "longitudinal",
+    "theory",
+    "GLMMBinomial"
+  ]
+  port = 8042
+
+  # Extra directories to be copied.
+  extra_directories = [
+    "assets"
+  ]
+  
+  online_url = "https://embraceuncertainty.io"
+
+  output_filename = "embraceuncertainty"
