@@ -979,7 +979,7 @@ $\tilde{u}_\theta$
 :   the $q$-dimensional conditional mode (the value at which the
     conditional density is maximized) of $\bc U$ given $\bc Y=\vec y$.
 
-Exercises {#exercises .unnumbered}
+Exercises {#intro_exercises .unnumbered}
 ---------
 
 These exercises and several others in this book use data sets from the

@@ -1059,7 +1059,7 @@ REML criterion $$\tilde{d}_R(\vec\theta|\vec y_{\text{obs}})=
   \left[1+\log\left(\frac{2\pi r^2_\theta}{n-p}\right)\right]$$ can be
 evaluated and optimized (minimized) with respect to $\vec\theta$.
 
-Exercises {#exercises .unnumbered}
+Exercises {#theory_exercises .unnumbered}
 ---------
 
 Unlike the exercises in other chapters, these exercises establish
