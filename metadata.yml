@@ -1,50 +1,17 @@
 ---
-title: "Embrace Uncertainty"
-subtitle: "Fitting Mixed-Effects Models with Julia"
+title: Embrace Uncertainty
+subtitle: Fitting Mixed-Effects Models with Julia
 book: true
-author: "Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, & Douglas Bates"
-
-# This affects things as whether to include a white page before each chapter in the PDF.
-# See the `.tex` template for more information.
-# For reports, set `book: false`.
-book: true
-
-# Licenses; can be empty.
-html-license: <a href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
-tex-license: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
-
-pdf-footer: "\\url{https://github.com/JuliaMixedModels}"
-
-# Make margins a bit smaller. LaTeX has huge default margins.
-geometry:
-  - top=20mm
-  - left=24mm
-  - right=24mm
-  - bottom=28mm
-
-# A setting for the PDF. I don't know whether it is important.
+author: "Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, and Douglas Bates"
+html-license: <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+pdf-footer: "\\textbf{DRAFT} - See \\url{https://... } for the latest version."
+tex-license: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
 lang: en-US
-
-tags: [pandoc, Books.jl, JuliaLang]
-number-sections: true
-
-code-block-font-size: \scriptsize
-
-titlepage: true
-linkReferences: true
-bibliography: EmbUnc.bib
-link-citations: true
-
-# These table of contents settings only affect the PDF.
-toc: true
-toc-depth: 2
-
-# Cross-reference prefixes.
-eqnPrefix: Equation
+tags: [JuliaLang, Linear Mixed Models]
+repo: https://github.com/JuliaMixedModels
+secPrefix: Section
 figPrefix: Figure
 tblPrefix: Table
-secPrefix: Section
-
-# Keyboard shortcuts.
-mousetrap: true
+titlepage: true
+bibliography: pandoc/EmbUnc.bib
 ---
