@@ -6,7 +6,8 @@
     "multiple",
     "longitudinal",
     "theory",
-    "GLMMBinomial"
+    "GLMMBinomial",
+    "references"
   ]
   port = 8042
 
