@@ -118,7 +118,7 @@ a particular, versatile class of mixed models called linear mixed models
 and by studying a simple example of such a model.
 First we describe the data in the example.
 
-The `Dyestuff` and `Dyestuff2` Data {#sec:DyestuffData}
+The *Dyestuff* and *Dyestuff2* Data {#sec:DyestuffData}
 -----------------------------------
 
 Models with random effects have been in use for a long time.
@@ -148,7 +148,7 @@ coming from
 > each sample. The equivalent yield of each preparation as grams of
 > standard colour was determined by dye-trial.
 
-To access these data within we must first attach the package to our
+To access these data within `Julia` we must first attach the package to our
 session using
 ```jl
 sc("using MixedModels")
