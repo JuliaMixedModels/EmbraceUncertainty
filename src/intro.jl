@@ -35,3 +35,30 @@ function dyestuffdataplot()
         label="dyestuffdata",
     )
 end
+
+function dyestuff2dataplot()
+    dyestuff2 = select(    # convert columns to types that Makie knows how to deal with
+        DataFrame(MixedModels.dataset(:dyestuff2)),
+        :yield => Array,
+        :batch => PooledArray;
+        renamecols=false,
+    )
+    gdf = groupby(dyestuff2, :batch)
+    mnyld = @combine(gdf, :mean_yield=mean(:yield))
+    perm = sortperm(mnyld.mean_yield)
+    iperm = invperm(perm)
+    scatter(
+        dyestuff2.yield,
+        iperm[dyestuff2.batch.refs] .+ randn(30) .* 0.05,
+        axis=(;
+            xlabel="Simulated yield (dimensionless)",
+            ylabel="Batch in simulation",
+            yticks=(1:6, levels(dyestuff2.batch)[perm]),
+        ),
+    )
+    lines!(mnyld.mean_yield[perm], 1:6)
+    Options(current_figure();
+        caption="Artificial data of yield by batch.  The line joins the mean yields.",
+        label="dyestuff2data",
+    )
+end
