@@ -1,5 +1,4 @@
-Computational Methods for Mixed Models {#chap:computational}
-======================================
+# Computational Methods for Mixed Models {#sec:computational}
 
 In this chapter we describe some of the details of the computational
 methods for fitting linear mixed models, as implemented in the package,
@@ -20,8 +19,7 @@ themselves should not feel obligated to master these details.
 We begin by reviewing the definition of linear mixed-effects models and
 some of the basics of the computational methods, as given in .
 
-Definitions and Basic Results {#sec:defnLMM}
------------------------------
+## Definitions and Basic Results {#sec:defnLMM}
 
 As described in , a linear mixed-effects model is based on two
 vector-valued random variables: the $q$-dimensional vector of random
