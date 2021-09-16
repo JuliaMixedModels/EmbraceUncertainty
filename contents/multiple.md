@@ -1,5 +1,5 @@
-Models With Multiple Random-effects Terms {#chap:Multiple}
-=========================================
+# Models With Multiple Random-effects Terms {#chap:Multiple}
+
 
 The mixed models considered in the previous chapter had only one
 random-effects term, which was a simple, scalar random-effects term, and
@@ -16,8 +16,8 @@ effects as being crossed or nested although, strictly speaking, the
 distinction between nested and non-nested refers to the grouping
 factors, not the random effects.
 
-A Model With Crossed Random Effects {#sec:crossedRE}
------------------------------------
+## A Model With Crossed Random Effects {#sec:crossedRE}
+
 
 One of the areas in which the methods in the package for are
 particularly effective is in fitting models to cross-classified data
@@ -33,7 +33,7 @@ grouping factors to large, possibly unbalanced, data sets. The methods
 in the package are able to do this. To introduce the methods let us
 first consider a small, balanced data set with crossed grouping factors.
 
-### The `Penicillin` Data {#sec:Penicillin}
+### The *penicillin* Data {#ssec:penicillin}
 
 The data are derived from Table 6.6, p. 144 of
 @davies72:_statis_method_in_resear_and_produc where they are described
@@ -53,13 +53,18 @@ as coming from an investigation to
 > to the concentration of penicillin in the solution.
 
 As with the data, we examine the structure
-
+```jl
+sco("penicillin = MixedModels.dataset(:penicillin)")
+```
 and a summary
-
+```jl
+s = """
+penicillin = DataFrame(penicillin)
+describe(penicillin)
+"""
+sco(s)
+```
 of the data, then plot it
-
-(Fig. [\[fig:Penicillindot\]](#fig:Penicillindot){reference-type="ref"
-reference="fig:Penicillindot"}).
 
 The variation in the diameter is associated with the plates and with the
 samples. Because each plate is used only for the six samples shown here
@@ -101,12 +106,22 @@ samples to each of the 24 plates, something could go wrong for one of
 the samples on one of the plates, leaving us without a measurement for
 that combination of levels and thus an unbalanced data set.
 
-### A Model For the `Penicillin` Data {#sec:PenicillinModel}
+### A Model For the *penicillin* Data {#sec:PenicillinModel}
 
 A model incorporating random effects for both the and the is
 straightforward to specify --- we include simple, scalar random effects
 terms for both these factors.
-
+```jl
+s = """
+m3 = fit(
+    MixedModel,
+    @formula(diameter ~ 1 + (1|plate) + (1|sample)),
+    penicillin;
+    thin=1,
+    )
+"""
+sco(s)
+```
 This model display indicates that the sample-to-sample variability has
 the greatest contribution, then plate-to-plate variability and finally
 the "residual" variability that cannot be attributed to either the
@@ -134,10 +149,10 @@ effect for a particular plate depends on only 6 responses.
 In chapter [\[chap:ExamLMM\]](#chap:ExamLMM){reference-type="ref"
 reference="chap:ExamLMM"} we saw that a model with a single, simple,
 scalar random-effects term generated a random-effects model matrix,
-$\vec Z$, that is the matrix of indicators of the levels of the grouping
+$\mathbf{Z}$, that is the matrix of indicators of the levels of the grouping
 factor. When we have multiple, simple, scalar random-effects terms, as
 in model , each term generates a matrix of indicator columns and these
-sets of indicators are concatenated to form the model matrix $\vec Z$.
+sets of indicators are concatenated to form the model matrix $\mathbf{Z}$.
 The transpose of this matrix, shown in
 Fig. [\[fig:fm03Ztimage\]](#fig:fm03Ztimage){reference-type="ref"
 reference="fig:fm03Ztimage"}, contains rows of indicators for each
@@ -157,12 +172,12 @@ convergence, and the second is the relative standard deviation of the
 random effects for ($1.93157/0.54992=3.512443$).
 
 Because $\Lambda_\theta$ is diagonal, the pattern of non-zeros in
-$\Lambda_\theta\trans\vec Z\trans\vec Z\Lambda_\theta+\vec I$ will be
-the same as that in $\vec Z\trans\vec Z$, shown in the middle panel of
+$\Lambda_\theta\trans\mathbf{Z}\trans\mathbf{Z}\Lambda_\theta+\mathbf{I}$ will be
+the same as that in $\mathbf{Z}\trans\mathbf{Z}$, shown in the middle panel of
 Fig. [\[fig:fm03LambdaLimage\]](#fig:fm03LambdaLimage){reference-type="ref"
-reference="fig:fm03LambdaLimage"}. The sparse Cholesky factor, $\vec L$,
+reference="fig:fm03LambdaLimage"}. The sparse Cholesky factor, $\mathbf{L}$,
 shown in the right panel, is lower triangular and has non-zero elements
-in the lower right hand corner in positions where $\vec Z\trans\vec Z$
+in the lower right hand corner in positions where $\mathbf{Z}\trans\mathbf{Z}$
 has systematic zeros. We say that "fill-in" has occurred when forming
 the sparse Cholesky decomposition. In this case there is a relatively
 minor amount of fill but in other cases there can be a substantial
@@ -240,13 +255,12 @@ they are much closer to the elliptical pattern.
 Conversely, if we tried to plot contours on the scale of $\sigma_1^2$
 and $\sigma_2^2$ (not shown), they would be hideously distorted.
 
-A Model With Nested Random Effects {#sec:NestedRE}
-----------------------------------
+## A Model With Nested Random Effects {#sec:NestedRE}
 
 In this section we again consider a simple example, this time fitting a
 model with *nested* grouping factors for the random effects.
 
-### The `Pastes` Data {#sec:PastesData}
+### The *pastes* Data {#ssec:pastesData}
 
 The third example from @davies72:_statis_method_in_resear_and_produc
 [Table 6.5, p. 138] is described as coming from
@@ -259,7 +273,16 @@ The third example from @davies72:_statis_method_in_resear_and_produc
 > two analytical tests carried out on each of the 30 samples.
 
 The structure and summary of the data object are
-
+```jl
+sco("pastes = MixedModels.dataset(:pastes)")
+```
+```jl
+s = """
+pastes = DataFrame(pastes)
+describe(pastes)
+"""
+sco(s)
+```
 As stated in the description in
 @davies72:_statis_method_in_resear_and_produc, there are 30 samples,
 three from each of the 10 delivery batches. We have labelled the levels
@@ -385,33 +408,48 @@ Fitting a model with simple, scalar random effects for nested factors is
 done in exactly the same way as fitting a model with random effects for
 crossed grouping factors. We include random-effects terms for each
 factor, as in
-
+```jl
+s = """
+m4 = fit(
+    MixedModel,
+    @formula(strength ~ 1 + (1|batch/cask)),
+    pastes;
+    thin=1,
+)
+"""
+sco(s)
+```
 Not only is the model specification similar for nested and crossed
 
 factors, the internal calculations are performed according to the
 methods described in for each model type. Comparing the patterns in the
-matrices $\Lambda$, $\vec Z\trans\vec Z$ and $\vec L$ for this model
+matrices $\Lambda$, $\mathbf{Z}\trans\mathbf{Z}$ and $\mathbf{L}$ for this model
+```jl
+sco("sparseL(m4; full=true)")
+```
+```jl
+sco("BlockDescription(m4)")
+```
 (Fig. [\[fig:fm04LambdaLimage\]](#fig:fm04LambdaLimage){reference-type="ref"
 reference="fig:fm04LambdaLimage"}) to those in
 Fig. [\[fig:fm03LambdaLimage\]](#fig:fm03LambdaLimage){reference-type="ref"
 reference="fig:fm03LambdaLimage"} shows that models with nested factors
 produce simple repeated structures along the diagonal of the sparse
-Cholesky factor, $\vec L$, after reordering the random effects (we
+Cholesky factor, $\mathbf{L}$, after reordering the random effects (we
 discuss this reordering later in ). This type of structure has the
 desirable property that there is no "fill-in" during calculation of the
-Cholesky factor. In other words, the number of non-zeros in $\vec L$ is
+Cholesky factor. In other words, the number of non-zeros in $\mathbf{L}$ is
 the same as the number of non-zeros in the lower triangle of the matrix
-being factored, $\Lambda\trans\vec Z\trans\vec Z\Lambda+\vec I$ (which,
+being factored, $\Lambda\trans\mathbf{Z}\trans\mathbf{Z}\Lambda+\mathbf{I}$ (which,
 because $\Lambda$ is diagonal, has the same structure as
-$\vec Z\trans\vec
-Z$).
+$\mathbf{Z}\trans\mathbf{Z}$).
 
 Fill-in of the Cholesky factor is not an important issue when we have a
 few dozen random effects, as we do here. It is an important issue when
 we have millions of random effects in complex configurations, as has
 been the case in some of the models that have been fit using .
 
-### Assessing Parameter Estimates in Model `fm04` {#sec:assessingfm04}
+### Assessing Parameter Estimates in Model *fm04* {#sec:assessingfm04}
 
 The parameter estimates are: $\widehat{\sigma_1}=$, the standard
 deviation of the random effects for ; $\widehat{\sigma_2}=$, the
@@ -432,6 +470,16 @@ Plots of the prediction intervals of the random effects
 (Fig. [\[fig:fm04ranef\]](#fig:fm04ranef){reference-type="ref"
 reference="fig:fm04ranef"})
 
+```jl
+s = """
+caterpillar(m4, :batch)
+caption = "Plot of *batch* prediction intervals from *m4*" # hide
+filename = "m4_batch_caterpillar"  # hide
+label = "m4batchcaterpillar"  # hide
+Options(current_figure(); filename, caption, label) # hide
+"""
+sco(s)
+```
 confirm this impression in that all the prediction intervals for the
 random effects for contain zero. Furthermore, the profile zeta plot
 (Fig. [\[fig:fm04prplot\]](#fig:fm04prplot){reference-type="ref"
@@ -495,9 +543,21 @@ determined by the number of constraints imposed on the parameters of
 $H_a$ to produce $H_0$.
 
 The restricted model fit
-
-is compared to model with the function
-
+```jl
+s = """
+m5 = fit(
+    MixedModel,
+    @formula(strength ~ 1 + (1|batch & cask)),
+    pastes;
+    thin=1,
+)
+"""
+sco(s)
+```
+is compared to model `m4` with the function
+```jl
+sco("MixedModels.likelihoodratiotest(m5, m4)")
+```
 which provides a p-value of Because typical standards for "small"
 p-values are 5% or 1%, a p-value over 50% would not be considered
 significant at any reasonable level.
@@ -515,12 +575,11 @@ will be twice as large as it should be but, even if that were true, an
 effective p-value of 26% would not cause us to reject $H_0$ in favor of
 $H_a$.
 
-### Assessing the Reduced Model, `fm04a` {#sec:assessReduced}
+### Assessing the Reduced Model, *fm04a* {#sec:assessReduced}
 
 The profile zeta plots for the remaining parameters in model
 (Fig. [\[fig:fm04aprplot\]](#fig:fm04aprplot){reference-type="ref"
 reference="fig:fm04aprplot"})
-
 are similar to the corresponding panels in
 Fig. [\[fig:fm04prplot\]](#fig:fm04prplot){reference-type="ref"
 reference="fig:fm04prplot"}, as confirmed by the numerical values of the
@@ -538,8 +597,7 @@ those in
 Fig. [\[fig:fm01profpair\]](#fig:fm01profpair){reference-type="ref"
 reference="fig:fm01profpair"}, the profile pairs plot for model .
 
-A Model With Partially Crossed Random Effects {#sec:partially}
----------------------------------------------
+## A Model With Partially Crossed Random Effects {#sec:partially}
 
 Especially in observational studies with multiple grouping factors, the
 configuration of the factors frequently ends up neither nested nor
@@ -562,7 +620,7 @@ instructors where the response is the student's evaluation of the
 instructor's effectiveness. These data, like those from most large
 observational studies, are quite unbalanced.
 
-### The `InstEval` Data {#sec:InstEval}
+### The *insteval* Data {#ssec:insteval}
 
 The data are from a special evaluation of lecturers by students at the
 Swiss Federal Institute for Technology--Zürich (ETH--Zürich), to
@@ -571,13 +629,30 @@ data have been slightly simplified and identifying labels have been
 removed, so as to preserve anonymity.
 
 The variables
+```jl
+sco("insteval = MixedModels.dataset(:insteval)")
+```
+```jl
+s = """
+insteval = DataFrame(insteval)
+describe(insteval)
+"""
+sco(s)
+```
+have somewhat cryptic names. Factor `s` designates the student and `d` the instructor.
+The factor `dept` is the department for the course and `service` indicates whether the course was a service course taught to students from other departments.
 
-have somewhat cryptic names. Factor designates the student and the
-instructor. The factor is the department for the course and indicates
-whether the course was a service course taught to students from other
-departments.
-
-Although the response, , is on a scale of 1 to 5,
+Although the response, `y`, is on a scale of 1 to 5,
+```jl
+s = """
+hist(insteval.y)
+filename="insteval_hist"   # hide
+caption="Histogram of instructor ratings in the *insteval* data" # hide
+label="instevalhist"   # hide
+Options(current_figure(); filename, caption, label) # hide
+"""
+sco(s)
+```
 
 it is sufficiently diffuse to warrant treating it as if it were a
 continuous response.
@@ -586,7 +661,17 @@ At this point we will fit models that have random effects for student,
 instructor, and department (or the combination) to these data. In the
 next chapter we will fit models incorporating fixed-effects for
 instructor and department to these data.
-
+```jl
+s = """
+m6 = fit(
+    MixedModel,
+    @formula(y ~ 1 + (1|s) + (1|d) + (1|dept)),
+    insteval;
+    thin=1,
+)
+"""
+sco(s)
+```
 (Fitting this complex model to a moderately large data set takes less
 than two minutes on a modest laptop computer purchased in 2006. Although
 this is more time than required for earlier model fits, it is a
@@ -627,10 +712,10 @@ factor and not the interaction to define random effects, but we will
 revisit these data in the next chapter and follow up on some of these
 variations there.
 
-![Image of the sparse Cholesky factor, $\vec L$, from model
+![Image of the sparse Cholesky factor, $\mathbf{L}$, from model
 ](figure/Multiple-fm05Limage){#fig:fm05Limage}
 
-### Structure of $\vec L$ for model `fm05` {#sec:fm05L}
+### Structure of $\mathbf{L}$ for model `fm05` {#sec:fm05L}
 
 Before leaving this model we examine the sparse Cholesky factor, $\vec
 L$, (Fig. [1.1](#fig:fm05Limage){reference-type="ref"
