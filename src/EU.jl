@@ -16,6 +16,17 @@ using Reexport
 
 include("utilities.jl")
 include("intro.jl")
-include("convert_output_overrides.jl")
+
+"""
+    build()
+
+This method is called during CI.
+"""
+function build()
+    println("Building EU")
+    fail_on_error = true
+    Books.gen(; fail_on_error)
+    Books.build_all(; fail_on_error)
+end
 
 end # module
