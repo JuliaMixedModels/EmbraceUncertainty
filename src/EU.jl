@@ -26,7 +26,11 @@ function build()
     println("Building EU")
     fail_on_error = true
     Books.gen(; fail_on_error)
-    Books.build_all(; fail_on_error)
+    # These last two lines should be replaced by
+    # Books.build_all(; fail_on_error)
+    # once the figures such as "Multiple-fm05Limage" have been replaced.
+    mkpath(Books.BUILD_DIR)
+    Books.html()
 end
 
 end # module
