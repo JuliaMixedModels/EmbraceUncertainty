@@ -95,13 +95,3 @@ and both are centered about zero.
 Another way to think of this is that, if we would have profiled
 $\sigma_1^2$ instead of $\sigma_1$, we would change all the panels in
 the first column but the panels on the first row would remain the same.
-
-Exercises {#exercises .unnumbered}
----------
-
-Create a profile pairs plot for model fit in
-Chap. [\[chap:ExamLMM\]](#chap:ExamLMM){reference-type="ref"
-reference="chap:ExamLMM"} to the data. Does the shape of the deviance
-contours in this model mirror those in
-Fig. [\[fig:fm01profpair\]](#fig:fm01profpair){reference-type="ref"
-reference="fig:fm01profpair"}?
