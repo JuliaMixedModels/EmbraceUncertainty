@@ -13,9 +13,8 @@
 
   # Extra directories to be copied.
   extra_directories = [
-    "assets"
   ]
-  
+
   online_url = "https://embraceuncertainty.io"
 
   output_filename = "embraceuncertainty"

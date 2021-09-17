@@ -118,8 +118,12 @@ a particular, versatile class of mixed models called linear mixed models
 and by studying a simple example of such a model.
 First we describe the data in the example.
 
-The *Dyestuff* and *Dyestuff2* Data {#sec:DyestuffData}
------------------------------------
+```{=comment}
+Rik: Using italics or backticks around "Dyestuff" and "Dyestuff2" will mess up the menu item.
+https://github.com/rikhuijzer/Books.jl/issues/211.
+```
+
+## The Dyestuff and Dyestuff2 Data {#sec:DyestuffData}
 
 Models with random effects have been in use for a long time.
 The first
@@ -150,8 +154,8 @@ the fourth edition of the book mentioned above, as coming from
 
 To access these data within `Julia` we must first attach the package to our
 session using
-```jl
-sc("using MixedModels")
+```julia
+using MixedModels
 ```
 The package must be attached before any of the data
 sets or functions in the package can be used.
@@ -216,26 +220,23 @@ The data in a data frame are viewed as a table with columns
 corresponding to variables and rows to observations.
 The functions `first` and `last` the first or last few rows
 ```jl
-sco("first(dyestuff, 7)")
+sco("first(dyestuff, 7)", process=without_caption_label)
 ```
 ```jl
-sco("last(dyestuff, 7)")
+sco("last(dyestuff, 7)", process=without_caption_label)
 ```
 or we could tabulate the data using `DataFrames.groupby` and the `@combine` macro from the
 [`DataFrameMacros`](https://github.com/jkrumbiegel/DataFrameMacros.jl) package.
-```jl
-sc("""
-@combine(groupby(dyestuff, :batch),
-    :mean_yield = mean(:yield),
-    :n = length(:yield),
-)
-"""
-)
-```
 
 ```jl
-EU.dyestufftable()
+let
+    caption = "Mean yield by batch of dyestuff"
+    label = "mean_yield"
+    pre(out) = Options(out; caption, label)
+    @sco pre=pre EU.dyestufftable()
+end
 ```
+
 Although @tbl:mean_yield does show us an important property of the data, namely that
 there are exactly $5$ observations on each batch --- a property that we
 will describe by saying that the data are *balanced* with respect to `batch` ---
@@ -307,22 +308,27 @@ state
 > undoubtedly occur in practice they seem to be rarely published.
 
 The structure and summary
+
 ```jl
 sco("dyestuff2 = MixedModels.dataset(:dyestuff2)")
 ```
+
 ```jl
-sco("""
-dyestuff2 = DataFrame(dyestuff2)
-describe(dyestuff2)
-"""
-)
+s = """
+    dyestuff2 = DataFrame(dyestuff2)
+    describe(dyestuff2)
+    """
+sco(s; process=without_caption_label)
 ```
+
 are intentionally similar to those of the `dyestuff` data.
 
-A data plot
+A data plot in @fig:dyestuffdata:
+
 ```jl
 EU.dyestuff2dataplot()
 ```
+
 shows that the batch-to-batch
 variability in these data is small compared to the within-batch
 variability.
@@ -352,6 +358,7 @@ example.
 
 We fit a model to the data allowing for an overall level of the `yield` and for
 an additive random effect for each level of `batch`.
+
 ```jl
 sco("m1 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff)")
 ```
@@ -476,10 +483,10 @@ of probability.
 Before proceeding further we clarify the linear mixed-effects probability model and define several terms and concepts that will be used throughout the book.
 Readers who are more interested in practical results than in the statistical theory should feel free to skip this section.
 
-### Definitions and Results {#ssec:definitions}
+### Definitions and Results {#sec:definitions}
 
 In this section we provide some definitions and formulas without derivation and with minimal explanation, so that we can use these terms in what follows.
-In @chap:computational we revisit these definitions providing derivations and more explanation.
+In @sec:computational we revisit these definitions providing derivations and more explanation.
 
 As mentioned in @sec:memod, a mixed model incorporates two random variables:
 $\mathcal{B}$, the $q$-dimensional vector of random effects, and $\mathcal{Y}$, the $n$-dimensional response vector.
@@ -779,7 +786,7 @@ which, of course, just accentuates the skewness in the distribution of these var
 Assessing the Random Effects {#sec:assessRE}
 ----------------------------
 
-In @ssec:definitions we mentioned that what are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the conditional modes evaluated at the parameter estimates, calculated as $\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$.
+In @sec:definitions we mentioned that what are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the conditional modes evaluated at the parameter estimates, calculated as $\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$.
 
 These values are often considered as some sort of "estimates" of the random effects.
 It can be helpful to think of them this way but it can also be misleading.

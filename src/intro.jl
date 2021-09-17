@@ -4,9 +4,6 @@ function dyestufftable()
         :mean_yield = mean(:yield),
         :n = length(:yield),
     )
-    caption = "Mean yield by batch of dyestuff"
-    label = "mean_yield"
-    Options(res; caption, label)
 end
 
 function dyestuffdataplot()
