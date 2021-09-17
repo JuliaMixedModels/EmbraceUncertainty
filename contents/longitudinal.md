@@ -32,9 +32,9 @@ In this data frame, the response variable, `reaction`, is the average of the rea
 The two covariates are `days`, the number of days of sleep deprivation, and `subj`, the identifier of the subject on which the observation was made.
 
 As recommended for any statistical analysis, we begin by plotting the data.
-The most important relationship to plot for longitudinal data on multiple subjects is the trend of the response over time by subject, as shown in @fig:sleepxyplot.
+The most important relationship to plot for longitudinal data on multiple subjects is the trend of the response over time by subject, as shown in <!-- @fig:sleepxyplot. -->
 This plot, in which the data for different subjects are shown in separate panels with the axes held constant for all the panels, allows for examination of the time-trends within subjects and for comparison of these patterns between subjects.
-Through the use of small panels in a repeating pattern @fig:sleepxyplot conveys a great deal of information, the individual time trends for 18 subjects over 10 days --- a total of 180 points --- without being overly cluttered.
+Through the use of small panels in a repeating pattern <!-- @fig:sleepxyplot --> conveys a great deal of information, the individual time trends for 18 subjects over 10 days --- a total of 180 points --- without being overly cluttered.
 
 ### Characteristics of the *sleepstudy* data {#sec:DataPlotChar}
 
@@ -54,7 +54,7 @@ Instead we use a characteristic of the data to determine the ordering of the pan
 For example, a question of interest to the experimenters is whether a subject's rate of change in reaction time is related to the subject's initial reaction time.
 If this were the case we would expect that the slopes would show an increasing trend (or, less likely, a decreasing trend) in the left to right, bottom to top ordering.
 
-There is little evidence in @fig:sleepxyplot of such a systematic relationship between the subject's initial reaction time and their rate of change in reaction time per day of sleep deprivation.
+There is little evidence in <!-- @fig:sleepxyplot --> of such a systematic relationship between the subject's initial reaction time and their rate of change in reaction time per day of sleep deprivation.
 We do see that for each subject, except `S335`, reaction time increases, more-or-less linearly, with days of sleep deprivation.
 However, there is considerable variation both in the initial reaction time and in the daily rate of increase in reaction time.
 We can also see that these data are balanced, both with respect to the number of observations on each subject, and with respect to the times at which these observations were taken.
@@ -137,13 +137,13 @@ These represent a typical initial reaction time (i.e. without sleep deprivation)
 The estimated subject-to-subject variation in the intercept corresponds to a standard deviation of about 25 ms.
 A 95% prediction interval on this random variable would be approximately $\pm 50$ ms.
 Combining this range with a population estimated intercept of 250 ms. indicates that we should not be surprised by intercepts as low as 200 ms. or as high as 300 ms.
-This range is consistent with the reference lines shown in @fig:sleepxyplot .
+This range is consistent with the reference lines shown in <!-- @fig:sleepxyplot --> .
 
 Similarly, the estimated subject-to-subject variation in the slope corresponds to a standard deviation of about 5.7 ms./day so we would not be surprised by slopes as low as $10.5 - 2\cdot 5.7=-0.9$ ms./day or as high as $10.5 + 2\cdot 5.7=21.9$ ms./day.
-Again, the conclusions from these rough, "back of the envelope" calculations are consistent with our observations from @fig:sleepxyplot .
+Again, the conclusions from these rough, "back of the envelope" calculations are consistent with our observations from <!-- @fig:sleepxyplot --> .
 
 The estimated residual standard deviation is about 25 ms. leading us to expect a scatter around the fitted lines for each subject of up to $\pm 50$ ms.
-From @fig:sleepxyplot we can see that some subjects (`S309`, `S372`, and `S337`) appear to have less variation than $\pm 50$ ms. about their within-subject fit but others (`S308`, `S332`, and `S331`) may have more.
+From <!-- @fig:sleepxyplot --> we can see that some subjects (`S309`, `S372`, and `S337`) appear to have less variation than $\pm 50$ ms. about their within-subject fit but others (`S308`, `S332`, and `S331`) may have more.
 
 Finally, we see the estimated within-subject correlation of the random effect for the intercept and the random effect for the slope is very low, $0.081$, confirming our impression that there is little evidence of a systematic relationship between these quantities.
 In other words, observing a subject's initial reaction time does not give us much information for predicting whether their reaction time will be strongly affected by each day of sleep deprivation or not.
@@ -265,7 +265,7 @@ sco("MixedModels.likelihoodratiotest(m12, m11)")
 The value of the $\chi^2$ statistic, $0.0639$, is very small, corresponding to a p-value of $0.80$ and indicating that the extra parameter in model relative to does not produce a significantly better fit.
 By the principal of parsimony we prefer the reduced model, `m12`.
 
-This conclusion is consistent with the visual impression provided by @fig:sleepxyplot.
+This conclusion is consistent with the visual impression provided by <!-- @fig:sleepxyplot -->.
 There does not appear to be a strong relationship between a subject's initial reaction time and the extent to which his or her reaction time is affected by sleep deprivation.
 
 In this likelihood ratio test the value of the parameter being tested, a correlation of zero, is not on the boundary of the parameter space.
@@ -329,7 +329,7 @@ They are a combination of parameter estimates with the modal values of random va
 (In the Bayesian approach [@box73:_bayes_infer_statis_analy] to inference, however, both the parameters and the random effects are random variables and the interpretation of these values is straightforward.)
 Despite the difficulties of interpretation in the probability model, these values are of interest because they determine the fitted response for each subject.
 
-Because responses for each individual are recorded on each of ten days we can determine the within-subject estimates of the slope and intercept (that is, the slope and intercept of each of the lines in @fig:sleepxyplot.
+Because responses for each individual are recorded on each of ten days we can determine the within-subject estimates of the slope and intercept (that is, the slope and intercept of each of the lines in <!-- @fig:sleepxyplot -->.
 In Fig. [\[fig:shrinkage\]](#fig:shrinkage){reference-type="ref" reference="fig:shrinkage"} we compare the within-subject least squares estimates to the per-subject slope and intercept calculated from model .
 We see that, in general, the per-subject slopes and intercepts from the mixed-effects model are closer to the population estimates than are the within-subject least squares estimates.
 This pattern is sometimes described as a *shrinkage* of coefficients toward the population values.
