@@ -260,7 +260,7 @@ and $\sigma_2^2$ (not shown), they would be hideously distorted.
 In this section we again consider a simple example, this time fitting a
 model with *nested* grouping factors for the random effects.
 
-### The *pastes* Data {#ssec:pastesData}
+### The *pastes* Data {#sec:pastesData}
 
 The third example from @davies72:_statis_method_in_resear_and_produc
 [Table 6.5, p. 138] is described as coming from
