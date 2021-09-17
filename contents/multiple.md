@@ -33,7 +33,7 @@ grouping factors to large, possibly unbalanced, data sets. The methods
 in the package are able to do this. To introduce the methods let us
 first consider a small, balanced data set with crossed grouping factors.
 
-### The *penicillin* Data {#ssec:penicillin}
+### The *penicillin* Data {#sec:penicillin}
 
 The data are derived from Table 6.6, p. 144 of
 @davies72:_statis_method_in_resear_and_produc where they are described
