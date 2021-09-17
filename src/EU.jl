@@ -25,12 +25,13 @@ This method is called during CI.
 function build()
     println("Building EU")
     fail_on_error = true
+    mkpath(Books.BUILD_DIR)
     Books.gen(; fail_on_error)
-    # These last two lines should be replaced by
+    # Books.html(; fail_on_error) should be replaced by
     # Books.build_all(; fail_on_error)
     # once the figures such as "Multiple-fm05Limage" have been replaced.
-    mkpath(Books.BUILD_DIR)
-    Books.html()
+    # Verifies cross references.
+    Books.html(; fail_on_error)
 end
 
 end # module
