@@ -241,21 +241,11 @@ Although @tbl:mean_yield does show us an important property of the data, namely 
 there are exactly $5$ observations on each batch --- a property that we
 will describe by saying that the data are *balanced* with respect to `batch` ---
 we usually learn much more about the structure of such data from plots like
+
 ```jl
-s = """
-myld = @combine(groupby(dyestuff, :batch), :mean_yield=mean(:yield)) # hide
-ord = sortperm(myld.mean_yield)    # hide
-obatch = CategoricalArray(dyestuff.batch; levels=myld.batch[ord], ordered=true) # hide
-axis = (; xlabel="Yield of dyestuff [g]", ylabel="Batch of intermediate product", yticks=(1:6, levels(obatch))) # hide
-scatter(Array(dyestuff.yield), obatch.refs; color=(:blue, 0.3), axis) # hide
-lines!(myld.mean_yield[ord], 1:6) # hide
-filename = "dyestuff_data"   # hide
-caption="Yield of dyestuff by batch.  The line joins the mean yields." # hide
-label = "dyestuffdata" # hide
-Options(current_figure();  filename, caption, label) # hide
-"""
-sco(s)
+EU.dyestuffdataplot()
 ```
+
 than we do from numerical summaries.
 
 In @fig:dyestuffdata we can see that there is considerable
