@@ -1,8 +1,14 @@
 function dyestufftable()
-    res = @combine(
-        groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch),
-        :mean_yield = mean(:yield),
-        :n = length(:yield),
+    caption = "Mean yield by batch of dyestuff"
+    label = "mean_yield"
+    Options(
+        @combine(
+            groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch),
+            :mean_yield = mean(:yield),
+            :n = length(:yield),
+        );
+        caption,
+        label,
     )
 end
 
