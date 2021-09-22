@@ -3,6 +3,7 @@ module EU
 import Books
 
 using Reexport
+@reexport using AlgebraOfGraphics
 @reexport using Books
 @reexport using CairoMakie
 @reexport using CategoricalArrays
