@@ -6,6 +6,13 @@ function dyestufftable()
     )
 end
 
+"""
+    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)
+
+Returns a `DataFrame` created from df with the levels of `grps` reordered according to
+`combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
+levels of `grps` reordered.
+"""
 function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
                     # ensure the relevant columns are types that Makie can deal with 
     df = select(df, resp => Array, grps => CategoricalArray; renamecols=false)
