@@ -1,51 +1,56 @@
 function dyestufftable()
-    res = @combine(
-        groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch),
-        :mean_yield = mean(:yield),
-        :n = length(:yield),
+    caption = "Mean yield by batch of dyestuff"
+    label = "mean_yield"
+    Options(
+        @combine(
+            groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch),
+            :mean_yield = mean(:yield),
+            :n = length(:yield),
+        );
+        caption,
+        label,
     )
+end
+
+"""
+    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)
+
+Returns a `DataFrame` created from df with the levels of `grps` reordered according to
+`combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
+levels of `grps` reordered.
+"""
+function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
+                    # ensure the relevant columns are types that Makie can deal with 
+    df = select(df, resp => Array, grps => CategoricalArray; renamecols=false)
+                    # create a summary table by mean resp
+    sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
+    glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
+    levels!(df[!, grps], glevs)
+    levels!(sumry[!, grps], glevs)
+    return df, sumry
 end
 
 function dyestuffdataplot()
-    CairoMakie.activate!()
-    dyestuff = DataFrame(MixedModels.dataset(:dyestuff))
-    myld = @combine(groupby(dyestuff, :batch), :mean_yield=mean(:yield))
-    ord = sortperm(myld.mean_yield)
-    obatch = CategoricalArray(dyestuff.batch; levels=myld.batch[ord], ordered=true)
-    axis = (;
-        xlabel="Yield of dyestuff [g]",
-        ylabel="Batch of intermediate product",
-        yticks=(1:6, levels(obatch)),
+    df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff)), :yield, :batch)
+
+    mp = mapping(:yield => "Yield of dyestuff [g]", :batch => "Batch of intermediate product")
+    draw(
+        (data(df) * mp * visual(Scatter, marker='○', markersize=12)) +
+        (data(sumry) * mp * visual(Lines))
     )
-    scatter(Array(dyestuff.yield), obatch.refs; color=(:blue, 0.3), axis)
-    lines!(myld.mean_yield[ord], 1:6)
-    filename = "dyestuff_data"
-    caption="Yield of dyestuff by batch.  The line joins the mean yields by batch."
-    label = "dyestuffdata"
-    Options(current_figure();  filename, caption, label)
+    Options(current_figure();
+        caption="Yield of dyestuff by batch.  The line joins the mean yields.",
+        label="dyestuffdata",
+    )
 end
 
 function dyestuff2dataplot()
-    dyestuff2 = select(    # convert columns to types that Makie knows how to deal with
-        DataFrame(MixedModels.dataset(:dyestuff2)),
-        :yield => Array,
-        :batch => PooledArray;
-        renamecols=false,
+    df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff2)), :yield, :batch)
+    mp = mapping(:yield => "Simulated yield", :batch => "Batch")
+    draw(
+        (data(df) * mp * visual(Scatter, marker='○', markersize=12)) +
+        (data(sumry) * mp * visual(Lines))
     )
-    gdf = groupby(dyestuff2, :batch)
-    mnyld = @combine(gdf, :mean_yield=mean(:yield))
-    perm = sortperm(mnyld.mean_yield)
-    iperm = invperm(perm)
-    scatter(
-        dyestuff2.yield,
-        iperm[dyestuff2.batch.refs] .+ randn(30) .* 0.05,
-        axis=(;
-            xlabel="Simulated yield (dimensionless)",
-            ylabel="Batch in simulation",
-            yticks=(1:6, levels(dyestuff2.batch)[perm]),
-        ),
-    )
-    lines!(mnyld.mean_yield[perm], 1:6)
     Options(current_figure();
         caption="Artificial data of yield by batch.  The line joins the mean yields.",
         label="dyestuff2data",
