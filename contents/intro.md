@@ -1,4 +1,4 @@
-# A Simple, Linear, Mixed-effects Model {#sec:ExamLMM}
+# A Simple, Linear, Mixed-Effects Model {#sec:ExamLMM}
 
 In this book we describe the theory behind a type of statistical model called *mixed-effects* models and the practice of fitting and analyzing such models using the [MixedModels](https://github.com/JuliaStats/MixedModels.jl) package for [Julia](https://julialang.org).
 These models are used in many different disciplines.
@@ -7,7 +7,7 @@ Because the descriptions of the models can vary markedly between disciplines, we
 This simple example allows us to illustrate the use of the `LinearMixedModel` type in the `MixedModels` package for fitting such models and for analyzing the fitted model.
 We also describe methods of assessing the precision of the parameter estimates and of visualizing the conditional distribution of the random effects, given the observed data.
 
-## Mixed-effects Models {#sec:memod}
+## Mixed-effects models {#sec:memod}
 
 Mixed-effects models, like many other types of statistical models, describe a relationship between a *response* variable and some of the *covariates* that have been measured or observed along with the response.
 In mixed-effects models at least one of the covariates is a *categorical* covariate representing experimental or observational "units" in the data set.
@@ -25,7 +25,7 @@ If the levels that we observed represent a random sample from the set of all pos
 
 There are two things to notice about this distinction between fixed-effects parameters and random effects.
 First, the names are misleading because the distinction between fixed and random is more a property of the levels of the categorical covariate than a property of the effects associated with them.
-Secondly, we distinguish between "fixed-effects parameters", which are indeed parameters in the statistical model, and "random effects", which, strictly speaking, are not parameters.
+Second, we distinguish between "fixed-effects parameters", which are indeed parameters in the statistical model, and "random effects", which, strictly speaking, are not parameters.
 As we will see shortly, random effects are unobserved random variables.
 
 To make the distinction more concrete, suppose that we wish to model the annual reading test scores for students in a school district and that the covariates recorded with the score include a student identifier and the student's gender.
@@ -41,7 +41,7 @@ Thus, any model with random effects is a mixed model.
 
 We characterize the statistical model in terms of two random variables: a $q$-dimensional vector of random effects represented by the random variable $\mathcal{B}$ and an $n$-dimensional response vector represented by the random variable $\mathcal{Y}$.
 (We use upper-case "script" characters to denote random variables.
-The corresponding lower-case upright letter denotes a particular value of the random variable.)
+The corresponding lower-case upright letter denotes a particular value of the random variable, with vector-valued random variable values in boldface.)
 We observe the value, $\mathbf{y}$, of $\mathcal{Y}$.
 We do not observe the value, $\mathbf{b}$, of $\mathcal{B}$.
 
@@ -59,7 +59,7 @@ First we describe the data in the example.
 Models with random effects have been in use for a long time.
 The first edition of the classic book, *Statistical Methods in Research and Production*, edited by O.L. Davies, was published in 1947 and contained examples of the use of random effects to characterize batch-to-batch variability in chemical processes.
 The data from one of these examples are available as the `dyestuff` data in the `MixedModels` package.
-In this section we describe and plot these data and introduce a second example, the data, described in @box73:_bayes_infer_statis_analy.
+In this section we describe and plot these data and introduce a second example, the `dyestuff2` data, described in @box73:_bayes_infer_statis_analy.
 
 ### The dyestuff data {#sec:dyestuff}
 
@@ -74,14 +74,17 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 > each sample. The equivalent yield of each preparation as grams of
 > standard colour was determined by dye-trial.
 
-To access these data within `Julia` we must first attach the package to our session using
-```julia
-using MixedModels
-```
-The package must be attached before any of the data sets or functions in the package can be used.
-If typing this line results in an error report stating that there is no package by this name then you must first install the package.
+To access these data within `Julia` we must first attach this package, and others that we will use, to our session with
 
-In what follows, we will assume that the package has been installed and that it has been attached to the session before any of the code shown has been run.
+```julia
+using DataFrameMacros, DataFrames, MixedModels
+```
+
+A package must be attached before any of the data sets or functions in the package can be used.
+If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s).
+The error report should include instructions for how to do this.
+
+In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.
 
 The `MixedModels` package includes several datasets that are used in examples and in tests of the package.
 Individual datasets can be loaded with the `dataset` function.
@@ -94,25 +97,27 @@ sco("dyestuff = MixedModels.dataset(:dyestuff)")
 
 The output indicates that this dataset is a `Table` read from a file in the [Arrow](https://arrow.apache.org) data format.
 
-A `Table` is a simplified tabular form from the [Tables](https://github.com/JuliaData/Tables.jl) package.
-It is often convenient to convert the read-only table form to a `DataFrame`
+A `Table` is a general, but "bare bones", tabular form defined in the [Tables](https://github.com/JuliaData/Tables.jl) package.
+This particular table, read from an `Arrow` file, will be read-only.
+It is often convenient to convert the read-only table form to a `DataFrame` to be able to use the full power of the [DataFrames](https://github.com/JuliaData/DataFrames.jl) package.
 
 ```jl
 sc("dyestuff = DataFrame(dyestuff)")
 ```
 
-The `describe` function in the [DataFrames](https://github.com/JuliaData/DataFrames.jl) package provides a concise description of the structure of the
-data,
+The `describe` method for a `DataFrame` provides a concise description of the structure of the data,
 
 ```jl
 sco("describe(dyestuff)", process=without_caption_label)
 ```
 
-from which we see that it consists of $30$ observations of the `yield`, the response variable, and of the covariate, `batch`, which is a categorical variable whose levels are character strings.
+from which we see that it consists of 30 observations of the `yield`, the response variable, and of the covariate, `batch`, which is a categorical variable whose levels are character strings.
 
 ```jl
 sco("typeof(dyestuff.batch)")
 ```
+
+(`DictEncoded` is the `Arrow` term for a categorical structure where the levels form a dictionary or lookup table and the values are stored as indices into this lookup table.)
 
 ```jl
 sco("levels(dyestuff.batch)")
@@ -135,7 +140,7 @@ sco("first(dyestuff, 7)", process=without_caption_label)
 ```jl
 sco("last(dyestuff, 7)", process=without_caption_label)
 ```
-or we could tabulate the data using `DataFrames.groupby` and the `@combine` macro from the [`DataFrameMacros`](https://github.com/jkrumbiegel/DataFrameMacros.jl) package.
+or we could tabulate the data using `DataFrames.groupby` and the `@combine` macro from the [DataFrameMacros](https://github.com/jkrumbiegel/DataFrameMacros.jl) package.
 
 
 ```jl
@@ -197,7 +202,7 @@ sco(s; process=without_caption_label)
 
 are intentionally similar to those of the `dyestuff` data.
 
-A data plot in @fig:dyestuffdata:
+A data plot (@fig:dyestuff2data)
 
 ```jl
 EU.dyestuff2dataplot()
@@ -210,7 +215,7 @@ Paradoxically, small "variance components" can be more difficult to estimate tha
 
 The methods we will present are not compromised when estimating small variance components.
 
-## Fitting Linear Mixed Models {#sec:FittingLMMs}
+## Fitting linear mixed models {#sec:FittingLMMs}
 
 Before we formally define a linear mixed model, let's go ahead and fit models to these data sets using `MixedModels`.
 The simplest way to do this is to use the generic `fit` function with arguments describing the type of model to be fit (i.e. `MixedModel`), a *formula* specifying the model and the *data* on which to evaluate the formula.
@@ -258,7 +263,7 @@ In this model there is only one such term, labeled as the `(Intercept)`.
 The name "intercept", which is better suited to models based on straight lines written in a slope/intercept form, should be understood to represent an overall "typical" or mean level of the response in this case.
 (In case you are wondering about the parentheses around the name `(Intercept)`, they are included so that you can't accidentally create a variable with a name that conflicts with this name.)
 The line labeled `batch` in the random effects table shows that the random effects added to the term, one for each level of the factor `batch`, are modeled as random variables whose unconditional variance is estimated as 1388.33 g$^2$ in the ML fit.
-The corresponding standard deviation is 37.36 g.
+The corresponding standard deviation is 37.26 g.
 
 Note that the last column in the random effects summary table is the estimate of the variability expressed as a standard deviation rather than as a variance.
 These values are provided because it is usually easier to visualize standard deviations, which are on the scale of the response, than it is to visualize the magnitude of a variance.
@@ -348,7 +353,7 @@ $$
 r^2(\mathbf{\theta},\mathbf{\beta},\mathbf{u})=
 \|\mathbf{y} -\mathbf{X}\mathbf{\beta} -\mathbf{Z}\Lambda_\theta\mathbf{u}\|^2  + \|\mathbf{u}\|^2,
 $$
-is the sum of the residual sum of squares, measuring fidelity of the model to the data, and a penalty on the size of $\mathbf{u}$, measuring the complexity of the model.
+is the sum of squared residuals, measuring fidelity of the model to the data, and a penalty on the size of $\mathbf{u}$, measuring the complexity of the model.
 Minimizing $r^2$ with respect to $\mathbf{u}$,
 $$
 r^2_{\beta,\theta}=\min_{\mathbf{u}}\left\{\|\mathbf{y} -\mathbf{X}\mathbf{\beta} -\mathbf{Z}\Lambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2\right\}
@@ -370,10 +375,11 @@ Because $\mathbf{L}_\theta$ is triangular, its determinant is the product of its
 
 Because the conditional mean, $\mathbf{\mu}_{\mathcal{Y}|\mathcal{B}=\mathbf{b}}=\mathbf{X}\mathbf{\beta}+\mathbf{Z}\Lambda_\theta\mathbf{u}$, is a linear function of both $\mathbf{\beta}$ and $\mathbf{u}$, minimization of the PRSS with respect to both $\mathbf{\beta}$ and $\mathbf{u}$ to produce
 $$
-r^2_\theta =\min_{\mathbf{\beta},\mathbf{u}}\left\{\|\mathbf{y} -\mathbf{X}\mathbf{\beta} -\mathbf{Z}\Lambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2\right\}$$
+r^2_\theta =\min_{\mathbf{\beta},\mathbf{u}}\left\{\|\mathbf{y} -\mathbf{X}\mathbf{\beta} -\mathbf{Z}\Lambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2\right\}
+$$
 is also a direct calculation.
 The values of $\mathbf{u}$ and $\mathbf{\beta}$ that provide this minimum are called, respectively, the *conditional mode*, $\tilde{\mathbf{u}}_\theta$, of the spherical random effects and the conditional estimate, $\widehat{\mathbf{\beta}}_\theta$, of the fixed effects.
-At the conditional estimate of the fixed effects the deviance is
+At the conditional estimate of the fixed effects the objective, negative twice the log-likelihood, is
 $$
   d(\mathbf{\theta},\widehat{\beta}_\theta,\sigma|\mathbf{y})
   =n\log(2\pi\sigma^2)+\log(|\mathbf{L}_\theta|^2)+\frac{r^2_\theta}{\sigma^2}
@@ -391,7 +397,7 @@ $$
 $$ {#eq:LMMprofdev}
 a function of $\mathbf{\theta}$ alone.
 
-The MLE of $\mathbf{\theta}$, written $\widehat{\mathbf{\theta}}$, is the value that minimizes the profiled objective (#eq:LMMprofdev).
+The MLE of $\mathbf{\theta}$, written $\widehat{\mathbf{\theta}}$, is the value that minimizes the profiled objective (@eq:LMMprofdev).
 We determine this value by numerical optimization.
 In the process of evaluating $\tilde{d}(\widehat{\mathbf{\theta}}|\mathbf{y})$ we determine $\widehat{\mathbf{\beta}}=\widehat{\mathbf{\beta}}_{\widehat\theta}$, $\tilde{\mathbf{u}}_{\widehat{\theta}}$ and $r^2_{\widehat{\theta}}$, from
 which we can evaluate $\widehat{\sigma}=\sqrt{r^2_{\widehat{\theta}}/n}$.
@@ -406,27 +412,34 @@ Although it has an appealing acronym, we don't find the term particularly instru
 ### Matrices and vectors in the fitted model object {#sec:FittedModel}
 
 The optional argument, `thin=1`, in a call to `fit` causes all the values of $\mathbf{\theta}$ and the objective during the progress of the iterative optimization of $\tilde{d}(\mathbf{\theta}|\mathbf{y})$ to be stored in the `optsum` member of the fit.
+
 ```jl
 sco("""
 m1trace = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff; thin=1)
-m1trace.optsum.fitlog
-""")
+DataFrame(m1trace.optsum.fitlog)
+""", process=without_caption_label)
 ```
-The algorithm converges after 17 function evaluations to a profiled deviance of 327.3270598811301 at $\theta=0.7525807289241839$.
+
+Here the algorithm converges after 17 function evaluations to a profiled deviance of 327.327059881143 at $\theta=0.0.7525806394967323$.
 In this model the scalar parameter $\theta$ is the ratio $\sigma_1/\sigma$.
+(Different versions of packages or of Julia or different choices of libraries for the basic linear algebra subroutines, or BLAS, may result in slightly different values.)
 
 The actual values of many of the matrices and vectors defined above are available as properties of the fitted model object.
 
 In this case the $\Lambda_\theta$ matrix will be a $6\times 6$ diagonal matrix with the diagonal elements all equal to $\theta=0.7525807289241839$.
 
 The Cholesky factor, $\mathbf{L}$, is
+
 ```jl
 sco("sparseL(m1; full=true)")
 ```
+
 which consists of three blocks
+
 ```jl
 sco("BlockDescription(m1)")
 ```
+
 As we get to larger models we will see that large sparse matrices are displayed as patterns rather than as numerical values.
 
 In this simple model $\Lambda=\theta\mathbf{I}_6$ is a multiple of the identity matrix and the $30\times 6$ model matrix $\mathbf{Z}$, whose transpose is
@@ -485,8 +498,7 @@ We will refer to such plots as *profile zeta* plots.
 I usually adjust the aspect ratio of the panels in profile zeta plots to, say, and frequently set the layout so the panels form a single row (, in this
 case).
 
-The vertical lines in the panels delimit the 50%, 80%, 90%, 95% and 99%
-confidence intervals, when these intervals can be calculated.
+The vertical lines in the panels delimit the 50%, 80%, 90%, 95% and 99% confidence intervals, when these intervals can be calculated.
 Numerical values of the endpoints are returned by the extractor.
 
 By default the 95% confidence interval is returned.
@@ -495,8 +507,7 @@ The optional argument, , is used to obtain other confidence levels.
 Notice that the lower bound on the 99% confidence interval for $\sigma_1$ is not defined.
 Also notice that we profile $\log(\sigma)$ instead of $\sigma$, the residual standard deviation.
 
-A plot of $|\zeta|$, the absolute value of $\zeta$, versus the parameter
-, obtained by adding the optional argument to the call to , can be more effective for visualizing the confidence intervals.
+A plot of $|\zeta|$, the absolute value of $\zeta$, versus the parameter , obtained by adding the optional argument to the call to , can be more effective for visualizing the confidence intervals.
 
 ### Interpreting the profile zeta plot {#sec:interpprofzeta}
 
@@ -521,7 +532,8 @@ In most cases summarizing the precision of a variance component estimate by givi
 The pattern in the profile plot for $\beta_0$ is sigmoidal (i.e. an elongated "S"-shape).
 The pattern is symmetric about the estimate but curved in such a way that the profile-based confidence intervals are wider than those based on a normal approximation.
 We characterize this pattern as symmetric but over-dispersed (relative to a normal distribution).
-Again, this pattern is not unexpected. Estimators of the coefficients in a linear model without random effects have a distribution which is a scaled Student's T distribution.
+Again, this pattern is not unexpected.
+Estimators of the coefficients in a linear model without random effects have a distribution which is a scaled Student's T distribution.
 That is, they follow a symmetric distribution that is over-dispersed relative to the normal.
 
 The pattern in the profile zeta plot for $\sigma_1$ is more complex.
@@ -531,8 +543,7 @@ That is, $\sigma_1$ behaves like $\sigma$ in that its profile zeta plot is more-
 The model loses sensitivity to values of $\sigma_1$ that are close to zero.
 If, as in this case, zero is within the "region of interest" then we should expect that the profile zeta plot will flatten out on the left hand side.
 
-Notice that the profile zeta plot of $\sigma_1^2$ in
- is dramatically skewed.
+Notice that the profile zeta plot of $\sigma_1^2$ in  is dramatically skewed.
 If reporting the estimate, $\widehat{\sigma^2}_1$, and its standard error, as many statistical software packages do, were to be an adequate description of the variability in this estimate then this profile zeta plot should be a straight line.
 It's nowhere close to being a straight line in this and in many other model fits, which is why we don't report standard errors for variance estimates.
 
@@ -551,7 +562,7 @@ If we had plotted the densities corresponding to the profiles of the variance co
 
 ## Assessing the random effects {#sec:assessRE}
 
-In @sec:definitions we mentioned that what are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the conditional modes evaluated at the parameter estimates, calculated as $\tilde{b}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{u}_{\widehat{\theta}}$.
+In @sec:definitions we mentioned that what are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the conditional modes evaluated at the parameter estimates, calculated as $\tilde{\mathbf{b}}_{\widehat{\theta}}=\Lambda_{\widehat{\theta}}\tilde{\mathbf{u}}_{\widehat{\theta}}$.
 
 These values are often considered as some sort of "estimates" of the random effects.
 It can be helpful to think of them this way but it can also be misleading.
@@ -578,8 +589,7 @@ sco("only(m1.b)")
 In this case the vector consists of a single matrix because there is only one random-effects term, `(1|batch)`, in the model and, hence, only one grouping factor, `batch`, for the random effects.
 There is only one row in the matrix because the random-effects term, `(1|batch)`, is a simple, scalar term.
 
-To make this more explicit, random-effects terms in the model formula
-are those that contain the vertical bar (`|`) character.
+To make this more explicit, random-effects terms in the model formula are those that contain the vertical bar (`|`) character.
 The variable or expression on the right of the `|` is the grouping factor for the random effects generated by this term.
 If the expression on the left of the vertical bar is `1`, as it is here, we describe the term as a *simple, scalar, random-effects term*.
 The designation "scalar" means there will be exactly one random effect generated for each level of the grouping factor.
