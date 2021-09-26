@@ -1,17 +1,16 @@
 ---
 title: Embrace Uncertainty
 subtitle: Fitting Mixed-Effects Models with Julia
-book: true
-author: "Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, and Douglas Bates"
+author:
+  - Phillip Alday
+  - Dave Kleinschmidt
+  - Reinhold Kliegl
+  - Douglas Bates
 html-license: <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
 pdf-footer: "\\textbf{DRAFT} - See \\url{https://... } for the latest version."
-tex-license: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+tex-license: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 lang: en-US
 tags: [JuliaLang, Linear Mixed Models]
 repo: https://github.com/JuliaMixedModels
-secPrefix: Section
-figPrefix: Figure
-tblPrefix: Table
-titlepage: true
 bibliography: pandoc/EmbUnc.bib
 ---
