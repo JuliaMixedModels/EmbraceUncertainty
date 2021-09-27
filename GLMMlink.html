@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title>Link functions and interpreting coefficients - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="5.2" id="sec:GLMMlink"><span class="header-section-number">5.2</span> Link functions and interpreting coefficients</h2>
+<p>To this point the only difference we have encountered between and as model-fitting functions is the need to specify the distribution family in a call to . The formula specification is identical and the assessment of the significance of terms using likelihood ratio tests is similar. This is intentional. We have emphasized the use of likelihood ratio tests on terms, whether fixed-effects or random-effects terms, exactly so the approach will be general.</p>
+<p>However, the interpretation of the coefficient estimates in the different types of models is different. In a linear mixed model the linear predictor is the conditional mean (or “expected value”) of the response given the random effects. That is, if we assume that we know the values of the fixed-effects parameters and the random effects then the expected response for a particular combination of covariate values is the linear predictor. Individual coefficients can be interpreted as slopes of the fitted response with respect to a numeric covariate or as shifts between levels of a categorical covariate.</p>
+<p>To interpret the estimates of coefficients in a GLMM we must define and examine the link function that we mentioned earlier.</p>
+<h3 data-number="5.2.1" id="sec:logitlink"><span class="header-section-number">5.2.1</span> The logit link function for binary responses</h3>
+<p>The probability model for a binary response is the Bernoulli distribution, which is about the simplest probability distribution we can concoct. There are only two possible values: 0 and 1. If the probability of the response 1 is <span class="math inline">\(p\)</span> then the probability of 0 must be <span class="math inline">\(1-p\)</span>. It is easy to establish that the expected value is also <span class="math inline">\(p\)</span>. For consistency across distribution families we write this expected response as <span class="math inline">\(\mu\)</span> instead of <span class="math inline">\(p\)</span>. We should, however, keep in mind that, for this distribution, <span class="math inline">\(\mu\)</span> corresponds to a probability and hence must satisfy <span class="math inline">\(0\le\mu\le 1\)</span>.</p>
+<p>In general we don’t want to have restrictions on the values of the linear predictor so we equate the linear predictor to a function of <span class="math inline">\(\mu\)</span> that has an unrestricted range. In the case of the Bernoulli distribution with the canonical link function we equate the linear predictor to the <em>log odds</em> or <em>logit</em> of the positive response. That is <span class="math display">\[\label{eq:logodds}
+  \eta = \logit(\mu) = \log\left(\frac{\mu}{1-\mu}\right) .\]</span></p>
+<p>To understand why this is called the “log odds” recall that <span class="math inline">\(\mu\)</span> corresponds to a probability in <span class="math inline">\([0,1]\)</span>. The corresponding odds ratio, <span class="math inline">\(\frac{\mu}{1-\mu}\)</span>, is in <span class="math inline">\([0,\infty)\)</span> and the logarithm of the odds ratio, <span class="math inline">\(\logit(\mu)\)</span>, is in <span class="math inline">\((-\infty, \infty)\)</span>.</p>
+<p>The inverse of the logit link function, <span class="math display">\[\label{eq:logitinv}
+  \mu = \frac{1}{1+\exp(-\eta)}\]</span> shown in</p>
+<p>Fig. <a href="#fig:logitinv" data-reference-type="ref" data-reference="fig:logitinv">[fig:logitinv]</a>, takes a value on the unrestricted range, <span class="math inline">\((-\infty,\infty)\)</span>, and maps it to the probability range, <span class="math inline">\([0,1]\)</span>. It happens this function is also the cumulative distribution function for the standard logistic distribution, available in as the function . In some presentations the relationship between the logit link and the logistic distribution is emphasized but that often leads to questions of why we should focus on the logistic distribution. Also, it is not clear how this approach would generalize to other distributions such as the Poisson or the Gamma distributions.</p>
+<h3 data-number="5.2.2" id="sec:canonicallink"><span class="header-section-number">5.2.2</span> Canonical link functions</h3>
+<p>A way of deriving the logit link that does generalize to a class of common distributions in what is called the <em>exponential family</em> is to consider the logarithm of the probability function (for discrete distributions) or the probability density function (for continuous distributions). The probability function for the Bernoulli distribution is <span class="math inline">\(\mu\)</span> for <span class="math inline">\(y=1\)</span> and <span class="math inline">\(1-\mu\)</span> for <span class="math inline">\(y=0\)</span>. If we write this in a somewhat peculiar way as <span class="math inline">\(\mu^y+(1-\mu)^{1-y}\)</span> for <span class="math inline">\(y\in\{0,1\}\)</span> then the logarithm of the probability function becomes <span class="math display">\[\label{eq:BernoulliProb}
+  \log\left(\mu^y+(1-\mu)^{1-y}\right) = \log(1-\mu) +
+  y\,\log\left(\frac{\mu}{1-\mu}\right) .\]</span> Notice that the logit link function is the multiple of <span class="math inline">\(y\)</span> in the last term.</p>
+<p>For members of the exponential family the logarithm of the probability or probability density function can be expressed as a sum of up to three terms: one that involves <span class="math inline">\(y\)</span> only, one that involves the parameters only and the product of <span class="math inline">\(y\)</span> and a function of the parameters. This function is the canonical link.</p>
+<p>In the case of the Poisson distribution the probability function is <span class="math inline">\(\frac{e^{-\mu}\mu^y}{y!}\)</span> for <span class="math inline">\(y\in\{0,1,2,\dots\}\)</span> so the log probability function is <span class="math display">\[\label{eq:PoissonProb}
+  -\log(y!)-\mu+y\log(\mu) .\]</span> and the canonical link function is <span class="math inline">\(\log(\mu)\)</span>.</p>
+<h3 data-number="5.2.3" id="sec:GLMMcoefficients"><span class="header-section-number">5.2.3</span> Interpreting coefficient estimates</h3>
+<p>Returning to the interpretation of the estimated coefficients in model we apply exactly the same interpretation as for a linear mixed model but taking into account that slopes or differences in levels are with respect to the logit or log-odds function. If we wish to express results in the probability scale then we should apply the function to whatever combination of coefficients is of interest to us.</p>
+<p>For example, we see from Fig. <a href="#fig:Contra2" data-reference-type="ref" data-reference="fig:Contra2">[fig:Contra2]</a> that the observed proportion of childless women with a centered age of 0 living in a rural setting who use artificial contraception is about 20%. The fitted value of the log-odds for a typical district (i.e. with a random effect of zero) is corresponding to a fitted probability of</p>
+<p>or %.</p>
+<p>Similarly the predicted log-odds of a childless woman with a centered age of 0 in an urban setting of a typical district using artificial contraception is</p>
+<p>corresponding to a probability of</p>
+<p>The predicted log-odds and predicted probability for a woman with children and at the same age and location are</p>
+<p>We should also be aware that the random effects are defined on the linear predictor scale and not on the probability scale. A normal probability plot of the conditional modes of the random effects for model (Fig. <a href="#fig:fm13predqq" data-reference-type="ref" data-reference="fig:fm13predqq">[fig:fm13predqq]</a>)</p>
+<p>shows that the smallest random effects are approximately -1 and the largest are approximately 1. The numerical values and the identifier of the combination of and for these extreme values can be obtained as</p>
+<p>and</p>
+<p>The exponential of the random effect is the relative odds of a woman in a particular urban/district combination using artificial birth control compared to her counterpart (same age, same with/without children status, same urban/rural status) in a typical district. The odds of a rural woman in district 1 (i.e. the value of the interaction) using artifical contraception is</p>
+<p>or about 40% of that of her rural counterpart in a typical district.</p>
+<p>Notice that there is considerable variability in the lengths of the prediction intervals in Fig. <a href="#fig:fm13predqq" data-reference-type="ref" data-reference="fig:fm13predqq">[fig:fm13predqq]</a>, unlike those from previous model fits (e.g. Fig. <a href="#fig:fm01preddot" data-reference-type="ref" data-reference="fig:fm01preddot">[fig:fm01preddot]</a>, p.  or Fig. <a href="#fig:fm03ranef" data-reference-type="ref" data-reference="fig:fm03ranef">[fig:fm03ranef]</a>, p. <a href="#fig:fm03ranef" data-reference-type="ref" data-reference="fig:fm03ranef">[fig:fm03ranef]</a>). This is to be expected with data from a highly unbalanced observational study.</p>
+<p>Consider the cross-tabulation of counts of interviewees by district and urban/rural status presented at the end of . The data contains responses from 54 rural women in district 1 but only 21 rural women from district 11. Thus the bottom line in Fig. <a href="#fig:fm13predqq" data-reference-type="ref" data-reference="fig:fm13predqq">[fig:fm13predqq]</a>, from the level of the interaction, and based on 54 responses, is shorter than the line second from the bottom, for and based on 21 women only.</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+             
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title>Assessing the variability of the parameter estimates - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="1.5" id="sec:variability"><span class="header-section-number">1.5</span> Assessing the variability of the parameter estimates</h2>
+<p>In this section we show how to create a <em>profile deviance</em> object from a fitted linear mixed model and how to use this object to evaluate confidence intervals on the parameters. We also discuss the construction and interpretation of <em>profile zeta</em> plots for the parameters. In <code>chapter-that-may-or-may-not-get-written</code> we discuss the use of the deviance profiles to produce likelihood contours for pairs of parameters.</p>
+<h3 data-number="1.5.1" id="sec:profdevconf"><span class="header-section-number">1.5.1</span> Confidence intervals on the parameters</h3>
+<p>The mixed-effects model fit as or has three parameters for which we obtained estimates. These parameters are <span class="math inline">\(\sigma_1\)</span>, the standard deviation of the random effects, <span class="math inline">\(\sigma\)</span>, the standard deviation of the residual or “per-observation” noise term and <span class="math inline">\(\beta_0\)</span>, the fixed-effects parameter that is labeled as <code>(Intercept)</code>.</p>
+<p>The function systematically varies the parameters in a model, assessing the best possible fit that can be obtained with one parameter fixed at a specific value and comparing this fit to the <em>globally optimal fit</em>, which is the original model fit that allowed all the parameters to vary. The models are compared according to the change in the deviance, which is the <em>likelihood ratio test</em> (LRT) statistic. We apply a <em>signed square root</em> transformation to this statistic and plot the resulting function, called <span class="math inline">\(\zeta\)</span>, versus the parameter value. A <span class="math inline">\(\zeta\)</span> value can be compared to the quantiles of the <em>standard normal distribution</em>, <span class="math inline">\(\mathcal{Z}\sim\mathcal{N}(0,1)\)</span>. For example, a 95% profile deviance confidence interval on the parameter consists of those values for which <span class="math inline">\(-1.960 &lt; \zeta &lt; 1.960\)</span>.</p>
+<p>Because the process of profiling a fitted model, which involves re-fitting the model many times, can be computationally intensive, one should exercise caution with complex models fit to very large data sets. Because the statistic of interest is a likelihood ratio, the model is re-fit according to the maximum likelihood criterion, even if the original fit is a REML fit. Thus, there is a slight advantage in starting with an ML fit.</p>
+<p>Plots of <span class="math inline">\(\zeta\)</span> versus the parameter being profiled are obtained with</p>
+<p>We will refer to such plots as <em>profile zeta</em> plots. I usually adjust the aspect ratio of the panels in profile zeta plots to, say, and frequently set the layout so the panels form a single row (, in this case).</p>
+<p>The vertical lines in the panels delimit the 50%, 80%, 90%, 95% and 99% confidence intervals, when these intervals can be calculated. Numerical values of the endpoints are returned by the extractor.</p>
+<p>By default the 95% confidence interval is returned. The optional argument, , is used to obtain other confidence levels.</p>
+<p>Notice that the lower bound on the 99% confidence interval for <span class="math inline">\(\sigma_1\)</span> is not defined. Also notice that we profile <span class="math inline">\(\log(\sigma)\)</span> instead of <span class="math inline">\(\sigma\)</span>, the residual standard deviation.</p>
+<p>A plot of <span class="math inline">\(|\zeta|\)</span>, the absolute value of <span class="math inline">\(\zeta\)</span>, versus the parameter , obtained by adding the optional argument to the call to , can be more effective for visualizing the confidence intervals.</p>
+<h3 data-number="1.5.2" id="sec:interpprofzeta"><span class="header-section-number">1.5.2</span> Interpreting the profile zeta plot</h3>
+<p>A profile zeta plot, such as , shows us the sensitivity of the model fit to changes in the value of particular parameters. Although this is not quite the same as describing the distribution of an estimator, it is a similar idea and we will use some of the terminology from distributions when describing these plots. Essentially we view the patterns in the plots as we would those in a normal probability plot of data values or of residuals from a model.</p>
+<p>Ideally the profile zeta plot will be close to a straight line over the region of interest, in which case we can perform reliable statistical inference based on the parameter’s estimate, its standard error and quantiles of the standard normal distribution. We describe such a situation as providing a good normal approximation for inference. The common practice of quoting a parameter estimate and its standard error assumes that this is always the case.</p>
+<p>In the profile zeta plot for <span class="math inline">\(\log(\sigma)\)</span> is reasonably straight so <span class="math inline">\(\log(\sigma)\)</span> has a good normal approximation. But this does not mean that there is a good normal approximation for <span class="math inline">\(\sigma^2\)</span> or even for <span class="math inline">\(\sigma\)</span>. As shown in the profile zeta plot for <span class="math inline">\(\log(\sigma)\)</span> is slightly skewed, that for <span class="math inline">\(\sigma\)</span> is moderately skewed and the profile zeta plot for <span class="math inline">\(\sigma^2\)</span> is highly skewed. Deviance-based confidence intervals on <span class="math inline">\(\sigma^2\)</span> are quite asymmetric, of the form “estimate minus a little, plus a lot.”</p>
+<p>This should not come as a surprise to anyone who learned in an introductory statistics course that, given a random sample of data assumed to come from a Gaussian distribution, we use a <span class="math inline">\(\chi^2\)</span> distribution, which can be quite skewed, to form a confidence interval on <span class="math inline">\(\sigma^2\)</span>. Yet somehow there is a widespread belief that the distribution of variance estimators in much more complex situations should be well approximated by a normal distribution. It is nonsensical to believe that. In most cases summarizing the precision of a variance component estimate by giving an approximate standard error is woefully inadequate.</p>
+<p>The pattern in the profile plot for <span class="math inline">\(\beta_0\)</span> is sigmoidal (i.e. an elongated “S”-shape). The pattern is symmetric about the estimate but curved in such a way that the profile-based confidence intervals are wider than those based on a normal approximation. We characterize this pattern as symmetric but over-dispersed (relative to a normal distribution). Again, this pattern is not unexpected. Estimators of the coefficients in a linear model without random effects have a distribution which is a scaled Student’s T distribution. That is, they follow a symmetric distribution that is over-dispersed relative to the normal.</p>
+<p>The pattern in the profile zeta plot for <span class="math inline">\(\sigma_1\)</span> is more complex. shows the profile zeta plot on the scale of <span class="math inline">\(\log(\sigma_1)\)</span>, <span class="math inline">\(\sigma_1\)</span> and <span class="math inline">\(\sigma_1^2\)</span>. Notice that the profile zeta plot for <span class="math inline">\(\log(\sigma_1)\)</span> is very close to linear to the right of the estimate but flattens out on the left. That is, <span class="math inline">\(\sigma_1\)</span> behaves like <span class="math inline">\(\sigma\)</span> in that its profile zeta plot is more-or-less a straight line on the logarithmic scale, except when <span class="math inline">\(\sigma_1\)</span> is close to zero. The model loses sensitivity to values of <span class="math inline">\(\sigma_1\)</span> that are close to zero. If, as in this case, zero is within the “region of interest” then we should expect that the profile zeta plot will flatten out on the left hand side.</p>
+<p>Notice that the profile zeta plot of <span class="math inline">\(\sigma_1^2\)</span> in is dramatically skewed. If reporting the estimate, <span class="math inline">\(\widehat{\sigma^2}_1\)</span>, and its standard error, as many statistical software packages do, were to be an adequate description of the variability in this estimate then this profile zeta plot should be a straight line. It’s nowhere close to being a straight line in this and in many other model fits, which is why we don’t report standard errors for variance estimates.</p>
+<h3 data-number="1.5.3" id="sec:profDens"><span class="header-section-number">1.5.3</span> Deriving densities from the profile</h3>
+<p>In the profile zeta plots we show <span class="math inline">\(\zeta\)</span> as a function of a parameter. We can use the function shown there, which we will call the <em>profile zeta function</em>, to generate a corresponding distribution by setting the cumulative distribution function (c.d.f) to be <span class="math inline">\(\Phi(\zeta)\)</span> where <span class="math inline">\(\Phi\)</span> is the c.d.f. of the standard normal distribution. From this we can derive a density.</p>
+<p>This is not quite the same as evaluating the distribution of the estimator of the parameter, which for mixed-effects models can be very difficult, but it gives us a good indication of what the distribution of the estimator would be.</p>
+<p>shows the densities corresponding to the profiles in . We see that the density for <span class="math inline">\(\sigma_1\)</span> is quite skewed.</p>
+<p>If we had plotted the densities corresponding to the profiles of the variance components instead, we would get which, of course, just accentuates the skewness in the distribution of these variance components.</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+            <kbd>→</kbd> <a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a>
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>

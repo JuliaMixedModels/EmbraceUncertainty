@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title>The REML Criterion - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="4.5" id="sec:REML"><span class="header-section-number">4.5</span> The REML Criterion</h2>
+<p>The so-called REML estimates of variance components are often preferred to the maximum likelihood estimates. (“REML” can be considered to be an acronym for “restricted” or “residual” maximum likelihood, although neither term is completely accurate because these estimates do not maximize a likelihood.) We can motivate the use of the REML criterion by considering a linear regression model, <span class="math display">\[\label{eq:20}
+  \mathcal{Y}\sim\mathcal{N}(\mathbf{X}\mathbf{\beta},\sigma^2\mathbf{I}_n),\]</span> in which we typically estimate <span class="math inline">\(\sigma^2\)</span> as <span class="math display">\[\label{eq:21}
+  \widehat{\sigma^2_R}=\frac{\|\mathbf{y}_{\text{obs}}-\mathbf{X}\widehat{\mathbf{\beta}}\|^2}{n-p}\]</span> even though the maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is <span class="math display">\[\label{eq:22}
+  \widehat{\sigma^2_{L}}=\frac{\|\mathbf{y}_{\text{obs}}-\vec
+    X\widehat{\mathbf{\beta}}\|^2}{n} .\]</span></p>
+<p>The argument for preferring <span class="math inline">\(\widehat{\sigma^2_R}\)</span> to <span class="math inline">\(\widehat{\sigma^2_{L}}\)</span> as an estimate of <span class="math inline">\(\sigma^2\)</span> is that the numerator in both estimates is the sum of squared residuals at <span class="math inline">\(\widehat{\mathbf{\beta}}\)</span> and, although the residual vector, <span class="math inline">\(\vec y_{\text{obs}}-\mathbf{X}\widehat{\mathbf{\beta}}\)</span>, is an <span class="math inline">\(n\)</span>-dimensional vector, it satisfies <span class="math inline">\(p\)</span> linearly independent constraints, <span class="math inline">\(\vec X&#39;(\mathbf{y}_{\text{obs}}-\mathbf{X}\widehat{\mathbf{\beta}})=\mathbf{0}\)</span>. That is, the residual at <span class="math inline">\(\widehat{\mathbf{\beta}}\)</span> is the projection of the observed response vector, <span class="math inline">\(\mathbf{y}_{\text{obs}}\)</span>, into an <span class="math inline">\((n-p)\)</span>-dimensional linear subspace of the <span class="math inline">\(n\)</span>-dimensional response space. The estimate <span class="math inline">\(\widehat{\sigma^2_R}\)</span> takes into account the fact that <span class="math inline">\(\sigma^2\)</span> is estimated from residuals that have only <span class="math inline">\(n-p\)</span> <em>degrees of freedom</em>.</p>
+<p>Another argument often put forward for REML estimation is that <span class="math inline">\(\widehat{\sigma^2_R}\)</span> is an <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span>, in the sense that the expected value of the estimator is equal to the value of the parameter. However, determining the expected value of an estimator involves integrating with respect to the density of the estimator and we have seen that densities of estimators of variances will be skewed, often highly skewed. It is not clear why we should be interested in the expected value of a highly skewed estimator. If we were to transform to a more symmetric scale, such as the estimator of the standard deviation or the estimator of the logarithm of the standard deviation, the REML estimator would no longer be unbiased. Furthermore, this property of unbiasedness of variance estimators does not generalize from the linear regression model to linear mixed models. This is all to say that the distinction between REML and ML estimates of variances and variance components is probably less important than many people believe.</p>
+<p>Nevertheless it is worthwhile seeing how the computational techniques described in this chapter apply to the REML criterion because the REML parameter estimates <span class="math inline">\(\widehat{\mathbf{\theta}}_R\)</span> and <span class="math inline">\(\widehat{\sigma_R^2}\)</span> for a linear mixed model have the property that they would specialize to <span class="math inline">\(\widehat{\sigma^2_R}\)</span> from (<a href="#eq:21" data-reference-type="ref" data-reference="eq:21">[eq:21]</a>) for a linear regression model, as seen in .</p>
+<p>Although not usually derived in this way, the REML criterion (on the deviance scale) can be expressed as <span class="math display">\[\label{eq:23}
+  d_R(\mathbf{\theta},\sigma|\mathbf{y}_{\text{obs}})=-2\log
+  \int_{\mathbb{R}^p}L(\mathbf{\theta},\mathbf{\beta},\sigma|\mathbf{y}_{\text{obs}})\,d\mathbf{\beta} .\]</span> The REML estimates <span class="math inline">\(\widehat{\mathbf{\theta}}_R\)</span> and <span class="math inline">\(\widehat{\sigma_R^2}\)</span> minimize <span class="math inline">\(d_R(\mathbf{\theta},\sigma|\mathbf{y}_{\text{obs}})\)</span>.</p>
+<p>To evaluate this integral we form an expansion, similar to (<a href="#eq:PRSSwithL" data-reference-type="ref" data-reference="eq:PRSSwithL">[eq:PRSSwithL]</a>), of <span class="math inline">\(r^2_{\theta,\beta}\)</span> about <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span> <span class="math display">\[\label{eq:rsqbetathetaexp}
+  r^2_{\theta,\beta}=r^2_\theta+\|\mathbf{R}_X(\mathbf{\beta}-\widehat{\mathbf{\beta}}_\theta)\|^2 .\]</span> In the same way that (<a href="#eq:PRSSwithL" data-reference-type="ref" data-reference="eq:PRSSwithL">[eq:PRSSwithL]</a>) was used to simplify the integral in (<a href="#eq:hintegral" data-reference-type="ref" data-reference="eq:hintegral">[eq:hintegral]</a>), we can derive <span class="math display">\[\label{eq:betaintegral}
+  \int_{\mathbb{R}^p}\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
+  {(2\pi\sigma^2)^{n/2}|\mathbf{L}_\theta|} \,d\mathbf{\beta}=
+  \frac{\exp\left(-\frac{r^2_\theta}{2\sigma^2}\right)}
+  {(2\pi\sigma^2)^{(n-p)/2}|\mathbf{L}_\theta||\mathbf{R}_X|}\]</span> corresponding to a REML criterion on the deviance scale of <span class="math display">\[\label{eq:REMLdev}
+  d_R(\mathbf{\theta},\sigma|\mathbf{y}_{\text{obs}})=(n-p)\log(2\pi\sigma^2)+
+  2\log\left(|\mathbf{L}_\theta||\mathbf{R}_X|\right)+\frac{r^2_\theta}{\sigma^2} .\]</span> Plugging in the conditional REML estimate, <span class="math inline">\(\widehat{\sigma^2}_R=r^2_\theta/(n-p)\)</span>, provides the profiled REML criterion <span class="math display">\[\label{eq:24}
+  \tilde{d}_R(\mathbf{\theta}|\mathbf{y}_{\text{obs}})=
+  2\log\left(|\mathbf{L}_\theta||\mathbf{R}_X|\right)+(n-p)
+  \left[1+\log\left(\frac{2\pi r^2_\theta}{n-p}\right)\right].\]</span></p>
+<p>The REML estimate of <span class="math inline">\(\mathbf{\theta}\)</span> is <span class="math display">\[\label{eq:31}
+  \widehat{\mathbf{\theta}}_R=\arg\min_{\mathbf{\theta}}\tilde{d}_R(\mathbf{\theta}|\mathbf{y}_{\text{obs}}) ,\]</span> and the REML estimate of <span class="math inline">\(\sigma^2\)</span> is the conditional REML estimate of <span class="math inline">\(\sigma^2\)</span> at <span class="math inline">\(\widehat{\mathbf{\theta}}_R\)</span>, <span class="math display">\[\label{eq:REMLsigmasq}
+  \widehat{\sigma^2_R}=r^2_{\widehat\theta_R}/(n-p) .\]</span> It is not entirely clear how one would define a “REML estimate” of <span class="math inline">\(\mathbf{\beta}\)</span> because the REML criterion, <span class="math inline">\(d_R(\mathbf{\theta},\sigma|\vec y)\)</span>, defined in (<a href="#eq:REMLdev" data-reference-type="ref" data-reference="eq:REMLdev">[eq:REMLdev]</a>), does not depend on <span class="math inline">\(\mathbf{\beta}\)</span>. However, it is customary (and not unreasonable) to use <span class="math inline">\(\widehat{\mathbf{\beta}}_R=\widehat{\mathbf{\beta}}_{\widehat{\mathbf{\theta}}_R}\)</span> as the REML estimate of <span class="math inline">\(\mathbf{\beta}\)</span>.</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+            <kbd>→</kbd> <a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a>
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title>Artificial contraception use in regions of Bangladesh - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="5.1" id="sec:contraception"><span class="header-section-number">5.1</span> Artificial contraception use in regions of Bangladesh</h2>
+<p>One of the test data sets from the Center for Multilevel Modelling, University of Bristol is derived from the 1989 Bangladesh Fertility Survey, <span class="citation" data-cites="huq:cleland:1990">(<a href="/references#ref-huq:cleland:1990" role="doc-biblioref">Huq &amp; Cleland, 1990</a>)</span>. The data are a subsample of responses from 1934 women grouped in 60 districts and are available as the data set in the package.</p>
+<p>The response of interest is — whether the woman chooses to use artificial contraception. The covariates include the district in which the woman resides, the number of live children she currently has, her age and whether she is in a rural or an urban setting.</p>
+<p>Note that the variable is centered about a particular age so some values are negative. Regretably, the information on what the centering age was does not seem to be available.</p>
+<h3 data-number="5.1.1" id="sec:plottingbinary"><span class="header-section-number">5.1.1</span> Plotting the binary response</h3>
+<p>Producing informative graphical displays of a binary response as it relates to covariates is somewhat more challenging that the corresponding plots for responses on a continuous scale. If we were to plot the 1934 responses as 0/1 values versus, for example, the woman’s centered age, we would end up with a rather uninformative plot because all the points would fall on one of two horizontal lines.</p>
+<p>One approach to illustrating the structure of the data more effectively is to add <em>scatterplot smoother</em> lines (Fig. <a href="#fig:Contra1" data-reference-type="ref" data-reference="fig:Contra1">[fig:Contra1]</a>)</p>
+<p>to show the trend in the response with respect to the covariate. Once we have the smoother lines in such a plot we can omit the data points themselves, as we did here, because they add very little information.</p>
+<p>The first thing to notice about the plot is that the proportion of women using contraception is not linear in age, which, on reflection, makes sense. A woman in the middle of this age range (probably corresponding to an age around 25) is more likely to use artificial contraception than is a girl in her early teens or a woman in her forties. We also see that women in an urban setting are more likely to use contraception than those in a rural setting and that women with no live children are less likely than women who have live children. There do not seem to be strong differences between women who have 1, 2 or 3 or more children compared to the differences between women with children and those without children.</p>
+<p>Interestingly, the quadratic pattern with respect to age does not seem to have been noticed. Comparisons of model fits through different software systems, as provided by the Center for Multilevel Modelling, incorporate only a linear term in age, even though the pattern is clearly nonlinear. The lesson here is similar to what we have seen in other examples; careful plotting of the data should, whenever possible, precede attempts to fit models to the data.</p>
+<h3 data-number="5.1.2" id="sec:ContraGLMM"><span class="header-section-number">5.1.2</span> Initial GLMM fit to the contraception data</h3>
+<p>As for the function, the first two arguments to the function for fitting generalized linear mixed models are the model formula and the name of the data frame. The third argument to , named , describes the type of conditional distribution of the response given the random effects. Actually, as the name implies, it contains more information than just the distribution type in that each distribution and link are described by several functions. Certain distributions, including the binomial, have canonical link functions (described in ) associated with them and if we specify just the distribution type we get the family with the canonical link. Thus our initial fit is generated as</p>
+<p>When displaying a fitted model like this that has several fixed-effects coefficients it is helpful to specify the optional argument to suppress printing of the rather large correlation matrix of the fixed effects estimators.</p>
+<p>The interpretation of the coefficients in this model is somewhat different from the linear mixed models coefficients that we examined previously but many of the model-building steps are similar. A rough assessment of the utility of a particular term in the fixed-effects part of the model can be obtained from examining the estimates of the coefficients associated with it and their standard errors. To test whether a particular term is useful we omit it from the model, refit and compare the reduced model fit to the original according to the change in deviance.</p>
+<p>We will examine the terms in the model first and discuss the interpretation of the coefficients in .</p>
+<p>Recall from Chap. <a href="#chap:Covariates" data-reference-type="ref" data-reference="chap:Covariates">[chap:Covariates]</a> that the default set of contrasts for a factor such as is offsets relative to the reference level, in this case women who do not have any live children. Although the coefficients labeled , and are all large relative to their standard errors, they are quite close to each other. This confirms our earlier impression that the main distinction is between women with children and those without and, for those who do have children, the number of children is not an important distinction.</p>
+<p>After incorporating a new variable — an indicator of whether the woman has any children — in the data</p>
+<p>we fit a reduced model, , with summary</p>
+<p>Comparing this model to the previous model</p>
+<p>indicates that the reduced model is adequate.</p>
+<p>A plot of the smoothed observed proportions versus centered age according to and (Fig. <a href="#fig:Contra2" data-reference-type="ref" data-reference="fig:Contra2">[fig:Contra2]</a>)</p>
+<p>indicates that all four groups have a quadratic trend with respect to age but the location of the peak proportion is shifted for those without children relative to those with children. Incorporating an interaction of and allows for such a shift.</p>
+<p>Comparing this fitted model to the previous one</p>
+<p>confirms the usefulness of this term.</p>
+<p>Continuing with the model-building we turn our attention to the random effects specification to see whether urban/rural differences vary significantly between districts and whether the distinction between childless women and women with children varies between districts. We fit a succession of models, described in the exercises for this chapter, before settling on model ,</p>
+<p>Notice that although there are 60 distinct districts there are only 102 distinct combinations of represented in the data. In 15 of the 60 districts there are no rural women in the sample and in 3 districts there are no urban women in the sample, as shown in</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+            <kbd>→</kbd> <a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a>
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>

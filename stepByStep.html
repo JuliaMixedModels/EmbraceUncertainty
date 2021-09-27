@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title>Step-by-step Evaluation of the Profiled Deviance - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="4.6" id="sec:stepByStep"><span class="header-section-number">4.6</span> Step-by-step Evaluation of the Profiled Deviance</h2>
+<p>An object returned by is an S4-classed object <span class="citation" data-cites="R:Chambers:2008">(<a href="/references#ref-R:Chambers:2008" role="doc-biblioref">Chambers, 2008</a>)</span> of class . A special utility function, , creates a function to evaluate the deviance from such an object. Because the deviance evaluation function may be called many, many times for different values of the model parameters and may need to handle large data structures very efficiently, the default deviance evaluator uses compiled code, that is written in C++ using the facilities of the package <span class="citation" data-cites="Rcpp">(<a href="/references#ref-Rcpp" role="doc-biblioref">Eddelbuettel, 2013</a>)</span>. As such, this function is not very illuminating</p>
+<p>unless you are willing to go digging into the source code for the compiled function called .</p>
+<p>However, if we set the optional argument and suppress the compiled deviance evaluation then the deviance function follows the deviance evaluation in more easily understood constructions.</p>
+<p>Providing for an -based evaluation of the deviance, in addition to the compiled code, allows us to check for consistent results. For example, suppose that we wished to check that the compiled and -based deviance functions agreed at the initial values of the parameter <span class="math inline">\(\mathbf{\theta}=[1,0,1]&#39;\)</span></p>
+<p>Without going into detail let us just point out that, because the function is created within another function, , has access to the structures in the model, , which internally is identified as . The deviance evaluation uses the value of <span class="math inline">\(\mathbf{\theta}\)</span>, called , and information in three of the model slots: the random-effects structure, called , the fixed-effects structure, called , and the response structure, called . There is also a diagonal matrix of weights, called , available to this function but for our evaluation that matrix is the identity and we will ignore it.</p>
+<p>The function, with line numbers, is</p>
+<p>Lines 3 to 9 create local versions of <span class="math inline">\(\Lambda\)</span> and <span class="math inline">\(\mathbf{L}\)</span> from the information in the slot and the argument .</p>
+<p>In lines 3 to 5 the argument is checked for correct mode and length and whether it violates the lower bounds stored in the slot.</p>
+<p>In lines 6 and 7 the current value of <span class="math inline">\(\Lambda\)</span> is created from a template, stored in the slot, the value of and the index vector, which maps elements of <span class="math inline">\(\mathbf{\theta}\)</span> to the non-zero elements of <span class="math inline">\(\Lambda\)</span>.</p>
+<p>As mentioned above, is the identity in this case so line 8 amounts to assigning the matrix in the slot to the local variable . Then line 9 evaluates the sparse Cholesky factor, , by updating the template in the slot. The optional argument, , to the method is the multiple of the identity matrix to add to the of the second argument. This produces the factor <span class="math inline">\(\mathbf{L}_\theta\)</span> defined in (<a href="#eq:sparseCholeskyP" data-reference-type="ref" data-reference="eq:sparseCholeskyP">[eq:sparseCholeskyP]</a>).</p>
+<p>Lines 10 to 14 produce <span class="math inline">\(\mathbf{Z}&#39;\mathbf{y}\)</span>, <span class="math inline">\(\mathbf{X}&#39;\mathbf{y}\)</span> and <span class="math inline">\(\mathbf{Z}&#39;\mathbf{X}\)</span>, taking into account possible weights, from the (square root of the residual weights) slot, and/or an offset, from the slot. To avoid confusion when incorporating weights, these values are stored as , and .</p>
+<p>Because the -based evaluation function, , must be able to handle non-default values of arguments such as and to the function, we will skip over some of the details and concentrate on the parts that correspond to formulas in the previous section.</p>
+<p>First we derive the matrix <span class="math inline">\(\Lambda_\theta\)</span> from <span class="math inline">\(\mathbf{\theta}\)</span>. A template version of <span class="math inline">\(\Lambda\)</span> is stored in the random-effects structure slot, called , of the model object. The slot contains an index vector indicating which element of is to be used to replace an element of the slot in</p>
+<p>object <span class="citation" data-cites="R:Chambers:2008">(<a href="/references#ref-R:Chambers:2008" role="doc-biblioref">Chambers, 2008</a>)</span> containing a set of well-defined “slots.” For evaluation of the devai environment, accessed with the extractor. This environment contains several matrices and vectors that are used in the evaluation of the profiled deviance. In this section we use these matrices and vectors from one of our examples to explicitly trace the steps in evaluating the profiled deviance. This level of detail is provided for those whose style of learning is more of a “hands on” style and for those who may want to program modifications of this approach.</p>
+<p>Consider our model , fit as</p>
+<p>The environment of the model contains the converged parameter vector, <span class="math inline">\(\mathbf{\theta}\)</span> (), the relative covariance factor, <span class="math inline">\(\Lambda_\theta\)</span> (), the sparse Cholesky factor, <span class="math inline">\(\vec L_\theta\)</span> (), the matrices <span class="math inline">\(\mathbf{R}_{ZX}\)</span> () and <span class="math inline">\(\mathbf{R}_X\)</span> (), the conditional mode, <span class="math inline">\(\tilde{\mathbf{u}}\)</span> (), and the conditional estimate, <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span> (). The permutation represented by <span class="math inline">\(\mathbf{P}\)</span> is contained in the sparse Cholesky representation, .</p>
+<p>Although the model matrices, <span class="math inline">\(\mathbf{X}\)</span> () and <span class="math inline">\(\mathbf{Z}&#39;\)</span> (), and the response vector, <span class="math inline">\(\mathbf{y}_{\text{obs}}\)</span> (), are available in the environment, many of the products that involve only these fixed values are precomputed and stored separately under the names (<span class="math inline">\(\mathbf{X}&#39;\mathbf{X}\)</span>), , and .</p>
+<p>To provide easy access to the objects in the environment of we attach it to the search path.</p>
+<p>Please note that this is done here for illustration only. The practice of attaching a list or a data frame or, less commonly, an environment in an session is overused, somewhat dangerous (because of the potential of forgetting to detach it later) and discouraged. The preferred practice is to use the function to gain access by name to components of such composite objects. For this section of code, however, using or would quickly become very tedious and we use instead.</p>
+<p>To update the matrix <span class="math inline">\(\Lambda_\theta\)</span> to a new value of <span class="math inline">\(\mathbf{\theta}\)</span> we need to know which of the non-zeros in <span class="math inline">\(\Lambda\)</span> are updated from which elements of <span class="math inline">\(\mathbf{\theta}\)</span>. Recall that the dimension of <span class="math inline">\(\mathbf{\theta}\)</span> is small (3, in this case) but <span class="math inline">\(\Lambda\)</span> is potentially large (<span class="math inline">\(18\times18\)</span> with <span class="math inline">\(54\)</span> non-zeros). The environment contains an integer vector that maps the elements of to the non-zeros in .</p>
+<p>Suppose we wish to recreate the evaluation of the profiled deviance at the initial value of <span class="math inline">\(\mathbf{\theta}=(1,0,1)\)</span>. We begin by updating <span class="math inline">\(\Lambda_\theta\)</span> and forming the product <span class="math inline">\(\mathbf{u}&#39;=\Lambda_\theta&#39;\mathbf{Z}&#39;\)</span></p>
+<p>The Cholesky factor object, , can be updated from without forming <span class="math inline">\(\mathbf{u}&#39;\mathbf{u}+\mathbf{I}\)</span> explicitly. The optional argument to the method specifies a multiple of the identity to be added to <span class="math inline">\(\mathbf{u}&#39;\mathbf{u}\)</span></p>
+<p>Then we evaluate and according to (<a href="#eq:RZXdef" data-reference-type="ref" data-reference="eq:RZXdef">[eq:RZXdef]</a>) and (<a href="#eq:RXdef" data-reference-type="ref" data-reference="eq:RXdef">[eq:RXdef]</a>)</p>
+<p>Solving (<a href="#eq:bigPLS" data-reference-type="ref" data-reference="eq:bigPLS">[eq:bigPLS]</a>) for <span class="math inline">\(\tilde{\mathbf{u}}\)</span> and <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span> is done in stages. Writing <span class="math inline">\(\mathbf{c}_u\)</span> and <span class="math inline">\(\mathbf{c}_\beta\)</span> for the intermediate results that satisfy <span class="math display">\[\label{eq:stage1}
+    \begin{bmatrix}
+    \mathbf{L}_\theta &amp; \mathbf{0}\\
+    \mathbf{R}_{ZX}&#39; &amp; \mathbf{R}_X&#39;
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{c}_u\\\mathbf{c}_\beta
+  \end{bmatrix}=
+  \begin{bmatrix}
+    \mathbf{P}\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{y}_{\text{obs}}\\
+    \mathbf{X}&#39;\mathbf{y}_{\text{obs}} .
+  \end{bmatrix}\]</span> we evaluate</p>
+<p>The next set of equations to solve is <span class="math display">\[\label{eq:stage2}
+    \begin{bmatrix}
+    \mathbf{L}_\theta&#39; &amp; \mathbf{R}_{ZX}\\
+    \mathbf{0} &amp; \mathbf{R}_X
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{P}\tilde{\mathbf{u}}\\
+    \widehat{\mathbf{\beta}}_\theta
+  \end{bmatrix}=
+  \begin{bmatrix}
+    \mathbf{c}_U\\\mathbf{c}_\beta
+  \end{bmatrix}.\]</span></p>
+<p>We can now create the conditional mean, , the penalized residual sum of squares, , the logarithm of the square of the determinant of <span class="math inline">\(\mathbf{L}\)</span>, , and the profiled deviance, which, fortuitously, equals the value shown earlier.</p>
+<p>to avoid later name clashes.</p>
+<p>In terms of the calculations performed, these steps describe exactly the evaluation of the profiled deviance in . The actual function for evaluating the deviance, accessible as , —FIXME— is a slightly modified version of what is shown above. However, the modifications are only to avoid creating copies of potentially large objects and to allow for cases where the model matrix, <span class="math inline">\(\mathbf{X}\)</span>, is sparse. In practice, unless the optional argument is given, the profiled deviance is evaluated in compiled code, providing a speed boost, but the code can be used if desired. This allows for checking the results from the compiled code and can also be used as a template for extending the computational methods to other types of models.</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+            <kbd>→</kbd> <a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a>
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>

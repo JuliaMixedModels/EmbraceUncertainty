@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title>A Model With Nested Random Effects - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="2.2" id="sec:NestedRE"><span class="header-section-number">2.2</span> A Model With Nested Random Effects</h2>
+<p>In this section we again consider a simple example, this time fitting a model with <em>nested</em> grouping factors for the random effects.</p>
+<h3 data-number="2.2.1" id="sec:pastesData"><span class="header-section-number">2.2.1</span> The <em>pastes</em> Data</h3>
+<p>The third example from <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc"><a href="/references#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">Davies &amp; Goldsmith</a> (<a href="/references#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>Table 6.5, p. 138)</span> is described as coming from</p>
+<blockquote>
+<p>deliveries of a chemical paste product contained in casks where, in addition to sampling and testing errors, there are variations in quality between deliveries …As a routine, three casks selected at random from each delivery were sampled and the samples were kept for reference. …Ten of the delivery batches were sampled at random and two analytical tests carried out on each of the 30 samples.</p>
+</blockquote>
+<p>The structure and summary of the data object are</p>
+<pre class="language-julia"><code>pastes = MixedModels.dataset(:pastes)</code></pre>
+<pre class="output"><code>Arrow.Table with 60 rows, 3 columns, and schema:
+ :batch     String
+ :cask      String
+ :strength  Float64</code></pre>
+<pre class="language-julia"><code>pastes = DataFrame(pastes)
+describe(pastes)</code></pre>
+<table>
+<caption>PastesisDataFrame pastes describe pastes . {#tbl:pastesisDataFrame_pastes describe_pastes }</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">variable</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">median</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">nmissing</th>
+<th style="text-align: right;">eltype</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">batch</td>
+<td style="text-align: right;">nothing</td>
+<td style="text-align: right;">A</td>
+<td style="text-align: right;">nothing</td>
+<td style="text-align: right;">J</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">String</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">cask</td>
+<td style="text-align: right;">nothing</td>
+<td style="text-align: right;">a</td>
+<td style="text-align: right;">nothing</td>
+<td style="text-align: right;">c</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">String</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">strength</td>
+<td style="text-align: right;">60.05333333333333</td>
+<td style="text-align: right;">54.2</td>
+<td style="text-align: right;">59.3</td>
+<td style="text-align: right;">66.0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">Float64</td>
+</tr>
+</tbody>
+</table>
+<p>As stated in the description in <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc"><a href="/references#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">Davies &amp; Goldsmith</a> (<a href="/references#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>)</span>, there are 30 samples, three from each of the 10 delivery batches. We have labelled the levels of the factor with the label of the factor followed by ‘a,’ ‘b’ or ‘c’ to distinguish the three samples taken from that batch. The cross-tabulation produced by the function, using the optional argument , provides a concise display of the relationship.</p>
+<p>An image (Fig. <a href="#fig:imagextabsPastes" data-reference-type="ref" data-reference="fig:imagextabsPastes">[fig:imagextabsPastes]</a>) of this cross-tabulation is, perhaps, easier to appreciate.</p>
+<p>When plotting the versus and in the data we should remember that we have two strength measurements on each of the 30 samples. It is tempting to use the cask designation (‘a,’ ‘b’ and ‘c’) to determine, say, the plotting symbol within a . It would be fine to do this within a batch but the plot would be misleading if we used the same symbol for cask ‘a’ in different batches. There is no relationship between cask ‘a’ in batch ‘A’ and cask ‘a’ in batch ‘B.’ The labels ‘a,’ ‘b’ and ‘c’ are used only to distinguish the three samples within a batch; they do not have a meaning across batches.</p>
+<p>In Fig. <a href="#fig:Pastesplot" data-reference-type="ref" data-reference="fig:Pastesplot">[fig:Pastesplot]</a> we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample. The perceptive reader will have noticed that the levels of the factors on the vertical axis in this figure, and in Fig. <a href="#fig:Dyestuffdot" data-reference-type="ref" data-reference="fig:Dyestuffdot">[fig:Dyestuffdot]</a> and <a href="#fig:Penicillindot" data-reference-type="ref" data-reference="fig:Penicillindot">[fig:Penicillindot]</a>, have been reordered according to increasing average response. In all these cases there is no inherent ordering of the levels of the covariate such as or . Rather than confuse our interpretation of the plot by determining the vertical displacement of points according to a random ordering, we impose an ordering according to increasing mean response. This allows us to more easily check for structure in the data, including undesirable characteristics like increasing variability of the response with increasing mean level of the response.</p>
+<p>In Fig. <a href="#fig:Pastesplot" data-reference-type="ref" data-reference="fig:Pastesplot">[fig:Pastesplot]</a> we order the samples within each batch separately then order the batches according to increasing mean strength.</p>
+<p>Figure <a href="#fig:Pastesplot" data-reference-type="ref" data-reference="fig:Pastesplot">[fig:Pastesplot]</a> shows considerable variability in strength between samples relative to the variability within samples. There is some indication of variability between batches, in addition to the variability induced by the samples, but not a strong indication of a batch effect. For example, batches I and D, with low mean strength relative to the other batches, each contained one sample (I:b and D:c, respectively) that had high mean strength relative to the other samples. Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength. In we will examine the need for incorporating batch-to-batch variability, in addition to sample-to-sample variability, in the statistical model.</p>
+<h4 data-number="2.2.1.1" id="sec:nestedcrossed"><span class="header-section-number">2.2.1.1</span> Nested Factors</h4>
+<p>Because each level of occurs with one and only one level of we say that is <em>nested within</em> . Some presentations of mixed-effects models, especially those related to <em>multilevel modeling</em> <span class="citation" data-cites="MLwiNUser:2000">(<a href="/references#ref-MLwiNUser:2000" role="doc-biblioref">Rasbash et al., 2000</a>)</span> or <em>hierarchical linear models</em> <span class="citation" data-cites="Rauden:Bryk:2002">(<a href="/references#ref-Rauden:Bryk:2002" role="doc-biblioref">Raudenbush &amp; Bryk, 2002</a>)</span>, leave the impression that one can only define random effects with respect to factors that are nested. This is the origin of the terms “multilevel,” referring to multiple, nested levels of variability, and “hierarchical,” also invoking the concept of a hierarchy of levels. To be fair, both those references do describe the use of models with random effects associated with non-nested factors, but such models tend to be treated as a special case.</p>
+<p>The blurring of mixed-effects models with the concept of multiple, hierarchical levels of variation results in an unwarranted emphasis on “levels” when defining a model and leads to considerable confusion. It is perfectly legitimate to define models having random effects associated with non-nested factors. The reasons for the emphasis on defining random effects with respect to nested factors only are that such cases do occur frequently in practice and that some of the computational methods for estimating the parameters in the models can only be easily applied to nested factors.</p>
+<p>This is not the case for the methods used in the package. Indeed there is nothing special done for models with random effects for nested factors. When random effects are associated with multiple factors exactly the same computational methods are used whether the factors form a nested sequence or are partially crossed or are completely crossed.</p>
+<p>There is, however, one aspect of nested grouping factors that we should emphasize, which is the possibility of a factor that is <em>implicitly nested</em> within another factor. Suppose, for example, that the factor was defined as having three levels instead of 30 with the implicit assumption that is nested within . It may seem silly to try to distinguish 30 different batches with only three levels of a factor but, unfortunately, data are frequently organized and presented like this, especially in text books. The factor in the data is exactly such an implicitly nested factor. If we cross-tabulate and</p>
+<p>we get the impression that the and factors are crossed, not nested. If we know that the cask should be considered as nested within the batch then we should create a new categorical variable giving the batch-cask combination, which is exactly what the factor is. A simple way to create such a factor is to use the interaction operator, ’’, on the factors. It is advisable, but not necessary, to apply to the result thereby dropping unused levels of the interaction from the set of all possible levels of the factor. (An “unused level” is a combination that does not occur in the data.) A convenient code idiom is</p>
+<p>In a small data set like we can quickly detect a factor being implicitly nested within another factor and take appropriate action. In a large data set, perhaps hundreds of thousands of test scores for students in thousands of schools from hundreds of school districts, it is not always obvious if school identifiers are unique across the entire data set or just within a district. If you are not sure, the safest thing to do is to create the interaction factor, as shown above, so you can be confident that levels of the district:school interaction do indeed correspond to unique schools.</p>
+<h3 data-number="2.2.2" id="sec:fittingPastes"><span class="header-section-number">2.2.2</span> Fitting a Model With Nested Random Effects</h3>
+<p>Fitting a model with simple, scalar random effects for nested factors is done in exactly the same way as fitting a model with random effects for crossed grouping factors. We include random-effects terms for each factor, as in</p>
+<pre class="language-julia"><code>m4 = fit(
+    MixedModel,
+    @formula(strength ~ 1 + (1|batch/cask)),
+    pastes;
+    thin=1,
+)</code></pre>
+<pre class="language-plain"><code>Linear mixed model fit by maximum likelihood
+ strength ~ 1 + (1 | batch) + (1 | batch &amp; cask)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -123.9972   247.9945   255.9945   256.7217   264.3718
+
+Variance components:
+                Column   Variance Std.Dev. 
+batch &amp; cask (Intercept)  8.433617 2.904069
+batch        (Intercept)  1.199180 1.095071
+Residual                  0.678002 0.823409
+ Number of obs: 60; levels of grouping factors: 30, 10
+
+  Fixed-effects parameters:
+─────────────────────────────────────────────────
+               Coef.  Std. Error      z  Pr(&gt;|z|)
+─────────────────────────────────────────────────
+(Intercept)  60.0533    0.642136  93.52    &lt;1e-99
+─────────────────────────────────────────────────</code></pre>
+<p>Not only is the model specification similar for nested and crossed</p>
+<p>factors, the internal calculations are performed according to the methods described in for each model type. Comparing the patterns in the matrices <span class="math inline">\(\Lambda\)</span>, <span class="math inline">\(\mathbf{Z}\trans\mathbf{Z}\)</span> and <span class="math inline">\(\mathbf{L}\)</span> for this model</p>
+<pre class="language-julia"><code>sparseL(m4; full=true)</code></pre>
+<pre class="output"><code>42×42 SparseArrays.SparseMatrixCSC{Float64, Int32} with 153 stored entries:
+⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀
+⠤⢄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀
+⠀⠀⠀⠉⠑⠒⠤⢄⣀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠑⠒⠤⢄⣀⠀⠀⠀⠑⢄⠀
+⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠓</code></pre>
+<pre class="language-julia"><code>BlockDescription(m4)</code></pre>
+<pre class="output"><code>rows: batch &amp; cask     batch         fixed     
+  30:   Diagonal   
+  10:    Sparse       Diagonal   
+   2:    Dense         Dense         Dense     
+</code></pre>
+<p>(Fig. <a href="#fig:fm04LambdaLimage" data-reference-type="ref" data-reference="fig:fm04LambdaLimage">[fig:fm04LambdaLimage]</a>) to those in Fig. <a href="#fig:fm03LambdaLimage" data-reference-type="ref" data-reference="fig:fm03LambdaLimage">[fig:fm03LambdaLimage]</a> shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, <span class="math inline">\(\mathbf{L}\)</span>, after reordering the random effects (we discuss this reordering later in ). This type of structure has the desirable property that there is no “fill-in” during calculation of the Cholesky factor. In other words, the number of non-zeros in <span class="math inline">\(\mathbf{L}\)</span> is the same as the number of non-zeros in the lower triangle of the matrix being factored, <span class="math inline">\(\Lambda\trans\mathbf{Z}\trans\mathbf{Z}\Lambda+\mathbf{I}\)</span> (which, because <span class="math inline">\(\Lambda\)</span> is diagonal, has the same structure as <span class="math inline">\(\mathbf{Z}\trans\mathbf{Z}\)</span>).</p>
+<p>Fill-in of the Cholesky factor is not an important issue when we have a few dozen random effects, as we do here. It is an important issue when we have millions of random effects in complex configurations, as has been the case in some of the models that have been fit using .</p>
+<h3 data-number="2.2.3" id="sec:assessingfm04"><span class="header-section-number">2.2.3</span> Assessing Parameter Estimates in Model <em>fm04</em></h3>
+<p>The parameter estimates are: <span class="math inline">\(\widehat{\sigma_1}=\)</span>, the standard deviation of the random effects for ; <span class="math inline">\(\widehat{\sigma_2}=\)</span>, the standard deviation of the random effects for ; <span class="math inline">\(\widehat{\sigma}=\)</span>, the standard deviation of the residual noise term; and <span class="math inline">\(\widehat{\beta_0}=\)</span>, the overall mean response, which is labeled in these models.</p>
+<p>The estimated standard deviation for is nearly three times as large as that for , which confirms what we saw in Fig. <a href="#fig:Pastesplot" data-reference-type="ref" data-reference="fig:Pastesplot">[fig:Pastesplot]</a>. Indeed our conclusion from Fig. <a href="#fig:Pastesplot" data-reference-type="ref" data-reference="fig:Pastesplot">[fig:Pastesplot]</a> was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.</p>
+<p>Plots of the prediction intervals of the random effects (Fig. <a href="#fig:fm04ranef" data-reference-type="ref" data-reference="fig:fm04ranef">[fig:fm04ranef]</a>)</p>
+<pre class="language-julia"><code>caterpillar(m4, :batch)</code></pre>
+<figure>
+<img src="/im/m4_batch_caterpillar.svg" id="fig:m4batchcaterpillar" alt="Figure 5: Plot of batch prediction intervals from m4" /><figcaption aria-hidden="true">Figure 5: Plot of <em>batch</em> prediction intervals from <em>m4</em></figcaption>
+</figure>
+<p>confirm this impression in that all the prediction intervals for the random effects for contain zero. Furthermore, the profile zeta plot (Fig. <a href="#fig:fm04prplot" data-reference-type="ref" data-reference="fig:fm04prplot">[fig:fm04prplot]</a>)</p>
+<p>shows that the even the 50% profile-based confidence interval on <span class="math inline">\(\sigma_2\)</span> extends to zero.</p>
+<p>Because there are several indications that <span class="math inline">\(\sigma_2\)</span> could reasonably be zero, resulting in a simpler model incorporating random effects for only, we perform a statistical test of this hypothesis.</p>
+<h3 data-number="2.2.4" id="sec:TestingSig2is0"><span class="header-section-number">2.2.4</span> Testing <span class="math inline">\(H_0:\sigma_2=0\)</span> Versus <span class="math inline">\(H_a:\sigma_2&gt;0\)</span></h3>
+<p>One of the many famous statements attributed to Albert Einstein is “Everything should be made as simple as possible, but not simpler.” In statistical modeling this <em>principal of parsimony</em> is embodied in hypothesis tests comparing two models, one of which contains the other as a special case. Typically, one or more of the parameters in the more general model, which we call the <em>alternative hypothesis</em>, is constrained in some way, resulting in the restricted model, which we call the <em>null hypothesis</em>. Although we phrase the hypothesis test in terms of the parameter restriction, it is important to realize that we are comparing the quality of fits obtained with two nested models. That is, we are not assessing parameter values per se; we are comparing the model fit obtainable with some constraints on parameter values to that without the constraints.</p>
+<p>Because the more general model, <span class="math inline">\(H_a\)</span>, must provide a fit that is at least as good as the restricted model, <span class="math inline">\(H_0\)</span>, our purpose is to determine whether the change in the quality of the fit is sufficient to justify the greater complexity of model <span class="math inline">\(H_a\)</span>. This comparison is often reduced to a <em>p-value</em>, which is the probability of seeing a difference in the model fits as large as we did, or even larger, when, in fact, <span class="math inline">\(H_0\)</span> is adequate. Like all probabilities, a p-value must be between 0 and 1. When the p-value for a test is small (close to zero) we prefer the more complex model, saying that we “reject <span class="math inline">\(H_0\)</span> in favor of <span class="math inline">\(H_a\)</span>.” On the other hand, when the p-value is not small we “fail to reject <span class="math inline">\(H_0\)</span>,” arguing that there is a non-negligible probability that the observed difference in the model fits could reasonably be the result of random chance, not the inherent superiority of the model <span class="math inline">\(H_a\)</span>. Under these circumstances we prefer the simpler model, <span class="math inline">\(H_0\)</span>, according to the principal of parsimony.</p>
+<p>These are the general principles of statistical hypothesis tests. To perform a test in practice we must specify the criterion for comparing the model fits, the method for calculating the p-value from an observed value of the criterion, and the standard by which we will determine if the p-value is “small” or not. The criterion is called the <em>test statistic</em>, the p-value is calculated from a <em>reference distribution</em> for the test statistic, and the standard for small p-values is called the <em>level</em> of the test.</p>
+<p>In we referred to likelihood ratio tests (LRTs) for which the test statistic is the difference in the deviance. That is, the LRT statistic is <span class="math inline">\(d_0-d_a\)</span> where <span class="math inline">\(d_a\)</span> is the deviance in the more general (<span class="math inline">\(H_a\)</span>) model fit and <span class="math inline">\(d_0\)</span> is the deviance in the constrained (<span class="math inline">\(H_0\)</span>) model. An approximate reference distribution for an LRT statistic is the <span class="math inline">\(\chi^2_\nu\)</span> distribution where <span class="math inline">\(\nu\)</span>, the degrees of freedom, is determined by the number of constraints imposed on the parameters of <span class="math inline">\(H_a\)</span> to produce <span class="math inline">\(H_0\)</span>.</p>
+<p>The restricted model fit</p>
+<pre class="language-julia"><code>m5 = fit(
+    MixedModel,
+    @formula(strength ~ 1 + (1|batch &amp; cask)),
+    pastes;
+    thin=1,
+)</code></pre>
+<pre class="language-plain"><code>Linear mixed model fit by maximum likelihood
+ strength ~ 1 + (1 | batch &amp; cask)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -124.2008   248.4017   254.4017   254.8303   260.6847
+
+Variance components:
+                Column   Variance Std.Dev. 
+batch &amp; cask (Intercept)  9.632824 3.103679
+Residual                  0.678000 0.823407
+ Number of obs: 60; levels of grouping factors: 30
+
+  Fixed-effects parameters:
+──────────────────────────────────────────────────
+               Coef.  Std. Error       z  Pr(&gt;|z|)
+──────────────────────────────────────────────────
+(Intercept)  60.0533    0.576536  104.16    &lt;1e-99
+──────────────────────────────────────────────────</code></pre>
+<p>is compared to model <code>m4</code> with the function</p>
+<pre class="language-julia"><code>MixedModels.likelihoodratiotest(m5, m4)</code></pre>
+<pre class="output"><code>Model Formulae
+1: strength ~ 1 + (1 | batch &amp; cask)
+2: strength ~ 1 + (1 | batch) + (1 | batch &amp; cask)
+─────────────────────────────────────────────────
+     model-dof  -2 logLik      χ²  χ²-dof  P(&gt;χ²)
+─────────────────────────────────────────────────
+[1]          3   248.4017                        
+[2]          4   247.9945  0.4072       1  0.5234
+─────────────────────────────────────────────────</code></pre>
+<p>which provides a p-value of Because typical standards for “small” p-values are 5% or 1%, a p-value over 50% would not be considered significant at any reasonable level.</p>
+<p>We do need to be cautious in quoting this p-value, however, because the parameter value being tested, <span class="math inline">\(\sigma_2=0\)</span>, is on the boundary of set of possible values, <span class="math inline">\(\sigma_2\ge 0\)</span>, for this parameter. The argument for using a <span class="math inline">\(\chi^2_1\)</span> distribution to calculate a p-value for the change in the deviance does not apply when the parameter value being tested is on the boundary. As shown in <span class="citation" data-cites="pinheiro00:_mixed_effec_model_in_s"><a href="/references#ref-pinheiro00:_mixed_effec_model_in_s" role="doc-biblioref">Pinheiro &amp; Bates</a> (<a href="/references#ref-pinheiro00:_mixed_effec_model_in_s" role="doc-biblioref">2000</a>Sect. 2.5)</span>, the p-value from the <span class="math inline">\(\chi^2_1\)</span> distribution will be “conservative” in the sense that it is larger than a simulation-based p-value would be. In the worst-case scenario the <span class="math inline">\(\chi^2\)</span>-based p-value will be twice as large as it should be but, even if that were true, an effective p-value of 26% would not cause us to reject <span class="math inline">\(H_0\)</span> in favor of <span class="math inline">\(H_a\)</span>.</p>
+<h3 data-number="2.2.5" id="sec:assessReduced"><span class="header-section-number">2.2.5</span> Assessing the Reduced Model, <em>fm04a</em></h3>
+<p>The profile zeta plots for the remaining parameters in model (Fig. <a href="#fig:fm04aprplot" data-reference-type="ref" data-reference="fig:fm04aprplot">[fig:fm04aprplot]</a>) are similar to the corresponding panels in Fig. <a href="#fig:fm04prplot" data-reference-type="ref" data-reference="fig:fm04prplot">[fig:fm04prplot]</a>, as confirmed by the numerical values of the confidence intervals.</p>
+<p>The confidence intervals on <span class="math inline">\(\log(\sigma)\)</span> and <span class="math inline">\(\beta_0\)</span> are similar for the two models. The confidence interval on <span class="math inline">\(\sigma_1\)</span> is slightly wider in model than in , because the variability that is attributed to in is incorporated into the variability due to in .</p>
+<p>The patterns in the profile pairs plot (Fig. <a href="#fig:fm04aprpairs" data-reference-type="ref" data-reference="fig:fm04aprpairs">[fig:fm04aprpairs]</a>) for the reduced model are similar to those in Fig. <a href="#fig:fm01profpair" data-reference-type="ref" data-reference="fig:fm01profpair">[fig:fm01profpair]</a>, the profile pairs plot for model .</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+            <kbd>→</kbd> <a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a>
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>

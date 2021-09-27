@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Phillip Alday" />
+  <meta name="author" content="Dave Kleinschmidt" />
+  <meta name="author" content="Reinhold Kliegl" />
+  <meta name="author" content="Douglas Bates" />
+  <title> - Embrace Uncertainty</title>
+  <link rel="shortcut icon" type="image/png" href="/favicon.png"/>
+  <link rel="stylesheet" href="/style.css"/>
+    <script src="/mousetrap.min.js"></script>
+    <!-- TODO: Add url_prefix. -->
+  <style>
+  @font-face {
+    font-family: JuliaMono-Regular;
+    src: url("/JuliaMono-Regular.woff2");
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/github.min.css">
+<script src="/highlight.min.js"></script>
+<script src="/julia.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+});
+</script>
+ 
+</head>
+<body>
+<script>
+function click_next() {
+  var next = document.getElementById('nav-next');
+  next.firstElementChild.nextElementSibling.click();
+}
+function click_prev() {
+  var prev = document.getElementById('nav-prev');
+  prev.firstElementChild.click();
+}
+Mousetrap.bind('right', click_next);
+Mousetrap.bind('h', click_prev);
+Mousetrap.bind('left', click_prev);
+Mousetrap.bind('l', click_next);
+</script>
+
+<div class="books-container">
+<aside class="books-menu">
+<input type="checkbox" id="menu">
+<label for="menu">☰</label>
+<div class="books-title">
+<a href="/">Embrace Uncertainty</a>
+</div><br />
+<span class="books-subtitle">
+Fitting Mixed-Effects Models with Julia
+</span>
+<div class="books-menu-content">
+<li><a class="menu-level-1" href="/ExamLMM"><b>1</b> A Simple, Linear, Mixed-..</a></li>
+<li><a class="menu-level-2" href="/memod"><b>1.1</b> Mixed-effects models</a></li>
+<li><a class="menu-level-2" href="/DyestuffData"><b>1.2</b> The dyestuff and dyest..</a></li>
+<li><a class="menu-level-2" href="/FittingLMMs"><b>1.3</b> Fitting linear mixed m..</a></li>
+<li><a class="menu-level-2" href="/Probability"><b>1.4</b> The linear mixed-effec..</a></li>
+<li><a class="menu-level-2" href="/variability"><b>1.5</b> Assessing the variabil..</a></li>
+<li><a class="menu-level-2" href="/assessRE"><b>1.6</b> Assessing the random e..</a></li>
+<li><a class="menu-level-2" href="/ChIntroSummary"><b>1.7</b> Chapter summary</a></li>
+<li><a class="menu-level-1" href="/Multiple"><b>2</b> Models With Multiple Ran..</a></li>
+<li><a class="menu-level-2" href="/crossedRE"><b>2.1</b> A Model With Crossed R..</a></li>
+<li><a class="menu-level-2" href="/NestedRE"><b>2.2</b> A Model With Nested Ra..</a></li>
+<li><a class="menu-level-2" href="/partially"><b>2.3</b> A Model With Partially..</a></li>
+<li><a class="menu-level-2" href="/MultSummary"><b>2.4</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/longitudinal"><b>3</b> # Models for Longitudina..</a></li>
+<li><a class="menu-level-2" href="/sleep"><b>3.1</b> Data</a></li>
+<li><a class="menu-level-2" href="/SleepMixed"><b>3.2</b> Data</a></li>
+<li><a class="menu-level-2" href="/assess-prec-param"><b>3.3</b> Assessing the Precisio..</a></li>
+<li><a class="menu-level-2" href="/fm07re"><b>3.4</b> Examining the Random E..</a></li>
+<li><a class="menu-level-2" href="/chapter-summary"><b>3.5</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/computational"><b>4</b> Computational Methods fo..</a></li>
+<li><a class="menu-level-2" href="/defnLMM"><b>4.1</b> Definitions and Basic ..</a></li>
+<li><a class="menu-level-2" href="/conddistUgivenY"><b>4.2</b> </a></li>
+<li><a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a></li>
+<li><a class="menu-level-2" href="/PLSsol"><b>4.4</b> </a></li>
+<li><a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a></li>
+<li><a class="menu-level-2" href="/stepByStep"><b>4.6</b> Step-by-step Evaluatio..</a></li>
+<li><a class="menu-level-2" href="/general"><b>4.7</b> Generalizing to Other ..</a></li>
+<li><a class="menu-level-2" href="/lmmsummary"><b>4.8</b> Chapter Summary</a></li>
+<li><a class="menu-level-1" href="/GLMMbinomial"><b>5</b> Generalized Linear Mixed..</a></li>
+<li><a class="menu-level-2" href="/contraception"><b>5.1</b> Artificial contracepti..</a></li>
+<li><a class="menu-level-2" href="/GLMMlink"><b>5.2</b> Link functions and int..</a></li>
+<li><a class="menu-level-1" href="/references"><b></b> References</a></li>
+</div>
+</aside>
+
+<div class="books-content">
+<h2 data-number="4.4" id="sec:PLSsol"><span class="header-section-number">4.4</span> Determining the PLS Solutions, <span class="math inline">\(\tilde{\mathbf{u}}\)</span> and <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span></h2>
+<p>One way of expressing a penalized least squares problem like (<a href="#eq:r2thetabeta" data-reference-type="ref" data-reference="eq:r2thetabeta">[eq:r2thetabeta]</a>) is by incorporating the penalty as “pseudo-data” in an ordinary least squares problem. We extend the “response vector,” which is <span class="math inline">\(\mathbf{y}_{\text{obs}}-\mathbf{X}\mathbf{\beta}\)</span> when we minimize with respect to <span class="math inline">\(\mathbf{u}\)</span> only, with <span class="math inline">\(q\)</span> responses that are 0 and we extend the predictor expression, <span class="math inline">\(\mathbf{Z}\Lambda_\theta\mathbf{u}\)</span> with <span class="math inline">\(\mathbf{I}_q\mathbf{u}\)</span>. Writing this as a least squares problem produces <span class="math display">\[\label{eq:PLSLMM}
+  \tilde{\mathbf{u}}=\arg\min_{\mathbf{u}}\left\|
+    \begin{bmatrix}
+      \mathbf{y}_{\text{obs}}-\mathbf{X}\mathbf{\beta}\\
+      \mathbf{0}
+    \end{bmatrix} -
+    \begin{bmatrix}
+      \mathbf{Z}\Lambda_\theta\\
+      \mathbf{I}_q
+    \end{bmatrix}\mathbf{u}\right\|^2
+\]</span> with a solution that satisfies <span class="math display">\[\label{eq:LMMPLSsol}
+  \left(\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{Z}\Lambda_\theta+\mathbf{I}_q\right)\tilde{\mathbf{u}}
+  =\Lambda_\theta&#39;\mathbf{Z}&#39;\left(\mathbf{y}_{\text{obs}}-\mathbf{X}\mathbf{\beta}\right).
+\]</span></p>
+<p>To evaluate <span class="math inline">\(\tilde{\mathbf{u}}\)</span> we form the <em>sparse Cholesky factor</em>, <span class="math inline">\(\mathbf{L}_\theta\)</span>, which is a lower triangular <span class="math inline">\(q\times q\)</span> matrix that satisfies <span class="math display">\[\label{eq:sparseCholesky}
+  \mathbf{L}_\theta\mathbf{L}_\theta&#39;=
+  \Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{Z}\Lambda_\theta+\mathbf{I}_q .
+\]</span> The actual evaluation of the sparse Cholesky factor, <span class="math inline">\(\mathbf{L}_\theta\)</span>, often incorporates a <em>fill-reducing permutation</em>, which we describe next.</p>
+<h3 data-number="4.4.1" id="sec:fill-reducingP"><span class="header-section-number">4.4.1</span> The Fill-reducing Permutation, <span class="math inline">\(\mathbf{P}\)</span></h3>
+<p>In earlier chapters we have seen that often the random effects vector is re-ordered before <span class="math inline">\(\mathbf{L}_\theta\)</span> is created. The re-ordering or permutation of the elements of <span class="math inline">\(\mathbf{u}\)</span> and, correspondingly, the columns of the model matrix, <span class="math inline">\(\mathbf{Z}\Lambda_\theta\)</span>, does not affect the theory of linear mixed models but can have a profound effect on the time and storage required to evaluate <span class="math inline">\(\mathbf{L}_\theta\)</span> in large problems. We write the effect of the permutation as multiplication by a <span class="math inline">\(q\times q\)</span> <em>permutation matrix</em>, <span class="math inline">\(\mathbf{P}\)</span>, although in practice we apply the permutation without ever constructing <span class="math inline">\(\mathbf{P}\)</span>. That is, the matrix <span class="math inline">\(\mathbf{P}\)</span> is a notational convenience only.</p>
+<p>The matrix <span class="math inline">\(\mathbf{P}\)</span> consists of permuted columns of the identity matrix, <span class="math inline">\(\mathbf{I}_q\)</span>, and it is easy to establish that the inverse permutation corresponds to multiplication by <span class="math inline">\(\mathbf{P}&#39;\)</span>. Because multiplication by <span class="math inline">\(\mathbf{P}\)</span> or by <span class="math inline">\(\mathbf{P}&#39;\)</span> simply re-orders the components of a vector, the length of the vector is unchanged. Thus, <span class="math display">\[\label{eq:orthogonalP}
+  \|\mathbf{P}\mathbf{u}\|^2= \|\mathbf{u}\|^2 = \|\mathbf{P}&#39;\mathbf{u}\|^2\]</span> and we can express the penalty in (<a href="#eq:r2theta" data-reference-type="ref" data-reference="eq:r2theta">[eq:r2theta]</a>) in any of these three forms. The properties of <span class="math inline">\(\mathbf{P}\)</span> that it preserves lengths of vectors and that its transpose is its inverse are summarized by stating that <span class="math inline">\(\mathbf{P}\)</span> is an <em>orthogonal matrix</em>.</p>
+<p>The permutation represented by <span class="math inline">\(\mathbf{P}\)</span> is determined from the structure of <span class="math inline">\(\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{Z}\Lambda_\theta+\mathbf{I}_q\)</span> for some initial value of <span class="math inline">\(\mathbf{\theta}\)</span>. The particular value of <span class="math inline">\(\mathbf{\theta}\)</span> does not affect the result because the permutation depends only the positions of the non-zeros, not the numerical values at these positions.</p>
+<p>Taking into account the permutation, the sparse Cholesky factor, <span class="math inline">\(\mathbf{L}_\theta\)</span>, is defined to be the sparse, lower triangular, <span class="math inline">\(q\times q\)</span> matrix with positive diagonal elements satisfying <span class="math display">\[
+\label{eq:sparseCholeskyP}
+  \mathbf{L}_\theta\mathbf{L}_\theta&#39;
+   = \mathbf{P}\left(\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{Z}\Lambda_\theta
+   +\mathbf{I}_q\right)\mathbf{P}&#39;.
+\]</span> (Problems <a href="#pr:th:posdef" data-reference-type="ref" data-reference="pr:th:posdef">[pr:th:posdef]</a> and <a href="#pr:th:posdiag" data-reference-type="ref" data-reference="pr:th:posdiag">[pr:th:posdiag]</a> outline the steps in showing that we can require the diagonal elements of <span class="math inline">\(\Lambda_\theta\)</span> to be positive, not just non-negative.) Problems <a href="#pr:th:posdef" data-reference-type="ref" data-reference="pr:th:posdef">[pr:th:posdef]</a> and <a href="#pr:th:posdiag" data-reference-type="ref" data-reference="pr:th:posdiag">[pr:th:posdiag]</a> indicate why we can require this. Because the diagonal elements of <span class="math inline">\(\Lambda_\theta\)</span> are positive, its determinant, <span class="math inline">\(|\Lambda_\theta|\)</span>, which, for a triangular matrix such as <span class="math inline">\(\Lambda_\theta\)</span>, is simply the product of its diagonal elements, is also positive.</p>
+<p>Many sparse matrix methods, including the sparse Cholesky decomposition, are performed in two stages: the <em>symbolic phase</em> in which the locations of the non-zeros in the result are determined and the <em>numeric phase</em> in which the numeric values at these positions are evaluated. The symbolic phase for the decomposition (<a href="#eq:sparseCholeskyP" data-reference-type="ref" data-reference="eq:sparseCholeskyP">[eq:sparseCholeskyP]</a>), which includes determining the permutation, <span class="math inline">\(\mathbf{P}\)</span>, need only be done once. Evaluation of <span class="math inline">\(\mathbf{L}_\theta\)</span> for subsequent values of <span class="math inline">\(\mathbf{\theta}\)</span> requires only the numeric phase, which typically is much faster than the symbolic phase.</p>
+<p>The permutation, <span class="math inline">\(\mathbf{P}\)</span>, serves two purposes. The first, and more important purpose, is to reduce the number of non-zeros in the factor, <span class="math inline">\(\mathbf{L}_\theta\)</span>. The factor is potentially non-zero at every non-zero location in the lower triangle of the matrix being decomposed. However, as we saw in Fig. <a href="#fig:fm03LambdaLimage" data-reference-type="ref" data-reference="fig:fm03LambdaLimage">[fig:fm03LambdaLimage]</a> of , there may be positions in the factor that get filled-in even though they are known to be zero in the matrix being decomposed. The <em>fill-reducing permutation</em> is chosen according to certain heuristics to reduce the amount of fill-in. We use the approximate minimal degree (AMD) method described in <span class="citation" data-cites="Davis:1996"><a href="/references#ref-Davis:1996" role="doc-biblioref">Davis</a> (<a href="/references#ref-Davis:1996" role="doc-biblioref">1996</a>)</span>. After the fill-reducing permutation is determined, a “post-ordering” is applied. This has the effect of concentrating the non-zeros near the diagonal of the factor. See <span class="citation" data-cites="davis06:csparse_book"><a href="/references#ref-davis06:csparse_book" role="doc-biblioref">Davis</a> (<a href="/references#ref-davis06:csparse_book" role="doc-biblioref">2006</a>)</span> for details.</p>
+<p>The pseudo-data representation of the PLS problem, (<a href="#eq:PLSLMM" data-reference-type="ref" data-reference="eq:PLSLMM">[eq:PLSLMM]</a>), becomes <span class="math display">\[\label{eq:PLSLMMP}
+  \tilde{\mathbf{u}}=\arg\min_{\mathbf{u}}\left\|
+    \begin{bmatrix}
+      \mathbf{y}_{\text{obs}}-\mathbf{X}\mathbf{\beta}\\
+      \mathbf{0}
+    \end{bmatrix} -
+    \begin{bmatrix}
+      \mathbf{Z}\Lambda_\theta\mathbf{P}&#39;\\
+      \mathbf{P}&#39;
+    \end{bmatrix}\mathbf{P}\mathbf{u}\right\|^2\]</span> and the system of linear equations satisfied by <span class="math inline">\(\tilde{\mathbf{u}}\)</span> is <span class="math display">\[\label{eq:LMMPLSsolP}
+  \mathbf{L}_\theta\mathbf{L}_\theta&#39;\mathbf{P}\tilde{\mathbf{u}}=
+  \mathbf{P}\left(\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{Z}\Lambda_\theta+\mathbf{I}_q\right)\mathbf{P}&#39;\mathbf{P}\tilde{\mathbf{u}}
+  =\mathbf{P}\Lambda_\theta&#39;\mathbf{Z}&#39;\left(\mathbf{y}_{\text{obs}}-\mathbf{X}\mathbf{\beta}\right) .\]</span></p>
+<p>Obtaining the Cholesky factor, <span class="math inline">\(\mathbf{L}_\theta\)</span>, may not seem to be great progress toward determining <span class="math inline">\(\tilde{\mathbf{u}}\)</span> because we still must solve (<a href="#eq:LMMPLSsolP" data-reference-type="ref" data-reference="eq:LMMPLSsolP">[eq:LMMPLSsolP]</a>) for <span class="math inline">\(\tilde{\mathbf{u}}\)</span>. However, it is the key to the computational methods in the package. The ability to evaluate <span class="math inline">\(\mathbf{L}_\theta\)</span> rapidly for many different values of <span class="math inline">\(\mathbf{\theta}\)</span> is what makes the computational methods in feasible, even when applied to very large data sets with complex structure. Once we evaluate <span class="math inline">\(\mathbf{L}_\theta\)</span> it is straightforward to solve (<a href="#eq:LMMPLSsolP" data-reference-type="ref" data-reference="eq:LMMPLSsolP">[eq:LMMPLSsolP]</a>) for <span class="math inline">\(\tilde{\mathbf{u}}\)</span> because <span class="math inline">\(\mathbf{L}_\theta\)</span> is triangular.</p>
+<p>In we will describe the steps in determining this solution but first we will show that the solution, <span class="math inline">\(\tilde{\mathbf{u}}\)</span>, and the value of the objective at the solution, <span class="math inline">\(r^2_{\theta,\beta}\)</span>, do allow us to evaluate the deviance.</p>
+<h3 data-number="4.4.2" id="sec:solvingtildeu"><span class="header-section-number">4.4.2</span> The Value of the Deviance and Profiled Deviance</h3>
+<p>After evaluating <span class="math inline">\(\mathbf{L}_\theta\)</span> and using that to solve for <span class="math inline">\(\tilde{\mathbf{u}}\)</span>, which also produces <span class="math inline">\(r^2_{\beta,\theta}\)</span>, we can write the PRSS for a general <span class="math inline">\(\mathbf{u}\)</span> as <span class="math display">\[\label{eq:PRSSwithL}
+\left\|
+    \mathbf{y}_{\text{obs}}-\mathbf{X}\mathbf{\beta}-\mathbf{Z}\Lambda_\theta\mathbf{u}\right\|^2+ \|\mathbf{u}\|^2=
+  r^2_{\theta,\beta}+\|\mathbf{L}_\theta&#39;(\mathbf{u}-\tilde{\mathbf{u}})\|^2\]</span> which finally allows us to evaluate the likelihood. We plug the right hand side of (<a href="#eq:PRSSwithL" data-reference-type="ref" data-reference="eq:PRSSwithL">[eq:PRSSwithL]</a>) into the definition of <span class="math inline">\(h(\mathbf{u})\)</span> and apply the change of variable <span class="math display">\[\label{eq:changeVar}
+  \mathbf{Z}=\frac{\mathbf{L}_\theta&#39;(\mathbf{u}-\tilde{\mathbf{u}})}{\sigma} .\]</span> The determinant of the Jacobian of this transformation, <span class="math display">\[\label{eq:tranJac}
+  \left|\frac{d\mathbf{Z}}{d\mathbf{u}}\right|=
+  \left|\frac{\mathbf{L}_\theta&#39;}{\sigma}\right|=
+  \frac{|\mathbf{L}_\theta|}{\sigma^q}\]</span> is required for the change of variable in the integral. We use the letter <span class="math inline">\(\mathbf{Z}\)</span> for the transformed value because we will rearrange the integral to have the form of the integral of the density of the standard multivariate normal distribution. That is, we will use the result <span class="math display">\[\label{eq:stdnormint}
+   \int_{\mathbb{R}^q}\frac{e^{-\|\mathbf{Z}\|^2/2}}{(2\pi)^{q/2}}\,d\mathbf{z} = 1.
+\]</span></p>
+<p>Putting all these pieces together gives <span class="math display">\[\label{eq:hintegral}
+  \begin{aligned}
+    L(\theta,\beta,\sigma)&amp;=\int_{\mathbb{R}^q}h(\mathbf{u})\,d\mathbf{u}\\
+    &amp;=\int_{\mathbb{R}^q}\frac{1}{(2\pi\sigma^2)^{(n+q)/2}}
+    \exp\left(-\frac{r^2_{\theta,\beta}+\|\mathbf{L}_\theta&#39;(\mathbf{u}-\tilde{\mathbf{u}})\|^2}{2\sigma^2}\right)d\mathbf{u}\\
+    &amp;=\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
+    {(2\pi\sigma^2)^{n/2}}\int_{\mathbb{R}^q}\frac{1}{(2\pi)^{q/2}}
+    \exp\left(-\frac{\|\mathbf{L}_\theta&#39;(\mathbf{u}-\tilde{\mathbf{u}})\|^2}{2\sigma^2}\right)
+    \frac{|\mathbf{L}_\theta|}{|\mathbf{L}_\theta|}
+    \frac{d\mathbf{u}}{\sigma^q}\\
+    &amp;=\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
+    {(2\pi\sigma^2)^{n/2}|\mathbf{L}_\theta|}
+    \int_{\mathbb{R}^q}\frac{e^{-\|\mathbf{z}\|^2/2}}{(2\pi)^{q/2}}\,d\mathbf{Z}\\
+    &amp;=\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
+    {(2\pi\sigma^2)^{n/2}|\mathbf{L}_\theta|} .
+  \end{aligned}\]</span></p>
+<p>The deviance can now be expressed as <span class="math display">\[d(\mathbf{\theta},\mathbf{\beta},\sigma|\mathbf{y}_{\text{obs}})=
+  -2\log\left(L(\mathbf{\theta},\mathbf{\beta},\sigma|\mathbf{y}_{\text{obs}})\right)
+  =n\log(2\pi\sigma^2)+2\log|\mathbf{L}_\theta|+
+  \frac{r^2_{\beta,\theta}}{\sigma^2},\]</span> as stated in (<a href="#eq:LMMdeviance" data-reference-type="ref" data-reference="eq:LMMdeviance">[eq:LMMdeviance]</a>). The maximum likelihood estimates of the parameters are those that minimize this deviance.</p>
+<p>Equation (<a href="#eq:LMMdeviance" data-reference-type="ref" data-reference="eq:LMMdeviance">[eq:LMMdeviance]</a>) is a remarkably compact expression, considering that the class of models to which it applies is very large indeed. However, we can do better than this if we notice that <span class="math inline">\(\mathbf{\beta}\)</span> affects (<a href="#eq:LMMdeviance" data-reference-type="ref" data-reference="eq:LMMdeviance">[eq:LMMdeviance]</a>) only through <span class="math inline">\(r^2_{\beta,\theta}\)</span>, and, for any value of <span class="math inline">\(\mathbf{\theta}\)</span>, minimizing this expression with respect to <span class="math inline">\(\mathbf{\beta}\)</span> is just an extension of the penalized least squares problem. Let <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span> be the value of <span class="math inline">\(\mathbf{\beta}\)</span> that minimizes the PRSS simultaneously with respect to <span class="math inline">\(\mathbf{\beta}\)</span> and <span class="math inline">\(\mathbf{u}\)</span> and let <span class="math inline">\(r^2_\theta\)</span> be the PRSS at these minimizing values. If, in addition, we set <span class="math inline">\(\widehat{\sigma^2}_\theta=r^2_\theta/n\)</span>, which is the value of <span class="math inline">\(\sigma^2\)</span> that minimizes the deviance for a given value of <span class="math inline">\(r^2_\theta\)</span>, then the <em>profiled deviance</em>, which is a function of <span class="math inline">\(\mathbf{\theta}\)</span> only, becomes <span class="math display">\[\label{eq:LMMprofdeviance}
+  \tilde{d}(\mathbf{\theta}|\mathbf{y}_{\text{obs}})
+  =2\log|\mathbf{L}_\theta|+n\left[1 +
+    \log\left(\frac{2 \pi r^2_\theta}{n}\right)\right].\]</span></p>
+<p>Numerical optimization (minimization) of <span class="math inline">\(\tilde{d}(\mathbf{\theta}|\mathbf{y}_{\text{obs}})\)</span> with respect to <span class="math inline">\(\mathbf{\theta}\)</span> determines the MLE, <span class="math inline">\(\widehat{\mathbf{\theta}}\)</span>. The MLEs for the other parameters, <span class="math inline">\(\widehat{\mathbf{\beta}}\)</span> and <span class="math inline">\(\widehat{\sigma}\)</span>, are the corresponding conditional estimates evaluated at <span class="math inline">\(\widehat{\mathbf{\theta}}\)</span>.</p>
+<h3 data-number="4.4.3" id="sec:betahat"><span class="header-section-number">4.4.3</span> Determining <span class="math inline">\(r^2_\theta\)</span> and <span class="math inline">\(\hat{\mathbf{\beta}}_\theta\)</span></h3>
+<p>To determine <span class="math inline">\(\tilde{\mathbf{u}}\)</span> and <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span> simultaneously we rearrange the terms in (<a href="#eq:PLSLMMP" data-reference-type="ref" data-reference="eq:PLSLMMP">[eq:PLSLMMP]</a>) as <span class="math display">\[\label{eq:PLSLMM1}
+  \begin{bmatrix}
+    \tilde{\mathbf{u}}\\
+    \widehat{\mathbf{\beta}}_\theta
+  \end{bmatrix}
+  =\arg\min_{\mathbf{u},\mathbf{\beta}}
+  \left\|
+    \begin{bmatrix}
+      \mathbf{y}_{\text{obs}}\\
+      \mathbf{0}
+    \end{bmatrix} -
+    \begin{bmatrix}
+      \mathbf{Z}\Lambda_\theta\mathbf{P}&#39; &amp; \mathbf{X}\\
+      \mathbf{P}&#39; &amp;\mathbf{0}
+    \end{bmatrix}
+    \begin{bmatrix}
+      \mathbf{P}\mathbf{u}\\
+      \mathbf{\beta}
+    \end{bmatrix}
+  \right\|^2 .\]</span> The PLS values, <span class="math inline">\(\tilde{\mathbf{u}}\)</span> and <span class="math inline">\(\widehat{\mathbf{\beta}}_\theta\)</span>, are the solutions to <span class="math display">\[\label{eq:bigPLS}
+  \begin{bmatrix}
+    \mathbf{P}\left(\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{Z}\Lambda_\theta+\mathbf{I}_q\right)\mathbf{P}&#39; &amp;
+    \mathbf{P}\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{X}\\
+    \mathbf{X}&#39;\mathbf{Z}\Lambda_\theta\mathbf{P}&#39; &amp; \mathbf{X}&#39;\mathbf{X}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{P}\tilde{\mathbf{u}}\\
+    \widehat{\mathbf{\beta}}_\theta
+  \end{bmatrix}=
+  \begin{bmatrix}
+    \mathbf{P}\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{y}_{\text{obs}}\\
+    \mathbf{X}&#39;\mathbf{y}_{\text{obs}}
+  \end{bmatrix}.\]</span> To evaluate these solutions we decompose the system matrix as <span class="math display">\[\label{eq:bigdecomp}
+  \begin{bmatrix}
+    \mathbf{P}\left(\Lambda_\theta&#39;\mathbf{Z}&#39;\vec
+      Z\Lambda_\theta+\mathbf{I}_q\right)\mathbf{P}&#39; &amp;
+    \mathbf{P}\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{X}\\
+    \mathbf{X}&#39;\mathbf{Z}\Lambda_\theta\mathbf{P}&#39; &amp; \mathbf{X}&#39;\mathbf{X}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    \mathbf{L}_\theta &amp; \mathbf{0}\\
+    \mathbf{R}_{ZX}&#39; &amp; \mathbf{R}_X&#39;
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{L}_\theta&#39; &amp; \mathbf{R}_{ZX}\\
+    \mathbf{0} &amp; \mathbf{R}_X
+  \end{bmatrix}\]</span> where, as before, <span class="math inline">\(\mathbf{L}_\theta\)</span>, the sparse Cholesky factor, is the sparse lower triangular <span class="math inline">\(q\times q\)</span> matrix satisfying (<a href="#eq:sparseCholeskyP" data-reference-type="ref" data-reference="eq:sparseCholeskyP">[eq:sparseCholeskyP]</a>). The other two matrices in (<a href="#eq:bigdecomp" data-reference-type="ref" data-reference="eq:bigdecomp">[eq:bigdecomp]</a>): <span class="math inline">\(\mathbf{R}_{ZX}\)</span>, which is a general <span class="math inline">\(q\times p\)</span> matrix, and <span class="math inline">\(\mathbf{R}_X\)</span>, which is an upper triangular <span class="math inline">\(p\times p\)</span> matrix, satisfy <span class="math display">\[\label{eq:RZXdef}
+  \mathbf{L}_\theta\mathbf{R}_{ZX}=\mathbf{P}\Lambda_\theta&#39;\mathbf{Z}&#39;\mathbf{X}\]</span> and <span class="math display">\[\label{eq:RXdef}
+  \mathbf{R}_X&#39;\mathbf{R}_X=\mathbf{X}&#39;\mathbf{X}-\mathbf{R}_{ZX}&#39;\mathbf{R}_{ZX}.\]</span></p>
+<p>Those familiar with standard ways of writing a Cholesky decomposition as either <span class="math inline">\(\mathbf{L}\mathbf{L}&#39;\)</span> or <span class="math inline">\(\mathbf{R}&#39;\mathbf{R}\)</span> (<span class="math inline">\(\mathbf{L}\)</span> is the factor as it appears on the left and <span class="math inline">\(\mathbf{R}\)</span> is as it appears on the right) will notice a notational inconsistency in (<a href="#eq:bigdecomp" data-reference-type="ref" data-reference="eq:bigdecomp">[eq:bigdecomp]</a>). One Cholesky factor is defined as the lower triangular fractor on the left and the other is defined as the upper triangular factor on the right. It happens that in the Cholesky factor of a dense positive-definite matrix is returned as the right factor, whereas the sparse Cholesky factor is returned as the left factor.</p>
+<p>One other technical point that should be addressed is whether <span class="math inline">\(\vec X&#39;\mathbf{X}-\mathbf{R}_{ZX}&#39;\mathbf{R}_{ZX}\)</span> is positive definite. In theory, if <span class="math inline">\(\mathbf{X}\)</span> has full column rank, so that <span class="math inline">\(\mathbf{X}&#39;\mathbf{X}\)</span> is positive definite, then the downdated matrix, <span class="math inline">\(\mathbf{X}&#39;\vec X-\mathbf{R}_{ZX}&#39;\mathbf{R}_{ZX}\)</span>, must also be positive definite (see Prob. <a href="#pr:th:downdate" data-reference-type="ref" data-reference="pr:th:downdate">[pr:th:downdate]</a>). In practice, the downdated matrix can become computationally singular in ill-conditioned problems, in which case an error is reported.</p>
+<p>The extended decomposition (<a href="#eq:bigdecomp" data-reference-type="ref" data-reference="eq:bigdecomp">[eq:bigdecomp]</a>) not only provides for the evaluation of the profiled deviance function, <span class="math inline">\(\tilde{d}(\mathbf{\theta})\)</span>, (<a href="#eq:LMMprofdeviance" data-reference-type="ref" data-reference="eq:LMMprofdeviance">[eq:LMMprofdeviance]</a>) but also allows us to define and evaluate the profiled REML criterion.</p>
+
+
+<div class="bottom-nav">
+    <p id="nav-prev" style="text-align: left;">
+        <a class="menu-level-2" href="/IntegratingH"><b>4.3</b> in the Linear Mixed Mo..</a> <kbd>←</kbd>
+        <span id="nav-next" style="float: right;">
+            <kbd>→</kbd> <a class="menu-level-2" href="/REML"><b>4.5</b> The REML Criterion</a>
+        </span>
+    </p>
+</div>
+
+
+<div class="license">
+    <br/>
+  <br/>
+  <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    Phillip Alday, Dave Kleinschmidt, Reinhold Kliegl, Douglas Bates
+</div>
+</div>
+</div>
+</body>
+</html>
