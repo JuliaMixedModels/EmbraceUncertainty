@@ -34,8 +34,8 @@ Therefore, although it is *not* required to meet an assumption of the statistica
 
 In LMMs the levels of at least one of the factors represents *units* in the data set that are assumed to be sampled, ideally randomly, from a population that is normally distributed with respect to the response. 
 *This is the second assumption of normal distribution in LMMs.*  
-In the example from the chemical industry discussed in this vignette, the observational unit is the batch of an intermediate product used in production of a dye.
 In psychology and linguistics the observational units are often the subjects or items (e..g., texts, sentences, words, pictures) in the study.
+In sociology we may look at aggregations of individuals such as we find in countries, communes, organizations, companies, schools, or families.
 In agriculture the experimental units may be the plots of land or the specific plants being studied. 
 We may use numbers, such as subject identifiers, to designate the particular levels that we observed but these numbers are simply labels.
 
