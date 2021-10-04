@@ -1,5 +1,13 @@
 # Quotes
 
+"[Open science] refers to efforts by researchers, governments, research funding agencies or the scientific community itself to make the primary outputs of publicly funded research results – publications and the research data – publicly accessible in digital format with no or minimal restriction as a means for accelerating research; these efforts are in the interest of enhancing transparency and collaboration, and fostering innovation." 
+- Organisation for Economic Co-operation and Development (OECD)). 2015. Making open science a reality. In OECD Science, Technology and Industry Policy Papers, 25. Paris: OECD Publishing. doi:10.1787/5jrs2f963zs1-en
+
+"An article about computational science in a scientific publication is not the scholarship itself, it is merely advertising of the scholarship. 
+The actual scholarship is the complete software development environment and the complete set of instructions which generated the figures.
+- Jon Claerbout (Claerbout & Karrenbach, 1992 )cited according to Jonathan B. Buckheit & David L. Donoho (1995). Wavelab and reproducible research. In A. Antoniadis (ed.). Wavelets and statistics. New York, NY: Springer, 55–81.
+- Claerbout J., &  Karrenbach M. (1992). Electronic documents give reproducible research a new meaning. In: Proceedings of the 62nd Annual International Meeting of the Society of Exploration Geophysics, 601-604.
+
 “The combination of some data and an aching desire for an answer does not ensure that a reasonable answer can be extracted from a given body of data” 
 -  John W. Tukey (1986). Sunset salvo. The American Statistician, 40, 72–76.
   
@@ -23,7 +31,7 @@ It is inappropriate to be concerned about mice when there are tigers abroad."
 -  George E. P. Box (1976). Science and Statistics. JASA, 71, 791-799. (all of the above)
 
 "The hallmark of empirical progress is not trivial verification. ... 
-It is no success for Newto- nian theory that stones, when dropped, fall towards the earth, no matter how often this is repeated. But so-called ‘refutations’ are not the hallmark of empirical failure, as Popper has preached, since all programmes grow in a permanent ocean of anomalies. 
+It is no success for Newtonian theory that stones, when dropped, fall towards the earth, no matter how often this is repeated. But so-called ‘refutations’ are not the hallmark of empirical failure, as Popper has preached, since all programmes grow in a permanent ocean of anomalies. 
 What really counts are dramatic, unexpected stunning predictions: a few of them are enough to tilt the balance..."
 - Imre Lakatos (1978). The methodology of scientific research programmes. In: Worrall, J. & Currie, G. (eds.). Philosophical Papers 1. Cambridge: Cambridge University Press.
 
