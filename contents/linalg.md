@@ -20,7 +20,7 @@ y_i = \beta_1 x_{i,1} + \beta_2 x_{i,2} + \dots + \beta_p x_{i,p} + \epsilon_i, 
 $$ {#eq:elementlinmod}
 and some additional description like "where the $\epsilon_i,i=1,\dots,n$ are independently and identically distributed as $\mathcal{N}(0, \sigma^2)$".
 
-An alternative is to write the model in terms of the $n$-dimensional *response vector*, $\mathbf{y}$, an $n\times p$ *model matrix*, $\mathbf{X}, and a $p$-dimensional *coefficient vector*, $\boldsymbol{\beta}$, as
+An alternative is to write the model in terms of the $n$-dimensional *response vector*, $\mathbf{y}$, an $n\times p$ *model matrix*, $\mathbf{X}$, and a $p$-dimensional *coefficient vector*, $\boldsymbol{\beta}$, as
 $$
 \mathcal{Y} \sim \mathcal{N}\left(\mathbf{X}\boldsymbol{\beta}, \sigma^2\mathbf{I}\right),
 $$ {#eq:mvnlinmod}
@@ -58,8 +58,8 @@ $$
 $$ {#eq:positiveDef}
 (the symbol $\forall$ means "for all").
 Positive definiteness implies that the *precision matrix*, $\boldsymbol\Sigma^{-1}$, exists and is also positive definite.
-It also implies that there are "matrix square roots" of $\boldsymbol\Sigma$ in the sense that there are matrices $\mathbf{A}$ such that $\mathbf{A}\mathbf{A}'=\boldsymbol{\Sigma}$.
-(The reason for writing $\mathbf{A}\mathbf{A}'$ and not simply the square of $\mathbf{A}$ is that $\mathbf{A}$ is not required to be symmetric but $\mathbf{A}\mathbf{A}'$ will be symmetric, even in $\mathbf{A}$ is not.)
+It also implies that there are "matrix square roots" of $\boldsymbol\Sigma$ in the sense that there are matrices $\mathbf{A}$ such that $\mathbf{A}'\mathbf{A}=\boldsymbol{\Sigma}$.
+(The reason for writing $\mathbf{A}'\mathbf{A}$ and not simply the square of $\mathbf{A}$ is that $\mathbf{A}$ is not required to be symmetric but $\mathbf{A}'\mathbf{A}$ will be symmetric, even in $\mathbf{A}$ is not.)
 
 One such "square root" of a positive definite $\boldsymbol\Sigma$ is the [Cholesky factor](https://en.wikipedia.org/wiki/Cholesky_decomposition), which is an $n\times n$ upper-triangular matrix, $\mathbf{R}$, such that
 $$
@@ -119,9 +119,9 @@ $$
 \mathbf{x} = \mathbf{L}^{-1}\mathbf{b}
 $$ {#eq:inversesolve}
 involves doing roughly $n$ times as much work as solving the system directly, as in @eq:forwardsolve.
-Requiring that the inverse of a matrix must be evaluated to solve a linear system is like saying that a quotient, $a/b$, must be evalated by calculating, $b^{-1}$, the reciprocal of $b$, then evaluating $b^{-1}a$, instead of evaluating the quotient directly.
+Requiring that the inverse of a matrix must be evaluated to solve a linear system is like saying that a quotient, $a/b$, must be evalated by calculating $b^{-1}$, the reciprocal of $b$, then evaluating the product $b^{-1}a$, instead of evaluating the quotient directly.
 
-In a derivation we may write an expression like $\mathbf{L}^{-1}\mathbf{b}$ but the evaluation is performed like @eq:forwardsolve.
+In a derivation we may write an expression like $\mathbf{L}^{-1}\mathbf{b}$ but the evaluation is performed by solving a system like @eq:forwardsolve.
 
 ### Positive definiteness and the Cholesky factor
 
@@ -194,6 +194,8 @@ $$
 \mathcal{U}\sim\mathcal{N}(\mathbf{A}\boldsymbol{\mu}, \mathbf{A}\boldsymbol{\Sigma}\mathbf{A}')
 $$ {#eq:mvnlinfunc}
 
+For the special case of $\mathbf{A}$ being of dimension $1\times n$ (i.e. a *row vector*), the expression for the $1\times 1$ covariance matrix is the quadratic form defined by $\boldsymbol{\Sigma}$, which is why $\boldsymbol{\Sigma}$ must be positive definite for the conditional distributions to be non-degenerate.
+
 ## Back at the linear model
 
 The probability density function for the linear model, @eq:mvnlinmod, is
@@ -213,11 +215,9 @@ $$
 L(\boldsymbol{\beta},\sigma^2;\mathbf{y})=
 \left(2\pi\sigma^2\right)^{-n/2}\exp\left(-\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2/\left(2\sigma^2\right)\right)
 $$ {#eq:linmodlikelihood}
-Usually the log-likelihood is easier to optimize, either algebraically or numerically, than the likelihood itself.
-
 The [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) estimates of the parameters are, as the name implies, the values of $\boldsymbol{\beta}$ and $\sigma^2$ that maximize the expression on the right of @eq:linmodlikelihood .
-Because the logarithm is a [monotone increasing](https://en.wikipedia.org/wiki/Monotonic_function) function, the maximum likelihood estimates will also maximize the *log-likelihood*
 
+Because the logarithm is a [monotone increasing](https://en.wikipedia.org/wiki/Monotonic_function) function, the maximum likelihood estimates will also maximize the *log-likelihood*
 $$
 \begin{align}
 \ell(\boldsymbol{\beta},\sigma^2;\mathbf{y})
@@ -225,16 +225,487 @@ $$
 &=-\frac{n}{2}\log(2\pi\sigma^2)-\frac{\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2}{2\sigma^2}
 \end{align}
 $$ {#eq:linmodloglike}
+Usually the log-likelihood is easier to optimize, either algebraically or numerically, than the likelihood itself.
 
-To avoid the negative signs and the factors of 2 in the denominator, we often convert the log-likelihood to the *deviance scale*, which is negative twice the log-likelihood
+To avoid the negative signs and the factors of 2 in the denominator, we often convert the log-likelihood to the *deviance scale*, which is negative twice the log-likelihood,
 $$
 \begin{align}
 d(\boldsymbol{\beta},\sigma^2;\mathbf{y})
 &=-2\ell(\boldsymbol{\beta},\sigma^2; \mathbf{y})\\
-&=n\log(2\pi\sigma^2)+\frac{\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2}{2\sigma^2}
+&=n\log(2\pi\sigma^2)+\frac{\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2}{\sigma^2} .
 \end{align}
 $$ {#eq:linmoddevscale}
 Because of the negative sign, the maximum likelihood estimates are those that *minimize* $d(\boldsymbol{\beta},\sigma^2;\mathbf{y})$.
 
 (The term *deviance scale* is used for $d(\boldsymbol{\beta},\sigma^2;\mathbf{y})$ rather than [deviance](https://en.wikipedia.org/wiki/Deviance_(statistics)) because the deviance involves an additive shift, which is a correction for the saturated model - see the link.
 It is obvious what the saturated model should be for the linear model but not for the linear mixed model so, to avoid confusion, we refer to the log-likelihood on the deviance scale as the *objective*.)
+
+The form of @eq:linmoddevscale makes it easy to determine the maximum likelihood estimates.
+Because $\boldsymbol{\beta}$ appears only in the sum of squared residuals expression, $\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|^2$, we minimize that with respect to $\boldsymbol{\beta}$
+$$
+\widehat{\boldsymbol{\beta}}=
+\arg\min_{\boldsymbol{\beta}}\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|^2 ,
+$$ {#eq:leastsquaresest}
+where $\arg\min_{\boldsymbol{\beta}}$ means the value of $\boldsymbol{\beta}$ that minimizes the expression that follows.
+
+Let $r^2(\widehat{\boldsymbol{\beta}}) = \left\|\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}\right\|^2$ be the minimum sum of squared residuals.
+Substituting this value into @eq:linmoddevscale, differentiating with respect to $\sigma^2$, and setting this derivative to zero gives
+$$
+\widehat{\sigma^2}=\frac{r^2(\widehat{\boldsymbol{\beta}})}{n}
+$$
+
+## Minimizing the sum of squared residuals
+
+A condition for $\widehat{\boldsymbol{\beta}}$ to minimize the sum of squared residuals is that the *gradient*
+$$
+\nabla r^2(\boldsymbol{\beta})=-2\mathbf{X}'(\mathbf{y}-\mathbf{X}\boldsymbol{\beta})
+$$ {#eq:sumsqgrad}
+be zero at $\widehat{\boldsymbol{\beta}}$.
+This condition can be rewritten as
+$$
+\mathbf{X}'\mathbf{X}\widehat{\boldsymbol{\beta}}=\mathbf{X}'\mathbf{y} ,
+$$ {#eq:normaleq}
+which are called the *normal equations*.
+
+The term *normal* in this expression comes from the fact that requiring the gradient @eq:sumsqgrad to be zero is equivalent to requiring that the *residual vector*, $\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}$, be perpendicular, or *normal*, to the columns of $\mathbf{X}$.
+
+When the model matrix, $\mathbf{X}$, is of *full column rank*, which means
+$$
+\mathbf{X}\boldsymbol{\beta}\ne\mathbf{0}\quad\forall\boldsymbol{\beta}\ne\mathbf{0} ,
+$$ {#eq:fullcolumnrank}
+then the quadratic form defined by $\mathbf{X}'\mathbf{X}$ is positive definite and has a Cholesky factor, say $\mathbf{R}_{XX}$, and the normal equations can be solved in two stages.
+First, solve
+$$
+\mathbf{R}_{XX}'\mathbf{r}_{Xy}=\mathbf{X}'\mathbf{y}
+$$ {#eq:rXydef}
+for $\mathbf{r}_{Xy}$ using forward solution, then solve
+$$
+\mathbf{R}_{XX}\widehat{\boldsymbol{\beta}}=\mathbf{r}_{Xy}
+$$ {#eq:betahatchol}
+for $\widehat{\boldsymbol{\beta}}$ using backward solution.
+
+An alternative approach is to write the residual sum of squares as a quadratic form
+$$
+\begin{align}
+r^2(\boldsymbol{\beta})&=\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|^2\\
+&=(\mathbf{y}-\mathbf{X}\boldsymbol{\beta})'(\mathbf{y}-\mathbf{X}\boldsymbol{\beta})\\
+&=(\mathbf{X}\boldsymbol{\beta}-\mathbf{y})'(\mathbf{X}\boldsymbol{\beta}-\mathbf{y})\\
+&=\begin{bmatrix}\boldsymbol{\beta}&-1\end{bmatrix}
+\begin{bmatrix}
+  \mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y}\\
+  \mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+\end{bmatrix}
+\begin{bmatrix}
+  \boldsymbol{\beta}\\
+  -1
+\end{bmatrix}\\
+&=\begin{bmatrix}\boldsymbol{\beta}&-1\end{bmatrix}
+\begin{bmatrix}
+  \mathbf{R}_{XX}' & \mathbf{0}\\
+  \mathbf{r}_{Xy}' & r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+  \mathbf{R}_{XX} & \mathbf{r}_{Xy}\\
+  \mathbf{0} & r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+  \boldsymbol{\beta}\\
+  -1
+\end{bmatrix}\\
+&=\left\|
+\begin{bmatrix}
+  \mathbf{R}_{XX} & \mathbf{r}_{Xy}\\
+  \mathbf{0} & r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+  \boldsymbol{\beta}\\
+  -1
+\end{bmatrix}\right\|^2\\
+&=\left\|\mathbf{R}_{XX}\boldsymbol{\beta}-\mathbf{r}_{Xy}\right\|^2
++ r_{yy}^2
+\end{align}
+$$ {#eq:extendedqf}
+
+The first term, $\left\|\mathbf{R}_{XX}\boldsymbol{\beta}-\mathbf{r}_{Xy}\right\|^2$, is non-negative and can be made zero by solving @eq:betahatchol for $\widehat{\boldsymbol{\beta}}$.
+Thus, the minimum sum of squared residuals is $r_{yy}^2$.
+
+One consequence of this derivation is that the minimum sum of squared residuals can be evaluated directly from the extended Cholesky factor
+$$
+\begin{bmatrix}
+  \mathbf{R}_{XX} & \mathbf{r}_{Xy}\\
+  \mathbf{0} & r_{yy}
+\end{bmatrix}
+$$ {#eq:extendedcholfac}
+without needing to solve for $\widehat{\boldsymbol{\beta}}$ first.
+This is not terribly important for a linear model where the evaluation of $\widehat{\boldsymbol{\beta}}$ and the residual is typically done only once.
+However, for the linear mixed model, a similar calculation must be done for every evaluation of the objective in the iterative optimization and being able to evaluate the minimum penalized sum of squared residuals without solving for parameter values and without needing to evaluate the residual does represent a considerable savings in time and effort.
+
+## Numerical example
+
+Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject `S372` in the `sleepstudy` dataset.
+```jl
+s = """
+S372 = last(groupby(DataFrame(MixedModels.dataset(:sleepstudy)), :subj))
+"""
+sco(s; process=without_caption_label)
+```
+The model matrix and the response vector can be constructed as
+```jl
+sco("X = hcat(ones(nrow(S372)), S372.days)")
+```
+and
+```jl
+sco("y = S372.reaction")
+```
+from which we obtain the Cholesky factor
+```jl
+sco("chfac = cholesky!(X'X)")
+```
+(Recall that the upper triangular Cholesky factor is the `U` property of the `Cholesky` type.)
+
+The `\` operator with a `Cholesky` factor on the left performs both the forward and backward solutions to obtain the least squares estimates
+```jl
+sco("β̂ = chfac\\(X'y)")
+```
+
+Alternatively, we could carry out the two solution of triangular systems explicitly by first solving for $\mathbf{r}_{Xy}$
+```jl
+sco("rXy = ldiv!(chfac.L, X'y)")
+```
+then solving in-place to obtain $\widehat{\boldsymbol{\beta}}$
+```jl
+sco("ldiv!(chfac.U, rXy)")
+```
+
+The residual vector, $\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}$, is
+```jl
+sco("r = y - X * β̂")
+```
+with geometric length or "norm",
+```jl
+sco("norm(r)")
+```
+
+For the extended Cholesky factor, create the extended matrix of sums of squares and cross products
+```jl
+s = """
+crprod = let x = S372.days
+    Symmetric(
+        [length(x) sum(x)       sum(y)
+             0.    sum(abs2, x) dot(x, y)
+             0.      0.         sum(abs2, y)
+        ],
+        :U
+    )
+end
+"""
+sco(s)
+```
+The call to `Symmetric` with the second argument the symbol `:U` indicates that the matrix should be treated as symmetric but only the upper triangle is given.
+
+The Cholesky factor of the `crprod` reproduces $\mathbf{R}_{XX}$, $\mathbf{r}_{Xy}$, and the norm of the residual, $r_{yy}$.
+```jl
+sco("extchfac = cholesky(crprod)")
+```
+from which the parameter estimates can be evaluated.
+```jl
+s = """
+β̂ ≈ ldiv!(
+  UpperTriangular(view(extchfac.U, 1:2, 1:2)),
+  copy(view(extchfac.U, 1:2, 3)),
+)
+"""
+sco(s)
+```
+The operator `≈` is a check of approximate equality of floating point numbers or arrays.
+Exact equality of floating point results from "equivalent" calculations cannot be relied upon.
+
+```jl
+sco("norm(r) ≈ extchfac.U[3,3]")
+```
+
+## Alternative decompositions of X
+
+There are two other decompositions of the model matrix $\mathbf{X}$ or the augmented model matrix $[\mathbf{X,y}]$ that can be used to evaluate the least squares estimates; the [QR decomposition](https://en.wikipedia.org/wiki/QR_decomposition) and the [singular value decomposition (SVD)](https://en.wikipedia.org/wiki/Singular_value_decomposition).
+
+The QR decomposition expresses $\mathbf{X}$ as the product of an *orthogonal* matrix, $\mathbf{Q}$ and an upper triangular matrix $\mathbf{R}$.
+The upper triangular $\mathbf{R}$ is related to the upper triangular Cholesky factor in that the numerical values are the same but the signs can be different.
+In particular, the usual way of creating $\mathbf{Q}$ and $\mathbf{R}$ using [Householder transformations](https://en.wikipedia.org/wiki/Householder_transformation) typically results in the first row of $\mathbf{R}$ from the `qr` function being the negative of the first row of the upper Cholesky factor.
+
+```jl
+s = """
+qrfac = qr(X);
+qrfac.R
+"""
+sco(s)
+```
+
+Just as the Cholesky factor can be used on the left of the `\` operator, so can the `qr` factor but with `y` on the right.
+
+```jl
+sco("b3 = qrfac\\y")
+``` 
+
+The matrix $\mathbf{R}$ is returned as a square matrix with the same number of columns as $\mathbf{X}$.
+That is, if $\mathbf{X}$ is of size $n\times p$ where $n>p$, as in the example, then $\mathbf{R}$ is $p\times p$, as shown above.
+
+The matrix $\mathbf{Q}$ is usually considered to be an $n\times n$ orthogonal matrix, which means that its transpose is its inverse
+$$
+\mathbf{Q'Q}=\mathbf{QQ'}=\mathbf{I}
+$$ {#eq:orthogonalQ}
+To form the product $\mathbf{QR}$ the matrix $\mathbf{R}$ is treated as if it were $n\times p$ with zeros below the main diagonal.
+
+The $n\times n$ matrix $\mathbf{Q}$ can be very large if $n$, the number of observations, is large but it does not need to be explicitly evaluated.
+In practice $\mathbf{Q}$ is a "virtual" matrix represented as a product of Householder reflections that only require storage of the size of $\mathbf{X}$.
+The effect of multiplying a vector or matrix by $\mathbf{Q}$ or by $\mathbf{Q}'$ is achieved by applying the Householder reflections in a particular order.
+
+```jl
+sco("rXy2 = qrfac.Q'y")
+```
+
+```jl
+sco("b4 = ldiv!(UpperTriangular(qrfac.R), rXy2[1:2])")
+```
+
+Forming the QR decomposition is a direct, non-iterative, calculation, like forming the Cholesky factor.
+Forming the SVD, by contrast, is usually an iterative calculation.
+(It should be noted that modern methods for evaluating the SVD are very fast for an iterative calculation.)
+The SVD consists of two orthogonal matrices, the $n\times n$ $\mathbf{U}$ and the $p\times p$ $\mathbf{V}$ and an $n\times p$ matrix $\mathbf{S}$ that is zero off the main diagonal, where
+$$
+\mathbf{X}=\mathbf{USV'} .
+$$
+
+Unlike the $\mathbf{Q}$ in the QR decomposition, the orthogonal matrices $\mathbf{U}$ and $\mathbf{V}$ are explicitly evaluated.
+Because of this, the default for the `svd` function is to produce a compact form where $\mathbf{U}$ is $n\times p$ and only the diagonal of $\mathbf{S}$ is returned.
+```jl
+sco("Xsvd = svd(X)")
+```
+
+If all the singular values are non-zero, as is the case here, the least squares solution $\widehat{\boldsymbol{\beta}}$ can be obtained as
+$$
+\mathbf{V}\mathbf{S}^{-1}\mathbf{U}'\mathbf{y}
+$$ {#eq:pseudoinv}
+for the diagonal $\mathbf{S}$.
+
+```jl
+sco("b5 = Xsvd.V * (Xsvd.U'y ./ Xsvd.S)")
+```
+
+In the extensions to linear mixed-effects models we will emphasize the Cholesky factorization over the QR decomposition or the SVD.
+
+## Linear mixed-effects models
+
+As described in @bates.maechler.etal:2015 , a linear mixed-effects model is based on two vector-valued random variables: the $q$-dimensional vector of random effects, $\mathcal{B}$, and the $n$-dimensional response vector, $\mathcal{Y}$. @eq:LMMdist defines the unconditional distribution of $\mathcal{B}$ and the conditional distribution of $\mathcal{Y}$, given $\mathcal{B}=\mathbf{b}$, as multivariate Gaussian distributions of the form
+$$
+\begin{aligned}
+  (\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mathcal{N}(\mathbf{X}\boldsymbol{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})\\
+  \mathcal{B}&\sim\mathcal{N}(\mathbf{0},\boldsymbol{\Sigma}_\theta) .
+\end{aligned}
+$$
+
+The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mathcal{B})=\boldsymbol{\Sigma}_\theta$, depends on the *variance-component parameter vector*, $\boldsymbol{\theta}$, through a lower triangular *relative covariance factor*, $\Lambda_\theta$ as
+$$
+\boldsymbol{\Sigma}_\theta=\sigma^2\boldsymbol{\Lambda}_\theta\boldsymbol{\Lambda}_\theta' .
+$$
+(Recall that the lower Cholesky factor is generally written $\mathbf{L}$.
+In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, $\Lambda$.)
+
+Many computational formulas for linear mixed models are written in terms of this *precision matrix*, $\boldsymbol{\Sigma}_\theta^{-1}$.
+Such formulas will become unstable as $\boldsymbol{\Sigma}_\theta$ approaches singularity.
+And it can do so.
+It is a fact that singular (i.e. non-invertible) $\boldsymbol{\Sigma}_\theta$ can and do occur in practice, as we have seen in some of the examples in earlier chapters.
+Moreover, during the course of the numerical optimization by which the parameter estimates are determined, it is frequently the case that the deviance or the REML criterion will need to be evaluated at values of $\boldsymbol{\theta}$ that produce a singular $\boldsymbol{\Sigma}_\theta$.
+Because of this we will take care to use computational methods that can be applied even when $\boldsymbol{\Sigma}_\theta$ is singular and are stable as $\boldsymbol{\Sigma}_\theta$ approaches singularity.
+
+As defined in @eq:relcovfac, a relative covariance factor, $\Lambda_\theta$, is any matrix that satisfies
+$$
+\boldsymbol{\Sigma}_\theta=\sigma^2\Lambda_\theta\Lambda_\theta' .
+$$
+According to this definition, $\boldsymbol{\Sigma}$ depends on both $\sigma$ and $\theta$, and we should write it as $\boldsymbol{\Sigma}_{\sigma,\theta}$.
+However, we will blur that distinction and continue to write $\text{Var}(\mathcal{B})=\boldsymbol{\Sigma}_\theta$.
+Another technicality is that the *common scale parameter*, $\sigma$, could, in theory, be zero.
+We will show that in practice the only way for its estimate, $\widehat{\sigma}$, to be zero is for the fitted values from the fixed-effects only, $\mathbf{X}\widehat{\boldsymbol{\beta}}$, to be exactly equal to the observed data.
+This occurs only with data that have been (incorrectly) simulated without error.
+In practice we can safely assume that $\sigma>0$.
+However, $\Lambda_\theta$, like $\boldsymbol{\Sigma}_\theta$, can be singular.
+
+The computational methods in the *MixedModels* package are based on $\Lambda_\theta$ and do not require evaluation of $\boldsymbol{\Sigma}_\theta$.
+In fact, $\boldsymbol{\Sigma}_\theta$ is explicitly evaluated only at the converged parameter estimates.
+
+The spherical random effects, $\mathcal{U}\sim\mathcal{N}(\mathbf{0},\sigma^2\mathbf{I}_q)$, determine $\mathcal{B}$ as
+$$
+  \mathcal{B}=\Lambda_\theta\mathcal{U} .
+$$ {#eq:sphericalRE}
+Although it may seem more intuitive to write $\mathcal{U}$ as a linear transformation of $\mathcal{B}$, we cannot do that when $\Lambda_\theta$ is singular, which is why @eq:sphericalRE is in the form shown.
+
+We can easily verify that @eq:sphericalRE provides the desired distribution for $\mathcal{B}$.
+As a linear transformation of a multivariate Gaussian random variable, $\mathcal{B}$ will also be multivariate Gaussian with mean $𝔼\left[\mathcal{B}\right]=𝔼\left[\boldsymbol{\Lambda}_\theta\mathcal{U}\right]=\boldsymbol{\Lambda}_\theta\,𝔼\left[\mathcal{U}\right]=
+\boldsymbol{\Lambda}_\theta\mathbf{0}=\mathbf{0}$ and covariance matrix $\text{Var}(\mathcal{B})=\boldsymbol{\Lambda}_\theta\text{Var}(\mathcal{U})\boldsymbol{\Lambda}_\theta'=\sigma^2\boldsymbol{\Lambda}_\theta\boldsymbol{\Lambda}_\theta'=\boldsymbol{\Sigma}_\theta$
+
+Just as we concentrate on how $\boldsymbol{\theta}$ determines $\Lambda_\theta$, not $\boldsymbol{\Sigma}_\theta$, we will concentrate on properties of $\mathcal{U}$ rather than $\mathcal{B}$.
+In particular, we now define the model according to the distributions
+$$
+  \begin{aligned}
+  (\mathcal{Y}|\mathcal{U}=\mathbf{u})&\sim\mathcal{N}(\mathbf{Z}\Lambda_\theta\mathbf{u}+\mathbf{X}\beta,\sigma^2\mathbf{I}_n)\\
+  \mathcal{U}&\sim\mathcal{N}(\mathbf{0},\sigma^2\mathbf{I}_q) .
+  \end{aligned}
+$$ {#eq:condYgivenU}
+
+The joint density for $\mathcal{Y}$ and $\mathcal{U}$ is the product of densities of the two distributions shown in @eq:condYgivenU.
+That is
+$$
+f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})=
+\frac{1}{\left(2\pi\sigma^2\right)^{-(n+q)/2}}\exp
+\left(\frac{\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}
+-\mathbf{Z}\boldsymbol{\Lambda}_\theta\mathbf{u}\right\|^2+
+\left\|\mathbf{u}\right\|^2}{-2\sigma^2}\right) .
+$$ {#eq:YUjointdensity}
+
+To evaluate the likelihood for the parameters, $\boldsymbol{\theta}$, $\boldsymbol{\beta}$, and $\sigma^2$, given the observed response, $\mathbf{y}$, we must evaluate the marginal distribution of $\mathcal{Y}$, which is the integral of $f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})$ with respect to $\mathbf{u}$.
+
+This is much simpler if we first rewrite the *penalized sum of squared residuals*, $\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}
+-\mathbf{Z}\boldsymbol{\Lambda}_\theta\mathbf{u}\right\|^2+
+\left\|\mathbf{u}\right\|^2$ in @eq:YUjointdensity, which is a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
+$$
+\begin{aligned}
+  r^2_\theta(\mathbf{u},\boldsymbol{\beta})
+  &=
+  \|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}-\mathbf{Z}\boldsymbol{\Lambda}_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2 \\
+  &=
+  \left\|
+    \begin{bmatrix}
+      \mathbf{Z}\boldsymbol{\Lambda}_\theta & \mathbf{X} & \mathbf{y} \\
+     -\mathbf{I}_q & \mathbf{0} & \mathbf{0}
+    \end{bmatrix}
+    \begin{bmatrix}
+     -\mathbf{u} \\
+     -\boldsymbol{\beta} \\
+     1
+    \end{bmatrix}
+  \right\|^2 \\
+  &=
+    \begin{bmatrix}
+     -\mathbf{u'} &
+     -\boldsymbol{\beta}' &
+      1
+    \end{bmatrix}
+    \begin{bmatrix}
+      \boldsymbol{\Lambda}'\mathbf{Z}'\mathbf{Z}\boldsymbol{\Lambda}+\mathbf{I} & \boldsymbol{\Lambda}'\mathbf{Z}'\mathbf{X} & \boldsymbol{\Lambda}'\mathbf{Z}'\mathbf{y} \\
+      \mathbf{X}'\mathbf{Z}\boldsymbol{\Lambda} & \mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
+      \mathbf{y}'\mathbf{Z}\boldsymbol{\Lambda} & \mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+    \end{bmatrix}
+    \begin{bmatrix}
+     -\mathbf{u} \\
+     -\boldsymbol{\beta} \\
+      1
+    \end{bmatrix} \\
+     &=
+    \begin{bmatrix}
+     -\mathbf{u'} &
+     -\boldsymbol{\beta'} &
+      1
+    \end{bmatrix}
+    \begin{bmatrix}
+      \mathbf{R}_{ZZ}' & \mathbf{0} & \mathbf{0} \\
+      \mathbf{R}_{ZX}' & \mathbf{R}_{XX}' & \mathbf{0} \\
+      \mathbf{r}_{Zy}' & \mathbf{r}_{Xy}' & r_{yy}
+    \end{bmatrix}
+    \begin{bmatrix}
+      \mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy} \\
+      \mathbf{0} & \mathbf{R}_{XX} & \mathbf{r}_{Xy} \\
+      \mathbf{0} & \mathbf{0} & r_{yy}
+    \end{bmatrix}
+    \begin{bmatrix}
+     -\mathbf{u} \\
+     -\boldsymbol{\beta} \\
+      1
+    \end{bmatrix}\\
+  &= \left\|
+    \begin{bmatrix}
+      \mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy}\\
+      \mathbf{0} & \mathbf{R}_{XX}' & \mathbf{r}_{Xy}\\
+      \mathbf{0} & \mathbf{0} & r_{yy}
+    \end{bmatrix}
+    \begin{bmatrix}
+     -\mathbf{u} \\
+     -\boldsymbol{\beta} \\
+      1
+    \end{bmatrix}
+    \right\|^2\\
+  &= \| \mathbf{r}_{Zy}-\mathbf{R}_{ZX}\boldsymbol{\beta}-\mathbf{R}_{ZZ}\mathbf{u} \|^2 +
+     \| \mathbf{r}_{Xy}-\mathbf{R}_{XX}\boldsymbol{\beta}\|^2 + r_{yy}^2 ,
+  \end{aligned}
+$$ {#eq:penalized-rss}
+using the Cholesky factor of the blocked matrix,
+$$
+  \begin{bmatrix}
+    \boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I} & 
+    \boldsymbol{\Lambda}_\theta'\mathbf{Z'X} & \boldsymbol{\Lambda}_\theta'\mathbf{Z'y} \\
+    \mathbf{X'Z}\boldsymbol{\Lambda}_\theta & \mathbf{X'X} & \mathbf{X'y} \\
+    \mathbf{y'Z}\boldsymbol{\Lambda}_\theta & \mathbf{y'X} & \mathbf{y'y}
+  \end{bmatrix} =
+  \begin{bmatrix}
+    \mathbf{R}_{ZZ}' & \mathbf{0} & \mathbf{0} \\
+    \mathbf{R}_{ZX}' & \mathbf{R}'_{XX} & \mathbf{0} \\
+    \mathbf{r}_{Zy}' & \mathbf{r}'_{Xy} & r_{yy}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{R}_{ZZ} & \mathbf{R}_{ZX} & \mathbf{r}_{Zy} \\
+    \mathbf{0} & \mathbf{R}_{XX} & \mathbf{r}_{Xy} \\
+    \mathbf{0} & \mathbf{0} & r_{yy}
+  \end{bmatrix} .
+$$ {#eq:bigCholfac}
+
+Note that the block in the upper left, $\boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I}$, is positive definite even when $\boldsymbol{\Lambda}_\theta$ is singular, because
+$$
+\mathbf{u}'\left(\boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I}\right)\mathbf{u} = \left\|\mathbf{Z}\boldsymbol{\Lambda}_\theta\mathbf{u}\right\|^2
++\left\|\mathbf{u}\right\|^2
+$$ {#eq:Cholfacupperleft}
+and the first term is non-negative while the second is positive if $\mathbf{u}\ne\mathbf{0}$.
+
+Thus $\mathbf{R}_{ZZ}$, with positive diagonal elements, can be evaluated and its determinant, $\left|\mathbf{R}_{ZZ}\right|$, is positive.
+This determinant appears in the marginal density of $\mathcal{Y}$, from which the likelihood of the parameters is evaluated.
+
+To evaluate the likelihood,
+$$
+L(\mathbf{\theta},\boldsymbol{\beta},\sigma|\mathbf{y}) = \int_\mathbf{u} f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})\, d\mathbf{u}
+$$ {#eq:likelihood-abstract}
+we isolate the part of the joint density that depends on $\mathbf{u}$ and perform a change of variable
+$$
+\mathbf{v}=\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\boldsymbol{\beta}-\mathbf{r}_{Zy} .
+$$ {#eq:u-system}
+From the properties of the multivariate Gaussian distribution
+$$
+\begin{aligned}
+  \int_{\mathbf{u}}\frac{1}{(2\pi\sigma^2)^{q/2}}
+    \exp\left(-\frac{\|\mathbf{R}_{ZZ}\mathbf{u}+\mathbf{R}_{ZX}\boldsymbol{\beta}-\mathbf{r}_{Zy}\|^2}{2\sigma^2}\right)
+    \,d\mathbf{u}
+  &= \int_{\mathbf{v}}\frac{1}{(2\pi\sigma^2)^{q/2}}
+    \exp\left(-\frac{\|\mathbf{v}\|^2}{2\sigma^2}\right)|\mathbf{R}_{ZZ}|^{-1}\,d\mathbf{v}\\
+  &=|\mathbf{R}_{ZZ}|^{-1}
+\end{aligned}
+$$ {#eq:likelihood-integral}
+from which we obtain the likelihood as
+$$
+  L(\mathbf{\theta},\boldsymbol{\beta},\sigma;\mathbf{y})=
+  \frac{|\mathbf{R}_{ZZ}|^{-1}}{(2\pi\sigma^2)^{n/2}}
+  \exp\left(-\frac{r_{yy}^2 + \|\mathbf{R}_{XX}(\boldsymbol{\beta}-\widehat{\boldsymbol{\beta}})\|^2}{2\sigma^2}\right) ,
+$$ {#eq:likelihood}
+where the conditional estimate, $\widehat{\boldsymbol{\beta}}$, given $\boldsymbol{\theta}$, satisfies
+$$
+\mathbf{R}_{XX}\widehat{\boldsymbol{\beta}} = \mathbf{r}_{Xy} .
+$$
+
+Setting $\boldsymbol{\beta}=\widehat{\boldsymbol{\beta}}$
+and taking the logarithm provides the estimate of $\sigma^2$,
+given $\mathbf{\theta}$, as
+$$
+\widehat{\sigma^2}=\frac{l_\mathbf{yy}^2}{n}
+$$ {#eq:sigma-hat}
+which gives the *profiled log-likelihood*,
+$\ell(\mathbf{\theta}|\mathbf{y})=\log L(\mathbf{\theta},\widehat{\boldsymbol{\beta}},\widehat{\sigma})$,
+on the deviance scale, as
+$$
+-2\ell(\mathbf{\theta}|\mathbf{y})=2\log(|\mathbf{R}_{ZZ}|) +
+    n\left(1+\log\left(\frac{2\pi r_{yy}^2(\boldsymbol{\theta})}{n}\right)\right)
+$$ {#eq:profiled-log-likelihood}

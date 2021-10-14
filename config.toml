@@ -5,9 +5,10 @@
     "intro",
     "multiple",
     "longitudinal",
-    "theory",
+#    "theory",
     "GLMMBinomial",
-    "references"
+    "linalg",
+    "references",
   ]
   port = 8042
 
