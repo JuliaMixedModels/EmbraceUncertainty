@@ -267,7 +267,7 @@ $$
 $$ {#eq:normaleq}
 which are called the *normal equations*.
 
-The term *normal* in this expression comes from the fact that requiring the gradient @eq:sumsqgrad to be zero is equivalent to requiring that the *residual vector*, $\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}$, be perpendicular, or *normal*, to the columns of $\mathbf{X}$.
+The term *normal* in this expression comes from the fact that requiring the gradient, @eq:sumsqgrad, to be zero is equivalent to requiring that the *residual vector*, $\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}$, be perpendicular, or *normal*, to the columns of $\mathbf{X}$.
 
 When the model matrix, $\mathbf{X}$, is of *full column rank*, which means
 $$
@@ -338,7 +338,7 @@ $$
 $$ {#eq:extendedcholfac}
 without needing to solve for $\widehat{\boldsymbol{\beta}}$ first.
 This is not terribly important for a linear model where the evaluation of $\widehat{\boldsymbol{\beta}}$ and the residual is typically done only once.
-However, for the linear mixed model, a similar calculation must be done for every evaluation of the objective in the iterative optimization and being able to evaluate the minimum penalized sum of squared residuals without solving for parameter values and without needing to evaluate the residual does represent a considerable savings in time and effort.
+However, for the linear mixed model, a similar calculation must be done for every evaluation of the objective in the iterative optimization, and being able to evaluate the minimum penalized sum of squared residuals without solving for parameter values and without needing to evaluate the residual saves a non-negligible amount of time and effort.
 
 ## Numerical example
 
@@ -407,7 +407,7 @@ The Cholesky factor of the `crprod` reproduces $\mathbf{R}_{XX}$, $\mathbf{r}_{X
 ```jl
 sco("extchfac = cholesky(crprod)")
 ```
-from which the parameter estimates can be evaluated.
+and information from which the parameter estimates can be evaluated.
 ```jl
 s = """
 β̂ ≈ ldiv!(
@@ -443,7 +443,7 @@ sco(s)
 Just as the Cholesky factor can be used on the left of the `\` operator, so can the `qr` factor but with `y` on the right.
 
 ```jl
-sco("b3 = qrfac\\y")
+sco(raw"b3 = qrfac\y")
 ``` 
 
 The matrix $\mathbf{R}$ is returned as a square matrix with the same number of columns as $\mathbf{X}$.
@@ -510,7 +510,7 @@ $$
 (Recall that the lower Cholesky factor is generally written $\mathbf{L}$.
 In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, $\Lambda$.)
 
-Many computational formulas for linear mixed models are written in terms of this *precision matrix*, $\boldsymbol{\Sigma}_\theta^{-1}$.
+Many computational formulas for linear mixed models are written in terms of the *precision matrix*, $\boldsymbol{\Sigma}_\theta^{-1}$.
 Such formulas will become unstable as $\boldsymbol{\Sigma}_\theta$ approaches singularity.
 And it can do so.
 It is a fact that singular (i.e. non-invertible) $\boldsymbol{\Sigma}_\theta$ can and do occur in practice, as we have seen in some of the examples in earlier chapters.
@@ -539,8 +539,19 @@ $$ {#eq:sphericalRE}
 Although it may seem more intuitive to write $\mathcal{U}$ as a linear transformation of $\mathcal{B}$, we cannot do that when $\Lambda_\theta$ is singular, which is why @eq:sphericalRE is in the form shown.
 
 We can easily verify that @eq:sphericalRE provides the desired distribution for $\mathcal{B}$.
-As a linear transformation of a multivariate Gaussian random variable, $\mathcal{B}$ will also be multivariate Gaussian with mean $𝔼\left[\mathcal{B}\right]=𝔼\left[\boldsymbol{\Lambda}_\theta\mathcal{U}\right]=\boldsymbol{\Lambda}_\theta\,𝔼\left[\mathcal{U}\right]=
-\boldsymbol{\Lambda}_\theta\mathbf{0}=\mathbf{0}$ and covariance matrix $\text{Var}(\mathcal{B})=\boldsymbol{\Lambda}_\theta\text{Var}(\mathcal{U})\boldsymbol{\Lambda}_\theta'=\sigma^2\boldsymbol{\Lambda}_\theta\boldsymbol{\Lambda}_\theta'=\boldsymbol{\Sigma}_\theta$
+As a linear transformation of a multivariate Gaussian random variable, $\mathcal{B}$ will also be multivariate Gaussian with mean
+$$
+𝔼\left[\mathcal{B}\right]=
+𝔼\left[\boldsymbol{\Lambda}_\theta\mathcal{U}\right]=
+\boldsymbol{\Lambda}_\theta\,𝔼\left[\mathcal{U}\right]=
+\boldsymbol{\Lambda}_\theta\mathbf{0}=\mathbf{0}
+$$
+and covariance matrix
+$$
+\text{Var}(\mathcal{B})=
+\boldsymbol{\Lambda}_\theta\text{Var}(\mathcal{U})\boldsymbol{\Lambda}\theta'=
+\sigma^2\boldsymbol{\Lambda}_\theta\boldsymbol{\Lambda}_\theta'=\boldsymbol{\Sigma}_\theta
+$$
 
 Just as we concentrate on how $\boldsymbol{\theta}$ determines $\Lambda_\theta$, not $\boldsymbol{\Sigma}_\theta$, we will concentrate on properties of $\mathcal{U}$ rather than $\mathcal{B}$.
 In particular, we now define the model according to the distributions
@@ -638,6 +649,7 @@ $$
 $$ {#eq:penalized-rss}
 using the Cholesky factor of the blocked matrix,
 $$
+\boldsymbol{\Omega}_\theta=
   \begin{bmatrix}
     \boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I} & 
     \boldsymbol{\Lambda}_\theta'\mathbf{Z'X} & \boldsymbol{\Lambda}_\theta'\mathbf{Z'y} \\
@@ -668,7 +680,7 @@ This determinant appears in the marginal density of $\mathcal{Y}$, from which th
 
 To evaluate the likelihood,
 $$
-L(\mathbf{\theta},\boldsymbol{\beta},\sigma|\mathbf{y}) = \int_\mathbf{u} f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})\, d\mathbf{u}
+L(\boldsymbol{\theta},\boldsymbol{\beta},\sigma|\mathbf{y}) = \int_\mathbf{u} f_{\mathcal{Y},\mathcal{U}}(\mathbf{y},\mathbf{u})\, d\mathbf{u}
 $$ {#eq:likelihood-abstract}
 we isolate the part of the joint density that depends on $\mathbf{u}$ and perform a change of variable
 $$
@@ -687,7 +699,7 @@ $$
 $$ {#eq:likelihood-integral}
 from which we obtain the likelihood as
 $$
-  L(\mathbf{\theta},\boldsymbol{\beta},\sigma;\mathbf{y})=
+  L(\boldsymbol{\theta},\boldsymbol{\beta},\sigma;\mathbf{y})=
   \frac{|\mathbf{R}_{ZZ}|^{-1}}{(2\pi\sigma^2)^{n/2}}
   \exp\left(-\frac{r_{yy}^2 + \|\mathbf{R}_{XX}(\boldsymbol{\beta}-\widehat{\boldsymbol{\beta}})\|^2}{2\sigma^2}\right) ,
 $$ {#eq:likelihood}
@@ -698,14 +710,104 @@ $$
 
 Setting $\boldsymbol{\beta}=\widehat{\boldsymbol{\beta}}$
 and taking the logarithm provides the estimate of $\sigma^2$,
-given $\mathbf{\theta}$, as
+given $\boldsymbol{\theta}$, as
 $$
-\widehat{\sigma^2}=\frac{l_\mathbf{yy}^2}{n}
+\widehat{\sigma^2}=\frac{r_\mathbf{yy}^2}{n}
 $$ {#eq:sigma-hat}
 which gives the *profiled log-likelihood*,
-$\ell(\mathbf{\theta}|\mathbf{y})=\log L(\mathbf{\theta},\widehat{\boldsymbol{\beta}},\widehat{\sigma})$,
+$\ell(\boldsymbol{\theta}|\mathbf{y})=\log L(\boldsymbol{\theta},\widehat{\boldsymbol{\beta}},\widehat{\sigma})$,
 on the deviance scale, as
 $$
--2\ell(\mathbf{\theta}|\mathbf{y})=2\log(|\mathbf{R}_{ZZ}|) +
+-2\ell(\boldsymbol{\theta}|\mathbf{y})=2\log(|\mathbf{R}_{ZZ}|) +
     n\left(1+\log\left(\frac{2\pi r_{yy}^2(\boldsymbol{\theta})}{n}\right)\right)
 $$ {#eq:profiled-log-likelihood}
+
+One of the interesting aspects of this formulation is that it is not necessary to solve for the conditional estimate of $\boldsymbol{\beta}$ or the conditional modes of the random effects when evaluating the log-likelihood.
+The two values needed for the log-likelihood evaluation, $2\log(|\mathbf{L}_{ZZ}|)$ and $l_\mathbf{yy}^2$, are obtained directly from the diagonal elements of the Cholesky factor.
+
+Furthermore, $\boldsymbol{\Omega}_{\theta}$ and, from that, the Cholesky factor, $\mathbf{R}_{\theta}$, and the objective to be optimized can be evaluated for a given value of $\boldsymbol{\theta}$ from
+$$
+\mathbf{A} = \begin{bmatrix}
+\mathbf{Z}^\prime\mathbf{Z} & \mathbf{Z}^\prime\mathbf{X} & \mathbf{Z}^\prime\mathbf{y} \\
+\mathbf{X}^\prime\mathbf{Z} & \mathbf{X}^\prime\mathbf{X} & \mathbf{X}^\prime\mathbf{y} \\
+\mathbf{y}^\prime\mathbf{Z} & \mathbf{y}^\prime\mathbf{X} & \mathbf{y}^\prime\mathbf{y}
+\end{bmatrix}
+$$ {#eq:A}
+and $\boldsymbol{\Lambda}_{\theta}$.
+
+In the `MixedModels` package the `LinearMixedModel` struct contains a symmetric blocked array in the `A` field and a similarly structured lower-triangular blocked array in the `L` field.
+Evaluation of the objective simply involves updating the template matrices, $\lambda_i, i=1,\dots,k$ in the `ReMat` structures then updating `L` from `A` and the $\lambda_i$.
+
+## The REML criterion {#sec:REML}
+
+The so-called REML estimates of variance components are often preferred to the maximum likelihood estimates.
+("REML" can be considered to be an acronym for "restricted" or "residual" maximum likelihood, although neither term is completely accurate because these estimates do not maximize a likelihood.)
+We can motivate the use of the REML criterion by considering a linear regression model, 
+$$
+  \mathcal{Y}\sim\mathcal{N}(\mathbf{X}\boldsymbol{\beta},\sigma^2\mathbf{I}_n),
+$$ {#eq:20}
+in which we typically estimate $\sigma^2$ as
+$$
+  \widehat{\sigma^2_R}=\frac{\|\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}\|^2}{n-p}
+$$ {#eq:21}
+even though the maximum likelihood estimate of $\sigma^2$ is
+$$
+  \widehat{\sigma^2_{L}}=\frac{\|\mathbf{y}-\vec
+    X\widehat{\boldsymbol{\beta}}\|^2}{n} .
+$$ {#eq:22}
+
+The argument for preferring $\widehat{\sigma^2_R}$ to $\widehat{\sigma^2_{L}}$ as an estimate of $\sigma^2$ is that the numerator in both estimates is the sum of squared residuals at $\widehat{\boldsymbol{\beta}}$ and, although the residual vector, $\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}$, is an $n$-dimensional vector, it satisfies $p$ linearly independent constraints, $\mathbf{X}'(\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}})=\mathbf{0}$.
+That is, the residual at $\widehat{\boldsymbol{\beta}}$ is the projection of the observed response vector, $\mathbf{y}$, into an $(n-p)$-dimensional linear subspace of the $n$-dimensional response space.
+The estimate $\widehat{\sigma^2_R}$ takes into account the fact that $\sigma^2$ is estimated from residuals that have only $n-p$ *degrees of freedom*.
+
+Another argument often put forward for REML estimation is that $\widehat{\sigma^2_R}$ is an *unbiased* estimate of $\sigma^2$, in the sense that the expected value of the estimator is equal to the value of the parameter.
+However, determining the expected value of an estimator involves integrating with respect to the density of the estimator and we have seen that densities of estimators of variances will be skewed, often highly skewed.
+It is not clear why we should be interested in the expected value of a highly skewed estimator.
+If we were to transform to a more symmetric scale, such as the estimator of the standard deviation or the estimator of the logarithm of the standard deviation, the REML estimator would no longer be unbiased.
+Furthermore, this property of unbiasedness of variance estimators does not generalize from the linear regression model to linear mixed models.
+This is all to say that the distinction between REML and ML estimates of variances and variance components is probably less important than many people believe.
+
+Nevertheless it is worthwhile seeing how the computational techniques described in this chapter apply to the REML criterion because the REML parameter estimates $\widehat{\boldsymbol{\theta}}_R$ and $\widehat{\sigma_R^2}$ for a linear mixed model have the property that they would specialize to $\widehat{\sigma^2_R}$ from #eq:21 for a linear regression model, as seen in @sec:Dyestuff2LMM.
+
+Although not usually derived in this way, the REML criterion (on the deviance scale) can be expressed as
+$$
+  d_R(\boldsymbol{\theta},\sigma|\mathbf{y})=-2\log
+  \int_{\mathbb{R}^p}L(\boldsymbol{\theta},\boldsymbol{\beta},\sigma|\mathbf{y})\,d\boldsymbol{\beta} .
+$$ {#eq:23}
+The REML estimates $\widehat{\boldsymbol{\theta}}_R$ and $\widehat{\sigma_R^2}$
+minimize $d_R(\boldsymbol{\theta},\sigma|\mathbf{y})$.
+
+To evaluate this integral we form an expansion, similar to @eq:likelihood, of $r^2_{\theta,\beta}$ about $\widehat{\boldsymbol{\beta}}_\theta$
+$$
+  r^2_{\theta,\beta}=r^2_\theta+\|\mathbf{R}_{XX}(\boldsymbol{\beta}-\widehat{\boldsymbol{\beta}}_\theta)\|^2 .
+$$ {#eq:rsqbetathetaexp}
+from which we can derive
+$$
+  \int_{\mathbb{R}^p}\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
+  {(2\pi\sigma^2)^{n/2}|\mathbf{R}_{ZZ}|} \,d\boldsymbol{\beta}=
+  \frac{\exp\left(-\frac{r^2_\theta}{2\sigma^2}\right)}
+  {(2\pi\sigma^2)^{(n-p)/2}|\mathbf{R}_{ZZ}||\mathbf{R}_X|}
+$$ {#eq:betaintegral}
+corresponding to a REML criterion on the deviance scale of
+$$
+  d_R(\boldsymbol{\theta},\sigma|\mathbf{y})=(n-p)\log(2\pi\sigma^2)+
+  2\log\left(|\mathbf{R}_{ZZ}||\mathbf{R}_X|\right)+\frac{r^2_\theta}{\sigma^2} .
+$$ {#eq:REMLdev}
+Plugging in the conditional REML estimate, $\widehat{\sigma^2}_R=r^2_\theta/(n-p)$, provides the profiled REML criterion
+$$
+  \tilde{d}_R(\boldsymbol{\theta}|\mathbf{y})=
+  2\log\left(|\mathbf{R}_{ZZ}||\mathbf{R}_X|\right)+(n-p)
+  \left[1+\log\left(\frac{2\pi r^2_\theta}{n-p}\right)\right].
+$$ {#eq:24}
+
+The REML estimate of $\boldsymbol{\theta}$ is
+$$
+  \widehat{\boldsymbol{\theta}}_R=\arg\min_{\boldsymbol{\theta}}\tilde{d}_R(\boldsymbol{\theta}|\mathbf{y}) ,
+$$ {#eq:31}
+and the REML estimate of $\sigma^2$ is the conditional REML estimate of $\sigma^2$ at $\widehat{\boldsymbol{\theta}}_R$,
+$$ \widehat{\sigma^2_R}=r^2_{\widehat\theta_R}/(n-p) . $$ {#eq:REMLsigmasq}
+It is not entirely clear how one would define a "REML estimate" of $\boldsymbol{\beta}$
+because the REML criterion, $d_R(\boldsymbol{\theta},\sigma|\mathbf{y})$, defined in @eq:REMLdev, does not depend on $\boldsymbol{\beta}$.
+However, it is customary (and not unreasonable) to use
+$\widehat{\boldsymbol{\beta}}_R=\widehat{\boldsymbol{\beta}}_{\widehat{\boldsymbol{\theta}}_R}$ as
+the REML estimate of $\boldsymbol{\beta}$.
