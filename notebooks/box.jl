@@ -66,7 +66,7 @@ draw
 
 # ╔═╡ 5b952856-f36a-48de-8e6d-8feca127a48e
 m1 = let
-	form = @formula(resp ~ (1 + time + time^2) * Group + (1+time+time^2|Subj))
+	form = @formula(resp ~ 1 + (time + time^2) * Group + (1+time+time^2|Subj))
 	fit(MixedModel, form, boxdf)
 end
 
