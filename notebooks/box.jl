@@ -66,7 +66,7 @@ draw
 
 # ╔═╡ 5b952856-f36a-48de-8e6d-8feca127a48e
 m1 = let
-	form = @formula(resp ~ (1 + time + time^2) * Group + (1+time+time^2|Subj))
+	form = @formula(resp ~ 1 + (time + time^2) * Group + (1+time+time^2|Subj))
 	fit(MixedModel, form, boxdf)
 end
 
@@ -82,6 +82,9 @@ m2 = let
 	form = @formula(resp ~ 1 + (time + time^2) & Group + (1+time+time^2|Subj))
 	fit(MixedModel, form, boxdf)
 end
+
+# ╔═╡ be884132-44ee-4cf2-b1d3-7478cc3de270
+MixedModels.likelihoodratiotest(m2, m1)
 
 # ╔═╡ 6899448a-b853-4e31-92c8-3d226a5b8f6e
 shrinkageplot(m2)
@@ -104,14 +107,14 @@ m3 = let
 	fit(MixedModel, form, boxdf)
 end
 
-# ╔═╡ 380735ba-14bf-43ba-9c7c-9a445fe66f1b
+# ╔═╡ 6dc66c32-550f-45fc-8ea0-0b8f47ebeed5
 MixedModels.likelihoodratiotest(m3, m2)
 
 # ╔═╡ d31908f1-d1fc-410c-950d-1083bc30923b
 geomdof(m::LinearMixedModel) = sum(leverage(m));
 
 # ╔═╡ 396cb9b7-ae98-434d-94b6-721ec4b7719f
-geomdof.([m1, m2, m3])
+geomdof.([m2, m3])
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1461,13 +1464,14 @@ version = "3.5.0+0"
 # ╠═5b952856-f36a-48de-8e6d-8feca127a48e
 # ╟─7d6742c1-f33b-46ac-96e8-2d8408dfaf1c
 # ╠═56be6e96-82e3-44e7-bebc-f995a0379e58
+# ╠═be884132-44ee-4cf2-b1d3-7478cc3de270
 # ╠═6899448a-b853-4e31-92c8-3d226a5b8f6e
 # ╠═ea972f64-df2e-4689-84bd-d5017da9898a
 # ╠═bb07626d-a5a5-4bca-a2e6-4dae100aa899
 # ╠═67795329-ad64-49fc-899d-8d6ffe109616
 # ╠═758ed3d0-1dab-4ffa-9e1a-66d7181714ff
 # ╠═00eff4e5-92f7-4b7c-a059-347c06ef0f5d
-# ╠═380735ba-14bf-43ba-9c7c-9a445fe66f1b
+# ╠═6dc66c32-550f-45fc-8ea0-0b8f47ebeed5
 # ╠═d31908f1-d1fc-410c-950d-1083bc30923b
 # ╠═396cb9b7-ae98-434d-94b6-721ec4b7719f
 # ╟─00000000-0000-0000-0000-000000000001
