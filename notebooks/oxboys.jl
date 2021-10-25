@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.3
+# v0.16.4
 
 using Markdown
 using InteractiveUtils
@@ -22,14 +22,13 @@ CairoMakie.activate!(type="svg")
 
 # ╔═╡ 1d76e259-fee6-462c-a7bc-01c2abb81765
 begin
-	oxboys = DataFrame(Arrow.Table("../data/Oxboys.arrow"))
-	oxboys.subject = CategoricalArray(string.('S', lpad.(oxboys.subject, 2, '0')))
-	oxboys.Subj = CategoricalArray(oxboys.subject; # create an ordered Subj variable
+	oxboys = DataFrame(Arrow.Table("../data/oxboys.arrow"))
+	oxboys.Subjord = CategoricalArray(oxboys.Subj; # create an ordered Subj variable
 		levels = string.(@chain oxboys begin
-			groupby(:subject)
+			groupby(:Subj)
 			@combine(:intcpt = first(simplelinreg(:age, :height)))
 			sort(:intcpt)
-			getproperty(:subject)
+			getproperty(:Subj)
 		end),
 		ordered=true,
 		)
@@ -39,14 +38,14 @@ end
 # ╔═╡ e52954f6-daeb-478c-a9de-51de522bd41b
 begin
 	plt = data(oxboys) * mapping(:age => "Scaled Age", :height => "Height [cm]")
-	draw(plt * mapping(color=:subject) * (visual(Scatter) + visual(Lines)))
+	draw(plt * mapping(color=:Subj) * (visual(Scatter) + visual(Lines)))
 end
 
 # ╔═╡ a45b53d8-7fd4-4a64-834e-d6b295cd315b
-draw(plt * mapping(layout=:Subj), axis=(height=400,width=200))
+draw(plt * mapping(layout=:Subjord), axis=(height=400,width=200))
 
 # ╔═╡ 876421f0-9d6e-4d8b-a2eb-17b6c11e0c6b
-m1 = let form = @formula(height ~ 1 + age + (1+age|subject))
+m1 = let form = @formula(height ~ 1 + age + (1+age|Subj))
 	fit(MixedModel, form, oxboys)
 end
 
@@ -54,7 +53,7 @@ end
 VarCorr(m1)
 
 # ╔═╡ 045920bb-02fa-40fa-a95a-3167f2264896
-m2 = let form = @formula(height ~ 1 + age + age^2 + (1+age+age^2|subject))
+m2 = let form = @formula(height ~ 1 + age + age^2 + (1+age+age^2|Subj))
 	fit(MixedModel, form, oxboys)
 end
 
@@ -120,7 +119,7 @@ MixedModelsMakie = "~0.3.10"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.0-rc1"
+julia_version = "1.7.0-rc2"
 manifest_format = "2.0"
 
 [[deps.AbstractFFTs]]
@@ -964,9 +963,9 @@ version = "0.11.1"
 
 [[deps.PNGFiles]]
 deps = ["Base64", "CEnum", "ImageCore", "IndirectArrays", "OffsetArrays", "libpng_jll"]
-git-tree-sha1 = "85e3436b18980e47604dd0909e37e2f066f54398"
+git-tree-sha1 = "33ae7d19c6ba748d30c0c08a82378aae7b64b5e9"
 uuid = "f57f5aa1-a3ce-4bc8-8ab9-96f992907883"
-version = "0.3.10"
+version = "0.3.11"
 
 [[deps.Packing]]
 deps = ["GeometryBasics"]
@@ -1062,7 +1061,7 @@ deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [[deps.Random]]
-deps = ["Serialization"]
+deps = ["SHA", "Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[deps.Ratios]]
@@ -1298,9 +1297,9 @@ version = "0.4.1"
 
 [[deps.WoodburyMatrices]]
 deps = ["LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "9398e8fefd83bde121d5127114bd3b6762c764a6"
+git-tree-sha1 = "de67fa59e33ad156a590055375a30b23c40299d3"
 uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
-version = "0.5.4"
+version = "0.5.5"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
