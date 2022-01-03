@@ -10,6 +10,7 @@ using Reexport
 @reexport using Chain
 @reexport using DataFrameMacros
 @reexport using DataFrames
+@reexport using LinearAlgebra
 @reexport using MixedModels
 @reexport using MixedModelsMakie
 @reexport using PooledArrays
