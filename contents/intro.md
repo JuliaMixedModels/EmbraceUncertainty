@@ -77,7 +77,7 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 To access these data within `Julia` we must first attach this package, and others that we will use, to our session with
 
 ```julia
-using DataFrameMacros, DataFrames, MixedModels
+using DataFrameMacros, DataFrames, MixedModels, Random
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -131,7 +131,7 @@ When the labels are numbers a categorical covariate can be mistaken for a numeri
 It is a good practice to apply `describe` to any data frame the first time you work with it and to check carefully that any categorical variables are indeed represented as factors.
 
 The data in a data frame are viewed as a table with columns corresponding to variables and rows to observations.
-The functions `first` and `last` the first or last few rows
+The functions `first` and `last` select the first or last few rows of the table.
 
 ```jl
 sco("first(dyestuff, 7)", process=without_caption_label)
@@ -163,7 +163,7 @@ EU.dyestuffdataplot()
 than we do from numerical summaries.
 
 In @fig:dyestuffdata we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability.
-For example, four of the five preparations from batch F provided lower yields than did any of the preparations from batches C and E.
+For example, four of the five preparations from batch F provided lower yields than did any of the preparations from batches B, C, and E.
 
 This plot, and essentially all the other plots in this book, were created using the [Makie](https://makie.juliaplots.io) package (@DanischKrumbiegel2021).
 
@@ -251,7 +251,7 @@ For linear mixed models we refer to `-2 loglik` as the value of the *objective* 
 To evaluate the *deviance* we should subtract the value of this criterion at a *saturated* or baseline model but it is not clear how to define such a baseline model in these cases.
 
 However, it is still possible to perform *likelihood ratio tests* of different models fit to the same data using the difference in the minimized objectives, because it is the same as the difference in the deviances.
-(Recall that the objective is negative twice the log-likelihood, hence a ratio of likelihoods corresponds to the difference in objectives.)
+(Recall that a ratio of likelihoods corresponds to a difference in log-likelihoods.)
 
 The third section is the table of estimates of parameters associated with the random effects.
 There are two sources of variability in the model we have fit, a batch-to-batch variability in the level of the response and the residual or per-observation variability --- also called the within-batch variability.
@@ -266,7 +266,7 @@ The line labeled `batch` in the random effects table shows that the random effec
 The corresponding standard deviation is 37.26 g.
 
 Note that the last column in the random effects summary table is the estimate of the variability expressed as a standard deviation rather than as a variance.
-These values are provided because it is usually easier to visualize standard deviations, which are on the scale of the response, than it is to visualize the magnitude of a variance.
+These values are provided because usually it is easier to visualize standard deviations, which are on the scale of the response, than it is to visualize the magnitude of a variance.
 The values in this column are a simple re-expression (the square root) of the estimated variances.
 Do not confuse them with the standard errors of the variance estimators, which are not given here.
 In `add-section-reference-here` we explain why we do not provide standard errors of variance estimates.
@@ -280,11 +280,16 @@ There will be a total of six random effects, one for each level of `batch`.
 
 The final part of the printed display gives the estimates and standard errors of any fixed-effects parameters in the model.
 The only fixed-effects term in the model formula is the `1`, denoting a constant which, as explained above, is labeled as `(Intercept)`.
-The estimate of this parameter is 1527.5 g, which happens to be the mean yield across all the data.
+The estimate of this parameter is 1527.5 g, which happens to be the mean yield across all the data - a consequence of the experiment being *balanced*, in the sense that there was the same number of observations for each batch.
+
+This *coefficient table* also includes the *standard error* of the estimate, which is the estimated standard deviation of the estimator, a `z` ratio, which is the ratio of the estimate to its standard error, and the probability the absolute value of a standard normal distribution exceeding the absolute value of the `z` ratio.
+
+If the hypothesis that the coefficient is zero is of interest, which is not the case here, then the value in the fourth column is an approximate p-value for the hypothesis test.
+An alternative measure of precision of the estimate - a coverage interval based on a *parametric bootstrap* - is presented in @sec:furtherassess
 
 ### A model for the dyestuff2 data {#sec:Dyestuff2LMM}
 
-Fitting a similar model to the data produces an estimate $\widehat{\sigma}_1=0$.
+Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\sigma}_1=0$.
 
 ```jl
 sco("m2 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff2)")
@@ -294,15 +299,74 @@ An estimate of $0$ for $\sigma_1$ does not mean that there is no variation betwe
 Indeed @fig:dyestuff2data shows that there is some small amount of variability between the groups.
 The estimate, $\widehat{\sigma}_1=0$, simply indicates that the level of "between-group" variability is not sufficient to warrant incorporating random effects in the model.
 
+This point is worth reiterating.
+An estimate of zero for a variance component does not imply that there is no variability between the groups.
+There will always be variability between groups that is induced by the per-observation variability.
+If we divided 30 observations from a homogeneous distribution arbitrarily into six groups of five observations, which is likely the way that this sample was simulated, the sample averages would inherit a level of variability from the original sample.
+What is being estimated in the variance component for `batch` is the *excess* variability between groups beyond that induced by the residual variability.
+
+In other words, an estimate $\widehat{\sigma}_1=0$ is not inconsistent with the model.
 The important point to take away from this example is that we must allow for the estimates of variance components to be zero.
-We describe such a model as being degenerate, in the sense that it corresponds to a linear model in which we have removed the random effects associated with `batch`.
+
+We describe such a model as being [degenerate](https://en.wikipedia.org/wiki/Degenerate_distribution), in the sense that it corresponds to a linear model in which we have removed the random effects associated with `batch`.
 Degenerate models can and do occur in practice.
 Even when the final fitted model is not degenerate, we must allow for such models when determining the parameter estimates through numerical optimization.
 
 To reiterate, the model corresponds to the linear model because the random effects are inert, in the sense that they have a variance of zero, and hence can be removed.
 
-Notice that the estimate of $\sigma$ from the linear model (called the in the summary) corresponds to the estimate in the REML fit () but not that from the ML fit ().
-The fact that the REML estimates of variance components in mixed models generalize the estimate of the variance used in linear models, in the sense that these estimates coincide in the degenerate case, is part of the motivation for the use of the REML criterion for fitting mixed-effects models.
+### Some stylistic conventions
+
+Because many models will be fit in this book we will adopt certain conventions regarding the argument specifications.
+In particular we will establish the convention of specifying `contrasts` for any categorical covariates and the possibility of using certain transformations, such as centering and scaling, of numeric covariates.
+
+The name `contrasts` is used in a general sense here to specify certain transformations that are to take place during the process of converting a formula and the structure, or [schema](https://en.wikipedia.org/wiki/Database_schema), of the data into model matrices.
+
+The [StatsModels.jl package](https://github.com/JuliaStats/StatsModels.jl) allows for contrasts to be specified as a key-value dictionary where the keys are symbols and the values are of a type that specializes `StatsModels.AbstractContrasts`.
+The [MixedModels.jl package](https://github.com/JuliaStats/MixedModels.jl) provides for a `Grouping()` contrast and the [StandardizedPredictors.jl](https://github.com/beacon-biosignals/StandardizedPredictors.jl) allows transformations to be expressed as contrasts.
+
+For models `m1` and `m2` the only covariate in the model formula is `batch`, which is a grouping factor for the random effects.
+Thus the desired contrasts specification is
+```jl
+sc("contrasts = Dict(:batch => Grouping())")
+```
+
+(Symbols in Julia are denoted by a colon followed by the name of the symbol.)
+```jl
+sco(""":batch === Symbol("batch")""")
+```
+
+It is best to get into the habit of specifying `Grouping()` contrasts for any grouping factors in the data.
+Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter.
+However, when the number of levels is large, as for some of the models in later chapters, failure to specify `Grouping()` contrasts can cause memory faults when constructing the numeric represention of the model.
+
+There is an advantage in assigning the contrasts dictionary to the name `contrasts` in that the call to `fit` with the optional, named argument `contrasts`
+```jl
+sc("m1 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff, contrasts=contrasts)")
+```
+can be condensed to 
+```jl
+sc("m1 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff; contrasts)")
+```
+(Note that the comma after the positional arguments has been changed to a semicolon.
+This is necessary because it indicates that arguments following the semicolon are named arguments, not positional.)
+
+Another convention we will use is assigning the formula separately from the call to `fit` as part of a `let` block.
+Often the formula can become rather long, sometimes needing multiple lines in the call, and it becomes difficult to keep track of the other arguments.
+Assigning the formula separately helps in keeping track of the arguments to `fit`.
+
+A `let` block is a way of making temporary assignments that do not affect the global state.
+An assignment to a variable name inside a `let` block is local to the block.
+
+Thus `m1` can be assigned as
+```jl
+s = """
+m1 = let
+    form = @formula(yield ~ 1 + (1|batch))
+    fit(MixedModel, form, dyestuff; contrasts)
+end
+"""
+sco(s)
+```
 
 ### Further Assessment of the Fitted Models {#sec:furtherassess}
 
@@ -310,7 +374,24 @@ The parameter estimates in a statistical model represent our "best guess" at the
 However, they are not the whole story.
 Statistical models characterize the variability in the data and we must assess the effect of this variability on the parameter estimates and on the precision of predictions made from the model.
 
-In we introduce a method of assessing variability in parameter estimates using the "profiled deviance" and in we show methods of characterizing the conditional distribution of the random effects given the data.
+One method of assessing the variability in the parameter estimates is through a [parametric bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Parametric_bootstrap), a process where a large number of data sets are simulated from the assumed model using the parameter estimates as the "true" parameter values.
+The distribution of the parameter estimators is inferred from the distribution of the parameter estimates from these generated data sets.
+
+This method is well-suited to the package for Julia because refitting an existing model to a simulated data set is very fast.
+
+For methods that involve simulation, it is best to initialize a random number generator to a known state so that the "random" sample can be reproduced if desired.
+Beginning with Julia v1.7.0 the default random number generator is the `Xoshiro` generator, which we initialize to an arbitrary (but reproducible) value.
+```jl
+s = """
+    using Random
+    const bsrng = Xoshiro(4321234)
+    m1samp = parametricbootstrap(bsrng, 10_000, m1; hide_progress=true)
+    m1samppars = DataFrame(m1samp.allpars)
+    first(m1samppars, 6)
+    """
+sco(s, process=without_caption_label)
+```
+
 Before we get to these sections, however, we should state in some detail the probability model for linear mixed-effects and establish some definitions and notation.
 In particular, before we can discuss profiling the deviance, we should define the deviance.
 We do that in the next section.
