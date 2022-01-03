@@ -42,8 +42,8 @@ and probabilities defined by this density are most easily evaluated by standardi
 (This is why $\sigma$ is called the *standard deviation*.)
 
 To be able to evaluate $\sigma$, the variance, $\sigma^2$, must be positive, or at least non-negative.
-If $\sigma^2=0$ then all the probability is concentrated at a single point, $x=\mu$, and we no longer have a probability density, in the usual way of thinking of it.
-Such a distribution is said to be [degenerate](https://en.wikipedia.org/wiki/Degenerate_distribution).
+If $\sigma^2=0$ then all the probability is concentrated at a single point, $x=\mu$, and we no longer have a probability density, in the usual way of thinking of one.
+The density shrinks to a point mass and the distribution is said to be [degenerate](https://en.wikipedia.org/wiki/Degenerate_distribution).
 
 Similar constraints apply to the covariance matrix, $\boldsymbol{\Sigma}$.
 Because the covariance of the i'th and j'th elements does not depend upon the order in which we write them, $\boldsymbol\Sigma$ must be symmetric.
@@ -61,7 +61,7 @@ Positive definiteness implies that the *precision matrix*, $\boldsymbol\Sigma^{-
 It also implies that there are "matrix square roots" of $\boldsymbol\Sigma$ in the sense that there are matrices $\mathbf{A}$ such that $\mathbf{A}'\mathbf{A}=\boldsymbol{\Sigma}$.
 (The reason for writing $\mathbf{A}'\mathbf{A}$ and not simply the square of $\mathbf{A}$ is that $\mathbf{A}$ is not required to be symmetric but $\mathbf{A}'\mathbf{A}$ will be symmetric, even in $\mathbf{A}$ is not.)
 
-One such "square root" of a positive definite $\boldsymbol\Sigma$ is the [Cholesky factor](https://en.wikipedia.org/wiki/Cholesky_decomposition), which is an $n\times n$ upper-triangular matrix, $\mathbf{R}$, such that
+One such "square root" of a positive definite $\boldsymbol\Sigma$ is the [Cholesky factor](https://en.wikipedia.org/wiki/Cholesky_decomposition), which corresponds to $n\times n$ upper-triangular matrix, $\mathbf{R}$, such that
 $$
 \boldsymbol{\Sigma}=\mathbf{R}'\mathbf{R} .
 $$ {#eq:upperCholesky}
@@ -428,7 +428,7 @@ sco("norm(r) ≈ extchfac.U[3,3]")
 
 There are two other decompositions of the model matrix $\mathbf{X}$ or the augmented model matrix $[\mathbf{X,y}]$ that can be used to evaluate the least squares estimates; the [QR decomposition](https://en.wikipedia.org/wiki/QR_decomposition) and the [singular value decomposition (SVD)](https://en.wikipedia.org/wiki/Singular_value_decomposition).
 
-The QR decomposition expresses $\mathbf{X}$ as the product of an *orthogonal* matrix, $\mathbf{Q}$ and an upper triangular matrix $\mathbf{R}$.
+The QR decomposition expresses $\mathbf{X}$ as the product of an *orthogonal* matrix, $\mathbf{Q}$, and an upper triangular matrix $\mathbf{R}$.
 The upper triangular $\mathbf{R}$ is related to the upper triangular Cholesky factor in that the numerical values are the same but the signs can be different.
 In particular, the usual way of creating $\mathbf{Q}$ and $\mathbf{R}$ using [Householder transformations](https://en.wikipedia.org/wiki/Householder_transformation) typically results in the first row of $\mathbf{R}$ from the `qr` function being the negative of the first row of the upper Cholesky factor.
 
@@ -576,7 +576,7 @@ To evaluate the likelihood for the parameters, $\boldsymbol{\theta}$, $\boldsymb
 
 This is much simpler if we first rewrite the *penalized sum of squared residuals*, $\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}
 -\mathbf{Z}\boldsymbol{\Lambda}_\theta\mathbf{u}\right\|^2+
-\left\|\mathbf{u}\right\|^2$ in @eq:YUjointdensity, which is a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
+\left\|\mathbf{u}\right\|^2$, in @eq:YUjointdensity, which is a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
 $$
 \begin{aligned}
   r^2_\theta(\mathbf{u},\boldsymbol{\beta})
@@ -723,7 +723,7 @@ $$
 $$ {#eq:profiled-log-likelihood}
 
 One of the interesting aspects of this formulation is that it is not necessary to solve for the conditional estimate of $\boldsymbol{\beta}$ or the conditional modes of the random effects when evaluating the log-likelihood.
-The two values needed for the log-likelihood evaluation, $2\log(|\mathbf{L}_{ZZ}|)$ and $l_\mathbf{yy}^2$, are obtained directly from the diagonal elements of the Cholesky factor.
+The two values needed for the log-likelihood evaluation, $2\log(|\mathbf{R}_{ZZ}|)$ and $r_\mathbf{yy}^2$, are obtained directly from the diagonal elements of the Cholesky factor.
 
 Furthermore, $\boldsymbol{\Omega}_{\theta}$ and, from that, the Cholesky factor, $\mathbf{R}_{\theta}$, and the objective to be optimized can be evaluated for a given value of $\boldsymbol{\theta}$ from
 $$
