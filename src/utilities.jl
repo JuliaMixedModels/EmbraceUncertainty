@@ -47,3 +47,14 @@ function Books.convert_output(expr, path, out::MixedModel; kwargs...)
         ```
         """
 end
+
+"""
+    orthpoly(x, n)
+
+Return a matrix of `n` orthogonal polynomial contrasts for the positions `x`
+"""
+function orthpoly(x::AbstractVector{<:Real}, n::Integer)
+    return Matrix(qr!(float([v^i for v in x, i in 0:n])).Q)[:, 2:(n+1)]
+end
+
+orthpoly(k::Integer, n::Integer) = orthpoly(1:k, n)

@@ -123,7 +123,7 @@ Requiring that the inverse of a matrix must be evaluated to solve a linear syste
 
 In a derivation we may write an expression like $\mathbf{L}^{-1}\mathbf{b}$ but the evaluation is performed by solving a system like @eq:forwardsolve.
 
-### Positive definiteness and the Cholesky factor
+### Positive definiteness and the Cholesky factor {#sec:Cholesky}
 
 It turns out that the ability to form the Cholesky factor, which means that all the quantities like $\boldsymbol{\Sigma}_{2,2}-\mathbf{L}_{2,1}^2$, whose square roots form the diagonal of $\mathbf{L}$, evaluate to positive numbers, is equivalent to $\boldsymbol\Sigma$ being positive definite.
 It is straightforward to show that having a Cholesky factor implies that $\boldsymbol\Sigma$ is positive definite, because
@@ -138,7 +138,7 @@ The other direction is a bit more complicated to prove but essentially it amount
 In practice, the easiest way to check a symmetric matrix to see if it is positive definite is to attempt to evaluate the Cholesky factor and check whether that succeeds.
 This is exactly what the `isposdef` methods in the *LinearAlgebra* package do.
 
-### Density of the multivariate Gaussian
+### Density of the multivariate Gaussian {#sec:mvGaussian}
 
 For the general multivariate normal distribution, $\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$, where $\boldsymbol{\Sigma}$ is positive definite with lower Cholesky factor $\mathbf{L}$, the probability density function is
 $$
@@ -147,7 +147,9 @@ f(\mathbf{x};\boldsymbol{\mu},\boldsymbol{\Sigma})&=
 \frac{1}{\sqrt{(2\pi)^n\left|\boldsymbol{\Sigma}\right|}}
 \exp\left(\frac{-[\mathbf{x}-\boldsymbol{\mu}]'\boldsymbol{\Sigma}^{-1}[\mathbf{x}-\boldsymbol{\mu}]}{2}\right)\\
 &=\frac{1}{\sqrt{(2\pi)^n}\left|\mathbf{L}\right|}
-\exp\left(\frac{-[\mathbf{x}-\boldsymbol{\mu}]'{\mathbf{L}'}^{-1}\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}]}{2}\right)
+\exp\left(\frac{-[\mathbf{x}-\boldsymbol{\mu}]'{\mathbf{L}'}^{-1}\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}]}{2}\right)\\
+&=\frac{1}{\sqrt{(2\pi)^n}\left|\mathbf{L}\right|}
+\exp\left(\frac{-\left\|\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}]\right\|^2}{2}\right)\\
 \end{align}
 $$ {#eq:mvndensity}
 and the standardizing transformation becomes
@@ -168,7 +170,7 @@ where $\mathbf{z}$ is simulated from the $n$-dimensional *standard multivariate 
 
 ### Linear functions of a multivariate Gaussian
 
-In general, if $\mathcal{X}$ is an $n$-dimensional random variable with mean $\boldsymbol{\mu}$ and covariance matrix $\boldsymbol{\Sigma}$ and $\mathbf{A}$ is a matrix with $n$ columns then the mean and variance of $\mathcal{U}=\mathbf{A}\mathcal{X}$ are given by
+In general, if $\mathcal{X}$ is an $n$-dimensional random variable with mean $\boldsymbol{\mu}$ and covariance matrix $\boldsymbol{\Sigma}$, and $\mathbf{A}$ is a matrix with $n$ columns then the mean and variance of $\mathcal{U}=\mathbf{A}\mathcal{X}$ are given by
 $$
 \require{unicode}
 𝔼\left[\mathcal{U}\right] =
@@ -368,7 +370,7 @@ The `\` operator with a `Cholesky` factor on the left performs both the forward 
 sco("β̂ = chfac\\(X'y)")
 ```
 
-Alternatively, we could carry out the two solution of triangular systems explicitly by first solving for $\mathbf{r}_{Xy}$
+Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for $\mathbf{r}_{Xy}$
 ```jl
 sco("rXy = ldiv!(chfac.L, X'y)")
 ```
@@ -383,7 +385,7 @@ sco("r = y - X * β̂")
 ```
 with geometric length or "norm",
 ```jl
-sco("norm(r)")
+scob("norm(r)")
 ```
 
 For the extended Cholesky factor, create the extended matrix of sums of squares and cross products
@@ -415,13 +417,14 @@ s = """
   copy(view(extchfac.U, 1:2, 3)),
 )
 """
-sco(s)
+scob(s)
 ```
 The operator `≈` is a check of approximate equality of floating point numbers or arrays.
 Exact equality of floating point results from "equivalent" calculations cannot be relied upon.
 
+Similarly we check that the value of $r_{y,y}$ is approximately equal to the norm of the residual vector.
 ```jl
-sco("norm(r) ≈ extchfac.U[3,3]")
+scob("norm(r) ≈ extchfac.U[3,3]")
 ```
 
 ## Alternative decompositions of X
@@ -433,17 +436,18 @@ The upper triangular $\mathbf{R}$ is related to the upper triangular Cholesky fa
 In particular, the usual way of creating $\mathbf{Q}$ and $\mathbf{R}$ using [Householder transformations](https://en.wikipedia.org/wiki/Householder_transformation) typically results in the first row of $\mathbf{R}$ from the `qr` function being the negative of the first row of the upper Cholesky factor.
 
 ```jl
-s = """
-qrfac = qr(X);
-qrfac.R
-"""
-sco(s)
+let s = """
+    qrfac = qr(X)
+    qrfac.R
+    """
+    sco(s)
+end
 ```
 
 Just as the Cholesky factor can be used on the left of the `\` operator, so can the `qr` factor but with `y` on the right.
 
 ```jl
-sco(raw"b3 = qrfac\y")
+sco("b3 = qrfac\\y")
 ``` 
 
 The matrix $\mathbf{R}$ is returned as a square matrix with the same number of columns as $\mathbf{X}$.
@@ -493,7 +497,7 @@ sco("b5 = Xsvd.V * (Xsvd.U'y ./ Xsvd.S)")
 
 In the extensions to linear mixed-effects models we will emphasize the Cholesky factorization over the QR decomposition or the SVD.
 
-## Linear mixed-effects models
+## Linear mixed-effects models {#sec:LMMtheory}
 
 As described in @bates.maechler.etal:2015 , a linear mixed-effects model is based on two vector-valued random variables: the $q$-dimensional vector of random effects, $\mathcal{B}$, and the $n$-dimensional response vector, $\mathcal{Y}$. @eq:LMMdist defines the unconditional distribution of $\mathcal{B}$ and the conditional distribution of $\mathcal{Y}$, given $\mathcal{B}=\mathbf{b}$, as multivariate Gaussian distributions of the form
 $$
@@ -517,10 +521,10 @@ It is a fact that singular (i.e. non-invertible) $\boldsymbol{\Sigma}_\theta$ ca
 Moreover, during the course of the numerical optimization by which the parameter estimates are determined, it is frequently the case that the deviance or the REML criterion will need to be evaluated at values of $\boldsymbol{\theta}$ that produce a singular $\boldsymbol{\Sigma}_\theta$.
 Because of this we will take care to use computational methods that can be applied even when $\boldsymbol{\Sigma}_\theta$ is singular and are stable as $\boldsymbol{\Sigma}_\theta$ approaches singularity.
 
-As defined in @eq:relcovfac, a relative covariance factor, $\Lambda_\theta$, is any matrix that satisfies
+A relative covariance factor, $\Lambda_\theta$, is any matrix that satisfies
 $$
 \boldsymbol{\Sigma}_\theta=\sigma^2\Lambda_\theta\Lambda_\theta' .
-$$
+$$ {#eq:relcovfac}
 According to this definition, $\boldsymbol{\Sigma}$ depends on both $\sigma$ and $\theta$, and we should write it as $\boldsymbol{\Sigma}_{\sigma,\theta}$.
 However, we will blur that distinction and continue to write $\text{Var}(\mathcal{B})=\boldsymbol{\Sigma}_\theta$.
 Another technicality is that the *common scale parameter*, $\sigma$, could, in theory, be zero.

@@ -4,6 +4,7 @@ import Books
 
 using Reexport
 @reexport using AlgebraOfGraphics
+@reexport using Arrow
 @reexport using Books
 @reexport using CairoMakie
 @reexport using CategoricalArrays
@@ -14,10 +15,14 @@ using Reexport
 @reexport using MixedModels
 @reexport using MixedModelsMakie
 @reexport using PooledArrays
+@reexport using Random
+@reexport using StandardizedPredictors
 @reexport using Statistics
 
 include("utilities.jl")
 include("intro.jl")
+include("multiple.jl")
+include("longitudinal.jl")
 
 """
     build()

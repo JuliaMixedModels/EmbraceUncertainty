@@ -6,14 +6,14 @@ Although such models can be useful, it is with the facility to use multiple rand
 In this chapter we consider models with multiple simple, scalar random-effects terms, showing examples where the grouping factors for these terms are in completely crossed or nested or partially crossed configurations.
 For ease of description we will refer to the random effects as being crossed or nested although, strictly speaking, the distinction between nested and non-nested refers to the grouping factors, not the random effects.
 
-## A Model With crossed random effects {#sec:crossedRE}
+## A model with crossed random effects {#sec:crossedRE}
 
-One of the areas in which the methods in the package for are particularly effective is in fitting models to cross-classified data where several factors have random effects associated with them.
-For example, in many experiments in psychology the reaction of each of a group of subjects to each of a group of stimuli or items is measured.
+One of the areas in which the methods in the `MixedModels.jl` package are particularly effective is in fitting models to cross-classified data where several factors have random effects associated with them.
+For example, in many experiments in psychology a reaction time for each of a group of subjects exposed to some or all of a group of stimuli or items is measured.
 If the subjects are considered to be a sample from a population of subjects and the items are a sample from a population of items, then it would make sense to associate random effects with both these factors.
 
 In the past it was difficult to fit mixed models with multiple, crossed grouping factors to large, possibly unbalanced, data sets.
-The methods in the *MixedModels* package are able to do this.
+The methods in `MixedModels.jl` are able to do this.
 To introduce the methods let us first consider a small, balanced data set with crossed grouping factors.
 
 ### The penicillin data {#sec:penicillin}
@@ -65,7 +65,8 @@ We say that the `plate` and `sample` factors are *crossed*, as opposed to *neste
 By itself, the designation "crossed" just means that the factors are not nested.
 If we wish to be more specific, we could describe these factors as being *completely crossed*, which means that we have at least one observation for each combination of a
 level of `plate` and a level of `sample`.
-We can see this in @fig:penicillindot and, because there are moderate numbers of levels in these factors, we can check it in a cross-tabulation
+We can see this in @fig:penicillindot.
+Alternatively, because there are moderate numbers of levels in these factors, we could also check by a cross-tabulation of these factors.
 
 Like the `dyestuff` data, the factors in the `penicillin` data are balanced.
 That is, there are exactly the same number of observations on each plate and for each sample and, furthermore, there is the same number of observations on each combination of levels.
@@ -74,7 +75,7 @@ We would describe the configuration of these two factors as an unreplicated, com
 
 In general, balance is a desirable but precarious property of a data set.
 We may be able to impose balance in a designed experiment but we typically cannot expect that data from an observation study will be balanced.
-Also, as anyone who analyzes real data soon finds out, expecting that balance in the design of an experiment will produce a balanced data set is contrary to "Murphy's Law".
+Also, as anyone who analyzes real data soon finds out, expecting that balance in the design of an experiment will produce a balanced data set is contrary to [Murphy's law](https://en.wikipedia.org/wiki/Murphy%27s_law).
 That's why statisticians allow for missing data.
 Even when we apply each of the six samples to each of the 24 plates, something could go wrong for one of the samples on one of the plates, leaving us without a measurement for that combination of levels and thus an unbalanced data set.
 
@@ -83,83 +84,108 @@ Even when we apply each of the six samples to each of the 24 plates, something c
 A model incorporating random effects for both the `plate` and the `sample` is straightforward to specify --- we include simple, scalar random effects terms for both these factors.
 
 ```jl
-s = """
-m3 = fit(
-    MixedModel,
-    @formula(diameter ~ 1 + (1|plate) + (1|sample)),
-    penicillin;
-    thin=1,
-    )
-"""
-sco(s)
+pnm01 = EU.fitpnm01()
 ```
 
 This model display indicates that the sample-to-sample variability has the greatest contribution, then plate-to-plate variability and finally the "residual" variability that cannot be attributed to either the sample or the plate.
 These conclusions are consistent with what we see in the data plot (@fig:penicillindot).
 
-The prediction intervals on the random effects (@fig:fm03ranef) confirm that the conditional distribution of the random effects for `plate` has much less variability than does the conditional distribution of the random effects for `sample`, in the sense that the dots in the bottom panel have less variability than those in the top panel.
-(Note the different horizontal axes for the two panels.)
-However, the conditional distribution of the random effect for a particular sample, say sample F, has less variability than the conditional distribution of the random effect for a particular plate, say plate m.
-That is, the lines in the bottom panel are wider than the lines in the top panel, even after taking the different axis scales into account.
+```jl
+EU.pnm01platepred(pnm01)
+```
+
+```jl
+EU.pnm01samplepred(pnm01)
+```
+
+The prediction intervals on the random effects (@fig:pnm01platepred and @fig:pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` has much less variability than does the conditional distribution of the random effects for `sample`.
+However, the conditional distribution of the random effect for a particular sample, say sample `F`, has less variability than the conditional distribution of the random effect for a particular plate, say plate `m`.
+That is, the lines in @fig:pnm01samplepred are wider than the lines in @fig:pnm01platepred, even after taking the different axis scales into account.
 This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.
 
 In @sec:ExamLMM we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, $\mathbf{Z}$, that is the matrix of indicators of the levels of the grouping factor.
-When we have multiple, simple, scalar random-effects terms, as in model `m3`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\mathbf{Z}$.
-The transpose of this matrix, shown in @fig:fm03Ztimage, contains rows of indicators for each factor.
+When we have multiple, simple, scalar random-effects terms, as in model `m3`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\mathbf{Z}$ whose transpose is
 
-The relative covariance factor, $\Lambda_\theta$, @fig:fm03LambdaLimage (left panel) is no longer a multiple of the identity.
-It is now block diagonal, with two blocks, one of size 24 and one of size 6, each of which is a multiple of the identity.
+```jl
+sco("vcat(transpose.(sparse.(pnm01.reterms))...)")
+```
+
+The relative covariance factor, $\boldsymbol{\Lambda}_{\boldsymbol\theta}$, for this model
+is block diagonal, with two blocks, one of size 24 and one of size 6, each of which is a multiple of the identity.
 The diagonal elements of the two blocks are $\theta_1$ and $\theta_2$, respectively.
 The numeric values of these parameters can be obtained as 
 
 ```jl
-sco("m3.θ'")
+sco("pnm01.θ'")
 ```
 
-The first parameter is the relative standard deviation of the random effects for sample, which has the value $0.84671/0.54992=1.53968$ at convergence, and the second is the relative standard deviation of the plate random effects for ($1.93157/0.54992=3.512443$).
+The first parameter is the relative standard deviation of the random effects for plate, which has the value $0.845565/0.549933=1.53758$ at convergence, and the second is the relative standard deviation of the sample random effects ($1.770648/0.549933=3.21975$).
 
-Because $\Lambda_\theta$ is diagonal, the pattern of non-zeros in $\Lambda_\theta\trans\mathbf{Z}\trans\mathbf{Z}\Lambda_\theta+\mathbf{I}$ will be the same as that in $\mathbf{Z}\trans\mathbf{Z}$, shown in the middle panel of @fig:fm03LambdaLimage.
-The sparse Cholesky factor, $\mathbf{L}$, shown in the right panel, is lower triangular and has non-zero elements in the lower right hand corner in positions where $\mathbf{Z}\trans\mathbf{Z}$ has systematic zeros.
+Because $\boldsymbol{\Lambda}_{\boldsymbol\theta}$ is diagonal, the pattern of non-zeros in $\Lambda_\theta'\mathbf{Z}'\mathbf{Z}\Lambda_\theta+\mathbf{I}$ will be the same as that in $\mathbf{Z}'\mathbf{Z}$.
+The sparse Cholesky factor, $\mathbf{L}$, is lower triangular and has non-zero elements in the lower right hand corner in positions where $\mathbf{Z}'\mathbf{Z}$ has systematic zeros.
+
+```jl
+sco("sparseL(pnm01)")
+```
+
 We say that "fill-in" has occurred when forming the sparse Cholesky decomposition.
-In this case there is a relatively minor amount of fill but in other cases there can be a substantial amount of fill and we shall take precautions so as to reduce this, because fill-in adds to the computational effort in determining the MLEs or the REML estimates.
-
-A profile zeta plot, @fig:fm03prplot, for the parameters in model `m3` leads to conclusions similar to those from @fig:fm01prof for model `m1` in the previous chapter.
-The fixed-effect parameter, $\beta_0$, for the term has symmetric intervals and is over-dispersed relative to the normal distribution.
-The logarithm of $\sigma$ has a good normal approximation but the standard deviations of the random effects, $\sigma_1$ and $\sigma_2$, are skewed.
-The skewness for $\sigma_2$ is worse than that for $\sigma_1$, because the estimate of $\sigma_2$ is less precise than that of $\sigma_1$, in both absolute and relative senses.
-For an absolute comparison we compare the widths of the confidence intervals for these parameters.
-
-In a relative comparison we examine the ratio of the endpoints of the interval divided by the estimate.
-
-(We have switched from the REML estimates shown in the display of to the ML estimates of the standard deviations.)
+In this case there is a relatively minor amount of fill but in other cases there can be a substantial amount of fill.
+The computational methods are tuned to reduce the amount of fill.
 
 The lack of precision in the estimate of $\sigma_2$ is a consequence of only having 6 distinct levels of the sample factor.
 The plate factor, on the other hand, has 24 distinct levels.
 In general it is more difficult to estimate a measure of spread, such as the standard deviation, than to estimate a measure of location, such as a mean, especially when the number of levels of the factor is small.
 Six levels are about the minimum number required for obtaining sensible estimates of standard deviations for simple, scalar random effects terms.
 
-The profile pairs plot,  @fig:fm03prpairs, shows patterns similar to those in @fig:fm01profpair for pairs of parameters in model m03 fit to the penicillin data.
-On the $\zeta$ scale (panels below the diagonal) the profile traces are nearly straight and orthogonal with the exception of the trace of $\zeta(\sigma_2)$ on $\zeta(\beta_0)$ (the horizontal trace for the panel in the $(4,2)$ position).
-The pattern of this trace is similar to the pattern of the trace of $\zeta(\sigma_1)$ on $\zeta(\beta_0)$ in @fig:fm01profpair.
-Moving $\beta_0$ from its estimate, $\widehat{\beta}_0$, in either direction will increase the residual sum of squares.
-The increase in the residual variability is reflected in an increase of one or more of the dispersion parameters.
-The balanced experimental design results in a fixed estimate of $\sigma$ and the extra apparent variability must be incorporated into $\sigma_1$ or $\sigma_2$.
+A parametric bootstrap sample of the parameter estimates
 
-Contours in panels of parameter pairs on the original scales (i.e. panels above the diagonal) can show considerable distortion from the ideal elliptical shape.
-For example, contours in the $\sigma_2$ versus $\sigma_1$ panel (the $(1,2)$ position) and the $\log(\sigma)$ versus $\sigma_2$ panel (in the $(2,3)$ position) are dramatically non-elliptical.
-However, the distortion of the contours is not due to these parameter estimates depending strongly on each other.
-It is almost entirely due to the choice of scale for $\sigma_1$ and $\sigma_2$.
-When we plot the contours on the scale of $\log(\sigma_1)$ and $\log(\sigma_2)$ instead (@fig:fm03lprpairs) they are much closer to the elliptical pattern.
+```jl
+bsrng = Xoshiro(9876789);
+sc("pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress=true)")
+```
 
-Conversely, if we tried to plot contours on the scale of $\sigma_1^2$ and $\sigma_2^2$ (not shown), they would be hideously distorted.
+can be used to create shortest 95% coverage intervals for the parameters in the model.
 
-## A model With nested random effects {#sec:NestedRE}
+```jl
+sco("DataFrame(shortestcovint(pnm01samp))", process=without_caption_label)
+```
+
+As for model `dsm01` the bootstrap parameter estimate of the fixed-effects parameter are have approximately a "normal" or Gaussian shape, as shown in the kernel density plot(@fig:pnm01bsbeta)
+
+```jl
+allpars = pnm01samp.allpars   # this will be used twice
+Options(
+    EU.bssampdens(allpars);
+    filename = "pnm01bsbeta",
+    caption = "Parametric bootstrap estimates of fixed-effects parameters in model pnm01",
+    label = "pnm01bsbeta",
+)
+```
+
+and the shortest coverage interval on this parameter is close to the Wald interval
+
+```jl
+only(pnm01.beta) .+ [-2, 2] * only(pnm01.stderror)
+```
+
+The densities of the variance-components, on the scale of the standard deviation parameters, are diffuse but do not exhibit point masses at zero.
+
+```jl
+Options(
+    EU.bssampdens(allpars, "σ");
+    filename = "pnm01bssigma",
+    caption = "Parametric bootstrap estimates of variance components in model pnm01",
+    label = "pnm01bssigma",
+)
+```
+
+## A model with nested random effects {#sec:NestedRE}
 
 In this section we again consider a simple example, this time fitting a model with *nested* grouping factors for the random effects.
 
 ### The pastes data {#sec:pastesData}
 
-The third example from @davies72:_statis_method_in_resear_and_produc [Table 6.5, p. 138] is described as coming from
+The third example from @davies72:_statis_method_in_resear_and_produc [, Table 6.5, p. 138] is described as coming from
 
 > deliveries of a chemical paste product contained in casks where, in
 > addition to sampling and testing errors, there are variations in
@@ -176,17 +202,14 @@ sco("pastes = MixedModels.dataset(:pastes)")
 
 ```jl
 s = """
-pastes = DataFrame(pastes)
+pastes = @transform(DataFrame(pastes), :sample = string(:batch, :cask))
 describe(pastes)
 """
-sco(s)
+sco(s, process=without_caption_label)
 ```
 
 As stated in the description in @davies72:_statis_method_in_resear_and_produc, there are 30 samples, three from each of the 10 delivery batches.
-We have labelled the levels of the factor with the label of the factor followed by 'a', 'b' or 'c' to distinguish the three samples taken from that batch. The
-cross-tabulation produced by the function, using the optional argument , provides a concise display of the relationship.
-
-An image (@fig:imagextabsPastes) of this cross-tabulation is, perhaps, easier to appreciate.
+We have created a `sample` factor by concatenating the label of the `batch` factor with 'a', 'b' or 'c' to distinguish the three samples taken from that batch.
 
 When plotting the strength versus batch and cask in the data we should remember that we have two strength measurements on each of the 30 samples.
 It is tempting to use the cask designation ('a', 'b' and 'c') to determine, say, the plotting symbol within a batch.
@@ -195,7 +218,7 @@ There is no relationship between cask 'a' in batch 'A' and cask 'a' in batch 'B'
 The labels 'a', 'b' and 'c' are used only to distinguish the three samples within a batch; they do not have a meaning across batches.
 
 In @fig:Pastesplot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
-The perceptive reader will have noticed that the levels of the factors on the vertical axis in this figure, and in @fig:Dyestuffdot, and @fig:Penicillindot, have been reordered  according to increasing average response.
+The perceptive reader will have noticed that the levels of the factors on the vertical axis in this figure, and in @fig:dyestuffdata, and @fig:penicillindot, have been reordered  according to increasing average response.
 In all these cases there is no inherent ordering of the levels of the covariate such as batch or plate.
 Rather than confuse our interpretation of the plot by determining the vertical displacement of points according to a random ordering, we impose an ordering according to increasing mean response.
 This allows us to more easily check for structure in the data, including undesirable characteristics like increasing variability of the response with increasing mean level of the response.
@@ -208,9 +231,9 @@ For example, batches I and D, with low mean strength relative to the other batch
 Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength.
 In @sec:assessingfm04 we will examine the need for incorporating batch-to-batch variability, in addition to sample-to-sample variability, in the statistical model.
 
-#### Nested Factors {#sec:nestedcrossed}
+### Nested Factors {#sec:nestedcrossed}
 
-Because each level of occurs with one and only one level of we say that cask is *nested within* batch.
+Because each level of `sample` occurs with one and only one level of `batch` we say that `sample` is *nested within* `batch`.
 Some presentations of mixed-effects models, especially those related to *multilevel modeling* [@MLwiNUser:2000] or *hierarchical linear models* [@Rauden:Bryk:2002], leave the impression that one can only define random effects with respect to factors that are nested.
 This is the origin of the terms "multilevel", referring to multiple, nested levels of variability, and "hierarchical", also invoking the concept of a hierarchy of levels.
 To be fair, both those references do describe the use of models with random effects associated with non-nested factors, but such models tend to be treated as a special case.
@@ -219,24 +242,21 @@ The blurring of mixed-effects models with the concept of multiple, hierarchical 
 It is perfectly legitimate to define models having random effects associated with non-nested factors.
 The reasons for the emphasis on defining random effects with respect to nested factors only are that such cases do occur frequently in practice and that some of the computational methods for estimating the parameters in the models can only be easily applied to nested factors.
 
-This is not the case for the methods used in the MixedModels package.
+This is not the case for the methods used `MixedModels.jl`.
 Indeed there is nothing special done for models with random effects for nested factors.
 When random effects are associated with multiple factors exactly the same computational methods are used whether the factors form a nested sequence or are partially crossed or are completely crossed.
 
 There is, however, one aspect of nested grouping factors that we should emphasize, which is the possibility of a factor that is *implicitly nested* within another factor.
-Suppose, for example, that the factor was sample defined as having three levels instead of 30 with the implicit assumption that sample is nested within batch.
+Suppose, for example, that the factor `sample` had been defined as having three levels instead of 30 with the implicit assumption that `sample` is nested within batch.
 It may seem silly to try to distinguish 30 different batches with only three levels of a factor but, unfortunately, data are frequently organized and presented like this, especially in text books.
-The factor cask in the data is exactly such an implicitly nested factor.
-If we cross-tabulate cask and batch we get the impression that the and factors are crossed, not nested.
-If we know that the cask should be considered as nested within the batch then we should create a new categorical variable giving the batch-cask combination, which is exactly what the sample factor is.
-A simple way to create such a factor is to use the interaction operator, '`&`', on the factors.
-It is advisable, but not necessary, to apply to the result thereby dropping unused levels of the interaction from the set of all possible levels of the factor.
-(An "unused level" is a combination that does not occur in the data.)
-A convenient code idiom is
+The factor `cask` in the data is exactly such an implicitly nested factor.
+If we cross-tabulate `cask` and `batch` we get the impression that these factors are crossed, not nested.
+If we know that the `cask` should be considered as nested within the `batch` then we should create a new categorical variable giving the batch-cask combination, which is exactly what the `sample` factor is.
 
 In a small data set like we can quickly detect a factor being implicitly nested within another factor and take appropriate action.
-In a large data set, perhaps hundreds of thousands of test scores for students in thousands of schools from hundreds of school districts, it is not always obvious if school identifiers are unique across the entire data set or just within a district.
-If you are not sure, the safest thing to do is to create the interaction factor, as shown above, so you can be confident that levels of the district:school interaction do indeed correspond to unique schools.
+In a large data set, such as from a multi-center study, it is often assumed that, say, subject identifiers are unique to each center.
+Frequently this is not the case. 
+Especially when dealing with large data sets assumptions about nested identifiers should be checked carefully.
 
 ### Fitting a model with nested random effects {#sec:fittingPastes}
 
@@ -244,57 +264,64 @@ Fitting a model with simple, scalar random effects for nested factors is done in
 We include random-effects terms for each factor, as in
 
 ```jl
-s = """
-m4 = fit(
-    MixedModel,
-    @formula(strength ~ 1 + (1|batch/cask)),
-    pastes;
-    thin=1,
-)
-"""
-sco(s)
+psm01 = EU.fitpsm01(pastes)
 ```
 
 Not only is the model specification similar for nested and crossed factors, the internal calculations are performed according to the methods described in for each model type.
-Comparing the patterns in the matrices $\Lambda$, $\mathbf{Z}\trans\mathbf{Z}$ and $\mathbf{L}$ for this model 
+Comparing the patterns in the matrices $\Lambda$, $\mathbf{Z}'\mathbf{Z}$ and $\mathbf{L}$ for this model 
 
 ```jl
-sco("sparseL(m4; full=true)")
+sco("sparseL(psm01; full=true)")
 ```
 
 ```jl
-sco("BlockDescription(m4)")
+sco("BlockDescription(psm01)")
 ```
 
-Comparing @fig:fm04LambdaLimage to those in @fig:fm03LambdaLimage shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\mathbf{L}$, after reordering the random effects (we discuss this reordering later in @sec:notsure).
+Comparing the block structure of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\mathbf{L}$.
 This type of structure has the desirable property that there is no "fill-in" during calculation of the Cholesky factor.
-In other words, the number of non-zeros in $\mathbf{L}$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\Lambda\trans\mathbf{Z}\trans\mathbf{Z}\Lambda+\mathbf{I}$ (which, because $\Lambda$ is diagonal, has the same structure as $\mathbf{Z}\trans\mathbf{Z}$).
+In other words, the number of non-zeros in $\mathbf{L}$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\Lambda'\mathbf{Z}'\mathbf{Z}\Lambda+\mathbf{I}$ (which, because $\Lambda$ is diagonal, has the same structure as $\mathbf{Z}'\mathbf{Z}$).
 
 Fill-in of the Cholesky factor is not an important issue when we have a few dozen random effects, as we do here.
 It is an important issue when we have millions of random effects in complex configurations, as has been the case in some of the models that have been fit using MixedModels.
 
-### Assessing parameter estimates in model fm04 {#sec:assessingfm04}
+### Assessing parameter estimates in psm01 {#sec:assessingfm04}
 
-The parameter estimates are: $\widehat{\sigma_1}=$, the standard deviation of the random effects for sample; $\widehat{\sigma_2}=$, the standard deviation of the random effects for batch; $\widehat{\sigma}=$, the standard deviation of the residual noise term; and $\widehat{\beta_0}=$, the overall mean response, which is labeled `(Intercept)` in these models.
+The parameter estimates are: $\widehat{\sigma_1}=$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}=$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}=$, the standard deviation of the residual noise term; and $\widehat{\beta_1}=$, the overall mean response, which is labeled `(Intercept)` in these models.
 
-The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig:Pastesplot).
+The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig:Pastesplot.
 Indeed our conclusion from @fig:Pastesplot was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.
 
-Plots of the prediction intervals of the random effects (@fig:m4batchcaterpillar)
+Plots of the prediction intervals of the random effects (@fig:psm01batchcaterpillar)
 
 ```jl
-s = """
-caterpillar(m4, :batch)
-caption = "Plot of *batch* prediction intervals from *m4*" # hide
-filename = "m4_batch_caterpillar"  # hide
-label = "m4batchcaterpillar"  # hide
-Options(current_figure(); filename, caption, label) # hide
-"""
-sco(s)
+Options(
+    caterpillar(psm01, :batch),
+    caption = "Plot of *batch* prediction intervals from *psm01*",
+    filename = "psm01_batch_caterpillar",
+    label = "psm01batchcaterpillar",
+)
 ```
 
 confirm this impression in that all the prediction intervals for the random effects for contain zero.
-Furthermore, the profile zeta plot (@fig:fm04prplot) shows that the even the 50% profile-based confidence interval on $\sigma_2$ extends to zero.
+
+Furthermore, kernel density estimates from a parametric bootstrap sample of the estimated standard deviations of the random effects and residuals
+
+```jl
+sc("""
+psm01samp = parametricbootstrap(Xoshiro(4567654), 10_000, psm01)
+psm01pars = psm01samp.allpars
+""")
+```
+
+```jl
+Options(
+    EU.bssampdens(psm01pars, "σ"),
+    caption="Kernel density plots of bootstrap estimates of σ for model psm01",
+    label="psm01bssampdens",
+    filename="psm01bssampdens",
+)
+```
 
 Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only, we perform a statistical test of this hypothesis.
 
@@ -323,21 +350,13 @@ An approximate reference distribution for an LRT statistic is the $\chi^2_\nu$ d
 The restricted model fit
 
 ```jl
-s = """
-m5 = fit(
-    MixedModel,
-    @formula(strength ~ 1 + (1|batch & cask)),
-    pastes;
-    thin=1,
-)
-"""
-sco(s)
+psm02 = EU.fitpsm02(pastes)
 ```
 
-is compared to model `m4` with the function
+is compared to model `psm01` as
 
 ```jl
-sco("MixedModels.likelihoodratiotest(m5, m4)")
+sco("MixedModels.likelihoodratiotest(psm02, psm01)")
 ```
 
 which provides a p-value of .
@@ -345,17 +364,24 @@ Because typical standards for "small" p-values are 5% or 1%, a p-value over 50% 
 
 We do need to be cautious in quoting this p-value, however, because the parameter value being tested, $\sigma_2=0$, is on the boundary of set of possible values, $\sigma_2\ge 0$, for this parameter.
 The argument for using a $\chi^2_1$ distribution to calculate a p-value for the change in the deviance does not apply when the parameter value being tested is on the boundary.
-As shown in @pinheiro00:_mixed_effec_model_in_s [Sect. 2.5], the p-value from the $\chi^2_1$ distribution will be "conservative" in the sense that it is larger than a simulation-based p-value would be.
+As shown in @pinheiro00:_mixed_effec_model_in_s [, Sect. 2.5], the p-value from the $\chi^2_1$ distribution will be "conservative" in the sense that it is larger than a simulation-based p-value would be.
 In the worst-case scenario the $\chi^2$-based p-value will be twice as large as it should be but, even if that were true, an effective p-value of 26% would not cause us to reject $H_0$ in favor of $H_a$.
 
-### Assessing the reduced model, fm04a {#sec:assessReduced}
+### Assessing the reduced model, psm02 {#sec:assessReduced}
 
-The profile zeta plots for the remaining parameters in model (@fig:fm04aprplot) are similar to the corresponding panels in (@fig:fm04prplot), as confirmed by the numerical values of the confidence intervals.
+Comparing the coverage intervals for models `psm01` and `psm02`
+
+```jl
+sco("DataFrame(shortestcovint(psm01samp))", process=without_caption_label)
+```
+
+```jl
+psm02samp = parametricbootstrap(Xoshiro(9753579), 10_000, psm02)
+sco("DataFrame(shortestcovint(psm02samp))", process=without_caption_label)
+```
 
 The confidence intervals on $\log(\sigma)$ and $\beta_0$ are similar for the two models.
 The confidence interval on $\sigma_1$ is slightly wider in model than in , because the variability that is attributed to in is incorporated into the variability due to in .
-
-The patterns in the profile pairs plot (@fig:fm04aprpairs) for the reduced model are similar to those in @fig:fm01profpair, the profile pairs plot for model m01.
 
 ## A model with partially crossed random effects {#sec:partially}
 
@@ -397,14 +423,12 @@ The factor `dept` is the department for the course and `service` indicates wheth
 Although the response, `y`, is on a scale of 1 to 5,
 
 ```jl
-s = """
-hist(insteval.y)
-filename="insteval_hist"   # hide
-caption="Histogram of instructor ratings in the *insteval* data" # hide
-label="instevalhist"   # hide
-Options(current_figure(); filename, caption, label) # hide
-"""
-sco(s)
+Options(
+    hist(insteval.y);
+    filename="insteval_hist",
+    caption="Histogram of instructor ratings in the *insteval* data",
+    label="instevalhist",
+)
 ```
 
 it is sufficiently diffuse to warrant treating it as if it were a continuous response.
@@ -413,45 +437,39 @@ At this point we will fit models that have random effects for student, instructo
 In the next chapter we will fit models incorporating fixed-effects for instructor and department to these data.
 
 ```jl
-s = """
-m6 = fit(
+iem01 = fit(
     MixedModel,
     @formula(y ~ 1 + (1|s) + (1|d) + (1|dept)),
     insteval;
+    contrasts = Dict(:s => Grouping(), :d => Grouping(), :dept => Grouping()),
     thin=1,
 )
-"""
-sco(s)
 ```
 
 All three estimated standard deviations of the random effects are less than $\widehat{\sigma}$, with $\widehat{\sigma}_3$, the estimated standard deviation of the random effects for the `dept`, less than one-tenth the estimated residual standard deviation.
 
-It is not surprising that zero is within all of the prediction intervals on the random effects for this factor (@fig:m6caterpillardept).
+It is not surprising that zero is within all of the prediction intervals on the random effects for this factor (@fig:iem01caterpillardept).
 
 ```jl
-s = """
-caterpillar(m6, :dept)
-filename="m6_caterpillar_dept"     # hide
-caption="Prediction intervals on random effects for department in model m06" # hide
-label= "m6caterpillardept" # hide
-Options(current_figure(); filename, caption, label) # hide
-"""
-sco(s)
+Options(
+    caterpillar(iem01, :dept);
+    filename="iem01_caterpillar_dept",
+    caption="Prediction intervals on random effects for department in model iem01",
+    label= "iem01caterpillardept",
+)
 ```
 
 In fact, zero is close to the middle of all these prediction intervals.
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$ 
 
 ```jl
-s = """
-m6a = fit(
+iem02 = fit(
     MixedModel,
     @formula(y ~ 1 + (1|s) + (1|d)),
-    insteval
-    )
-MixedModels.likelihoodratiotest(m6a, m6)
-"""
-sco(s)
+    insteval;
+    contrasts=Dict(:s => Grouping(), :d => Grouping()),
+)
+sco("MixedModels.likelihoodratiotest(iem02, iem01)")
 ```
 
 is highly significant.
@@ -466,16 +484,46 @@ We could profile this model fit but doing so would take a very long time and, in
 
 We could pursue other mixed-effects models here, such as using the factor and not the interaction to define random effects, but we will revisit these data in the next chapter and follow up on some of these variations there.
 
-### Structure of $\mathbf{L}$ for model fm05 {#sec:fm05L}
+### Structure of $\mathbf{L}$ for model iem01 {#sec:iem01L}
 
-Before leaving this model we examine the sparse Cholesky factor, $\mathbf{L}$, (@fig:fm05Limage), which is of size $4128\times4128$.
+Before leaving this model we examine the sparse Cholesky factor, $\mathbf{L}$, which is of size $4116\times4116$.
+
+```jl
+sparseL(iem01; full=true)
+```
+
 Even as a sparse matrix this factor requires a considerable amount of memory, but as a triangular dense matrix it would require nearly 10 times as much.
-There are $(4128\times 4129)/2$ elements on and below the diagonal, each of which would  require 8 bytes of storage.
-A packed lower triangular array would require XXX megabytes.
-The more commonly used full rectangular storage requires YYY megabytes of storage.
+There are $(4116\times 4117)/2$ elements on and below the diagonal, each of which would  require 8 bytes of storage.
 
-The number of nonzero elements in this matrix that must be updated for each evaluation of the deviance is ZZZ.
-Comparing this to YYY, the number of elements that must be updated in a dense Cholesky factor, we can see why the sparse Cholesky factor provides a much more efficient evaluation of the profiled deviance function.
+### "Best-liked"
+
+A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random effects, @fig:iem01qqcaterpillard,
+
+```jl
+Options(
+    qqcaterpillar(iem01, :d);
+    label="iem01qqcaterpillard",
+    caption="Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles",
+    filename="iem01qqcaterpillard",
+)
+```
+
+shows the differences in precision due to different numbers of observations for different instructors.
+
+```jl
+EU.iednobshist(insteval)
+```
+
+The precision of the conditional distributions of the random effects, as measured by the width of the intervals, varies considerably between instructors.
+
+We can determine the instructor, `I1258`, with the largest mean of the conditional distribution of the random effects
+
+```jl
+s = "last(sort(DataFrame(ranefinfotable(ranefinfo(iem01, :d))), :cmode), 5)"
+sco(s)
+```
+
+but the conditional distribution of this random effect clearly overlaps significantly with others.
 
 ## Chapter summary {#sec:MultSummary}
 

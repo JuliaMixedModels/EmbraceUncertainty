@@ -2,10 +2,10 @@ function dyestufftable()
     caption = "Mean yield by batch of dyestuff"
     label = "mean_yield"
     Options(
-        @combine(
+        combine(
             groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch),
-            :mean_yield = mean(:yield),
-            :n = length(:yield),
+            :yield => mean,
+            nrow,
         );
         caption,
         label,
@@ -21,7 +21,7 @@ levels of `grps` reordered.
 """
 function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
                     # ensure the relevant columns are types that Makie can deal with 
-    df = select(df, resp => Array, grps => CategoricalArray; renamecols=false)
+    df = transform(df, resp => Array, grps => CategoricalArray; renamecols=false)
                     # create a summary table by mean resp
     sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
     glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
@@ -55,4 +55,11 @@ function dyestuff2dataplot()
         caption="Artificial data of yield by batch.  The line joins the mean yields.",
         label="dyestuff2data",
     )
+end
+
+function lmmobjective(m::LinearMixedModel, θ::NamedTuple)
+    θ₀ = copy(m.θ)
+    obj = [objective(updateL!(setθ!(m, vec(r)))) for r in eachrow(Tables.matrix(θ))]
+    updateL!(setθ!(m, θ₀))
+    return DataFrame(merge(θ, (; objective = obj)))
 end
