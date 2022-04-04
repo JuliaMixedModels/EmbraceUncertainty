@@ -1,11 +1,11 @@
+const iocntx = IOContext(IOBuffer(), :compact => true)
+
 function dyestufftable()
     caption = "Mean yield by batch of dyestuff"
     label = "mean_yield"
-    Options(
+    return Options(
         combine(
-            groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch),
-            :yield => mean,
-            nrow,
+            groupby(DataFrame(MixedModels.dataset(:dyestuff)), :batch), :yield => mean, nrow
         );
         caption,
         label,
@@ -20,9 +20,9 @@ Returns a `DataFrame` created from df with the levels of `grps` reordered accord
 levels of `grps` reordered.
 """
 function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
-                    # ensure the relevant columns are types that Makie can deal with 
+    # ensure the relevant columns are types that Makie can deal with 
     df = transform(df, resp => Array, grps => CategoricalArray; renamecols=false)
-                    # create a summary table by mean resp
+    # create a summary table by mean resp
     sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
     glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
     levels!(df[!, grps], glevs)
@@ -33,12 +33,15 @@ end
 function dyestuffdataplot()
     df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff)), :yield, :batch)
 
-    mp = mapping(:yield => "Yield of dyestuff [g]", :batch => "Batch of intermediate product")
-    draw(
-        (data(df) * mp * visual(Scatter, marker='○', markersize=12)) +
-        (data(sumry) * mp * visual(Lines))
+    mp = mapping(
+        :yield => "Yield of dyestuff [g]", :batch => "Batch of intermediate product"
     )
-    Options(current_figure();
+    draw(
+        (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
+        (data(sumry) * mp * visual(Lines)),
+    )
+    return Options(
+        current_figure();
         caption="Yield of dyestuff by batch.  The line joins the mean yields.",
         label="dyestuffdata",
     )
@@ -48,10 +51,11 @@ function dyestuff2dataplot()
     df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff2)), :yield, :batch)
     mp = mapping(:yield => "Simulated yield", :batch => "Batch")
     draw(
-        (data(df) * mp * visual(Scatter, marker='○', markersize=12)) +
-        (data(sumry) * mp * visual(Lines))
+        (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
+        (data(sumry) * mp * visual(Lines)),
     )
-    Options(current_figure();
+    return Options(
+        current_figure();
         caption="Artificial data of yield by batch.  The line joins the mean yields.",
         label="dyestuff2data",
     )
@@ -61,5 +65,5 @@ function lmmobjective(m::LinearMixedModel, θ::NamedTuple)
     θ₀ = copy(m.θ)
     obj = [objective(updateL!(setθ!(m, vec(r)))) for r in eachrow(Tables.matrix(θ))]
     updateL!(setθ!(m, θ₀))
-    return DataFrame(merge(θ, (; objective = obj)))
+    return DataFrame(merge(θ, (; objective=obj)))
 end

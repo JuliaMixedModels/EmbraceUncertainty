@@ -1,9 +1,9 @@
 function stripcodechunks(
     fn::AbstractString;                                # source filename
-    chunkre::Tuple{Regex,Regex} = ( r"^<<"m, r"^@$"m), # begin/end chunk delimiters
-    fn_ext::AbstractString = ".Rnw",                   # extension for source
-    chnk_ext::AbstractString = ".txt",                 # extension for file of chunks
-    body_ext::AbstractString = ".tex",
+    chunkre::Tuple{Regex,Regex}=(r"^<<"m, r"^@$"m), # begin/end chunk delimiters
+    fn_ext::AbstractString=".Rnw",                   # extension for source
+    chnk_ext::AbstractString=".txt",                 # extension for file of chunks
+    body_ext::AbstractString=".tex",
 )
     spltnm = splitext(fn)
     if last(spltnm) ≠ fn_ext
@@ -32,7 +32,7 @@ function stripcodechunks(
     end
     write(iobody, SubString(str, offend, length(str)))
     close(iobody)
-    close(iochnk)
+    return close(iochnk)
 end
 
 """
@@ -54,7 +54,7 @@ end
 Return a matrix of `n` orthogonal polynomial contrasts for the positions `x`
 """
 function orthpoly(x::AbstractVector{<:Real}, n::Integer)
-    return Matrix(qr!(float([v^i for v in x, i in 0:n])).Q)[:, 2:(n+1)]
+    return Matrix(qr!(float([v^i for v in x, i in 0:n])).Q)[:, 2:(n + 1)]
 end
 
 orthpoly(k::Integer, n::Integer) = orthpoly(1:k, n)

@@ -1,6 +1,6 @@
 module EU
 
-import Books
+using Books: Books
 
 using Reexport
 @reexport using AlgebraOfGraphics
@@ -18,6 +18,7 @@ using Reexport
 @reexport using Random
 @reexport using StandardizedPredictors
 @reexport using Statistics
+@reexport using StatsBase
 
 include("utilities.jl")
 include("intro.jl")
@@ -38,7 +39,7 @@ function build()
     # Books.build_all(; fail_on_error)
     # once the figures such as "Multiple-fm05Limage" have been replaced.
     # Verifies cross references.
-    Books.html(; fail_on_error)
+    return Books.html(; fail_on_error)
 end
 
 end # module
