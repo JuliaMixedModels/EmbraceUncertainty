@@ -155,7 +155,7 @@ As for model `dsm01` the bootstrap parameter estimate of the fixed-effects param
 ```jl
 allpars = pnm01samp.allpars   # this will be used twice
 Options(
-    EU.bssampdens(allpars);
+    EU.bssampdens(allpars).figure;
     filename = "pnm01bsbeta",
     caption = "Parametric bootstrap estimates of fixed-effects parameters in model pnm01",
     label = "pnm01bsbeta",
@@ -172,7 +172,7 @@ The densities of the variance-components, on the scale of the standard deviation
 
 ```jl
 Options(
-    EU.bssampdens(allpars, "σ");
+    EU.bssampdens(allpars, "σ").figure;
     filename = "pnm01bssigma",
     caption = "Parametric bootstrap estimates of variance components in model pnm01",
     label = "pnm01bssigma",
@@ -316,7 +316,7 @@ psm01pars = psm01samp.allpars
 
 ```jl
 Options(
-    EU.bssampdens(psm01pars, "σ"),
+    EU.bssampdens(psm01pars, "σ").figure;
     caption="Kernel density plots of bootstrap estimates of σ for model psm01",
     label="psm01bssampdens",
     filename="psm01bssampdens",
@@ -424,7 +424,7 @@ Although the response, `y`, is on a scale of 1 to 5,
 
 ```jl
 Options(
-    hist(insteval.y);
+    draw(data(DataFrame(response = 1:5, count = counts(insteval.y))) * mapping(:response, :count) * visual(BarPlot)).figure;
     filename="insteval_hist",
     caption="Histogram of instructor ratings in the *insteval* data",
     label="instevalhist",

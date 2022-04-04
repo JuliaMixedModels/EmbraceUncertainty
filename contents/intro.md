@@ -348,7 +348,7 @@ sco("Zdsm01'")
 ```
 or, even more compact, as a sparse matrix pattern
 ```jl
-sco("sparse(only(dsm01.reterms)')")
+sco("sparse(Zdsm01')")
 ```
 
 The fixed-effects parameters, of which there is only one here, are gathered into a vector, $\boldsymbol{\beta}$, of length $p$, and multiplied by another model matrix, $\mathbf{X}$, of size $n\times p$.
@@ -395,7 +395,7 @@ sco("dsm01.A")
 ```
 
 The first, diagonal matrix is $\mathbf{Z}'\mathbf{Z}$.
-A simple, scalar random effects term like `(1|batch)` in the formula for models `dsm01` and `dsm02` results in $\mathbf{Z}$ being the indicator matrix for the levels of the grouping factor and a diagonal $\mathbf{Z}'\mathbf{Z}$, whose diagonal elements are the frequencies of the levels.
+A simple, scalar random effects term like `(1|batch)` in the formula for models `dsm01` and `dsm02` results in $\mathbf{Z}$ being the indicator matrix for the levels of the grouping factor and, hence, in a diagonal $\mathbf{Z}'\mathbf{Z}$, whose diagonal elements are the frequencies of the levels.
 Thus this block shows that there are exactly 5 observations on each of the 6 batches.
 
 The second, rectangular matrix is $\begin{bmatrix}
@@ -482,7 +482,7 @@ The code is, of course, available on the Github repository for this book.)
 
 ```jl
 Options(
-  EU.bssampdens(dsm01pars);
+  EU.bssampdens(dsm01pars).figure;
   filename = "dsm01_bs_beta_density",
   caption = "Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01",
   label = "dsm01_bs_beta_density",
@@ -491,7 +491,7 @@ Options(
 
 > **NOTE** Find a way to use `:compact=true` when interpolating numeric values into the text
 
-The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `jl mean(βdf.value)`  which is close to the estimated `β₁` of `jl only(dsm01.β)`.
+The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `jl @sprintf("%f", mean(βdf.value))`  which is close to the estimated `β₁` of `jl @sprintf("%f", only(dsm01.β))`.
 
 Similarly the standard deviation of the simulated β values, `jl std(βdf.value)` is close to the standard error of the parameter, `jl only(stderror(dsm01))`.
 
@@ -502,7 +502,7 @@ The situation is different for the estimates of the standard deviation parameter
 
 ```jl
 Options(
-  EU.bssampdens(dsm01pars, "σ");
+  EU.bssampdens(dsm01pars, "σ").figure;
   filename = "dsm01_bs_sigma_density",
   caption = "Kernel density plot of bootstrap variance-component parameter estimates from model dsm01",
   label = "dsm01_bs_sigma_density",
@@ -520,9 +520,10 @@ In this case the distribution of the estimates is a combination of a continuous 
 
 ```jl
 Options(
-  (data(@subset(dsm01pars, :type == "σ")) *
-   mapping(:value => "Bootstrap parameter estimates of σ", color = :group => "Group") *
-   AlgebraOfGraphics.histogram(; bins=80) |> draw),
+  (
+    data(@subset(dsm01pars, :type == "σ")) *
+    mapping(:value => "Bootstrap parameter estimates of σ", color = :group => "Group") *
+    AlgebraOfGraphics.histogram(; bins=80) |> draw).figure;
   filename = "dsm01_bs_sigma_hist",
   caption = "Histogram of bootstrap variance-components as standard deviations from model dsm01",
   label = "dsm01_bs_sigma_hist",
@@ -554,7 +555,7 @@ In many cases standard errors are quoted for estimates of the variance component
 Options(
     (data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
     mapping(:value_abs2 => "Bootstrap sample of estimates of σ²", color = :group) * 
-    histogram(; bins=200) |> draw),
+    histogram(; bins=200) |> draw).figure;
     filename = "dsm01_bs_sigmasqr_hist",
     caption = "Histogram of bootstrap variance-components from model dsm01",
     label = "dsm01_bs_sigmasqr_hist",
