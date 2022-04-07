@@ -1,0 +1,829 @@
+# A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
+
+In this book we describe the theory behind a type of statistical model called *mixed-effects* models and the practice of fitting and analyzing such models using the [MixedModels](https://github.com/JuliaStats/MixedModels.jl) package for [Julia](https://julialang.org).
+These models are used in many different disciplines.
+Because the descriptions of the models can vary markedly between disciplines, we begin by describing what mixed-effects models are and by exploring a very simple example of one type of mixed model, the *linear mixed model*.
+
+This simple example allows us to illustrate the use of the `LinearMixedModel` type in the `MixedModels` package for fitting such models and for analyzing the fitted model.
+We also describe methods of assessing the precision of the parameter estimates and of visualizing the conditional distribution of the random effects, given the observed data.
+
+## Mixed-effects models {#sec-memod}
+
+Mixed-effects models, like many other types of statistical models, describe a relationship between a *response* variable and some of the *covariates* that have been measured or observed along with the response.
+In mixed-effects models at least one of the covariates is a *categorical* covariate representing experimental or observational "units" in the data set.
+In the example from the chemical industry that is given in this chapter, the observational unit is the batch of an intermediate product used in production of a dye.
+In medical and social sciences the observational units are often the human or animal subjects in the study.
+In agriculture the experimental units may be the plots of land or the specific plants being studied.
+
+In all of these cases the categorical covariate or covariates are observed at a set of discrete *levels*.
+We may use numbers, such as subject identifiers, to designate the particular levels that we observed but these numbers are simply labels.
+The important characteristic of a categorical covariate is that, at each observed value of the response, the covariate takes on the value of one of a set of distinct levels.
+
+Parameters associated with the particular levels of a covariate are sometimes called the "effects" of the levels.
+If the set of possible levels of the covariate is fixed and reproducible we model the covariate using *fixed-effects* parameters.
+If the levels that we observed represent a random sample from the set of all possible levels we incorporate *random effects* in the model.
+
+There are two things to notice about this distinction between fixed-effects parameters and random effects.
+First, the names are misleading because the distinction between fixed and random is more a property of the levels of the categorical covariate than a property of the effects associated with them.
+Second, we distinguish between "fixed-effects parameters", which are indeed parameters in the statistical model, and "random effects", which, strictly speaking, are not parameters.
+As we will see shortly, random effects are unobserved random variables.
+
+To make the distinction more concrete, suppose that we wish to model the annual reading test scores for students in a school district and that the covariates recorded with the score include a student identifier and the student's gender.
+Both of these are categorical covariates.
+The levels of the gender covariate, male and female, are fixed.
+If we consider data from another school district or we incorporate scores from earlier tests, we will not change those levels.
+On the other hand, the students whose scores we observed would generally be regarded as a sample from the set of all possible students whom we could have observed.
+Adding more data, either from more school districts or from results on previous or subsequent tests, will increase the number of distinct levels of the student identifier.
+
+*Mixed-effects models* or, more simply, *mixed models* are statistical models that incorporate both fixed-effects parameters and random effects.
+Because of the way that we will define random effects, a model with random effects always includes at least one fixed-effects parameter.
+Thus, any model with random effects is a mixed model.
+
+We characterize the statistical model in terms of two random variables: a $q$-dimensional vector of random effects represented by the random variable $\mathcal{B}$ and an $n$-dimensional response vector represented by the random variable $\mathcal{Y}$.
+(We use upper-case "script" characters to denote random variables.
+The corresponding lower-case upright letter denotes a particular value of the random variable, with vector-valued random variable values in boldface.)
+We observe the value, $\mathbf{y}$, of $\mathcal{Y}$.
+We do not observe the value, $\mathbf{b}$, of $\mathcal{B}$.
+
+When formulating the model we describe the unconditional distribution of $\mathcal{B}$ and the conditional distribution, $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$.
+The descriptions of the distributions involve the form of the distribution and the values of certain parameters. 
+We use the observed values of the response and the covariates to estimate these
+parameters and to make inferences about them.
+
+That's the big picture.
+Now let's make this more concrete by describing a particular, versatile class of mixed models called linear mixed models and by studying a simple example of such a model.
+First we describe the data in the example.
+
+## The dyestuff and dyestuff2 data {#sec-DyestuffData}
+
+Models with random effects have been in use for a long time.
+The first edition of the classic book, *Statistical Methods in Research and Production*, edited by O.L. Davies, was published in 1947 and contained examples of the use of random effects to characterize batch-to-batch variability in chemical processes.
+The data from one of these examples are available as the `dyestuff` data in the `MixedModels` package.
+In this section we describe and plot these data and introduce a second example, the `dyestuff2` data, described in @box73:_bayes_infer_statis_analy.
+
+### The dyestuff data {#sec-dyestuff}
+
+The data are described in @davies72:_statis_method_in_resear_and_produc [, Table 6.3, p. 131], the fourth edition of the book mentioned above, as coming from
+
+> an investigation to find out how much the variation from batch to
+> batch in the quality of an intermediate product (H-acid) contributes
+> to the variation in the yield of the dyestuff (Naphthalene Black 12B)
+> made from it. In the experiment six samples of the intermediate,
+> representing different batches of works manufacture, were obtained,
+> and five preparations of the dyestuff were made in the laboratory from
+> each sample. The equivalent yield of each preparation as grams of
+> standard colour was determined by dye-trial.
+
+To access these data within `Julia` we must first attach this package, and others that we will use, to our session with
+
+```{julia}
+const progress = false    # used in calls to fit to suppress progress bar
+
+using AlgebraOfGraphics   # high-level graphics
+using CairoMakie          # graphics back-end
+using CategoricalArrays   # factors and ordered factors
+using DataFrameMacros     # elegant DataFrame manipulation
+using DataFrames          # DataFrame implementation
+using DisplayAs           # control fine details of display
+using MKL                 # faster LAPACK on Intel processors
+using Markdown            # utilities for generating markdown text
+using MixedModels         # fit and examine mixed-effects models
+using MixedModelsMakie    # graphics for mixed-effects models
+using Printf              # formatted printing
+using Random              # random number generation
+using StatsBase           # basic statistical summaries
+```
+
+A package must be attached before any of the data sets or functions in the package can be used.
+If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s).
+If you are using Julia version 1.7.0 or later the error report will include instructions on how to do this.
+
+In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.
+
+The `MixedModels` package includes several datasets that are used in examples and in tests of the package.
+Individual datasets can be loaded with the `dataset` function.
+To allow for other packages to incorporate their own `dataset` function without causing name clashes, this function is not exported and must be called with the fully-qualified name `MixedModels.dataset`.
+(If this explanation sounds like gibberish to you, the bottom line is that you must use `MixedModels.dataset(:dyestuff)` and not just `dataset(:dyestuff)`.)
+
+```{julia}
+dyestuff = MixedModels.dataset(:dyestuff)
+```
+
+The output indicates that this dataset is a `Table` read from a file in the [Arrow](https://arrow.apache.org) data format.
+
+A `Table` is a general, but "bare bones", tabular form defined in the [Tables](https://github.com/JuliaData/Tables.jl) package.
+This particular table, read from an `Arrow` file, will be read-only.
+Often it is convenient to convert the read-only table form to a `DataFrame` to be able to use the full power of the [DataFrames](https://github.com/JuliaData/DataFrames.jl) package.
+
+```{julia}
+dyestuff = DataFrame(dyestuff)
+```
+
+The `describe` method for a `DataFrame` provides a concise description of the structure of the data,
+
+```{julia}
+describe(dyestuff)
+```
+
+Combining this information with the initial description of the `Table` we see that the data frame consists of 30 observations of the `yield`, the response variable, and of the covariate, `batch`, which is a categorical variable whose levels are character strings.
+
+```{julia}
+typeof(dyestuff.batch)
+```
+
+(`DictEncoded` is the `Arrow` term for a categorical structure where the levels form a dictionary or lookup table and the values are stored as indices into this lookup table.)
+
+```{julia}
+show(levels(dyestuff.batch))
+```
+
+If the labels for the factor levels are arbitrary, as they are here, we will use letters instead of numbers for the labels.
+That is, we label the batches as `"A"` through `"F"` rather than `1` through `6`.
+When the labels are letters it is clear that the variable is categorical.
+When the labels are numbers a categorical covariate can be mistaken for a numeric covariate, with unintended consequences.
+
+It is a good practice to apply `describe` to any data frame the first time you work with it and to check carefully that any categorical variables are indeed represented as factors.
+
+The data in a data frame are viewed as a table with columns corresponding to variables and rows to observations.
+The functions `first` and `last` select the first or last few rows of the table.
+
+```{julia}
+first(dyestuff, 7)
+```
+
+```{julia}
+last(dyestuff, 7)
+```
+or we could tabulate the data using `groupby` and `combine` from [DataFrames](https://github.com/JuliaData/DataFrames.jl).
+
+```{julia}
+combine(groupby(dyestuff, :batch), :yield => mean, nrow => :n)
+```
+
+
+Although this table does show us an important property of the data, namely that there are exactly 5 observations on each batch --- a property that we will describe by saying that the data are *balanced* with respect to `batch` --- we usually learn much more about the structure of such data from plots like @fig-dyestuffdata
+
+```{julia}
+#| fig-cap: "Yield of dyestuff by batch.  The line joins the mean yields."
+#| label: fig-dyestuffdata
+#| code-fold: true
+"""
+    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)
+
+Returns a `DataFrame` created from df with the levels of `grps` reordered according to
+`combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
+levels of `grps` reordered.
+"""
+function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
+    # ensure the relevant columns are types that Makie can deal with 
+    df = transform(df, resp => Array, grps => CategoricalArray; renamecols=false)
+    # create a summary table by mean resp
+    sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
+    glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
+    levels!(df[!, grps], glevs)
+    levels!(sumry[!, grps], glevs)
+    return df, sumry
+end
+let
+    df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff)), :yield, :batch)
+
+    mp = mapping(
+        :yield => "Yield of dyestuff [g]", :batch => "Batch of intermediate product"
+    )
+    draw(
+        (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
+        (data(sumry) * mp * visual(Lines)),
+    )
+end
+```
+
+than we do from numerical summaries.
+
+In @fig-dyestuffdata we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability.
+For example, four of the five preparations from batch F provided lower yields than did any of the preparations from batches B, C, and E.
+
+This plot, and essentially all the other plots in this book, were created using the [Makie](https://makie.juliaplots.io) package (@DanischKrumbiegel2021).
+
+In `yet-to-be-written-appendix` we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot.
+For example, in this plot the levels of `batch` are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are *jittered* to avoid overplotting of points.
+(Note that the two lowest yields of samples from batch `A` are identical.)
+At this point we will concentrate on the information conveyed by the plot and not on how the plot is created.
+
+In @sec-fittinglmms we will use mixed models to quantify the variability in yield between batches.
+For the time being let us just note that the particular batches used in this experiment are a selection or sample from the set of all batches that we wish to consider.
+Furthermore, the extent to which one particular batch tends to increase or decrease the mean yield of the process --- in other words, the "effect" of that particular batch on the yield --- is not as interesting to us as is the extent of the variability between batches.
+For the purposes of designing, monitoring and controlling a process we want to predict the yield from future batches, taking into account the batch-to-batch variability and the within-batch variability.
+Being able to estimate the extent to which a particular batch in the past increased or decreased the yield is not usually an important goal for us.
+We will model the effects of the batches as random effects rather than as fixed-effects parameters.
+
+### The dyestuff2 data {#sec-dyestuff2}
+
+The data are simulated data presented in @box73:_bayes_infer_statis_analy [, Table 5.1.4, p. 247] where the authors state
+
+> These data had to be constructed for although examples of this sort
+> undoubtedly occur in practice they seem to be rarely published.
+
+The structure and summary
+
+```{julia}
+dyestuff2 = MixedModels.dataset(:dyestuff2)
+```
+
+```{julia}
+dyestuff2 = DataFrame(dyestuff2)
+describe(dyestuff2)
+```
+
+are intentionally similar to those of the `dyestuff` data.
+
+A data plot (@fig-dyestuff2data)
+
+```{julia}
+#| fig-cap: "Artificial data of yield by batch.  The line joins the mean yields."
+#| label: fig-dyestuff2data
+#| code-fold: true
+let
+    df, sumry = _meanrespfrm(dyestuff2, :yield, :batch)
+    mp = mapping(:yield => "Simulated yield", :batch => "Batch")
+    draw(
+        (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
+        (data(sumry) * mp * visual(Lines)),
+    )
+end
+```
+
+shows that the batch-to-batch variability in these data is small compared to the within-batch variability.
+
+In some approaches to mixed models it can be difficult to fit models to such data.
+Paradoxically, small "variance components" can be more difficult to estimate than large variance components.
+
+The methods we will present are not compromised when estimating small variance components.
+
+## Fitting linear mixed models {#sec-fittinglmms}
+
+Before we formally define a linear mixed model, let's go ahead and fit models to these data sets using `MixedModels`.
+The simplest way to do this is to use the generic `fit` function with arguments describing the type of model to be fit (i.e. `MixedModel`), a *formula* specifying the model and the *data* on which to evaluate the formula.
+
+We will explain the structure of the formula after we have considered an example.
+
+### A model for the dyestuff data {#sec-dyestuffLMM}
+
+We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
+
+```{julia}
+dsm01 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff; progress)
+DisplayAs.Text(dsm01)
+```
+
+The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) parameter estimates, assigns the results to the name `dsm01`, and displays a summary of the fitted model.
+
+### Details of the printed display
+
+The display of the fitted model has four major sections:
+
+1. a description of the model that was fit
+2. some statistics characterizing the model fit
+3. a summary of properties of the random effects and
+4. a summary of the fixed-effects parameter estimates.
+
+We consider each of these sections in turn.
+
+The description section states that this is a linear mixed model in which the parameters have been estimate by maximum likelihood (ML).
+The model formula is displayed for later reference.
+
+The display of a model fit by maximum likelihood provides several model-fit statistics such as Akaike's Information Criterion [@saka:ishi:kita:1986], Schwarz's Bayesian Information Criterion [@schw:1978], the log-likelihood at the parameter estimates, and negative twice the log-likelihood, which is the estimation criterion transformed to the scale of the *deviance*.
+For linear mixed models we refer to `-2 loglik` as the value of the *objective* because this is the value that is minimized during the optimization phase of fitting the model.
+To evaluate the *deviance* we should subtract the value of this criterion at a *saturated* or baseline model but it is not clear how to define such a baseline model in these cases.
+
+However, it is still possible to perform [likelihood ratio tests](https://en.wikipedia.org/wiki/Likelihood-ratio_test) of different models fit to the same data using the difference in the minimized objectives, because this difference is the same as the difference in the deviances.
+(Recall that a ratio of likelihoods corresponds to a difference in log-likelihoods.)
+
+The third section is the table of estimates of parameters associated with the random effects.
+There are two sources of variability in the model we have fit, a batch-to-batch variability in the level of the response and the residual or per-observation variability --- also called the within-batch variability.
+The name "residual" is used in statistical modeling to denote the part of the variability that cannot be explained or modeled with the other terms.
+It is the variation in the observed data that is "left over" after we have determined the estimates of the parameters in the other parts of the model.
+
+Some of the variability in the response is associated with the fixed-effects terms.
+In this model there is only one such term, labeled as the `(Intercept)`.
+The name "intercept", which is better suited to models based on straight lines written in a slope/intercept form, should be understood to represent an overall "typical" or mean level of the response in this case.
+(In case you are wondering about the parentheses around the name `(Intercept)`, they are included so that you can't accidentally create a variable with a name that conflicts with this name.)
+The line labeled `batch` in the random effects table shows that the random effects added to the term, one for each level of the factor `batch`, are modeled as random variables whose unconditional variance is estimated as 1388.33 g$^2$ in the ML fit.
+The corresponding standard deviation is 37.26 g.
+
+Note that the last column in the random effects summary table is the estimate of the variability expressed as a standard deviation rather than as a variance.
+These values are provided because usually it is easier to visualize standard deviations, which are on the scale of the response, than it is to visualize the magnitude of a variance.
+The values in this column are a simple re-expression (the square root) of the estimated variances.
+Do not confuse them with standard errors of the variance estimators, which are not given here.
+In `add-section-reference-here` we explain why we do not provide standard errors of variance estimates.
+
+The line labeled `Residual` in this table gives the estimate of the variance of the residuals (also in g$^2$) and its corresponding standard deviation.
+The estimated standard deviation of the residuals is 49.5 g.
+
+The last line in the random effects table states the number of observations to which the model was fit and the number of levels of any "grouping factors" for the random effects.
+In this case we have a single random effects term, `(1|batch)`, in the model formula and the grouping factor for that term is `batch`.
+There will be a total of six random effects, one for each level of `batch`.
+
+The final part of the printed display gives the estimates and standard errors of any fixed-effects parameters in the model.
+The only fixed-effects term in the model formula is the `1`, denoting a constant which, as explained above, is labeled as `(Intercept)`.
+The estimate of this parameter is 1527.5 g, which happens to be the mean yield across all the data - a consequence of the experiment being *balanced*, in the sense that there was the same number of observations for each batch.
+
+This *coefficient table* also includes the *standard error* of the estimate, which is the estimated standard deviation of the estimator, a `z` ratio, which is the ratio of the estimate to its standard error, and the probability the absolute value of a standard normal distribution exceeding the absolute value of the `z` ratio.
+
+If the hypothesis that the coefficient is zero is of interest, which is not the case here, then the value in the fourth column is an approximate p-value for the hypothesis test.
+An alternative measure of precision of the estimate - a coverage interval based on a *parametric bootstrap* - is presented in @sec-furtherassess
+
+### A model for the dyestuff2 data {#sec-dyestuff2lmm}
+
+Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\sigma}_1=0$.
+
+```{julia}
+dsm02 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff2; progress)
+```
+
+An estimate of $0$ for $\sigma_1$ does not mean that there is no variation between the groups.
+Indeed @fig-dyestuff2data shows that there is some small amount of variability between the groups.
+The estimate, $\widehat{\sigma}_1=0$, simply indicates that the level of "between-group" variability is not sufficient to warrant incorporating random effects in the model.
+
+This point is worth reiterating.
+An estimate of zero for a variance component does not imply that there is no variability between the groups.
+There will always be variability between groups that is induced by the per-observation variability.
+If we arbitrarily divided 30 observations from a homogeneous distribution into six groups of five observations, which is likely the way that this sample was simulated, the sample averages would inherit a level of variability from the original sample.
+What is being estimated in the variance component for `batch` is the *excess* variability between groups beyond that induced by the residual variability.
+
+In other words, an estimate $\widehat{\sigma}_1=0$ is not inconsistent with the model.
+The important point to take away from this example is that we must allow for the estimates of variance components to be zero.
+
+We describe such a model as being *degenerate*, in the sense that the estimated distribution of the random effects is a [degenerate distribution](https://en.wikipedia.org/wiki/Degenerate_distribution), representing a point mass at zero.
+It corresponds to a linear model in which we have removed the random effects associated with `batch`.
+
+Degenerate models can and do occur in practice.
+Even when the final fitted model is not degenerate, we must allow for such models when determining the parameter estimates through numerical optimization.
+
+To reiterate, this model can be reduced to a linear model because the random effects are inert, in the sense that they have a variance of zero.
+
+## Model formulation {#sec-modelformulation}
+
+A common way of writing the statistical model being fit in `dsm01` and `dsm02` is as an expression for the i'th observation in the j'th batch
+$$
+y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
+$$
+with the further specification that the per-observation noise terms, $\epsilon_{i,j}$, are independently and identically distributed as $\mathcal{N}(0, \sigma^2)$ and the random effects, $b_j$, are independently and identically distributed as $\mathcal{N}(0, \sigma_1^2)$.
+The three parameters in the model are the overall mean, $\mu$, the standard deviation of the random effects, $\sigma_1$, and the standard deviation of the per-observation noise, $\sigma$.
+
+Generalizing this formulation to unbalanced data sets and more complex models can become unwieldy.
+For the range of models shown in this book it is more convenient to use a matrix-vector representation in which the random effects are described as a $q$-dimensional multivariate Gaussian random variable
+$$
+\mathcal{B}\sim\mathcal{N}(\mathbf{0},\sigma_1^2\mathbf{I}) .
+$$ {#eq-mvbdist}
+The multivariate Gaussian distribution is described in more detail in @sec-mvgaussian.
+At this point the important thing to know is that @eq-mvbdist describes a vector of independent Gaussian random variables, each of which has mean $0$ and variance $\sigma_1^2$.
+
+The random effects are associated with the observations through a *model matrix*, $\mathbf{Z}$.
+For a model with $n$ observations and a total of $q$ random effects, $\mathbf{Z}$ will be of size $n\times q$.
+Furthermore, it is sparse - meaning that most of the elements of the matrix are zeros.
+In this case, $\mathbf{Z}$ is the indicator matrix for the `batch` covariate.
+```{julia}
+Zdsm01 = Int.(Matrix(only(dsm01.reterms)))
+```
+
+The expression to produce that output first extracted the random-effects terms information from `dsm01`, extracted the term for the first grouping factor, checking that there is only one, converted it to a matrix and converted the matrix to integers to save on space when printing.
+
+In cases like this we will often print out the transpose of the model matrix to save more space
+```{julia}
+Zdsm01'
+```
+or, even more compact, as a sparse matrix pattern
+```{julia}
+sparse(Zdsm01')
+```
+
+The fixed-effects parameters, of which there is only one here, are gathered into a vector, $\boldsymbol{\beta}$, of length $p$, and multiplied by another model matrix, $\mathbf{X}$, of size $n\times p$.
+```{julia}
+dsm01.β
+```
+```{julia}
+Int.(dsm01.X')
+```
+
+A linear model without random effects can be described as $\mathcal{Y}\sim\mathcal{N}(\mathbf{X}\boldsymbol{\beta}, \sigma^2\mathbf{I})$.
+That is, the expected value of the response vector is the *linear predictor*, $\mathbf{X}\boldsymbol{\beta}$, and the covariance matrix of the multivariate Gaussian distribution for the response is $\sigma^2\mathbf{I}$, corresponding to independent, constant variance per-observation noise terms.
+
+For the linear mixed model, we describe the conditional distribution of the response, given a particular value, $\mathbf{b}$, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, $\mathbf{b}$, and the fixed-effects parameter vector $\boldsymbol{\beta}$.
+$$
+(\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim\mathcal{N}(\mathbf{X}\mathbf{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})
+$$
+
+The complete model can be written as
+$$
+  \begin{aligned}
+    (\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mathcal{N}(\mathbf{X}\mathbf{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})\\
+    \mathcal{B}&\sim\mathcal{N}(\mathbf{0},\Sigma_\theta) .
+  \end{aligned}
+$$ {#eq-lmmdist}
+
+From these two distributions, the joint distribution of $\mathcal{Y}$ and $\mathcal{B}$, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value $\mathbf{y}$ of $\mathcal{Y}$.
+
+Details on the derivation and evaluation of the log-likelihood are given in @sec-lmmtheory.
+At this point the important results are that the *profiled* log-likelihood for models `dsm01` and `dsm02` can be evaluated directly (i.e. without an iterative optimization) from a single parameter, $\theta=\sigma_1/\sigma$.
+
+Furthermore, this profiled log-likelihood can be evaluated from a matrix of $\mathbf{X}'\mathbf{X}$-like products,
+$$
+\mathbf{A}=
+\begin{bmatrix}
+  \mathbf{Z}'\mathbf{Z} & \mathbf{Z}'\mathbf{X} & \mathbf{Z}'\mathbf{y} \\
+  \mathbf{X}'\mathbf{Z} & \mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
+  \mathbf{y}'\mathbf{Z} & \mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+\end{bmatrix}
+$$
+which is stored in three pieces
+```{julia}
+first(dsm01.A)
+```
+```{julia}
+dsm01.A[2]
+```
+```{julia}
+last(dsm01.A)
+```
+
+The first, diagonal matrix is $\mathbf{Z}'\mathbf{Z}$.
+A simple, scalar random effects term like `(1|batch)` in the formula for models `dsm01` and `dsm02` results in $\mathbf{Z}$ being the indicator matrix for the levels of the grouping factor and, hence, in a diagonal $\mathbf{Z}'\mathbf{Z}$, whose diagonal elements are the frequencies of the levels.
+Thus this block shows that there are exactly 5 observations on each of the 6 batches.
+
+The second, rectangular matrix is $\begin{bmatrix}
+\mathbf{Z}'\mathbf{X} \\
+\mathbf{Z}'\mathbf{y}
+\end{bmatrix}$.
+Again, the fact that $\mathbf{Z}$ is the indicator matrix for the levels of the grouping factor and that $\mathbf{X}$ is a single column of 1's results in the frequencies of the levels of the factor in the first row of this block.
+The second row of this block consists of the sums of the yields for each batch.
+
+The third, square symmetric matrix is
+$$
+\begin{bmatrix}
+\mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
+\mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+\end{bmatrix}
+$$
+
+The parameters enter into the computation via a *relative covariance factor*, $\boldsymbol{\Lambda}_{\boldsymbol\theta}$, which is the $6\times 6$ matrix $\theta\,\mathbf{I}$ in this case.
+
+The method hinges on being able to evaluate efficiently the *Cholesky factor* (see @sec-cholesky for details) of
+$$
+  \begin{bmatrix}
+    \boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I} & 
+    \boldsymbol{\Lambda}_\theta'\mathbf{Z'X} & \boldsymbol{\Lambda}_\theta'\mathbf{Z'y} \\
+    \mathbf{X'Z}\boldsymbol{\Lambda}_\theta & \mathbf{X'X} & \mathbf{X'y} \\
+    \mathbf{y'Z}\boldsymbol{\Lambda}_\theta & \mathbf{y'X} & \mathbf{y'y}
+  \end{bmatrix}
+$$
+
+
+The optimal value of $\theta$ for model `dsm01` is 
+
+```{julia}
+only(dsm01.θ)
+```
+
+producing a lower Cholesky factor of
+
+```{julia}
+sparseL(dsm01; full=true)
+```
+
+## Variability of parameter estimates {#sec-furtherassess}
+
+The parameter estimates in a statistical model represent our "best guess" at the unknown values of the model parameters and, as such, are important results in statistical modeling.
+However, they are not the whole story.
+Statistical models characterize the variability in the data and we should assess the effect of this variability on the precision of the parameter estimates and of predictions made from the model.
+
+One method of assessing the variability in the parameter estimates is through a [parametric bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Parametric_bootstrap), a process where a large number of data sets are simulated from the assumed model using the estimated parameter values as the "true" parameter values.
+The distribution of the parameter estimators is inferred from the distribution of the parameter estimates from these generated data sets.
+
+This method is well-suited to Julia code because refitting an existing model to a simulated data set can be very fast.
+
+For methods that involve simulation, it is best to initialize a random number generator to a known state so that the "random" sample can be reproduced if desired.
+Beginning with Julia v1.7.0 the default random number generator is the `Xoshiro` generator, which we initialize to an arbitrary, but reproducible, value.
+
+The object returned by a call to `parametricbootstrap` has a somewhat complex internal structure to allow for the ability to simulate from complex models while still maintaining a comparatively small storage footprint.
+To examine the distribution of the parameter estimates we extract a table of all the estimated parameters and convert it to a `DataFrame`.
+
+```{julia}
+bsrng = Random.seed!(4321234)     # random number generator for bootstrap
+dsm01samp = parametricbootstrap(bsrng, 10_000, dsm01; hide_progress=true)
+dsm01pars = DataFrame(dsm01samp.allpars)
+first(dsm01pars, 7)
+```
+
+```{julia}
+last(dsm01pars, 7)
+```
+
+Plots of the bootstrap estimates for individual parameters are obtained by extracting subsets of the rows of this dataframe using `subset` methods from the `DataFrames` package or the `@subset` macro from the `DataFramesMacros` package.
+For example,
+
+```{julia}
+βdf = @subset(dsm01pars, :type == "β")
+```
+
+We begin by examining density plots constructed using the [AlgebraOfGraphics](https://github.com/JuliaGraphics/AlgebraOfGraphics.jl) package.
+(In general we will not show the code used to generate plots as it tends to have considerable detail that may distract from the plot itself.
+The code is, of course, available on the Github repository for this book.)
+
+```{julia}
+#| fig-cap: "Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01"
+#| label: fig-dsm01_bs_beta_density
+
+bssampdens(allpars, type::AbstractString="β") = bssampdens(DataFrame(allpars), type)
+
+function bssampdens(df::DataFrame, type::AbstractString="β")
+    selection = Dict("β" => (:names => "Names"), "σ" => (:group => "Group"))
+    return draw(
+        data(subset(df, :type => x -> x .== type)) *
+        mapping(:value => "Bootstrap samples of " * type; color=selection[type]) *
+        AlgebraOfGraphics.density(),
+    )
+end
+
+bssampdens(dsm01pars)
+```
+
+:::{callout-note}
+Find a way to use `:compact=true` when interpolating numeric values into the text
+:::
+
+```{julia}
+#| echo: false
+Markdown.parse("""
+  The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of $(@sprintf("%f", mean(βdf.value)))  which is close to the estimated `β₁` of $(@sprintf("%f", only(dsm01.β))).
+
+  Similarly the standard deviation of the simulated β values, $(std(βdf.value)) is close to the standard error of the parameter, $(only(stderror(dsm01))).
+""")
+```
+In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect.
+The estimates are approximately normally distributed centered about the "true" parameter value with a standard deviation given by the standard error of the parameter.
+
+The situation is different for the estimates of the standard deviation parameters, $\sigma$ and $\sigma_1$, as shown in @fig-dsm01_bs_sigma_density.
+
+```{julia}
+#| fig-cap: "Kernel density plot of bootstrap variance-component parameter estimates from model dsm01"
+#| label: fig-dsm01_bs_sigma_density
+bssampdens(dsm01pars, "σ")
+```
+
+The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).
+```{julia}
+#| echo: false
+Markdown.parse("""
+There is one peak around the "true" value for the simulation, $(only(dsm01.σs.batch)), and another peak at zero.
+""")
+```
+
+The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_density is being distorted by the method of approximating the density.
+A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation) approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a *kernel* such as a narrow Gaussian distribution (see the linked article for details).
+In this case the distribution of the estimates is a combination of a continuous distribution and a spike or point mass at zero as shown in a histogram, @fig-dsm01_bs_sigma_hist.
+
+:::{.callout-note}
+Use a lower alpha in the colors for multiple histograms so the bars behind another color are more visible
+:::
+
+```{julia}
+#| fig-cap: "Histogram of bootstrap variance-components as standard deviations from model dsm01"
+#| label: fig-dsm01_bs_sigma_hist
+draw(
+  data(@subset(dsm01pars, :type == "σ")) *
+  mapping(:value => "Bootstrap parameter estimates of σ", color = :group => "Group") *
+  AlgebraOfGraphics.histogram(; bins=80)
+)
+```
+
+Nearly 1000 of the 10,000 bootstrap fits are "singular" in that one (or more) of the estimated unconditional distribution(s) of the random effects are degenerate.
+For this model the only way singularity can occur is for $\sigma_1$ to be zero.
+
+```{julia}
+combine(
+  groupby(DataFrame(degenerate = issingular(dsm01samp)), :degenerate),
+  nrow => :n,
+)
+```
+
+The distribution of the estimator of $\sigma_1$ with this point mass at zero is not at all like a Gaussian or normal distribution.
+This is why characterizing the uncertainty of these parameter estimates with a standard error is misleading.
+Quoting an estimate and a standard error for the estimate is only meaningful if these values adequately characterize the distribution of the values of the estimator.
+
+In many cases standard errors are quoted for estimates of the variance components, $\sigma_1^2$ and $\sigma^2$, whose distribution (fig-dsm01_bs_sigmasqr_hist) in the bootstrap sample is even less like a normal or Gaussian distribution.
+
+```{julia}
+#| fig-cap: "Histogram of bootstrap variance-components from model dsm01"
+#| label: fig-dsm01_bs_sigmasqr_hist
+draw(
+  data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
+  mapping(:value_abs2 => "Bootstrap sample of estimates of σ²", color = :group) * 
+  histogram(; bins=200)
+)
+```
+
+The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accomodate non-normal distributions.
+
+### Confidence intervals on the parameters {#sec-confints}
+
+A bootstrap sample of parameter estimates also provides us with a method of creating bootstrap coverage intervals, which can be regarded as confidence intervals on the parameters.
+
+For, say, a 95% coverage interval based on 10,000 parameter estimates we determine an interval that contains 95% (9,500, in this case) of the estimated parameter values.
+
+There are many such intervals.
+For example, from the sorted parameter values we could return the interval from the smallest up to the 9,500th largest, or from the second smallest up to the 9,501 largest, and so on.
+
+The `shortestcovint` method returns the shortest of all these potential intervals which will correspond to the interval with the highest empirical density.
+
+```{julia}
+DataFrame(shortestcovint(dsm01samp))
+```
+
+For the `(Intercept)` fixed-effects parameter the interval is similar to an "asymptotic" or Wald interval constructed as the estimate plus or minus two standard errors.
+
+```{julia}
+show(only(dsm01.β) .+ [-2, 2] * only(dsm01.stderror))
+```
+
+The interval on the residual standard deviation, $\sigma$, is reasonable, given that there are only 30 observations, but the interval of the standard deviation of the random effects, $\sigma_1$, extends all the way down to zero.
+
+### Tracking the progress of the iterations {#sec-dsm01trace}
+
+The optional argument, `thin=1`, in a call to `fit` causes all the values of $\boldsymbol\theta$ and the corresponding value of objective from the iterative optimization to be stored in the `optsum` property.
+
+```{julia}
+dsm01trace = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff; thin=1, progress)
+DataFrame(dsm01trace.optsum.fitlog)
+```
+
+```{julia}
+#| echo: false
+Markdown.parse("""
+Here the algorithm converges after 18 function evaluations to a profiled deviance of $(dsm01trace.objective) at θ = $(only(dsm01trace.theta)).
+""")
+```
+## Assessing the random effects {#sec-assessRE}
+
+What are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the mode (location of the maximum probability density) of the conditional distribution, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$, evaluated at the parameter estimates and the observed response vector, $\mathbf{y}$.
+Although BLUP is an appealing acronym, we don't find the term particularly instructive (what is a "linear unbiased predictor" and in what sense are these the "best"?) and prefer the term "conditional mode" to describe this value.
+
+These values are often considered as some sort of "estimates" of the random effects.
+It can be helpful to think of them this way but it can also be misleading.
+As we have stated, the random effects are not, strictly speaking, parameters --- they are unobserved random variables.
+We don't estimate the random effects in the same sense that we estimate parameters.
+Instead, we consider the conditional distribution of $\mathcal{B}$ given the observed data, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
+
+Because the unconditional distribution, $\mathcal{B}\sim\mathcal{N}(\mathbf{0},\Sigma_\theta)$ is continuous, the conditional distribution, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$ will also be continuous.
+In general, the mode of a probability density is the point of maximum density, so the phrase "conditional mode" refers to the point at which this conditional density is maximized.
+Because this definition relates to the probability model, the values of the parameters are assumed to be known.
+In practice, of course, we don't know the values of the parameters (if we did there would be no purpose in forming the parameter estimates), so we use the estimated values of the parameters to evaluate the conditional modes.
+
+Those who are familiar with the multivariate Gaussian distribution may recognize that, because both $\mathcal{B}$ and $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$ are multivariate Gaussian, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$ will also be multivariate Gaussian and the conditional mode will also be the conditional mean of $\mathcal{B}$, given $\mathcal{Y}=\mathbf{y}$.
+This is the case for a linear mixed model but it does not carry over to other forms of mixed models.
+In the general case all we can say about $\tilde{\mathbf{b}}$ is that they maximize a conditional density, which is why we use the term "conditional mode" to describe these values.
+We will only use the term "conditional mean" and the symbol, $\mathbf{\mu}$, in reference to $\mathrm{E}(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, which is the conditional mean of $\mathcal{Y}$ given $\mathcal{B}$, and an important part of the formulation of all types of mixed-effects models.
+
+The conditional modes are available as a vector of matrices
+
+```{julia}
+only(dsm01.b)
+```
+
+In this case the vector consists of a single matrix because there is only one random-effects term, `(1|batch)`, in the model and, hence, only one grouping factor, `batch`, for the random effects.
+There is only one row in the matrix because the random-effects term, `(1|batch)`, is a simple, scalar term.
+
+To make this more explicit, random-effects terms in the model formula are those that contain the vertical bar (`|`) character.
+The variable or expression on the right of the `|` is the grouping factor for the random effects generated by this term.
+If the expression on the left of the vertical bar is `1`, as it is here, we describe the term as a *simple, scalar, random-effects term*.
+The designation "scalar" means there will be exactly one random effect generated for each level of the grouping factor.
+A simple, scalar term generates a block of indicator columns --- the indicators for the grouping factor --- in $\mathbf{Z}$.
+Because there is only one random-effects term in this model and because that term is a simple, scalar term, the model matrix $\mathbf{Z}$ for this model is the indicator matrix for the levels of `batch`, as shown earlier in this section.
+
+In the next chapter we fit models with multiple simple, scalar terms and, in subsequent chapters, we extend random-effects terms beyond simple, scalar terms.
+When we have only simple, scalar terms in the model, each term has a unique grouping factor and the elements of the list returned by can be considered as associated with terms or with grouping factors.
+In more complex models a particular grouping factor may occur in more than one term.
+In such cases the terms associated with the same grouping factor are internally amalgamated into a single term.
+Thus internally the random effects are associated with grouping factors, not the terms in the model formula.
+
+Given the data, $\mathbf{y}$, and the parameter estimates, we can evaluate a measure of the dispersion of $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
+In the case of a linear mixed model, this is the conditional standard deviation, from which we can obtain a prediction interval. 
+A plot of these prediction intervals is sometimes called a *caterpillar plot* because it can look like a fuzzy caterpillar when there are many levels of the grouping factor.
+
+```{julia}
+#| fig-cap: "Caterpillar plot of prediction intervals for dsm01 random effects"
+#| label: fig-caterpillar_dsm01
+caterpillar(dsm01)
+```
+
+The `caterpillar` function returns a plot with linear spacing of the
+levels on the y axis.
+An alternative
+
+```{julia}
+#| fig-cap: "Quantile caterpillar plot of prediction intervals for dsm01 random effects"
+#| label: fig-qqcaterpillar_dsm01
+qqcaterpillar(dsm01)
+```
+
+returns a plot where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.
+
+The `caterpillar` plot is preferred when there are only a few levels of the grouping factor, as in this case.
+When there are hundreds or thousands of random effects the `qqcaterpillar` form is preferred because it focuses attention on the "important few" at the extremes and de-emphasizes the "trivial many" that are close to zero.
+
+## Some stylistic conventions {#sec-stylistic}
+
+To make it easier to recognize the form of the many models that will be fit in this book, we will adopt certain conventions regarding the argument specifications.
+In particular we will establish the convention of specifying `contrasts` for any categorical covariates and the possibility of using certain transformations, such as centering and scaling, of numeric covariates.
+
+The name `contrasts` is used in a general sense here to specify certain transformations that are to take place during the process of converting a formula and the structure, or [schema](https://en.wikipedia.org/wiki/Database_schema), of the data into model matrices.
+
+The [StatsModels.jl package](https://github.com/JuliaStats/StatsModels.jl) allows for contrasts to be specified as a key-value dictionary where the keys are symbols and the values are of a type that specializes `StatsModels.AbstractContrasts`.
+The [MixedModels.jl package](https://github.com/JuliaStats/MixedModels.jl) provides for a `Grouping()` contrast and the [StandardizedPredictors.jl package](https://github.com/beacon-biosignals/StandardizedPredictors.jl) allows transformations to be expressed as contrasts.
+
+For models `dsm01` and `dsm02` the only covariate in the model formula is `batch`, which is a grouping factor for the random effects.
+Thus the desired contrasts specification is
+```{julia}
+#| code-fold: false
+#| eval: false
+contrasts = Dict(:batch => Grouping())
+```
+
+(Symbols in Julia can be written as a colon followed by the name of the symbol.
+The colon creates an expression but, if the expression consists of a single name, then the expression is the symbol.)
+
+It is best to get into the habit of specifying `Grouping()` contrasts for any grouping factors in the data.
+Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter.
+However, when the number of levels is large, as for some of the models in later chapters, failure to specify `Grouping()` contrasts can cause memory faults when constructing the numeric represention of the model.
+
+There is an advantage in assigning the contrasts dictionary to the name `contrasts` because a call to `fit` with the optional, named argument `contrasts`
+```{julia}
+#| code-fold: false
+#| eval: false
+dsm01 = fit(
+  MixedModel,
+  @formula(yield ~ 1 + (1|batch)), 
+  dyestuff;
+  contrasts=contrasts
+)
+```
+can be condensed to 
+```{julia}
+#| code-fold: false
+#| eval: false
+dsm01 = fit(
+  MixedModel,
+  @formula(yield ~ 1 + (1|batch)),
+  dyestuff;
+  contrasts
+)
+```
+
+That is, if the name of the object to be passed as a named argument is the same as the name of the argument, like `contrasts=contrasts`, then the name does not need to be repeated.
+Note that the comma after the positional arguments must be changed to a semicolon in this convention.
+This is necessary because it indicates that arguments following the semicolon are named arguments, not positional.
+
+Another convention we will use is assigning the formula separately from the call to `fit` as part of a `let` block.
+Often the formula can become rather long, sometimes needing multiple lines in the call, and it becomes difficult to keep track of the other arguments.
+Assigning the formula separately helps in keeping track of the arguments to `fit`.
+
+A `let` block is a way of making temporary assignments that do not affect the global state.
+An assignment to a variable name inside a `let` block is local to the block.
+
+Thus `dsm01` can be assigned as
+```{julia}
+#| code-fold: false
+#| eval: false
+dsm01 = let
+    form = @formula(yield ~ 1 + (1|batch))
+    fit(MixedModel, form, dyestuff; contrasts)
+end
+```
+
+## Chapter summary {#sec-ChIntroSummary}
+
+A considerable amount of material has been presented in this chapter, especially considering the word "simple" in its title (it's the model that is simple, not the material).
+A summary may be in order.
+
+A mixed-effects model incorporates fixed-effects parameters and random effects, which are unobserved random variables, $\mathcal{B}$.
+In a linear mixed model, both the unconditional distribution of $\mathcal{B}$ and the conditional distribution, $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, are multivariate Gaussian distributions.
+Furthermore, this conditional distribution is a spherical Gaussian with mean, $\mathbf{\mu}$, determined by the linear predictor, $\mathbf{Z}\mathbf{b}+\mathbf{X}\mathbf{\beta}$.
+That is,
+$$
+(\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim
+  \mathcal{N}(\mathbf{Z}\mathbf{b}+\mathbf{X}\mathbf{\beta}, \sigma^2\mathbf{I}_n) .
+$$
+The unconditional distribution of $\mathcal{B}$ has mean $\mathbf{0}$ and a parameterized $q\times q$ variance-covariance matrix, $\Sigma_\theta$.
+
+In the models we considered in this chapter, $\Sigma_\theta$, is a scalar multiple of the identity matrix, $\mathbf{I}_6$.
+This matrix is always a multiple of the identity in models with just one random-effects term that is a simple, scalar term.
+The reason for introducing all the machinery that we did is to allow for more general model specifications.
+
+The maximum likelihood estimates of the parameters are obtained by minimizing the deviance.
+For linear mixed models we can minimize the profiled deviance, which is a function of $\mathbf{\theta}$ only, thereby considerably simplifying the optimization problem.
+
+To assess the precision of the parameter estimates, we profile the deviance function with respect to each parameter and apply a signed square root transformation to the likelihood ratio test statistic, producing a profile zeta function for each parameter.
+These functions provide likelihood-based confidence intervals for the parameters.
+Profile zeta plots allow us to visually assess the precision of individual parameters.
+Density plots derived from the profile zeta function provide another way of examining the distribution of the estimators of the parameters.
+
+Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.

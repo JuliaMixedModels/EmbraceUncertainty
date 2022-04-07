@@ -1,0 +1,628 @@
+# Models for Longitudinal Data {#sec-longitudinal}
+
+Load the packages to be used.
+```{julia}
+#| code-fold: true
+const progress = false   # used in calls to `fit(MixedModel,...) to suppress progress bars
+
+using AlgebraOfGraphics
+using Arrow
+using CairoMakie
+using CategoricalArrays
+using DataFrameMacros
+using DataFrames
+using DisplayAs
+using LinearAlgebra
+using MKL
+using MixedModels
+using MixedModelsMakie
+using Random
+using StandardizedPredictors
+```
+
+Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time.
+Generally we wish to characterize the time trends within subjects and between subjects.
+The data will always include the response, the time covariate and the indicator of the subject on which the measurement has been made.
+If other covariates are recorded, say whether the subject is in the treatment group or the control group, we may wish to relate the within- and between-subject trends to such covariates.
+
+In this chapter we introduce graphical and statistical techniques for the analysis of longitudinal data by applying them to a simple example.
+
+## The elstongrizzle data
+
+Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
+
+```{julia}
+elstongrizzle = Arrow.Table("./data/elstongrizzle.arrow")
+```
+
+Converting the table to a data frame provides the description 
+
+```{julia}
+#| echo: false
+egdf = DataFrame(elstongrizzle)
+describe(egdf)
+```
+
+A common way of plotting such longitudinal data is response versus time on a single axis with the observations for each individual joined by a line, @fig-egspaghetti (see also Figure 3.2, p. 52 of @davis2002).
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Length of ramus bone versus age for a sample of 20 boys."
+#| label: fig-egspaghetti
+egplt = data(egdf) * mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
+draw(egplt * mapping(; color=:Subj) * (visual(Scatter) + visual(Lines)))
+```
+
+Unfortunately, unless there are very few subjects, such figures, sometimes called "spaghetti plots", are difficult to decipher.
+
+A preferred alternative is to plot response versus time with each subject's data in a separate panel (@fig-eglayout).
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the top left, by increasing initial bone length."
+#| label: fig-eglayout
+if "orderedsubj" ∉ names(egdf)
+    egdf.orderedsubj = CategoricalArray(
+        egdf.Subj; levels=@sort(@subset(egdf, :time == 8.0), :resp).Subj
+    )
+end
+egplt = data(egdf) * mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
+egplt2 = egplt * mapping(; layout=:orderedsubj) * visual(ScatterLines)
+draw(egplt2; axis=(height=300, width=120))
+```
+
+To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
+This ordering makes it easier to examine the patterns in the rate of increase versus the initial bone length.
+
+And there doesn't seem to be a strong relationship.
+Some subjects, e.g. `S03` and `S04`, with shorter initial bone lengths have low growth rates.
+Others, e.g. `S10` and `S20`, have low initial bone lengths and a high growth rate.
+Similarly, `S06` and `S11` have longer initial bone lengths and a low growth rate while `S07` and `S11` have longer initial bone lengths and a high growth rate.
+
+## A model with random effects for slope and intercept
+
+Although it seems that there isn't a strong correlation between initial bone length and growth rate in these data, a model with an overall linear trend and possibly correlated random effects for intercept and slope by subject estimates a strong negative correlation (-0.97) between these random effects.
+
+```{julia}
+egm01 = let
+    form = @formula(resp ~ 1 + time + (1 + time | Subj))
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, egdf; contrasts, progress)
+end
+DisplayAs.Text(egm01)
+```
+
+The reason for this seemingly unlikely result is that the `(Intercept)` term in the fixed effects and the random effects represents the bone length at age 0, which is not of interest here.
+Notice that the fixed-effects `(Intercept)` estimate is about 33.5 mm, which is far below the observed range of the data (45.0 to 55.5 mm.)
+
+Extrapolation from the observed range of ages, 8 years to 9.5 years, back to 0 years, will almost inevitably result is a negative correlation between slope and intercept.
+
+A caterpillar plot of the random effects for intercept and slope, @fig-egm01caterpillar, shows both the negative correlation between intercept and slope conditional means and wide prediction intervals on the random effects for the intercept.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01"
+#| label: fig-egm01caterpillar
+caterpillar(egm01)
+```
+
+### Centering the time values
+
+The problem of estimates of intercepts representing extrapolation beyond the observed range of the data is a common one for longitudinal data.
+If the time covariate represents an age, as it does here, or, say, a year in the range 2000 to 2020, the intercept, which corresponds to an age or year of zero, is rarely of interest.
+
+The way to avoid extrapolation beyond the range of the data is to center the time covariate at an age or date that is of interest.
+For example, we may wish to consider "time in study" instead of age as the time covariate.
+
+In discussing @fig-eglayout we referred to the bone length at 8 years of age, which was the time of first measurement for each of the subjects, as the "initial" bone length.
+If the purpose of the experiment is to create a predictive model for the growth rate that can be applied to boys who enter this age range then we could center the time at 8 years.
+
+Alternatively, we could center at the average observed time, 8.75 years, or at some other value of interest.
+
+The important thing is to make clear what the `(Itercept)` parameter estimates represent.
+The [StandardizedPredictors.jl](https://github.com/beacon-biosignals/StandardizedPredictors.jl) package allows for convenient representations of several standardizing transformations in a `contrasts` specification for the model.
+An advantage of this method of coding a transformation is that the coefficient names include a concise description of the transformation.
+
+(In model specifications in R and later in Julia the name `contrasts` has been come to be applied to ways of specifying the association between covariates in the data and parameters in a model.
+This is an extension of the original mathematical definition of contrasts amongst the levels of a categorical covariate.)
+
+A model with `time` centered at 8 years of age can be fit as
+
+```{julia}
+egm02 = let
+    form = @formula(resp ~ 1 + time + (1 + time | Subj))
+    contrasts = Dict(:time => Center(8), :Subj => Grouping())
+    fit(MixedModel, form, egdf; contrasts, progress)
+end
+DisplayAs.Text(egm02)
+```
+
+Comparing the parameter estimates from models `egm01` and `egm02`, we find that the only differences are in the estimates for the `(Intercept)` terms in the fixed-effects parameters and the variance component parameters and in the correlation of the random effects.
+In terms of the predictions from the model and the likelihood at the parameter estimates, `egm01` and `egm02` are the same model.
+
+A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread and more precision in the distribution of the random effects for `(Intercept)` but the same spread and precision for the `time` random effects, although these random effects are displayed in a different order.
+
+```{julia}
+#| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02"
+#| label: fig-egm02caterpillar
+#| code-fold: true
+caterpillar(egm02)
+```
+
+A third option is to center the `time` covariate at the mean of the original `time` values.
+
+```{julia}
+egm03 = let
+    form = @formula(resp ~ 1 + time + (1 + time | Subj))
+    contrasts = Dict(:Subj => Grouping(), :time => Center())
+    fit(MixedModel, form, egdf; contrasts, progress)
+end
+DisplayAs.Text(egm03)
+```
+
+Because the default for the `Center` contrast is to center about the mean, this `contrasts` argument can be written
+
+```{julia}
+#| eval: false
+contrasts = Dict(:time => Center())
+```
+
+Notice that in this model the estimated correlation of the random effects for `Subj` is positive.
+
+## Shrinkage plots
+
+One way of assessing a random-effects term in a linear mixed model is with a caterpillar plot, which shows two important characteristics, location and spread, of the conditional distribution $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
+
+Another plot of interest is to show the extent to which the conditional means have been "shrunk" towards the origin by the mixed-model, which represents a compromise between fidelity to the data, measured by the sum of squared residuals, and simplicity of the model.
+
+The model with the highest fidelity to the data corresponds to a fixed-effects model with the random effects model matrix, $\mathbf{Z}$, incorporated into the fixed-effects model matrix, $\mathbf{X}$.
+There are technical problems (rank deficiency) with trying to estimate parameters in this model but such "unconstrained" random effects can be approximated as the conditional means for a very large $\boldsymbol{\Sigma}$ matrix.  (In practice we use a large multiple, say 1000, of the identity matrix as the value of $\boldsymbol{\Sigma}$.)
+
+At the other end of the spectrum is the limit as $\boldsymbol{\Sigma}\rightarrow\mathbf{0}$, which is the simplest model, involving only the fixed-effects parameters, but usually with a comparatively poor fit.
+
+A *shrinkage plot* shows the conditional means of the random effects from the model that was fit and those for a "large" $\boldsymbol{\Sigma}$.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
+#| label: fig-egm02shrinkage
+shrinkageplot!(Figure(; resolution=(500, 500)), egm02)
+```
+
+@fig-egm02shrinkage reinforces some of the conclusions from @fig-egm02caterpillar.
+In particular, the random effects for the `(Intercept)` are reasonably precisely determined.
+We see this in @fig-egm02caterpillar because the intervals in the left panel are narrow.
+In @fig-egm02shrinkage there is little movement in the horizontal direction between the "unconstrained" within-subject estimates and the final random-effect locations.
+
+## Nonlinear growth curves
+
+As seen in @fig-eglayout some of the growth curves are reasonably straight (e.g. `S03`, `S11`, and `S15`) whereas others are concave-up (e.g. `S04`, `S13`, and `S17`) or concave-down (e.g. `S05`, `S07`, and `S19`).
+One way of allowing for curvature in individual growth curves is to include a quadratic term for `time` in both the fixed and random effects.
+
+The usual cautions about polynomial terms in regression models apply even more emphatically to linear mixed models.
+
+1. Interpretation of polynomial coefficients depends strongly upon the location of the zero point in the `time` axis.
+2. Extrapolation of polynomial models beyond the observed range of the `time` values is very risky.
+
+For balanced data like `egdf` we usually center the `time` axis about the mean, producing
+
+```{julia}
+egm04 = let
+    form = @formula(resp ~ 1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj))
+    dat = transform(egdf, :time => (x -> x .- 8.75) => :ctime)
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, dat; contrasts, progress)
+end
+DisplayAs.Text(egm04)
+```
+
+We see that the estimate for the population quadratic coefficient, `jl last(egm04.beta)`, is small, relative to its standard error, `jl last(egm04.stderror)`, indicating that it is not significantly different from zero.
+This is not unexpected because some of the growth curves in @fig-eglayout are concave-up, while others are concave-down, and others don't show a noticeable curvature.
+
+A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the quadratic term (vertical axis in the bottom row of panels) are highly attenuated relative to the unconstrained, "per-subject", values.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
+#| label: fig-egm04shrinkage
+shrinkageplot!(Figure(; resolution=(500, 500)), egm04)
+```
+
+Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.
+
+```{julia}
+MixedModels.likelihoodratiotest(egm03, egm04)
+```
+
+## Longitudinal data with treatments
+
+Often the "subjects" on which longitudinal measurements are made are divided into different treatment groups.
+Many of the examples cited in @davis2002 are of this type, including one from @box1950
+
+```{julia}
+box1950 = Arrow.Table("./data/box.arrow")
+```
+
+```{julia}
+bxdf = DataFrame(box1950)
+describe(bxdf)
+```
+
+There are three treatment groups
+
+```{julia}
+show(levels(bxdf.Group))
+```
+
+and each "subject" (rat, in this case) is in only one of the treatment groups.
+This can be checked by comparing the number of unique `Subj` levels to the number of unique combinations of `Subj` and `Group`.
+
+```{julia}
+nrow(unique(select(bxdf, :Group, :Subj))) == length(unique(bxdf.Subj))
+```
+
+Because the number of combinations of `Subj` and `Group` is equal to the number of subjects, each subject occurs in only one group.
+
+These data are balanced with respect to `time` (i.e. each rat is weighed at the same set of times) but not with respect to treatment, as can be seen by checking the number of rats in each treatment group.
+
+```{julia}
+combine(groupby(unique(select(bxdf, :Group, :Subj)), :Group), nrow => :n)
+```
+
+### Within-group variation
+
+Considering first the control group, whose trajectories can be plotted in a "spaghetti plot", @fig-bxctrlspaghetti
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Weight (g) of rats in the control group of bxdf versus time in trial (wk)."
+#| label: fig-bxctrlspaghetti
+bxaxes = mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")    
+draw(
+    data(@subset(bxdf, :Group == "Control")) *
+    bxaxes *
+    mapping(; color=:Subj) *
+    (visual(Scatter) + visual(Lines)),
+)
+```
+
+or in separate panels ordered by initial weight, @fig-bxctrllayout.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth."
+#| label: fig-bxctrllayout
+let
+    df = @subset(bxdf, :Group == "Control")
+    df.orderedsubj = CategoricalArray(
+        df.Subj; levels=sort(@subset(df, iszero(:time)), :resp).Subj, ordered=true
+    )
+    draw(
+        data(df) * bxaxes * mapping(; layout=:orderedsubj) * visual(ScatterLines);
+        axis=(height=250, width=150),
+    )
+end
+```
+
+The panels in @fig-bxctrllayout show a strong linear trend with little evidence of systematic curvature.
+
+A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth."
+#| label: fig-bxthiolayout
+let
+    df = @subset(bxdf, :Group == "Thioracil")
+    df.orderedsubj = CategoricalArray(
+        df.Subj; levels=sort(@subset(df, iszero(:time)), :resp).Subj, ordered=true
+    )
+    draw(
+        data(df) * bxaxes * mapping(; layout=:orderedsubj) * visual(ScatterLines);
+        axis=(height=250, width=150),
+    )
+end
+```
+
+shows several animals (`S18`, `S19`, `S21`, and `S24`) whose rate of weight gain decreases as the trial goes on.
+
+By contrast, in the Thyroxin group, @fig-bxthyrlayout,
+```{julia}
+#| code-fold: true
+#| fig-cap: "Weight (g) of rats in the Thyroxingroup versus time in trial (wk). Panels are ordered by increasing initial weigth."
+#| label: fig-bxthyrlayout
+let
+    df = @subset(bxdf, :Group == "Thyroxin")
+    df.orderedsubj = CategoricalArray(
+        df.Subj; levels=sort(@subset(df, iszero(:time)), :resp).Subj, ordered=true
+    )
+    draw(
+        data(df) * bxaxes * mapping(; layout=:orderedsubj) * visual(ScatterLines);
+        axis=(height=250, width=150),
+    )
+end
+```
+if there is any suggestion of curvature it would be concave-up.
+
+### Models with interaction terms
+
+Longitudinal data in which the observational units, each rat in this case, are in different treatment groups, require careful consideration of the origin on the time axis.
+If, as here, the origin on the time axis is when the treatments of the different groups began and the subjects have been randomly assigned to the treatment groups, we do not expect differences between groups at time zero.
+
+Usually, when a model incorporates an effect for `time` and a `time & Group` interaction - checking for different underlying slopes of the response with respect to `time` for each level of `Group`, we will also include a "main effect" for `Group`.
+This is sometimes called the *hierarchical principle* regarding interactions - a significant higher-order interaction usually forces inclusion of any lower-order interactions or main effects contained in it.
+
+One occasion where the hierarchical principle does not apply is when the main effect for `Group` would represent systematic differences in the response *before* the treatments began.
+Similarly in dose-response data; when a zero dose is included we could have a main effect for `dose` and a `dose & Group` interaction without a main effect for `Group`, because zero dose of a treatment is the same as zero dose of a placebo.
+
+We can begin with a main effect for `Group`, as in
+```{julia}
+bxm01 = let
+    form = @formula(resp ~ (1 + time + time^2) * Group + (1 + time + time^2 | Subj))
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, bxdf; contrasts, progress)
+end
+DisplayAs.Text(bxm01)
+```
+but we expect that a model without the main effect for `Group`,
+```{julia}
+bxm02 = let
+    form = @formula(resp ~ 1 + (time + time^2) & Group + (1 + time + time^2 | Subj))
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, bxdf; contrasts, progress)
+end
+DisplayAs.Text(bxm02)
+```
+will be adequate, as confirmed by
+```{julia}
+MixedModels.likelihoodratiotest(bxm02, bxm01)
+```
+
+:::{.callout-warning}
+Unfortunately, the interpretations of some of the fixed-effects coefficients change between models `bxm01` and `bxm02`.
+In model `bxm01` the coefficient labelled `time` is the estimated slope at time zero for the `Control` group.
+In model `bxm02` this coefficient is labelled `time & Group: Control`.
+
+In model `bxm01` the coefficient labelled `time & Group: Thioracil` is the change in the estimated slope at time zero between the `Thioracil` group and the `Control` group.
+In model `bxm02` the coefficient with this label is the estimated slope at time zero in the `Thioracil` group.
+:::
+:::{.callout-note}
+Is there a way to write the formula for `bxm02` to avoid this?
+:::
+
+We see the effect of this changing interpretation in the p-values associated with these coefficients.
+In model `bxm01` the only coefficients with low p-values are the `(Intercept)`, the `time`, representing a typical rate of weight gain in the control group at time zero, and the change in the quadratic term from the `Control` group to the `Thioracil` group.
+
+A model without systematic differences between groups in the initial weight and the initial slope but with differences between groups in the quadratic coefficient is sensible.
+It would indicate that the groups are initially homogeneous both in weight and growth rate but, as the trial proceeds, the different treatments change the rate of growth.
+
+```{julia}
+bxm03 = let
+    form = @formula(resp ~ 1 + time + time^2 & Group + (1 + time + time^2 | Subj))
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, bxdf; contrasts, progress)
+end
+DisplayAs.Text(bxm03)
+```
+
+```{julia}
+MixedModels.likelihoodratiotest(bxm03, bxm02)
+```
+
+### Possible simplification of random effects
+
+A caterpillar plot created from the conditional means and standard deviations of the random effects by `Subj` for model `bxm03`, @fig-bxm03caterpillar, indicates that all of the random-effects terms generate some prediction intervals that do not contain zero.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03"
+#| label: fig-bxm03caterpillar
+caterpillar(bxm03)
+```
+
+A shrinkage plot, @fig-bxm03shrinkage
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
+#| label: fig-bxm03shrinkage
+shrinkageplot!(Figure(; resolution=(500, 500)), bxm03)
+```
+
+shows that the random effects are considerably shrunk towards the origin, relative to the "unconstrained" values from within-subject fits, but none of the panels shows them collapsing to a line.
+
+Nevertheless, the estimated unconditional distribution of the random effects in model `bxm03` is a degenerate distribution.
+
+That is, the estimated within-subject covariance of the random effects is singular.
+```{julia}
+issingular(bxm03)
+```
+
+One way to see this is because the relative covariance factor, $\boldsymbol{\lambda}$, of the within-subject random effects is
+```{julia}
+Matrix(only(bxm03.λ))
+```
+and we see that the third column is all zeros.
+
+Thus, in a three-dimensional space the conditional means of the random effects for each rat, lie on a plane, even though each of the two-dimensional projections in @fig-bxm03shrinkage show a scatter.
+
+Three-dimensional plots of the conditional means of the random effects, @fig-bxm03plane,
+can help to see that these points lie on a plane.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Two views of the conditional means of the random effects from model bxm03. The lines from the origin are the principal axes of the unconditional distribution of the random effects.  The panel on the right is looking in along the negative of the second principle axis (red line in left panel)."
+#| label: fig-bxm03plane
+let
+    bpts = Point3f.(eachcol(only(bxm03.b)))
+    Upts = Point3f.(eachcol(svd(only(bxm03.λ)).U))
+    origin = Point3(zeros(Float32, 3))
+    xlabel, ylabel, zlabel = only(bxm03.reterms).cnames
+    zlabel = "time²"
+    perspectiveness = 0.5
+    aspect = :data
+    f = Figure(; resolution=(1200, 500))
+    u, v, w = -Upts[2]    # second principle direction flipped to get positive w
+    elevation = asin(w)
+    azimuth = atan(v, u)
+    ax1 = Axis3(f[1, 1]; aspect, xlabel, ylabel, zlabel, perspectiveness)
+    ax2 = Axis3(
+        f[1, 2]; aspect, xlabel, ylabel, zlabel, perspectiveness, elevation, azimuth
+    )
+    scatter!(ax1, bpts; marker='∘', markersize=20)
+    scatter!(ax2, bpts; marker='∘', markersize=20)
+    for p in Upts
+        seg = [origin, p]
+        lines!(ax1, seg)
+        lines!(ax2, seg)
+    end
+    f
+end
+```
+
+In each of the panels the three orthogonal lines from the origin are the three principle axes of the unconditional distribution of the random effects, corresponding to the columns of
+```{julia}
+svd(only(bxm03.λ)).U
+```
+
+The panel on the right is oriented so the viewpoint is along the negative of the second principle axis, showing that there is considerable variation in the first principle direction and zero variation in the third principle direction.
+
+We see that the distribution of the random effects in model `bxm03` is degenerate but it is not clear how to simplify the model.
+
+Coverage intervals from a parametric bootstrap sample for this model
+
+```{julia}
+bxm03samp = parametricbootstrap(Xoshiro(8642468), 10_000, bxm03; hide_progress=true)
+bxm03pars = DataFrame(bxm03samp.allpars)
+DataFrame(shortestcovint(bxm03samp))
+```
+
+shows that the coverage intervals for both of the correlation parameters involving the `(Intercept)` extend out to one of the limits of the allowable range [-1, 1] of correlations.
+
+A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates of the correlation coefficients reinforces this conclusion.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03"
+#| label: fig-bxm03rhodens
+draw(
+     data(@subset(bxm03pars, :type == "ρ")) *
+     mapping(:value => "Bootstrap replicates of correlation estimates"; color=:names) *
+     AlgebraOfGraphics.density(),
+)
+```
+
+Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/Fisher_transformation), @fig-bxm03rhodensatanh, these estimates are highly skewed.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03"
+#| label: fig-bxm03rhodensatanh
+draw(
+    data(
+        @transform(
+            @subset(bxm03pars, :type == "ρ"), :z = atanh(clamp(:value, -0.9999, 0.9999))
+        )
+    ) *
+    mapping(:z => "Fisher's z transformation of correlation estimates"; color=:names) *
+    AlgebraOfGraphics.density(),
+)
+```
+
+Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for `time ^ 2` reduces the model too much.
+
+```{julia}
+bxm04 = let
+    form = @formula(resp ~ 1 + time + time^2 & Group + (1 + time | Subj))
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, bxdf; contrasts, progress)
+end
+```
+```{julia}
+MixedModels.likelihoodratiotest(bxm04, bxm03)
+```
+as does eliminating within-subject correlations between the random-effects for the `time^2` random effect and the other random effects.
+
+```{julia}
+bxm05 = let
+    form = @formula(
+        resp ~ 1 + time + time^2 & Group + (1 + time | Subj) + (0 + time^2 | Subj)
+    )
+    contrasts = Dict(:Subj => Grouping())
+    fit(MixedModel, form, bxdf; contrasts, progress)
+end
+```
+
+```{julia}
+MixedModels.likelihoodratiotest(bxm05, bxm03)
+```
+
+### Some consequences of changing the random-effects structure
+
+The three models `bxm03`, `bxm04`, and `bxm05` have the same fixed-effects structure.
+The random effects specification varies from the most complicated (`bxm03`), which produces a singular estimate of the covariance, to the simplest (`bxm04`) structure to an intermediate structure (`bxm05`).
+
+The likelihood ratio tests give evidence for preferring `bxm03`, the most complex of these models, but also one with a degenerate distribution of the random effects.
+
+If we assume that the purpose of the experiment is to compare the effects of the two treatments versus the `Control` group on the weight gain of the rats, then interest would focus on the fixed-effects parameters and, in particular, on those associated with the groups.
+The models give essentially the same predictions of weight versus time for a "typical" animal in each group, @fig-bxmodfitted.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Typical weight curves from models bxm03, bxm04, and bxm05 for each of the three treatment groups."
+#| label: fig-bxmodfitted
+let
+    times = Float32.((0:256) / 64)
+    times² = abs2.(times)
+    z257 = zeros(Float32, 257)
+    tmat = hcat(
+        ones(Float32, 257 * 3),
+        repeat(times, 3),
+        vcat(times², z257, z257),
+        vcat(z257, times², z257),
+        vcat(z257, z257, times²),
+    )
+    grp = repeat(["Control", "Thioracil", "Thyroxin"]; inner=257)
+    draw(
+        data(
+            append!(
+                append!(
+                    DataFrame(;
+                        times=tmat[:, 2],
+                        wt=tmat * Float32.(bxm03.beta),
+                        Group=grp,
+                        model="bxm03",
+                    ),
+                    DataFrame(;
+                        times=tmat[:, 2],
+                        wt=tmat * Float32.(bxm04.beta),
+                        Group=grp,
+                        model="bxm04",
+                    ),
+                ),
+                DataFrame(;
+                    times=tmat[:, 2],
+                    wt=tmat * Float32.(bxm05.beta),
+                    Group=grp,
+                    model="bxm05",
+                ),
+            ),
+        ) *
+        mapping(
+            :times => "Time in trial (wk)", :wt => "Weight (gm)"; color=:Group, col=:model
+        ) *
+        visual(Lines);
+        axis=(width=600, height=600),
+    )
+end
+```
+
+:::{.callout-note}
+Other points to make:
+
+    1. Standard errors are different, largest for `bxm05`, smallest for `bxm04`
+    2. Real interest should center on the differences in the quadratic coef - trt vs control 
+    3. Not sure how to code that up
+    4. More complex models require more iterations and more work per iteration
+    5. Probably go with `bxm03` in this case, even though it gives a degenerate dist'n of random effects.  The idea is that the random effects are absorbing a form of rat-to-rat variability.  The residual standard deviation does reflect this.
+:::
