@@ -516,18 +516,14 @@ end
 
 All three estimated standard deviations of the random effects are less than $\widehat{\sigma}$, with $\widehat{\sigma}_3$, the estimated standard deviation of the random effects for the `dept`, less than one-tenth the estimated residual standard deviation.
 
-It is not surprising that zero is within all of the prediction intervals on the random effects for this factor (@fig-iem01caterpillardept).
-
+It is not surprising that zero is within most of the prediction intervals on the random effects for this factor (@fig-iem01caterpillardept).
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
 caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
 ```
-
-In fact, zero is close to the middle of all these prediction intervals.
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$ 
-
 ```{julia}
 iem02 = let
     form = @formula(y ~ 1 + (1|s) + (1|d))
@@ -536,12 +532,11 @@ iem02 = let
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
-
 is highly significant.
 That is, we have very strong evidence that we should reject $H_0$ in favor of $H_a$.
 
 The seeming inconsistency of these conclusions is due to the large sample size ($n=73421$).
-When a model is fit to a very large sample even the most subtle of differences can be highly "statistically significant".
+When a model is fit to a large sample even the most subtle of differences can be highly "statistically significant".
 The researcher or data analyst must then decide if these terms have practical significance, beyond the apparent statistical significance.
 
 The large sample size also helps to assure that the parameters have good normal approximations.
