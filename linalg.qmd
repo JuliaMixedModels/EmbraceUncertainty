@@ -81,11 +81,11 @@ To add to the confusion, the `cholesky` function in the *LinearAlgebra* package 
 The factor $\mathbf{R}$ or $\mathbf{L}$ can be evaluated directly from the elements of $\boldsymbol\Sigma$.
 For example, the non-zeros in the first two rows of $\mathbf{L}$ are evaluated as
 $$
-\begin{align}
+\begin{aligned}
   \mathbf{L}_{1,1}&=\sqrt{\boldsymbol{\Sigma}_{1,1}}\\
   \mathbf{L}_{2,1}&=\boldsymbol{\Sigma}_{2,1}/\mathbf{L}_{1,1}\\
   \mathbf{L}_{2,2}&=\sqrt{\boldsymbol{\Sigma}_{2,2}-\mathbf{L}_{2,1}^2}
-\end{align}
+\end{aligned}
 $$ {#eq-lowerCholtworows}
 Evaluating the diagonal elements involves taking a square root.
 By convention we choose the positive square root for the Cholesky factor with the result that the diagonal elements of $\mathbf{L}$ are all positive.
@@ -103,11 +103,11 @@ $$ {#eq-triangularsystem}
 can be solved.
 In the case of a lower-triangular system the method is called *forward solution*, with the sequence of scalar equations
 $$
-\begin{align}
+\begin{aligned}
 x_1&=b_1/\mathbf{L}_{1,1}\\
 x_2&=\left(b_2-x_1\mathbf{L}_{2,1}\right)/\mathbf{L}_{2,2}\\
 x_3&=\left(b_3-x_1\mathbf{L}_{3,1}-x_2\mathbf{L}_{3,2}\right)/\mathbf{L}_{3,3}
-\end{align}
+\end{aligned}
 $$ {#eq-forwardsolve}
 and so on.
 
@@ -147,7 +147,7 @@ This is exactly what the `isposdef` methods in the *LinearAlgebra* package do.
 
 For the general multivariate normal distribution, $\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$, where $\boldsymbol{\Sigma}$ is positive definite with lower Cholesky factor $\mathbf{L}$, the probability density function is
 $$
-\begin{align}
+\begin{aligned}
 f(\mathbf{x};\boldsymbol{\mu},\boldsymbol{\Sigma})&=
 \frac{1}{\sqrt{(2\pi)^n\left|\boldsymbol{\Sigma}\right|}}
 \exp\left(\frac{-[\mathbf{x}-\boldsymbol{\mu}]'\boldsymbol{\Sigma}^{-1}[\mathbf{x}-\boldsymbol{\mu}]}{2}\right)\\
@@ -155,15 +155,15 @@ f(\mathbf{x};\boldsymbol{\mu},\boldsymbol{\Sigma})&=
 \exp\left(\frac{-[\mathbf{x}-\boldsymbol{\mu}]'{\mathbf{L}'}^{-1}\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}]}{2}\right)\\
 &=\frac{1}{\sqrt{(2\pi)^n}\left|\mathbf{L}\right|}
 \exp\left(\frac{-\left\|\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}]\right\|^2}{2}\right)\\
-\end{align}
+\end{aligned}
 $$ {#eq-mvndensity}
 and the standardizing transformation becomes
 $$ 
-\mathbf{z}=\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}] .
+\mathbf{z}=\mathbf{L}^{-1}[\mathbf{x}-\boldsymbol{\mu}] ,
 $$ {#eq-mvnstandardizing}
 which, in practice, means using forward solution on the lower-triangular system of equations
 $$
-\mathbf{Lz}=\mathbf{x}-\boldsymbol{\mu}
+\mathbf{Lz}=\mathbf{x}-\boldsymbol{\mu} .
 $$ {#eq-mvnstandardizingsol}
 
 Note that the standardizing transformation gives us a way to simulate values from a general $n$-dimensional multivariate Gaussian, $\mathcal{X}\sim\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$ as
@@ -185,7 +185,7 @@ $$
 $$ {#eq-mvexpectedlin}
 and
 $$
-\begin{align}
+\begin{aligned}
 \text{Var}\left(\mathcal{U}\right)
 &=𝔼\left[\left(\mathcal{U}-𝔼\left[\mathcal{U}\right]\right)\left(\mathcal{U}-𝔼\left[\mathcal{U}\right]\right)'\right]\\
 &=𝔼\left[\left(\mathbf{A}\mathcal{X}-\mathbf{A}\boldsymbol{\mu}\right)\left(\mathbf{A}\mathcal{X}-\mathbf{A}\boldsymbol{\mu}\right)'\right]\\
@@ -193,7 +193,7 @@ $$
 &=\mathbf{A}\,𝔼\left[\left(\mathcal{X}-\boldsymbol{\mu}\right)\left(\mathcal{X}-\boldsymbol{\mu}\right)'\right]\mathbf{A}'\\
 &=\mathbf{A}\text{Var}(\mathcal{X})\mathbf{A}'\\
 &=\mathbf{A}\boldsymbol{\Sigma}\mathbf{A}'
-\end{align}
+\end{aligned}
 $$ {#eq-mvvarlin}
 
 A linear function, $\mathcal{U}=\mathbf{A}\mathcal{X}$, of a multivariate Gaussian distribution, $\mathcal{X}\sim\mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma})$, is also Gaussian and these relationships imply that
@@ -207,13 +207,13 @@ For the special case of $\mathbf{A}$ being of dimension $1\times n$ (i.e. a *row
 
 The probability density function for the linear model, @eq-mvnlinmod, is
 $$
-\begin{align}
+\begin{aligned}
 f(\mathbf{y}; \boldsymbol{\beta}, \sigma^2)&=
 \frac{1}{\sqrt{2\pi\left|\sigma^2\mathbf{I}\right|}}
 \exp\left(\frac{-[\mathbf{y}-\mathbf{X}\boldsymbol{\beta}]'
 \left(\sigma^2\mathbf{I}\right)^{-1}[\mathbf{y}-\mathbf{X}\boldsymbol{\beta}]}{2}\right)\\
 &=\left(2\pi\sigma^2\right)^{-n/2}\exp\left(-\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2/\left(2\sigma^2\right)\right)
-\end{align}
+\end{aligned}
 $$ {#eq-linmoddensity}
 
 @eq-linmoddensity describes the density of the random variable, $\mathcal{Y}$, representing the observations, given the values of the parameters, $\boldsymbol{\beta}$ and $\sigma^2$.
@@ -226,21 +226,21 @@ The [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estima
 
 Because the logarithm is a [monotone increasing](https://en.wikipedia.org/wiki/Monotonic_function) function, the maximum likelihood estimates will also maximize the *log-likelihood*
 $$
-\begin{align}
+\begin{aligned}
 \ell(\boldsymbol{\beta},\sigma^2;\mathbf{y})
 &=\log L(\boldsymbol{\beta},\sigma^2;\mathbf{y})\\
 &=-\frac{n}{2}\log(2\pi\sigma^2)-\frac{\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2}{2\sigma^2}
-\end{align}
+\end{aligned}
 $$ {#eq-linmodloglike}
 Usually the log-likelihood is easier to optimize, either algebraically or numerically, than the likelihood itself.
 
 To avoid the negative signs and the factors of 2 in the denominator, we often convert the log-likelihood to the *deviance scale*, which is negative twice the log-likelihood,
 $$
-\begin{align}
+\begin{aligned}
 d(\boldsymbol{\beta},\sigma^2;\mathbf{y})
 &=-2\ell(\boldsymbol{\beta},\sigma^2; \mathbf{y})\\
 &=n\log(2\pi\sigma^2)+\frac{\left\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\right\|^2}{\sigma^2} .
-\end{align}
+\end{aligned}
 $$ {#eq-linmoddevscale}
 Because of the negative sign, the maximum likelihood estimates are those that *minimize* $d(\boldsymbol{\beta},\sigma^2;\mathbf{y})$.
 
@@ -293,7 +293,7 @@ for $\widehat{\boldsymbol{\beta}}$ using backward solution.
 
 An alternative approach is to write the residual sum of squares as a quadratic form
 $$
-\begin{align}
+\begin{aligned}
 r^2(\boldsymbol{\beta})&=\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|^2\\
 &=(\mathbf{y}-\mathbf{X}\boldsymbol{\beta})'(\mathbf{y}-\mathbf{X}\boldsymbol{\beta})\\
 &=(\mathbf{X}\boldsymbol{\beta}-\mathbf{y})'(\mathbf{X}\boldsymbol{\beta}-\mathbf{y})\\
@@ -330,7 +330,7 @@ r^2(\boldsymbol{\beta})&=\|\mathbf{y}-\mathbf{X}\boldsymbol{\beta}\|^2\\
 \end{bmatrix}\right\|^2\\
 &=\left\|\mathbf{R}_{XX}\boldsymbol{\beta}-\mathbf{r}_{Xy}\right\|^2
 + r_{yy}^2
-\end{align}
+\end{aligned}
 $$ {#eq-extendedqf}
 
 The first term, $\left\|\mathbf{R}_{XX}\boldsymbol{\beta}-\mathbf{r}_{Xy}\right\|^2$, is non-negative and can be made zero by solving @eq-betahatchol for $\widehat{\boldsymbol{\beta}}$.

@@ -77,8 +77,6 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 To access these data within `Julia` we must first attach this package, and others that we will use, to our session with
 
 ```{julia}
-const progress = false    # used in calls to fit to suppress progress bar
-
 using AlgebraOfGraphics   # high-level graphics
 using CairoMakie          # graphics back-end
 using CategoricalArrays   # factors and ordered factors
@@ -104,6 +102,10 @@ The `MixedModels` package includes several datasets that are used in examples an
 Individual datasets can be loaded with the `dataset` function.
 To allow for other packages to incorporate their own `dataset` function without causing name clashes, this function is not exported and must be called with the fully-qualified name `MixedModels.dataset`.
 (If this explanation sounds like gibberish to you, the bottom line is that you must use `MixedModels.dataset(:dyestuff)` and not just `dataset(:dyestuff)`.)
+
+:::{.callout-note}
+Add metadata to Arrow files for datasets
+:::
 
 ```{julia}
 dyestuff = MixedModels.dataset(:dyestuff)
@@ -188,11 +190,13 @@ let
     df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff)), :yield, :batch)
 
     mp = mapping(
-        :yield => "Yield of dyestuff [g]", :batch => "Batch of intermediate product"
+        :yield => "Yield of dyestuff [g]",
+        :batch => "Batch of intermediate product"
     )
     draw(
         (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
-        (data(sumry) * mp * visual(Lines)),
+        (data(sumry) * mp * visual(Lines));
+        figure=(; resolution = (800, 400)),
     )
 end
 ```
@@ -247,7 +251,8 @@ let
     mp = mapping(:yield => "Simulated yield", :batch => "Batch")
     draw(
         (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
-        (data(sumry) * mp * visual(Lines)),
+        (data(sumry) * mp * visual(Lines));
+        figure=(; resolution = (800, 400)),
     )
 end
 ```
@@ -271,7 +276,12 @@ We will explain the structure of the formula after we have considered an example
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
 ```{julia}
-dsm01 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff; progress)
+const progress = false    # suppress the progress bar in the fit
+dsm01 = fit(
+    MixedModel,
+    @formula(yield ~ 1 + (1|batch)),
+    dyestuff; progress
+)
 DisplayAs.Text(dsm01)
 ```
 
@@ -338,6 +348,7 @@ Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\
 
 ```{julia}
 dsm02 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff2; progress)
+DisplayAs.Text(dsm02)
 ```
 
 An estimate of $0$ for $\sigma_1$ does not mean that there is no variation between the groups.
@@ -508,8 +519,10 @@ The object returned by a call to `parametricbootstrap` has a somewhat complex in
 To examine the distribution of the parameter estimates we extract a table of all the estimated parameters and convert it to a `DataFrame`.
 
 ```{julia}
-bsrng = Random.seed!(4321234)     # random number generator for bootstrap
-dsm01samp = parametricbootstrap(bsrng, 10_000, dsm01; hide_progress=true)
+#| warning: false
+const hide_progress = true    # hide the progress bar when sampling
+bsrng = Random.seed!(4321234) # random number generator for bootstrap
+dsm01samp = parametricbootstrap(bsrng, 10_000, dsm01; hide_progress)
 dsm01pars = DataFrame(dsm01samp.allpars)
 first(dsm01pars, 7)
 ```
@@ -526,25 +539,19 @@ For example,
 ```
 
 We begin by examining density plots constructed using the [AlgebraOfGraphics](https://github.com/JuliaGraphics/AlgebraOfGraphics.jl) package.
-(In general we will not show the code used to generate plots as it tends to have considerable detail that may distract from the plot itself.
-The code is, of course, available on the Github repository for this book.)
+(In general we "fold" the code used to generate plots as it tends to have considerable detail that may distract from the plot itself.
+You can check the details by clicking on the "Code" button in the HTML version of the plot or in the quarto files on the [github repository](https://github.com/JuliaMixedModels/EmbraceUncertainty) for this book.)
 
 ```{julia}
+#| code-fold: true
 #| fig-cap: "Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01"
 #| label: fig-dsm01_bs_beta_density
-
-bssampdens(allpars, type::AbstractString="β") = bssampdens(DataFrame(allpars), type)
-
-function bssampdens(df::DataFrame, type::AbstractString="β")
-    selection = Dict("β" => (:names => "Names"), "σ" => (:group => "Group"))
-    return draw(
-        data(subset(df, :type => x -> x .== type)) *
-        mapping(:value => "Bootstrap samples of " * type; color=selection[type]) *
-        AlgebraOfGraphics.density(),
-    )
-end
-
-bssampdens(dsm01pars)
+draw(
+    data(@subset(dsm01pars, :type == "β")) *
+    mapping(:value => "Bootstrap samples of β"; color=(:names => "Names")) *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450)),
+)
 ```
 
 :::{callout-note}
@@ -565,9 +572,15 @@ The estimates are approximately normally distributed centered about the "true" p
 The situation is different for the estimates of the standard deviation parameters, $\sigma$ and $\sigma_1$, as shown in @fig-dsm01_bs_sigma_density.
 
 ```{julia}
+#| code-fold: true
 #| fig-cap: "Kernel density plot of bootstrap variance-component parameter estimates from model dsm01"
 #| label: fig-dsm01_bs_sigma_density
-bssampdens(dsm01pars, "σ")
+draw(
+    data(@subset(dsm01pars, :type == "σ")) *
+    mapping(:value => "Bootstrap samples of σ"; color=(:group => "Group")) *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450)),
+)
 ```
 
 The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).
@@ -587,12 +600,14 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 :::
 
 ```{julia}
+#| code-fold: true
 #| fig-cap: "Histogram of bootstrap variance-components as standard deviations from model dsm01"
 #| label: fig-dsm01_bs_sigma_hist
 draw(
-  data(@subset(dsm01pars, :type == "σ")) *
-  mapping(:value => "Bootstrap parameter estimates of σ", color = :group => "Group") *
-  AlgebraOfGraphics.histogram(; bins=80)
+    data(@subset(dsm01pars, :type == "σ")) *
+    mapping(:value => "Bootstrap parameter estimates of σ"; color=(:group => "Group")) *
+    AlgebraOfGraphics.histogram(; bins=80);
+    figure=(; resolution = (800, 450))
 )
 ```
 
@@ -600,10 +615,7 @@ Nearly 1000 of the 10,000 bootstrap fits are "singular" in that one (or more) of
 For this model the only way singularity can occur is for $\sigma_1$ to be zero.
 
 ```{julia}
-combine(
-  groupby(DataFrame(degenerate = issingular(dsm01samp)), :degenerate),
-  nrow => :n,
-)
+countmap(issingular(dsm01samp))
 ```
 
 The distribution of the estimator of $\sigma_1$ with this point mass at zero is not at all like a Gaussian or normal distribution.
@@ -613,12 +625,14 @@ Quoting an estimate and a standard error for the estimate is only meaningful if 
 In many cases standard errors are quoted for estimates of the variance components, $\sigma_1^2$ and $\sigma^2$, whose distribution (fig-dsm01_bs_sigmasqr_hist) in the bootstrap sample is even less like a normal or Gaussian distribution.
 
 ```{julia}
+#| code-fold: true
 #| fig-cap: "Histogram of bootstrap variance-components from model dsm01"
 #| label: fig-dsm01_bs_sigmasqr_hist
 draw(
   data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
   mapping(:value_abs2 => "Bootstrap sample of estimates of σ²", color = :group) * 
-  histogram(; bins=200)
+  histogram(; bins=200);
+  figure=(; resolution=(800, 450))
 )
 ```
 
@@ -651,8 +665,18 @@ The interval on the residual standard deviation, $\sigma$, is reasonable, given 
 
 The optional argument, `thin=1`, in a call to `fit` causes all the values of $\boldsymbol\theta$ and the corresponding value of objective from the iterative optimization to be stored in the `optsum` property.
 
+:::{.callout-note}
+Fix the recording of the fitlog so that the initial value is not recorded twice
+:::
+
 ```{julia}
-dsm01trace = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff; thin=1, progress)
+dsm01trace = fit(
+    MixedModel,
+    @formula(yield ~ 1 + (1|batch)),
+    dyestuff;
+    thin=1,
+    progress,
+)
 DataFrame(dsm01trace.optsum.fitlog)
 ```
 
@@ -710,9 +734,10 @@ In the case of a linear mixed model, this is the conditional standard deviation,
 A plot of these prediction intervals is sometimes called a *caterpillar plot* because it can look like a fuzzy caterpillar when there are many levels of the grouping factor.
 
 ```{julia}
+#| code-fold: true
 #| fig-cap: "Caterpillar plot of prediction intervals for dsm01 random effects"
 #| label: fig-caterpillar_dsm01
-caterpillar(dsm01)
+caterpillar!(Figure(resolution=(800, 250)), ranefinfo(dsm01, :batch))
 ```
 
 The `caterpillar` function returns a plot with linear spacing of the
@@ -720,9 +745,10 @@ levels on the y axis.
 An alternative
 
 ```{julia}
+#| code-fold: true
 #| fig-cap: "Quantile caterpillar plot of prediction intervals for dsm01 random effects"
 #| label: fig-qqcaterpillar_dsm01
-qqcaterpillar(dsm01)
+qqcaterpillar!(Figure(resolution=(800, 250)), ranefinfo(dsm01, :batch))
 ```
 
 returns a plot where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.

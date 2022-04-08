@@ -4,12 +4,14 @@ Attach the packages to be used in this chapter
 ```{julia}
 #| code-fold: true
 const progress = false
+const hide_progress = true
 
 using AlgebraOfGraphics
 using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
+using DisplayAs
 using MKL
 using MixedModels
 using MixedModelsMakie
@@ -128,10 +130,11 @@ A model incorporating random effects for both the `plate` and the `sample` is st
 
 ```{julia}
 pnm01 = let
-    contrasts = contrasts=Dict(:plate => Grouping(), :sample => Grouping())
+    contrasts = Dict(:plate => Grouping(), :sample => Grouping())
     form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
     fit(MixedModel, form, penicillin; contrasts, progress)
 end
+DisplayAs.Text(pnm01)
 ```
 
 This model display indicates that the sample-to-sample variability has the greatest contribution, then plate-to-plate variability and finally the "residual" variability that cannot be attributed to either the sample or the plate.
@@ -141,14 +144,14 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for plate in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01platepred
-caterpillar!(Figure(; resolution=(1000, 600)), ranefinfo(pnm01, :plate))
+caterpillar!(Figure(; resolution=(800, 480)), ranefinfo(pnm01, :plate))
 ```
 
 ```{julia}
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for sample in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01samplepred
-caterpillar!(Figure(; resolution=(1000, 200)), ranefinfo(pnm01, :sample))
+caterpillar!(Figure(; resolution=(800, 160)), ranefinfo(pnm01, :sample))
 ```
 
 The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` has much less variability than does the conditional distribution of the random effects for `sample`.
@@ -195,7 +198,8 @@ A parametric bootstrap sample of the parameter estimates
 ```{julia}
 #| code-fold: true
 bsrng = Random.seed!(9876789)
-pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress=true);
+pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress)
+pnm01pars = DataFrame(pnm01samp.allpars);
 ```
 
 can be used to create shortest 95% coverage intervals for the parameters in the model.
@@ -210,20 +214,12 @@ As for model `dsm01` the bootstrap parameter estimate of the fixed-effects param
 #| code-fold: true
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
-
-bssampdens(allpars, type::AbstractString="β") = bssampdens(DataFrame(allpars), type)
-
-function bssampdens(df::DataFrame, type::AbstractString="β")
-    selection = Dict("β" => (:names => "Names"), "σ" => (:group => "Group"))
-    return draw(
-        data(subset(df, :type => x -> x .== type)) *
-        mapping(:value => "Bootstrap samples of " * type; color=selection[type]) *
-        AlgebraOfGraphics.density(),
-    )
-end
-
-allpars = pnm01samp.allpars   # this will be used twice
-bssampdens(allpars)
+draw(
+    data(@subset(pnm01pars, :type == "β")) *
+    mapping(:value => "Bootstrap samples of β"; color=(:names => "Names")) *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450)),
+)
 ```
 
 and the shortest coverage interval on this parameter is close to the Wald interval
@@ -239,7 +235,12 @@ The densities of the variance-components, on the scale of the standard deviation
 #| fig-cap: "Parametric bootstrap estimates of variance components in model pnm01"
 #| label: fig-pnm01bssigma
 #| code-fold: true
-bssampdens(allpars, "σ")
+draw(
+    data(@subset(pnm01pars, :type == "σ")) *
+    mapping(:value => "Bootstrap samples of σ"; color=(:group => "Group")) *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450)),
+)
 ```
 
 ## A model with nested random effects {#sec-NestedRE}
@@ -362,7 +363,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| code-fold: true
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
-caterpillar(psm01, :batch)
+caterpillar!(Figure(resolution=(800, 300)), ranefinfo(psm01, :batch))
 ```
 
 confirm this impression in that all the prediction intervals for the random effects for contain zero.
@@ -370,15 +371,20 @@ confirm this impression in that all the prediction intervals for the random effe
 Furthermore, kernel density estimates from a parametric bootstrap sample of the estimated standard deviations of the random effects and residuals
 
 ```{julia}
-psm01samp = parametricbootstrap(Random.seed!(4567654), 10_000, psm01; hide_progress=true)
-psm01pars = psm01samp.allpars;
+psm01samp = parametricbootstrap(Random.seed!(4567654), 10_000, psm01; hide_progress)
+psm01pars = DataFrame(psm01samp.allpars);
 ```
 
 ```{julia}
 #| fig-cap: "Kernel density plots of bootstrap estimates of σ for model psm01"
 #| label: fig-psm01bssampdens
 #| code-fold: true
-bssampdens(psm01pars, "σ")
+draw(
+    data(@subset(psm01pars, :type == "σ")) *
+    mapping(:value => "Bootstrap samples of σ"; color=(:group => "Group")) *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450)),
+)
 ```
 
 Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only, we perform a statistical test of this hypothesis.
@@ -487,7 +493,12 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| code-fold: true
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
-draw(data(DataFrame(response = 1:5, count = counts(insteval.y))) * mapping(:response, :count) * visual(BarPlot))
+draw(
+    data(DataFrame(response = 1:5, count = counts(insteval.y))) *
+    mapping(:response => "Rating", :count => "Count") * 
+    visual(BarPlot);
+    figure = (; resolution=(800, 450)),
+)
 ```
 
 it is sufficiently diffuse to warrant treating it as if it were a continuous response.
@@ -511,7 +522,7 @@ It is not surprising that zero is within all of the prediction intervals on the 
 #| code-fold: true
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
-caterpillar(iem01, :dept)
+caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
 ```
 
 In fact, zero is close to the middle of all these prediction intervals.
@@ -552,16 +563,12 @@ There are $(4116\times 4117)/2$ elements on and below the diagonal, each of whic
 ### "Best-liked"
 
 A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random effects, @fig-iem01qqcaterpillard,
-:::{.callout-note}
-This plot should be a qqcaterpillar, which works interactively but fails in quarto preview
-:::
 
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
-#| lable: fig-iem01qqcaterpillard
-#| eval: false
-qqcaterpillar(iem01, :d)
+#| label: fig-iem01qqcaterpillard
+qqcaterpillar!(Figure(; resolution=(800, 650)), ranefinfo(iem01, :d))
 ```
 
 shows the differences in precision due to different numbers of observations for different instructors.
@@ -573,7 +580,8 @@ shows the differences in precision due to different numbers of observations for 
 draw(
     data(combine(groupby(insteval, :d), nrow => :n)) *
     mapping(:n => "Number of observations") *
-    AlgebraOfGraphics.histogram(; bins=410)
+    AlgebraOfGraphics.histogram(; bins=410);
+    figure = (; resolution=(800, 600))
 )
 ```
 

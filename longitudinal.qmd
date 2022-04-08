@@ -103,7 +103,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| code-fold: true
 #| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01"
 #| label: fig-egm01caterpillar
-caterpillar(egm01)
+caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
 ```
 
 ### Centering the time values
@@ -146,7 +146,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02"
 #| label: fig-egm02caterpillar
 #| code-fold: true
-caterpillar(egm02)
+caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
 ```
 
 A third option is to center the `time` covariate at the mean of the original `time` values.
@@ -186,7 +186,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 #| code-fold: true
 #| fig-cap: "Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
 #| label: fig-egm02shrinkage
-shrinkageplot!(Figure(; resolution=(500, 500)), egm02)
+shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
 ```
 
 @fig-egm02shrinkage reinforces some of the conclusions from @fig-egm02caterpillar.
@@ -209,7 +209,7 @@ For balanced data like `egdf` we usually center the `time` axis about the mean, 
 ```{julia}
 egm04 = let
     form = @formula(resp ~ 1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj))
-    dat = transform(egdf, :time => (x -> x .- 8.75) => :ctime)
+    dat = @transform(egdf, :ctime = :time - 8.75)
     contrasts = Dict(:Subj => Grouping())
     fit(MixedModel, form, dat; contrasts, progress)
 end
@@ -225,7 +225,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 #| code-fold: true
 #| fig-cap: "Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
 #| label: fig-egm04shrinkage
-shrinkageplot!(Figure(; resolution=(500, 500)), egm04)
+shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
 ```
 
 Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.
@@ -386,6 +386,7 @@ In model `bxm02` this coefficient is labelled `time & Group: Control`.
 In model `bxm01` the coefficient labelled `time & Group: Thioracil` is the change in the estimated slope at time zero between the `Thioracil` group and the `Control` group.
 In model `bxm02` the coefficient with this label is the estimated slope at time zero in the `Thioracil` group.
 :::
+
 :::{.callout-note}
 Is there a way to write the formula for `bxm02` to avoid this?
 :::
@@ -426,7 +427,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 #| code-fold: true
 #| fig-cap: "Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
 #| label: fig-bxm03shrinkage
-shrinkageplot!(Figure(; resolution=(500, 500)), bxm03)
+shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
 ```
 
 shows that the random effects are considerably shrunk towards the origin, relative to the "unconstrained" values from within-subject fits, but none of the panels shows them collapsing to a line.
@@ -492,6 +493,7 @@ We see that the distribution of the random effects in model `bxm03` is degenerat
 Coverage intervals from a parametric bootstrap sample for this model
 
 ```{julia}
+#| code-fold: true
 bxm03samp = parametricbootstrap(Xoshiro(8642468), 10_000, bxm03; hide_progress=true)
 bxm03pars = DataFrame(bxm03samp.allpars)
 DataFrame(shortestcovint(bxm03samp))
@@ -507,8 +509,10 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 #| label: fig-bxm03rhodens
 draw(
      data(@subset(bxm03pars, :type == "ρ")) *
-     mapping(:value => "Bootstrap replicates of correlation estimates"; color=:names) *
-     AlgebraOfGraphics.density(),
+     mapping(
+         :value => "Bootstrap replicates of correlation estimates";
+         color=(:names => "Variables"),
+    ) * AlgebraOfGraphics.density();
 )
 ```
 
@@ -518,15 +522,19 @@ Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/F
 #| code-fold: true
 #| fig-cap: "Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03"
 #| label: fig-bxm03rhodensatanh
-draw(
-    data(
-        @transform(
-            @subset(bxm03pars, :type == "ρ"), :z = atanh(clamp(:value, -0.9999, 0.9999))
-        )
-    ) *
-    mapping(:z => "Fisher's z transformation of correlation estimates"; color=:names) *
-    AlgebraOfGraphics.density(),
-)
+let
+    dat = @transform(
+        @subset(bxm03pars, :type == "ρ"), :z = atanh(clamp(:value, -0.99999, 0.99999))
+    )
+    mp = mapping(
+        :z => "Fisher's z transformation of correlation estimates";
+        color=(:names => "Variables"),
+    )
+    draw(
+        data(dat) * mp * AlgebraOfGraphics.density();
+        figure=(; resolution = (800, 450)),
+    )
+end
 ```
 
 Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for `time ^ 2` reduces the model too much.
@@ -612,7 +620,7 @@ let
             :times => "Time in trial (wk)", :wt => "Weight (gm)"; color=:Group, col=:model
         ) *
         visual(Lines);
-        axis=(width=600, height=600),
+        axis=(width=350, height=350),
     )
 end
 ```
