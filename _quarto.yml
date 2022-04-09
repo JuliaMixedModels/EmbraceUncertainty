@@ -12,6 +12,7 @@ book:
     - multiple.qmd
     - longitudinal.qmd
     - linalg.qmd
+    - glmmbinomial.qmd
     - references.qmd
 
 bibliography: references.bib
