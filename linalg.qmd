@@ -1,7 +1,8 @@
 # Linear Algebra for Linear Models {#sec.LinAlg}
 
+Attach the packages to be used in this appendix
 ```{julia}
-#| code-fold: false
+#| code-fold: true
 using DataFrames, LinearAlgebra, MKL, MixedModels
 ```
 

@@ -21,22 +21,24 @@ using StatsBase
 
 In this chapter we consider mixed-effects models for data sets in which the response is *binary*, representing  yes/no or true/false or correct/incorrect responses.
 
-Because the response can only take on one of two values we adapt our
+Because the response must be one of only two possible values we adapt our
 models to predict the probability of the positive response.
-We retain the concept of the linear predictor, $\bf X\bf\beta+\bf Z\bf b$, depending on the fixed-effects parameters, $\bf\beta$, and the random effects, $\bf b$, with the corresponding model matrices, $\bf X$ and $\bf Z$, determining the conditional mean, $\bf\mu$, of the response, given the random effects, but the relationship is more general than that for the linear mixed model.
-The linear predictor, which we shall write as $\bf\eta$, determines $\bf\mu$ according to a *link function*, $g$.
-For historical reasons it is the function taking an element of $\bf\mu$ to the corresponding element of $\bf\eta$ that is called the link.
-The transformation in the opposite direction, from $\bf\eta$ to $\bf\mu$, is called the *inverse link*.
+As for linear models and linear mixed-effects models, the mean response, $\boldsymbol{\mu}$, is determined by a *linear predictor*,
+$$
+\boldsymbol{\eta}=\mathbf{X}\boldsymbol{\beta}+\mathbf(Z}\mathbf(b}
+$$ {#eq-linearpred}
+depending on the fixed-effects parameters, $\boldsymbol{\beta}$, the random effects, $\mathbf(b}$, and the model matrices, $\mathbf{X}$ and $\mathbf(Z}$.
+For a linear model the mean response, $\boldsymbol{\mu}$, is the linear predictor, $\boldsymbol{\eta}$.
+But for a generalized linear model $\boldsymbol{\eta}$ determines $\boldsymbol{\mu}$ according to a *link function*, $g$.
+For historical reasons it is the function taking an element of $\boldsymbol{\mu}$ to the corresponding element of $\boldsymbol{\eta}$ that is called the link.
+The transformation in the opposite direction, from $\boldsymbol{\eta}$ to $\boldsymbol{\mu}$, is called the *inverse link*.
 
-As described in earlier chapters, models based on a Gaussian distribution for the response vector with its mean determined by the linear predictor are called linear models.
-Models incorporating coefficients in a linear predictor but allowing for more general forms of the distribution of the response are called *generalized linear models*.
-When the linear predictor incorporates random effects in addition to the fixed-effects parameters we call them *generalized linear mixed models* (GLMMs) and fit such models with the function.
 As in previous chapters, we will begin with an example to help illustrate these ideas.
 
 ## Artificial contraception use in regions of Bangladesh {#sec-contraception}
 
 One of the test data sets from the Center for Multilevel Modelling, University of Bristol is derived from the 1989 Bangladesh Fertility Survey, [@huq:cleland:1990].
-The data are a subsample of responses from 1934 women grouped in 60 districts and are available as the data set in the `MixedModels` package.
+The data are a subsample of 1934 women selected from 60 of the 64 political districts or *zila*, available as the `contra` data set in the `MixedModels` package.
 ```{julia}
 contra = MixedModels.dataset(:contra)
 ```
@@ -48,7 +50,7 @@ describe(contra)
 The response of interest is `use` --- whether the woman chooses to use artificial contraception.
 The covariates include the district in which the woman resides, the number of live children she currently has, her age and whether she is in a rural or an urban setting.
 
-Note that the variable is centered about a particular age so some values are negative.
+Note that the `age` variable is centered about a particular age so some values are negative.
 Regretably, the information on what the centering age was does not seem to be available.
 
 ### Plotting the binary response {#sec-plottingbinary}
@@ -63,21 +65,17 @@ as in @fig-contradata
 #| fig-cap: "Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey"
 #| label: fig-contradata
 draw(
-    data(
-      @transform(
-        contra,
-        :numuse = Int(:use == "Y"),
-        :urb = ifelse(:urban == "Y", "Urban", "Rural")
-      )
-    ) *
-    mapping(
-      :age => "Centered age (yr)",
-      :numuse => "Frequency of contraception use";
-      col = :urb,
-      color = :livch
-    ) *
-    smooth();
-    figure=(; resolution=(800, 450)),
+  data(@transform(
+      contra,
+      :numuse = Int(:use == "Y"),
+      :urb = ifelse(:urban == "Y", "Urban", "Rural")
+      )) *
+  mapping(
+    :age => "Centered age (yr)",
+    :numuse => "Frequency of contraception use";
+    col = :urb,
+    color = :livch) * smooth();
+  figure=(; resolution=(800, 450)),
 )
 ```
 to show the trend in the response with respect to the covariate.
@@ -94,7 +92,7 @@ The lesson here is similar to what we have seen in other examples; careful plott
 
 ### Initial GLMM fit to the contraception data {#sec-contraglmm}
 
-As for a linear mixed-model, the first three arguments in a call to `fit` a generalized linear mixed models are `MixedModel, the model formula, and the name of the data frame.
+As for a linear mixed-model, the first three arguments in a call to `fit` a generalized linear mixed models are `MixedModel`, the model formula, and the name of the data frame.
 The fourth argument describes the type of conditional distribution of the response given the random effects.
 ```{julia}
 com01 = let
@@ -121,7 +119,7 @@ To test whether a particular term is useful we omit it from the model, refit and
 We will examine the terms in the model first and discuss the interpretation of the coefficients in .
 
 Recall from @sec-covariates that the default set of contrasts for a factor such as `livch` is offsets relative to the reference level, in this case women who do not have any live children.
-Although the coefficients labeled `livch: 1`, `livch: 2`, and `livch: 3+` are all large relative to their standard errors, they are quite close to each other.
+Although the coefficients labeled `livch: 1`, `livch: 2`, and `livch: 3+` are all large relative to their standard errors, they are reasonably close to each other.
 This confirms our earlier impression that the main distinction is between women with children and those without and, for those who do have children, the number of children is not an important distinction.
 
 After incorporating a new variable `ch` --- an indicator of whether the woman
@@ -191,7 +189,7 @@ confirms the usefulness of this term.
 Continuing with the model-building we turn our attention to the random effects specification to see whether urban/rural differences vary significantly between districts and whether the distinction between childless women and women with children varies between districts.
 ```{julia}
 com04 = let
-  form = @formula(use ~ 1 + ch + urban + age + age^2 + (1|dist))
+  form = @formula(use ~ 1 + urban + ch * age + age^2 + (1|dist))
   contrasts = Dict(:urban => HelmertCoding(), :dist => Grouping())
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
@@ -199,7 +197,7 @@ end
 We fit a succession of models, described in the exercises for this chapter, before settling on model `com05`,
 ```{julia}
 com05 = let
-  form = @formula(use ~ 1 + ch + urban + age + age^2 + (1|dist&urban))
+  form = @formula(use ~ 1 + urban + ch * age + age^2 + (1|dist&urban))
   contrasts = Dict(:urban => HelmertCoding(), :dist => Grouping())
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
@@ -239,19 +237,19 @@ $\mu$ that has an unrestricted range. In the case of the Bernoulli
 distribution with the canonical link function we equate the linear
 predictor to the *log odds* or *logit* of the positive response. That is
 $$
-  \eta = \logit(\mu) = \log\left(\frac{\mu}{1-\mu}\right) .
+  \eta = \log\left(\frac{\mu}{1-\mu}\right) .
 $$ {#eq-logodds}
 
 To understand why this is called the "log odds" recall that $\mu$
 corresponds to a probability in $[0,1]$. The corresponding odds ratio,
 $\frac{\mu}{1-\mu}$, is in $[0,\infty)$ and the logarithm of the odds
-ratio, $\logit(\mu)$, is in $(-\infty, \infty)$.
+ratio, $\mathrm{logit}(\mu)$, is in $(-\infty, \infty)$.
 
 The inverse of the logit link function, 
 $$
-  \mu = \frac{1}{1+\exp(-\eta)}
+  \mu = \frac{1}{1+\exp(-\eta)} ,
 $$ {#eq-logitinv}
-shown in @fig-logitinv
+is called the *logistic* function and is shown in @fig-logitinv.
 ```{julia}
 #| code-fold: true
 #| fig-cap: "The logistic function, which is the inverse to the logit link function."
