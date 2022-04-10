@@ -4,8 +4,14 @@ project:
 book:
   title: "Embrace Uncertainty"
   subtitle: "Mixed-effects models with Julia"
-  author: "Phillip Alday, Reinhold Kliegl, and Douglas Bates"
-  date: "2022-04-06"
+  author: 
+    - name: Phillip Alday
+      affiliation: Beacon Biosignals
+    - name: Reinhold Kliegl
+      affilitation: University of Potsdam
+    - name: Douglas Bates
+      affilitation: University of Wisconsin - Madison
+  date: "2022-04-12"
   chapters:
     - index.qmd
     - intro.qmd
