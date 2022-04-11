@@ -18,6 +18,7 @@ book:
     - multiple.qmd
     - longitudinal.qmd
     - linalg.qmd
+    - largescale.qmd
     - glmmbinomial.qmd
     - references.qmd
 

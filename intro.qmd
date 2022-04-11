@@ -82,7 +82,6 @@ using CairoMakie          # graphics back-end
 using CategoricalArrays   # factors and ordered factors
 using DataFrameMacros     # elegant DataFrame manipulation
 using DataFrames          # DataFrame implementation
-using DisplayAs           # control fine details of display
 using MKL                 # faster LAPACK on Intel processors
 using Markdown            # utilities for generating markdown text
 using MixedModels         # fit and examine mixed-effects models
@@ -275,6 +274,11 @@ We will explain the structure of the formula after we have considered an example
 
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
+:::{.callout-note}
+In this code block the model is "printed" using `println` after being fit.
+By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, a more compact presentation
+:::
+
 ```{julia}
 const progress = false    # suppress the progress bar in the fit
 dsm01 = fit(
@@ -282,7 +286,17 @@ dsm01 = fit(
     @formula(yield ~ 1 + (1|batch)),
     dyestuff; progress
 )
-DisplayAs.Text(dsm01)
+println(dsm01)
+```
+
+
+:::{.callout-note}
+In this code block the model is "printed" using `println` after being fit.
+By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, are shown more compactly.
+:::
+
+```{julia}
+dsm01
 ```
 
 The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) parameter estimates, assigns the results to the name `dsm01`, and displays a summary of the fitted model.
@@ -348,7 +362,7 @@ Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\
 
 ```{julia}
 dsm02 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff2; progress)
-DisplayAs.Text(dsm02)
+println(dsm02)
 ```
 
 An estimate of $0$ for $\sigma_1$ does not mean that there is no variation between the groups.

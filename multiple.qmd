@@ -11,7 +11,6 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
-using DisplayAs
 using MKL
 using MixedModels
 using MixedModelsMakie
@@ -134,7 +133,7 @@ pnm01 = let
     form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
     fit(MixedModel, form, penicillin; contrasts, progress)
 end
-DisplayAs.Text(pnm01)
+println(pnm01)
 ```
 
 This model display indicates that the sample-to-sample variability has the greatest contribution, then plate-to-plate variability and finally the "residual" variability that cannot be attributed to either the sample or the plate.

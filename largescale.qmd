@@ -1,0 +1,140 @@
+# Applications to large-scale studies {#sec-largescale}
+
+Load the packages to be used.
+```{julia}
+#| code-fold: true
+const progress = false   # used in calls to `fit(MixedModel,...) to suppress progress bars
+
+using AlgebraOfGraphics
+using Arrow
+using CairoMakie
+using CategoricalArrays
+using DataFrameMacros
+using DataFrames
+using LinearAlgebra
+using MKL
+using MixedModels
+using MixedModelsMakie
+using Random
+using StandardizedPredictors
+```
+
+As with many techniques in data science, the place where "the rubber meets the road", as they say in the automotive industry, is when working on large-scale studies, such as the English Lexicon Project [@Balota_2007].
+
+This is a multicenter study incorporating both a lexical decision task and a word recognition task.
+Different groups of subjects were used in the different tasks.
+
+Compared to our previous examples, these are large data sets.
+Data manipulation and model fitting in cases like these requires care.
+
+## Trial-level data from the LDT
+
+In the lexical decision task the study participant is shown a character string, under carefully controlled conditions, and responds according to whether they identify the string as a word or not.
+Two responses are recorded: whether the choice of word/non-word is correct and the time that elapsed between exposure to the string and registering a decision.
+
+Several covariates, some relating to the subject and some relating to the target, were recorded.
+Initially we consider only the trial-level data.
+
+```{julia}
+ldttrial = Arrow.Table("./data/ELP_ldt_trial.arrow")
+```
+```{julia}
+ldttrial = DataFrame(ldttrial)
+describe(ldttrial)
+```
+
+The two response variables are `acc` - the accuracy of the response - and `rt`, the response time in milliseconds.
+Generally the response times are analyzed for the correct identifications only.
+Furthermore, unrealistically large or small response times are eliminated.
+For this example we only use the responses between 300 and 2500 ms.
+
+```{julia}
+pruned = dropmissing!(@subset(ldttrial, coalesce(:acc, false), 300 ≤ :rt ≤ 2500))
+size(pruned)
+```
+```{julia}
+describe(pruned)
+```
+
+A density plot of the response times, @fig-elpldtrtdens, shows they are skewed to the right.
+```{julia}
+#| code-fold: true
+#| fig-cap: "Kernel density plot of the pruned response times (ms.) in the lexical decision task of the English Lexicon Project."
+#| label: fig-elpldtrtdens
+draw(
+    data(pruned) *
+    mapping(:rt => "Response time (ms.) for correct responses") *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450))
+)
+```
+In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.
+
+```{julia}
+@transform!(pruned, :speed = 1000 / :rt)
+describe(pruned)
+```
+
+The density of the response speed, in responses per second, is shown in @fig-elpldtspeeddens.
+```{julia}
+#| code-fold: true
+#| fig-cap: "Kernel density plot of the pruned response speed (s⁻¹) in the lexical desision task of the English Lexicon Project."
+#| label: fig-elpldtspeeddens
+draw(
+    data(pruned) *
+    mapping(:speed => "Response speed (s⁻¹) for correct responses") *
+    AlgebraOfGraphics.density();
+    figure=(; resolution = (800, 450))
+)
+```
+
+Finally, we fit a first model with simple, scalar, random effects for `subj` and `item`.
+```{julia}
+elm01 = let
+    contrasts = Dict(:subj => Grouping(), :item => Grouping())
+    form = @formula speed ~ 1 + (1|item) + (1|subj)
+    fit(MixedModel, form, pruned; contrasts, progress)
+end
+println(elm01)
+```
+
+This model takes only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.
+
+The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers.
+We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the `MixedModel` object followed by restoring the `optsum` object.
+
+```{julia}
+saveoptsum("./optsums/elm01.json", elm01);
+```
+```{julia}
+elm01a = restoreoptsum!(
+    let
+        contrasts = Dict(:subj => Grouping(), :item => Grouping())
+        form = @formula speed ~ 1 + (1|item) + (1|subj)
+        MixedModel(form, pruned; contrasts)
+    end,
+    "./optsums/elm01.json")
+```
+
+Model `elm01` is a preliminary model in that it doesn't account for important covariates such as whether an item is a word or a non-word, or the length of the word, or demographic characteristics of the subject.
+
+It is easy to 
+The covariates associated with the item are available as
+```{julia}
+elpldtitem = DataFrame(Arrow.Table("./data/ELP_ldt_item.arrow"))
+describe(elpldtitem)
+```
+and those associated with the subject are
+```{julia}
+elpldtsubj = DataFrame(Arrow.Table("./data/ELP_ldt_subj.arrow"))
+describe(elpldtsubj)
+```
+
+For the simple model `elm01` the estimated standard deviation of the random effects for subject is greater than that of the random effects for item, a common occurrence.
+A caterpillar plot, @fig-elm01caterpillarsubj,
+```{julia}
+#| code-fold: true
+#| fig-cap: "Conditional means and 95% prediction intervals of the random effects for subject in the simple model elm01 fit to the English Lexicon Project data.  The response in this model is speed."
+#| label: fig-elm01caterpillarsubj
+qqcaterpillar!(Figure(resolution=(800, 650)), ranefinfo(elm01, :subj))
+```

@@ -11,7 +11,6 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
-using DisplayAs
 using LinearAlgebra
 using MKL
 using MixedModels
@@ -79,7 +78,7 @@ Some subjects, e.g. `S03` and `S04`, with shorter initial bone lengths have low 
 Others, e.g. `S10` and `S20`, have low initial bone lengths and a high growth rate.
 Similarly, `S06` and `S11` have longer initial bone lengths and a low growth rate while `S07` and `S11` have longer initial bone lengths and a high growth rate.
 
-## A model with random effects for slope and intercept
+## Random effects for slope and intercept
 
 Although it seems that there isn't a strong correlation between initial bone length and growth rate in these data, a model with an overall linear trend and possibly correlated random effects for intercept and slope by subject estimates a strong negative correlation (-0.97) between these random effects.
 
@@ -89,7 +88,7 @@ egm01 = let
     contrasts = Dict(:Subj => Grouping())
     fit(MixedModel, form, egdf; contrasts, progress)
 end
-DisplayAs.Text(egm01)
+println(egm01)
 ```
 
 The reason for this seemingly unlikely result is that the `(Intercept)` term in the fixed effects and the random effects represents the bone length at age 0, which is not of interest here.
@@ -134,7 +133,7 @@ egm02 = let
     contrasts = Dict(:time => Center(8), :Subj => Grouping())
     fit(MixedModel, form, egdf; contrasts, progress)
 end
-DisplayAs.Text(egm02)
+println(egm02)
 ```
 
 Comparing the parameter estimates from models `egm01` and `egm02`, we find that the only differences are in the estimates for the `(Intercept)` terms in the fixed-effects parameters and the variance component parameters and in the correlation of the random effects.
@@ -157,7 +156,7 @@ egm03 = let
     contrasts = Dict(:Subj => Grouping(), :time => Center())
     fit(MixedModel, form, egdf; contrasts, progress)
 end
-DisplayAs.Text(egm03)
+println(egm03)
 ```
 
 Because the default for the `Center` contrast is to center about the mean, this `contrasts` argument can be written
@@ -213,7 +212,7 @@ egm04 = let
     contrasts = Dict(:Subj => Grouping())
     fit(MixedModel, form, dat; contrasts, progress)
 end
-DisplayAs.Text(egm04)
+println(egm04)
 ```
 
 We see that the estimate for the population quadratic coefficient, `jl last(egm04.beta)`, is small, relative to its standard error, `jl last(egm04.stderror)`, indicating that it is not significantly different from zero.
@@ -362,7 +361,7 @@ bxm01 = let
     contrasts = Dict(:Subj => Grouping())
     fit(MixedModel, form, bxdf; contrasts, progress)
 end
-DisplayAs.Text(bxm01)
+println(bxm01)
 ```
 but we expect that a model without the main effect for `Group`,
 ```{julia}
@@ -371,7 +370,7 @@ bxm02 = let
     contrasts = Dict(:Subj => Grouping())
     fit(MixedModel, form, bxdf; contrasts, progress)
 end
-DisplayAs.Text(bxm02)
+println(bxm02)
 ```
 will be adequate, as confirmed by
 ```{julia}
@@ -403,7 +402,7 @@ bxm03 = let
     contrasts = Dict(:Subj => Grouping())
     fit(MixedModel, form, bxdf; contrasts, progress)
 end
-DisplayAs.Text(bxm03)
+println(bxm03)
 ```
 
 ```{julia}
