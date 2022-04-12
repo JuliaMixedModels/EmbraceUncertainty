@@ -11,7 +11,7 @@ book:
       affilitation: University of Potsdam
     - name: Douglas Bates
       affilitation: University of Wisconsin - Madison
-  date: "2022-04-12"
+  date: today
   chapters:
     - index.qmd
     - intro.qmd

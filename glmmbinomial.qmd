@@ -24,9 +24,9 @@ Because the response must be one of only two possible values we adapt our
 models to predict the probability of the positive response.
 As for linear models and linear mixed-effects models, the mean response, $\boldsymbol{\mu}$, is determined by a *linear predictor*,
 $$
-\boldsymbol{\eta}=\mathbf{X}\boldsymbol{\beta}+\mathbf(Z}\mathbf(b}
+\boldsymbol{\eta}=\mathbf{X}\boldsymbol{\beta}+\mathbf{Z}\mathbf{b}
 $$ {#eq-linearpred}
-depending on the fixed-effects parameters, $\boldsymbol{\beta}$, the random effects, $\mathbf(b}$, and the model matrices, $\mathbf{X}$ and $\mathbf(Z}$.
+depending on the fixed-effects parameters, $\boldsymbol{\beta}$, the random effects, $\mathbf{b}$, and the model matrices, $\mathbf{X}$ and $\mathbf{Z}$.
 For a linear model the mean response, $\boldsymbol{\mu}$, is the linear predictor, $\boldsymbol{\eta}$.
 But for a generalized linear model $\boldsymbol{\eta}$ determines $\boldsymbol{\mu}$ according to a *link function*, $g$.
 For historical reasons it is the function taking an element of $\boldsymbol{\mu}$ to the corresponding element of $\boldsymbol{\eta}$ that is called the link.
