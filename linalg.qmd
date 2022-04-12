@@ -1,8 +1,13 @@
 # Linear Algebra for Linear Models {#sec.LinAlg}
 
 Attach the packages to be used in this appendix
+
 ```{julia}
 #| code-fold: true
+#| output: false
+using Pkg
+Pkg.activate(@__DIR__)
+
 using DataFrames, LinearAlgebra, MKL, MixedModels
 ```
 
@@ -351,48 +356,64 @@ However, for the linear mixed model, a similar calculation must be done for ever
 ## Numerical example
 
 Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject `S372` in the `sleepstudy` dataset.
+
 ```{julia}
 S372 = last(groupby(DataFrame(MixedModels.dataset(:sleepstudy)), :subj))
 ```
+
 The model matrix and the response vector can be constructed as
+
 ```{julia}
 X = hcat(ones(nrow(S372)), S372.days)
 ```
+
 and
+
 ```{julia}
 y = S372.reaction
 show(y)
 ```
+
 from which we obtain the Cholesky factor
+
 ```{julia}
 chfac = cholesky!(X'X)
 ```
+
 (Recall that the upper triangular Cholesky factor is the `U` property of the `Cholesky` type.)
 
 The `\` operator with a `Cholesky` factor on the left performs both the forward and backward solutions to obtain the least squares estimates
+
 ```{julia}
 β̂ = chfac \ (X'y)
 ```
 
 Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for $\mathbf{r}_{Xy}$
+
 ```{julia}
 rXy = ldiv!(chfac.L, X'y)
 ```
+
 then solving in-place to obtain $\widehat{\boldsymbol{\beta}}$
+
 ```{julia}
 ldiv!(chfac.U, rXy)
 ```
 
 The residual vector, $\mathbf{y}-\mathbf{X}\widehat{\boldsymbol{\beta}}$, is
+
 ```{julia}
 r = y - X * β̂
 ```
+
 with geometric length or "norm",
+
 ```{julia}
 norm(r)
 ```
 
 For the extended Cholesky factor, create the extended matrix of sums of squares and cross products
+
 ```{julia}
 crprod = let x = S372.days
     Symmetric(
@@ -404,23 +425,29 @@ crprod = let x = S372.days
     )
 end
 ```
+
 The call to `Symmetric` with the second argument the symbol `:U` indicates that the matrix should be treated as symmetric but only the upper triangle is given.
 
 The Cholesky factor of the `crprod` reproduces $\mathbf{R}_{XX}$, $\mathbf{r}_{Xy}$, and the norm of the residual, $r_{yy}$.
+
 ```{julia}
 extchfac = cholesky(crprod)
 ```
+
 and information from which the parameter estimates can be evaluated.
+
 ```{julia}
 β̂ ≈ ldiv!(
   UpperTriangular(view(extchfac.U, 1:2, 1:2)),
   copy(view(extchfac.U, 1:2, 3)),
 )
 ```
+
 The operator `≈` is a check of approximate equality of floating point numbers or arrays.
 Exact equality of floating point results from "equivalent" calculations cannot be relied upon.
 
 Similarly we check that the value of $r_{y,y}$ is approximately equal to the norm of the residual vector.
+
 ```{julia}
 norm(r) ≈ extchfac.U[3,3]
 ```
@@ -442,7 +469,7 @@ Just as the Cholesky factor can be used on the left of the `\` operator, so can 
 
 ```{julia}
 b3 = qrfac \ y
-``` 
+```
 
 The matrix $\mathbf{R}$ is returned as a square matrix with the same number of columns as $\mathbf{X}$.
 That is, if $\mathbf{X}$ is of size $n\times p$ where $n>p$, as in the example, then $\mathbf{R}$ is $p\times p$, as shown above.
@@ -475,6 +502,7 @@ $$
 
 Unlike the $\mathbf{Q}$ in the QR decomposition, the orthogonal matrices $\mathbf{U}$ and $\mathbf{V}$ are explicitly evaluated.
 Because of this, the default for the `svd` function is to produce a compact form where $\mathbf{U}$ is $n\times p$ and only the diagonal of $\mathbf{S}$ is returned.
+
 ```{julia}
 Xsvd = svd(X)
 ```
@@ -809,3 +837,4 @@ because the REML criterion, $d_R(\boldsymbol{\theta},\sigma|\mathbf{y})$, define
 However, it is customary (and not unreasonable) to use
 $\widehat{\boldsymbol{\beta}}_R=\widehat{\boldsymbol{\beta}}_{\widehat{\boldsymbol{\theta}}_R}$ as
 the REML estimate of $\boldsymbol{\beta}$.
+

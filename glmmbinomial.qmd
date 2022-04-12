@@ -1,8 +1,13 @@
 # Generalized Linear Mixed Models for Binary Responses {#sec-glmmbinomial}
 
 Attach the packages to be used in this chapter
+
 ```{julia}
 #| code-fold: true
+#| output: false
+using Pkg
+Pkg.activate(@__DIR__)
+
 const progress = false
 const hide_progress = true
 
@@ -38,9 +43,11 @@ As in previous chapters, we will begin with an example to help illustrate these 
 
 One of the test data sets from the Center for Multilevel Modelling, University of Bristol is derived from the 1989 Bangladesh Fertility Survey, [@huq:cleland:1990].
 The data are a subsample of 1934 women selected from 60 of the 64 political districts or *zila*, available as the `contra` data set in the `MixedModels` package.
+
 ```{julia}
 contra = MixedModels.dataset(:contra)
 ```
+
 ```{julia}
 contra = DataFrame(contra)
 describe(contra)
@@ -59,9 +66,10 @@ If we were to plot the 1934 responses as 0/1 values versus, for example, the wom
 
 One approach to illustrating the structure of the data more effectively is to add *scatterplot smoother* lines
 as in @fig-contradata
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey"
+#| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey
 #| label: fig-contradata
 draw(
   data(@transform(
@@ -77,6 +85,7 @@ draw(
   figure=(; resolution=(800, 450)),
 )
 ```
+
 to show the trend in the response with respect to the covariate.
 Once we have the smoother lines in such a plot we can omit the data points themselves, as we did here, because they add very little information.
 
@@ -93,6 +102,7 @@ The lesson here is similar to what we have seen in other examples; careful plott
 
 As for a linear mixed-model, the first three arguments in a call to `fit` a generalized linear mixed models are `MixedModel`, the model formula, and the name of the data frame.
 The fourth argument describes the type of conditional distribution of the response given the random effects.
+
 ```{julia}
 com01 = let
   form = @formula(use ~ 1 + livch + (age + age^2) * urban + (1|dist))
@@ -105,6 +115,7 @@ com01 = let
 end
 println(com01)
 ```
+
 The `Bernoulli` distribution is used for binary responses.
 Occasionally responses taken at the same covariate values are grouped together and modeled with a `Binomial` distribution, but that is the exception, not the rule.
 
@@ -123,11 +134,14 @@ This confirms our earlier impression that the main distinction is between women 
 
 After incorporating a new variable `ch` --- an indicator of whether the woman
 has any children --- in the data
+
 ```{julia}
 @transform!(contra, :ch = :livch > "0")
 describe(contra)
 ```
+
 we fit a reduced model.
+
 ```{julia}
 com02 = let
   form = @formula(use ~ 1 + ch + (age + age^2) * urban + (1|dist))
@@ -138,16 +152,20 @@ com02 = let
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
 ```
+
 Comparing this model to the previous model
+
 ```{julia}
 MixedModels.likelihoodratiotest(com02, com01)
 ```
+
 indicates that the reduced model is adequate.
 
 A plot of the smoothed observed proportions versus centered age according to `urban` and `ch`
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey.  The livch factor has been collapsed to children/nochildren."
+#| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey.  The livch factor has been collapsed to children/nochildren.
 #| label: fig-contradata2
 draw(
     data(
@@ -167,8 +185,10 @@ draw(
     figure=(; resolution=(800, 450)),
 )
 ```
+
 indicates that all four groups have a quadratic trend with respect to age but the location of the peak proportion is shifted for those without children relative to those with children.
 Incorporating an interaction of `age` and `ch` allows for such a shift.
+
 ```{julia}
 com03 = let
   form = @formula(use ~ 1 + (ch + age) * urban + age^2 + age^2 & urban + (1|dist))
@@ -179,13 +199,17 @@ com03 = let
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
 ```
+
 Comparing this fitted model to the previous one
+
 ```{julia}
 MixedModels.likelihoodratiotest(com03, com02)
 ```
+
 confirms the usefulness of this term.
 
 Continuing with the model-building we turn our attention to the random effects specification to see whether urban/rural differences vary significantly between districts and whether the distinction between childless women and women with children varies between districts.
+
 ```{julia}
 com04 = let
   form = @formula(use ~ 1 + urban + ch * age + age^2 + (1|dist))
@@ -193,7 +217,9 @@ com04 = let
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
 ```
+
 We fit a succession of models, described in the exercises for this chapter, before settling on model `com05`,
+
 ```{julia}
 com05 = let
   form = @formula(use ~ 1 + urban + ch * age + age^2 + (1|dist&urban))
@@ -201,6 +227,7 @@ com05 = let
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
 ```
+
 Notice that although there are 60 distinct districts there are only 102 distinct combinations of represented in the data.
 In 15 of the 60 districts there are no rural women in the sample and in 3 districts there are no urban women in the sample, as shown in
 
@@ -249,9 +276,10 @@ $$
   \mu = \frac{1}{1+\exp(-\eta)} ,
 $$ {#eq-logitinv}
 is called the *logistic* function and is shown in @fig-logitinv.
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "The logistic function, which is the inverse to the logit link function."
+#| fig-cap: 'The logistic function, which is the inverse to the logit link function.'
 #| label: fig-logitinv
 draw(
   data(@transform(DataFrame(η = collect(-5.:0.02:5.)), :μ = inv(1 + exp(-:η)))) *
@@ -316,12 +344,14 @@ The odds of a rural woman in district 1 (i.e. the value of the interaction) usin
 or about 40% of that of her rural counterpart in a typical district.
 
 Notice that there is considerable variability in the lengths of the prediction intervals in
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Caterpillar plot of the conditional modes of the random-effects for model `com05`"
+#| fig-cap: Caterpillar plot of the conditional modes of the random-effects for model `com05`
 #| label: fig-com05qqcaterpillar
 qqcaterpillar(com05)
 ```
+
 This is to be expected with data from a highly unbalanced observational study.
 
 Consider the cross-tabulation of counts of interviewees by district and urban/rural status presented at the end of .
@@ -329,3 +359,4 @@ The data contains responses from 54 rural women in district 1 but only 21 rural 
 Thus the bottom line in @fig-com05qqcaterpillar, from the level of the interaction, and
 based on 54 responses, is shorter than the line second from the bottom,
 for and based on 21 women only.
+

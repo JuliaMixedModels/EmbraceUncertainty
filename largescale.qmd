@@ -1,8 +1,13 @@
 # Applications to large-scale studies {#sec-largescale}
 
 Load the packages to be used.
+
 ```{julia}
 #| code-fold: true
+#| output: false
+using Pkg
+Pkg.activate(@__DIR__)
+
 const progress = false   # used in calls to `fit(MixedModel,...) to suppress progress bars
 
 using AlgebraOfGraphics
@@ -38,6 +43,7 @@ Initially we consider only the trial-level data.
 ```{julia}
 ldttrial = Arrow.Table("./data/ELP_ldt_trial.arrow")
 ```
+
 ```{julia}
 ldttrial = DataFrame(ldttrial)
 describe(ldttrial)
@@ -52,14 +58,16 @@ For this example we only use the responses between 300 and 2500 ms.
 pruned = dropmissing!(@subset(ldttrial, coalesce(:acc, false), 300 ≤ :rt ≤ 2500))
 size(pruned)
 ```
+
 ```{julia}
 describe(pruned)
 ```
 
 A density plot of the response times, @fig-elpldtrtdens, shows they are skewed to the right.
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Kernel density plot of the pruned response times (ms.) in the lexical decision task of the English Lexicon Project."
+#| fig-cap: Kernel density plot of the pruned response times (ms.) in the lexical decision task of the English Lexicon Project.
 #| label: fig-elpldtrtdens
 draw(
     data(pruned) *
@@ -68,6 +76,7 @@ draw(
     figure=(; resolution = (800, 450))
 )
 ```
+
 In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.
 
 ```{julia}
@@ -76,9 +85,10 @@ describe(pruned)
 ```
 
 The density of the response speed, in responses per second, is shown in @fig-elpldtspeeddens.
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Kernel density plot of the pruned response speed (s⁻¹) in the lexical desision task of the English Lexicon Project."
+#| fig-cap: Kernel density plot of the pruned response speed (s⁻¹) in the lexical desision task of the English Lexicon Project.
 #| label: fig-elpldtspeeddens
 draw(
     data(pruned) *
@@ -89,6 +99,7 @@ draw(
 ```
 
 Finally, we fit a first model with simple, scalar, random effects for `subj` and `item`.
+
 ```{julia}
 elm01 = let
     contrasts = Dict(:subj => Grouping(), :item => Grouping())
@@ -106,6 +117,7 @@ We can split the tasks of fitting and analyzing a model between computers by sav
 ```{julia}
 saveoptsum("./optsums/elm01.json", elm01);
 ```
+
 ```{julia}
 elm01a = restoreoptsum!(
     let
@@ -120,11 +132,14 @@ Model `elm01` is a preliminary model in that it doesn't account for important co
 
 It is easy to 
 The covariates associated with the item are available as
+
 ```{julia}
 elpldtitem = DataFrame(Arrow.Table("./data/ELP_ldt_item.arrow"))
 describe(elpldtitem)
 ```
+
 and those associated with the subject are
+
 ```{julia}
 elpldtsubj = DataFrame(Arrow.Table("./data/ELP_ldt_subj.arrow"))
 describe(elpldtsubj)
@@ -132,9 +147,11 @@ describe(elpldtsubj)
 
 For the simple model `elm01` the estimated standard deviation of the random effects for subject is greater than that of the random effects for item, a common occurrence.
 A caterpillar plot, @fig-elm01caterpillarsubj,
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Conditional means and 95% prediction intervals of the random effects for subject in the simple model elm01 fit to the English Lexicon Project data.  The response in this model is speed."
+#| fig-cap: Conditional means and 95% prediction intervals of the random effects for subject in the simple model elm01 fit to the English Lexicon Project data.  The response in this model is speed.
 #| label: fig-elm01caterpillarsubj
 qqcaterpillar!(Figure(resolution=(800, 650)), ranefinfo(elm01, :subj))
 ```
+

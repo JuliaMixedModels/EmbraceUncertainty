@@ -1,8 +1,13 @@
 # Models for Longitudinal Data {#sec-longitudinal}
 
 Load the packages to be used.
+
 ```{julia}
 #| code-fold: true
+#| output: false
+using Pkg
+Pkg.activate(@__DIR__)
+
 const progress = false   # used in calls to `fit(MixedModel,...) to suppress progress bars
 
 using AlgebraOfGraphics
@@ -46,7 +51,7 @@ A common way of plotting such longitudinal data is response versus time on a sin
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Length of ramus bone versus age for a sample of 20 boys."
+#| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
 egplt = data(egdf) * mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
 draw(egplt * mapping(; color=:Subj) * (visual(Scatter) + visual(Lines)))
@@ -58,7 +63,7 @@ A preferred alternative is to plot response versus time with each subject's data
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the top left, by increasing initial bone length."
+#| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the top left, by increasing initial bone length.
 #| label: fig-eglayout
 if "orderedsubj" ∉ names(egdf)
     egdf.orderedsubj = CategoricalArray(
@@ -100,7 +105,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01"
+#| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
 caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
 ```
@@ -142,7 +147,7 @@ In terms of the predictions from the model and the likelihood at the parameter e
 A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread and more precision in the distribution of the random effects for `(Intercept)` but the same spread and precision for the `time` random effects, although these random effects are displayed in a different order.
 
 ```{julia}
-#| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02"
+#| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02
 #| label: fig-egm02caterpillar
 #| code-fold: true
 caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
@@ -183,7 +188,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
+#| fig-cap: Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm02shrinkage
 shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
 ```
@@ -222,7 +227,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
+#| fig-cap: Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm04shrinkage
 shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
 ```
@@ -274,7 +279,7 @@ Considering first the control group, whose trajectories can be plotted in a "spa
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Weight (g) of rats in the control group of bxdf versus time in trial (wk)."
+#| fig-cap: Weight (g) of rats in the control group of bxdf versus time in trial (wk).
 #| label: fig-bxctrlspaghetti
 bxaxes = mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")    
 draw(
@@ -289,7 +294,7 @@ or in separate panels ordered by initial weight, @fig-bxctrllayout.
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth."
+#| fig-cap: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth.
 #| label: fig-bxctrllayout
 let
     df = @subset(bxdf, :Group == "Control")
@@ -309,7 +314,7 @@ A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth."
+#| fig-cap: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth.
 #| label: fig-bxthiolayout
 let
     df = @subset(bxdf, :Group == "Thioracil")
@@ -326,9 +331,10 @@ end
 shows several animals (`S18`, `S19`, `S21`, and `S24`) whose rate of weight gain decreases as the trial goes on.
 
 By contrast, in the Thyroxin group, @fig-bxthyrlayout,
+
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Weight (g) of rats in the Thyroxingroup versus time in trial (wk). Panels are ordered by increasing initial weigth."
+#| fig-cap: Weight (g) of rats in the Thyroxingroup versus time in trial (wk). Panels are ordered by increasing initial weigth.
 #| label: fig-bxthyrlayout
 let
     df = @subset(bxdf, :Group == "Thyroxin")
@@ -341,6 +347,7 @@ let
     )
 end
 ```
+
 if there is any suggestion of curvature it would be concave-up.
 
 ### Models with interaction terms
@@ -355,6 +362,7 @@ One occasion where the hierarchical principle does not apply is when the main ef
 Similarly in dose-response data; when a zero dose is included we could have a main effect for `dose` and a `dose & Group` interaction without a main effect for `Group`, because zero dose of a treatment is the same as zero dose of a placebo.
 
 We can begin with a main effect for `Group`, as in
+
 ```{julia}
 bxm01 = let
     form = @formula(resp ~ (1 + time + time^2) * Group + (1 + time + time^2 | Subj))
@@ -363,7 +371,9 @@ bxm01 = let
 end
 println(bxm01)
 ```
+
 but we expect that a model without the main effect for `Group`,
+
 ```{julia}
 bxm02 = let
     form = @formula(resp ~ 1 + (time + time^2) & Group + (1 + time + time^2 | Subj))
@@ -372,7 +382,9 @@ bxm02 = let
 end
 println(bxm02)
 ```
+
 will be adequate, as confirmed by
+
 ```{julia}
 MixedModels.likelihoodratiotest(bxm02, bxm01)
 ```
@@ -415,7 +427,7 @@ A caterpillar plot created from the conditional means and standard deviations of
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03"
+#| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03
 #| label: fig-bxm03caterpillar
 caterpillar(bxm03)
 ```
@@ -424,7 +436,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates."
+#| fig-cap: Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-bxm03shrinkage
 shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
 ```
@@ -434,14 +446,17 @@ shows that the random effects are considerably shrunk towards the origin, relati
 Nevertheless, the estimated unconditional distribution of the random effects in model `bxm03` is a degenerate distribution.
 
 That is, the estimated within-subject covariance of the random effects is singular.
+
 ```{julia}
 issingular(bxm03)
 ```
 
 One way to see this is because the relative covariance factor, $\boldsymbol{\lambda}$, of the within-subject random effects is
+
 ```{julia}
 Matrix(only(bxm03.λ))
 ```
+
 and we see that the third column is all zeros.
 
 Thus, in a three-dimensional space the conditional means of the random effects for each rat, lie on a plane, even though each of the two-dimensional projections in @fig-bxm03shrinkage show a scatter.
@@ -451,7 +466,7 @@ can help to see that these points lie on a plane.
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Two views of the conditional means of the random effects from model bxm03. The lines from the origin are the principal axes of the unconditional distribution of the random effects.  The panel on the right is looking in along the negative of the second principle axis (red line in left panel)."
+#| fig-cap: Two views of the conditional means of the random effects from model bxm03. The lines from the origin are the principal axes of the unconditional distribution of the random effects.  The panel on the right is looking in along the negative of the second principle axis (red line in left panel).
 #| label: fig-bxm03plane
 let
     bpts = Point3f.(eachcol(only(bxm03.b)))
@@ -481,6 +496,7 @@ end
 ```
 
 In each of the panels the three orthogonal lines from the origin are the three principle axes of the unconditional distribution of the random effects, corresponding to the columns of
+
 ```{julia}
 svd(only(bxm03.λ)).U
 ```
@@ -504,7 +520,7 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03"
+#| fig-cap: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodens
 draw(
      data(@subset(bxm03pars, :type == "ρ")) *
@@ -519,7 +535,7 @@ Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/F
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03"
+#| fig-cap: Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodensatanh
 let
     dat = @transform(
@@ -545,9 +561,11 @@ bxm04 = let
     fit(MixedModel, form, bxdf; contrasts, progress)
 end
 ```
+
 ```{julia}
 MixedModels.likelihoodratiotest(bxm04, bxm03)
 ```
+
 as does eliminating within-subject correlations between the random-effects for the `time^2` random effect and the other random effects.
 
 ```{julia}
@@ -576,7 +594,7 @@ The models give essentially the same predictions of weight versus time for a "ty
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Typical weight curves from models bxm03, bxm04, and bxm05 for each of the three treatment groups."
+#| fig-cap: Typical weight curves from models bxm03, bxm04, and bxm05 for each of the three treatment groups.
 #| label: fig-bxmodfitted
 let
     times = Float32.((0:256) / 64)
@@ -633,3 +651,4 @@ Other points to make:
     4. More complex models require more iterations and more work per iteration
     5. Probably go with `bxm03` in this case, even though it gives a degenerate dist'n of random effects.  The idea is that the random effects are absorbing a form of rat-to-rat variability.  The residual standard deviation does reflect this.
 :::
+

@@ -77,6 +77,11 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 To access these data within `Julia` we must first attach this package, and others that we will use, to our session with
 
 ```{julia}
+using Pkg
+Pkg.activate(@__DIR__)
+```
+
+```{julia}
 using AlgebraOfGraphics   # high-level graphics
 using CairoMakie          # graphics back-end
 using CategoricalArrays   # factors and ordered factors
@@ -155,17 +160,17 @@ first(dyestuff, 7)
 ```{julia}
 last(dyestuff, 7)
 ```
+
 or we could tabulate the data using `groupby` and `combine` from [DataFrames](https://github.com/JuliaData/DataFrames.jl).
 
 ```{julia}
 combine(groupby(dyestuff, :batch), :yield => mean, nrow => :n)
 ```
 
-
 Although this table does show us an important property of the data, namely that there are exactly 5 observations on each batch --- a property that we will describe by saying that the data are *balanced* with respect to `batch` --- we usually learn much more about the structure of such data from plots like @fig-dyestuffdata
 
 ```{julia}
-#| fig-cap: "Yield of dyestuff by batch.  The line joins the mean yields."
+#| fig-cap: Yield of dyestuff by batch.  The line joins the mean yields.
 #| label: fig-dyestuffdata
 #| code-fold: true
 """
@@ -242,7 +247,7 @@ are intentionally similar to those of the `dyestuff` data.
 A data plot (@fig-dyestuff2data)
 
 ```{julia}
-#| fig-cap: "Artificial data of yield by batch.  The line joins the mean yields."
+#| fig-cap: Artificial data of yield by batch.  The line joins the mean yields.
 #| label: fig-dyestuff2data
 #| code-fold: true
 let
@@ -288,7 +293,6 @@ dsm01 = fit(
 )
 println(dsm01)
 ```
-
 
 :::{.callout-note}
 In this code block the model is "printed" using `println` after being fit.
@@ -407,6 +411,7 @@ The random effects are associated with the observations through a *model matrix*
 For a model with $n$ observations and a total of $q$ random effects, $\mathbf{Z}$ will be of size $n\times q$.
 Furthermore, it is sparse - meaning that most of the elements of the matrix are zeros.
 In this case, $\mathbf{Z}$ is the indicator matrix for the `batch` covariate.
+
 ```{julia}
 Zdsm01 = Int.(Matrix(only(dsm01.reterms)))
 ```
@@ -414,18 +419,23 @@ Zdsm01 = Int.(Matrix(only(dsm01.reterms)))
 The expression to produce that output first extracted the random-effects terms information from `dsm01`, extracted the term for the first grouping factor, checking that there is only one, converted it to a matrix and converted the matrix to integers to save on space when printing.
 
 In cases like this we will often print out the transpose of the model matrix to save more space
+
 ```{julia}
 Zdsm01'
 ```
+
 or, even more compact, as a sparse matrix pattern
+
 ```{julia}
 sparse(Zdsm01')
 ```
 
 The fixed-effects parameters, of which there is only one here, are gathered into a vector, $\boldsymbol{\beta}$, of length $p$, and multiplied by another model matrix, $\mathbf{X}$, of size $n\times p$.
+
 ```{julia}
 dsm01.β
 ```
+
 ```{julia}
 Int.(dsm01.X')
 ```
@@ -461,12 +471,15 @@ $$
 \end{bmatrix}
 $$
 which is stored in three pieces
+
 ```{julia}
 first(dsm01.A)
 ```
+
 ```{julia}
 dsm01.A[2]
 ```
+
 ```{julia}
 last(dsm01.A)
 ```
@@ -558,7 +571,7 @@ You can check the details by clicking on the "Code" button in the HTML version o
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01"
+#| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
 draw(
     data(@subset(dsm01pars, :type == "β")) *
@@ -580,6 +593,7 @@ Markdown.parse("""
   Similarly the standard deviation of the simulated β values, $(std(βdf.value)) is close to the standard error of the parameter, $(only(stderror(dsm01))).
 """)
 ```
+
 In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect.
 The estimates are approximately normally distributed centered about the "true" parameter value with a standard deviation given by the standard error of the parameter.
 
@@ -587,7 +601,7 @@ The situation is different for the estimates of the standard deviation parameter
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Kernel density plot of bootstrap variance-component parameter estimates from model dsm01"
+#| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
 draw(
     data(@subset(dsm01pars, :type == "σ")) *
@@ -598,6 +612,7 @@ draw(
 ```
 
 The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).
+
 ```{julia}
 #| echo: false
 Markdown.parse("""
@@ -615,7 +630,7 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Histogram of bootstrap variance-components as standard deviations from model dsm01"
+#| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
 #| label: fig-dsm01_bs_sigma_hist
 draw(
     data(@subset(dsm01pars, :type == "σ")) *
@@ -640,7 +655,7 @@ In many cases standard errors are quoted for estimates of the variance component
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Histogram of bootstrap variance-components from model dsm01"
+#| fig-cap: Histogram of bootstrap variance-components from model dsm01
 #| label: fig-dsm01_bs_sigmasqr_hist
 draw(
   data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
@@ -700,6 +715,7 @@ Markdown.parse("""
 Here the algorithm converges after 18 function evaluations to a profiled deviance of $(dsm01trace.objective) at θ = $(only(dsm01trace.theta)).
 """)
 ```
+
 ## Assessing the random effects {#sec-assessRE}
 
 What are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the mode (location of the maximum probability density) of the conditional distribution, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$, evaluated at the parameter estimates and the observed response vector, $\mathbf{y}$.
@@ -749,7 +765,7 @@ A plot of these prediction intervals is sometimes called a *caterpillar plot* be
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Caterpillar plot of prediction intervals for dsm01 random effects"
+#| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
 caterpillar!(Figure(resolution=(800, 250)), ranefinfo(dsm01, :batch))
 ```
@@ -760,7 +776,7 @@ An alternative
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Quantile caterpillar plot of prediction intervals for dsm01 random effects"
+#| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
 qqcaterpillar!(Figure(resolution=(800, 250)), ranefinfo(dsm01, :batch))
 ```
@@ -782,6 +798,7 @@ The [MixedModels.jl package](https://github.com/JuliaStats/MixedModels.jl) provi
 
 For models `dsm01` and `dsm02` the only covariate in the model formula is `batch`, which is a grouping factor for the random effects.
 Thus the desired contrasts specification is
+
 ```{julia}
 #| code-fold: false
 #| eval: false
@@ -796,6 +813,7 @@ Doing so is not terribly important when the number of levels of the grouping fac
 However, when the number of levels is large, as for some of the models in later chapters, failure to specify `Grouping()` contrasts can cause memory faults when constructing the numeric represention of the model.
 
 There is an advantage in assigning the contrasts dictionary to the name `contrasts` because a call to `fit` with the optional, named argument `contrasts`
+
 ```{julia}
 #| code-fold: false
 #| eval: false
@@ -806,7 +824,9 @@ dsm01 = fit(
   contrasts=contrasts
 )
 ```
+
 can be condensed to 
+
 ```{julia}
 #| code-fold: false
 #| eval: false
@@ -830,6 +850,7 @@ A `let` block is a way of making temporary assignments that do not affect the gl
 An assignment to a variable name inside a `let` block is local to the block.
 
 Thus `dsm01` can be assigned as
+
 ```{julia}
 #| code-fold: false
 #| eval: false
@@ -867,3 +888,4 @@ Profile zeta plots allow us to visually assess the precision of individual param
 Density plots derived from the profile zeta function provide another way of examining the distribution of the estimators of the parameters.
 
 Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.
+

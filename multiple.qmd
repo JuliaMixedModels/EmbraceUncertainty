@@ -3,6 +3,10 @@
 Attach the packages to be used in this chapter
 ```{julia}
 #| code-fold: true
+#| output: false
+using Pkg
+Pkg.activate(@__DIR__)
+
 const progress = false
 const hide_progress = true
 
