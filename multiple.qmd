@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.7
+---
+
 # Models With Multiple Random-effects Terms {#sec-Multiple}
 
 Attach the packages to be used in this chapter

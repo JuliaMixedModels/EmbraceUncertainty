@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.7
+---
+
 # Applications to large-scale studies {#sec-largescale}
 
 Load the packages to be used.

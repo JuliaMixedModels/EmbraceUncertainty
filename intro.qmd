@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.7
+---
+
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
 
 In this book we describe the theory behind a type of statistical model called *mixed-effects* models and the practice of fitting and analyzing such models using the [MixedModels](https://github.com/JuliaStats/MixedModels.jl) package for [Julia](https://julialang.org).

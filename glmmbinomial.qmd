@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.7
+---
+
 # Generalized Linear Mixed Models for Binary Responses {#sec-glmmbinomial}
 
 Attach the packages to be used in this chapter

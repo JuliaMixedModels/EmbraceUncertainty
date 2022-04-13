@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.7
+---
+
 # Linear Algebra for Linear Models {#sec.LinAlg}
 
 Attach the packages to be used in this appendix
