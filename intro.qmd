@@ -78,12 +78,16 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 > each sample. The equivalent yield of each preparation as grams of
 > standard colour was determined by dye-trial.
 
-To access these data within `Julia` we must first attach this package, and others that we will use, to our session with
+To access these data within `Julia` we must first attach this package, and others that we will use, to our session.
+We use a local project specification for packages so we begin by activating the local project.
 
 ```{julia}
+#| output: false
 using Pkg
 Pkg.activate(@__DIR__)
 ```
+
+then attach the other packages to be used
 
 ```{julia}
 using AlgebraOfGraphics   # high-level graphics
@@ -282,11 +286,6 @@ We will explain the structure of the formula after we have considered an example
 ### A model for the dyestuff data {#sec-dyestuffLMM}
 
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
-
-:::{.callout-note}
-In this code block the model is "printed" using `println` after being fit.
-By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, a more compact presentation
-:::
 
 ```{julia}
 const progress = false    # suppress the progress bar in the fit
@@ -585,7 +584,7 @@ draw(
 )
 ```
 
-:::{callout-note}
+:::{.callout-note}
 Find a way to use `:compact=true` when interpolating numeric values into the text
 :::
 
@@ -655,7 +654,7 @@ The distribution of the estimator of $\sigma_1$ with this point mass at zero is 
 This is why characterizing the uncertainty of these parameter estimates with a standard error is misleading.
 Quoting an estimate and a standard error for the estimate is only meaningful if these values adequately characterize the distribution of the values of the estimator.
 
-In many cases standard errors are quoted for estimates of the variance components, $\sigma_1^2$ and $\sigma^2$, whose distribution (fig-dsm01_bs_sigmasqr_hist) in the bootstrap sample is even less like a normal or Gaussian distribution.
+In many cases standard errors are quoted for estimates of the variance components, $\sigma_1^2$ and $\sigma^2$, whose distribution (@fig-dsm01_bs_sigmasqr_hist) in the bootstrap sample is even less like a normal or Gaussian distribution.
 
 ```{julia}
 #| code-fold: true
