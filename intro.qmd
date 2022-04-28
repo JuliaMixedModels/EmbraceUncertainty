@@ -50,7 +50,7 @@ We observe the value, $\mathbf{y}$, of $\mathcal{Y}$.
 We do not observe the value, $\mathbf{b}$, of $\mathcal{B}$.
 
 When formulating the model we describe the unconditional distribution of $\mathcal{B}$ and the conditional distribution, $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$.
-The descriptions of the distributions involve the form of the distribution and the values of certain parameters. 
+The descriptions of the distributions involve the form of the distribution and the values of certain parameters.
 We use the observed values of the response and the covariates to estimate these
 parameters and to make inferences about them.
 
@@ -188,28 +188,46 @@ Returns a `DataFrame` created from df with the levels of `grps` reordered accord
 `combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
 levels of `grps` reordered.
 """
-function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
-    # ensure the relevant columns are types that Makie can deal with 
-    df = transform(df, resp => Array, grps => CategoricalArray; renamecols=false)
-    # create a summary table by mean resp
-    sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
-    glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
-    levels!(df[!, grps], glevs)
-    levels!(sumry[!, grps], glevs)
-    return df, sumry
+function _meanrespfrm(
+  df,
+  resp::Symbol,
+  grps::Symbol;
+  sumryf::Function = mean,
+)
+  # ensure the relevant columns are types that Makie can deal with 
+  df = transform(
+    df,
+    resp => Array,
+    grps => CategoricalArray;
+    renamecols = false,
+  )
+  # create a summary table by mean resp
+  sumry =
+    sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
+  glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
+  levels!(df[!, grps], glevs)
+  levels!(sumry[!, grps], glevs)
+  return df, sumry
 end
 let
-    df, sumry = _meanrespfrm(DataFrame(MixedModels.dataset(:dyestuff)), :yield, :batch)
+  df, sumry = _meanrespfrm(
+    DataFrame(MixedModels.dataset(:dyestuff)),
+    :yield,
+    :batch,
+  )
 
-    mp = mapping(
-        :yield => "Yield of dyestuff [g]",
-        :batch => "Batch of intermediate product"
-    )
-    draw(
-        (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
-        (data(sumry) * mp * visual(Lines));
-        figure=(; resolution = (800, 400)),
-    )
+  mp = mapping(
+    :yield => "Yield of dyestuff [g]",
+    :batch => "Batch of intermediate product",
+  )
+  draw(
+    (
+      data(df) *
+      mp *
+      visual(Scatter; marker = '○', markersize = 12)
+    ) + (data(sumry) * mp * visual(Lines));
+    figure = (; resolution = (800, 400)),
+  )
 end
 ```
 
@@ -259,13 +277,16 @@ A data plot (@fig-dyestuff2data)
 #| label: fig-dyestuff2data
 #| code-fold: true
 let
-    df, sumry = _meanrespfrm(dyestuff2, :yield, :batch)
-    mp = mapping(:yield => "Simulated yield", :batch => "Batch")
-    draw(
-        (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
-        (data(sumry) * mp * visual(Lines));
-        figure=(; resolution = (800, 400)),
-    )
+  df, sumry = _meanrespfrm(dyestuff2, :yield, :batch)
+  mp = mapping(:yield => "Simulated yield", :batch => "Batch")
+  draw(
+    (
+      data(df) *
+      mp *
+      visual(Scatter; marker = '○', markersize = 12)
+    ) + (data(sumry) * mp * visual(Lines));
+    figure = (; resolution = (800, 400)),
+  )
 end
 ```
 
@@ -288,12 +309,11 @@ We will explain the structure of the formula after we have considered an example
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
 ```{julia}
-const progress = false    # suppress the progress bar in the fit
-dsm01 = fit(
-    MixedModel,
-    @formula(yield ~ 1 + (1|batch)),
-    dyestuff; progress
-)
+const progress = false # suppress the progress bar in the fit
+dsm01 = let
+  form = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, form, dyestuff; progress)
+end
 println(dsm01)
 ```
 
@@ -312,10 +332,10 @@ The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum
 
 The display of the fitted model has four major sections:
 
-1. a description of the model that was fit
-2. some statistics characterizing the model fit
-3. a summary of properties of the random effects and
-4. a summary of the fixed-effects parameter estimates.
+ 1. a description of the model that was fit
+ 2. some statistics characterizing the model fit
+ 3. a summary of properties of the random effects and
+ 4. a summary of the fixed-effects parameter estimates.
 
 We consider each of these sections in turn.
 
@@ -368,7 +388,10 @@ An alternative measure of precision of the estimate - a coverage interval based 
 Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\sigma}_1=0$.
 
 ```{julia}
-dsm02 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), dyestuff2; progress)
+dsm02 = let
+  form = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, form, dyestuff2; progress)
+end
 println(dsm02)
 ```
 
@@ -453,10 +476,10 @@ $$
 
 The complete model can be written as
 $$
-  \begin{aligned}
-    (\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mathcal{N}(\mathbf{X}\mathbf{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})\\
-    \mathcal{B}&\sim\mathcal{N}(\mathbf{0},\Sigma_\theta) .
-  \end{aligned}
+\begin{aligned}
+(\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mathcal{N}(\mathbf{X}\mathbf{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})\\
+\mathcal{B}&\sim\mathcal{N}(\mathbf{0},\Sigma_\theta) .
+\end{aligned}
 $$ {#eq-lmmdist}
 
 From these two distributions, the joint distribution of $\mathcal{Y}$ and $\mathcal{B}$, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value $\mathbf{y}$ of $\mathcal{Y}$.
@@ -468,9 +491,9 @@ Furthermore, this profiled log-likelihood can be evaluated from a matrix of $\ma
 $$
 \mathbf{A}=
 \begin{bmatrix}
-  \mathbf{Z}'\mathbf{Z} & \mathbf{Z}'\mathbf{X} & \mathbf{Z}'\mathbf{y} \\
-  \mathbf{X}'\mathbf{Z} & \mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
-  \mathbf{y}'\mathbf{Z} & \mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+\mathbf{Z}'\mathbf{Z} & \mathbf{Z}'\mathbf{X} & \mathbf{Z}'\mathbf{y} \\
+\mathbf{X}'\mathbf{Z} & \mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
+\mathbf{y}'\mathbf{Z} & \mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
 \end{bmatrix}
 $$
 which is stored in three pieces
@@ -510,16 +533,15 @@ The parameters enter into the computation via a *relative covariance factor*, $\
 
 The method hinges on being able to evaluate efficiently the *Cholesky factor* (see @sec-cholesky for details) of
 $$
-  \begin{bmatrix}
-    \boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I} & 
-    \boldsymbol{\Lambda}_\theta'\mathbf{Z'X} & \boldsymbol{\Lambda}_\theta'\mathbf{Z'y} \\
-    \mathbf{X'Z}\boldsymbol{\Lambda}_\theta & \mathbf{X'X} & \mathbf{X'y} \\
-    \mathbf{y'Z}\boldsymbol{\Lambda}_\theta & \mathbf{y'X} & \mathbf{y'y}
-  \end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I} &
+\boldsymbol{\Lambda}_\theta'\mathbf{Z'X} & \boldsymbol{\Lambda}_\theta'\mathbf{Z'y} \\
+\mathbf{X'Z}\boldsymbol{\Lambda}_\theta & \mathbf{X'X} & \mathbf{X'y} \\
+\mathbf{y'Z}\boldsymbol{\Lambda}_\theta & \mathbf{y'X} & \mathbf{y'y}
+\end{bmatrix}
 $$
 
-
-The optimal value of $\theta$ for model `dsm01` is 
+The optimal value of $\theta$ for model `dsm01` is
 
 ```{julia}
 only(dsm01.θ)
@@ -528,7 +550,7 @@ only(dsm01.θ)
 producing a lower Cholesky factor of
 
 ```{julia}
-sparseL(dsm01; full=true)
+sparseL(dsm01; full = true)
 ```
 
 ## Variability of parameter estimates {#sec-furtherassess}
@@ -550,9 +572,9 @@ To examine the distribution of the parameter estimates we extract a table of all
 
 ```{julia}
 #| warning: false
-const hide_progress = true    # hide the progress bar when sampling
-bsrng = Random.seed!(4321234) # random number generator for bootstrap
-dsm01samp = parametricbootstrap(bsrng, 10_000, dsm01; hide_progress)
+const hide_progress = true # hide the progress bar when sampling
+Random.seed!(4321234)      # random number generator
+dsm01samp = parametricbootstrap(10_000, dsm01; hide_progress)
 dsm01pars = DataFrame(dsm01samp.allpars)
 first(dsm01pars, 7)
 ```
@@ -577,10 +599,13 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
 draw(
-    data(@subset(dsm01pars, :type == "β")) *
-    mapping(:value => "Bootstrap samples of β"; color=(:names => "Names")) *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450)),
+  data(@subset(dsm01pars, :type == "β")) *
+  mapping(
+    :value => "Bootstrap samples of β";
+    color = (:names => "Names"),
+  ) *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -590,11 +615,13 @@ Find a way to use `:compact=true` when interpolating numeric values into the tex
 
 ```{julia}
 #| echo: false
-Markdown.parse("""
+Markdown.parse(
+  """
   The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of $(@sprintf("%f", mean(βdf.value)))  which is close to the estimated `β₁` of $(@sprintf("%f", only(dsm01.β))).
 
   Similarly the standard deviation of the simulated β values, $(std(βdf.value)) is close to the standard error of the parameter, $(only(stderror(dsm01))).
-""")
+""",
+)
 ```
 
 In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect.
@@ -607,10 +634,13 @@ The situation is different for the estimates of the standard deviation parameter
 #| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
 draw(
-    data(@subset(dsm01pars, :type == "σ")) *
-    mapping(:value => "Bootstrap samples of σ"; color=(:group => "Group")) *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450)),
+  data(@subset(dsm01pars, :type == "σ")) *
+  mapping(
+    :value => "Bootstrap samples of σ";
+    color = (:group => "Group"),
+  ) *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -618,9 +648,11 @@ The estimator for the residual standard deviation, $\sigma$, is approximately no
 
 ```{julia}
 #| echo: false
-Markdown.parse("""
+Markdown.parse(
+  """
 There is one peak around the "true" value for the simulation, $(only(dsm01.σs.batch)), and another peak at zero.
-""")
+""",
+)
 ```
 
 The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_density is being distorted by the method of approximating the density.
@@ -636,10 +668,13 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 #| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
 #| label: fig-dsm01_bs_sigma_hist
 draw(
-    data(@subset(dsm01pars, :type == "σ")) *
-    mapping(:value => "Bootstrap parameter estimates of σ"; color=(:group => "Group")) *
-    AlgebraOfGraphics.histogram(; bins=80);
-    figure=(; resolution = (800, 450))
+  data(@subset(dsm01pars, :type == "σ")) *
+  mapping(
+    :value => "Bootstrap parameter estimates of σ";
+    color = (:group => "Group"),
+  ) *
+  AlgebraOfGraphics.histogram(; bins = 80);
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -662,9 +697,12 @@ In many cases standard errors are quoted for estimates of the variance component
 #| label: fig-dsm01_bs_sigmasqr_hist
 draw(
   data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
-  mapping(:value_abs2 => "Bootstrap sample of estimates of σ²", color = :group) * 
-  histogram(; bins=200);
-  figure=(; resolution=(800, 450))
+  mapping(
+    :value_abs2 => "Bootstrap sample of estimates of σ²",
+    color = :group,
+  ) *
+  histogram(; bins = 200);
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -703,20 +741,22 @@ Fix the recording of the fitlog so that the initial value is not recorded twice
 
 ```{julia}
 dsm01trace = fit(
-    MixedModel,
-    @formula(yield ~ 1 + (1|batch)),
-    dyestuff;
-    thin=1,
-    progress,
+  MixedModel,
+  @formula(yield ~ 1 + (1 | batch)),
+  dyestuff;
+  thin = 1,
+  progress,
 )
 DataFrame(dsm01trace.optsum.fitlog)
 ```
 
 ```{julia}
 #| echo: false
-Markdown.parse("""
+Markdown.parse(
+  """
 Here the algorithm converges after 18 function evaluations to a profiled deviance of $(dsm01trace.objective) at θ = $(only(dsm01trace.theta)).
-""")
+""",
+)
 ```
 
 ## Assessing the random effects {#sec-assessRE}
@@ -763,14 +803,17 @@ In such cases the terms associated with the same grouping factor are internally 
 Thus internally the random effects are associated with grouping factors, not the terms in the model formula.
 
 Given the data, $\mathbf{y}$, and the parameter estimates, we can evaluate a measure of the dispersion of $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
-In the case of a linear mixed model, this is the conditional standard deviation, from which we can obtain a prediction interval. 
+In the case of a linear mixed model, this is the conditional standard deviation, from which we can obtain a prediction interval.
 A plot of these prediction intervals is sometimes called a *caterpillar plot* because it can look like a fuzzy caterpillar when there are many levels of the grouping factor.
 
 ```{julia}
 #| code-fold: true
 #| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
-caterpillar!(Figure(resolution=(800, 250)), ranefinfo(dsm01, :batch))
+caterpillar!(
+  Figure(resolution = (800, 250)),
+  ranefinfo(dsm01, :batch),
+)
 ```
 
 The `caterpillar` function returns a plot with linear spacing of the
@@ -781,7 +824,10 @@ An alternative
 #| code-fold: true
 #| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
-qqcaterpillar!(Figure(resolution=(800, 250)), ranefinfo(dsm01, :batch))
+qqcaterpillar!(
+  Figure(resolution = (800, 250)),
+  ranefinfo(dsm01, :batch),
+)
 ```
 
 returns a plot where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.
@@ -822,22 +868,22 @@ There is an advantage in assigning the contrasts dictionary to the name `contras
 #| eval: false
 dsm01 = fit(
   MixedModel,
-  @formula(yield ~ 1 + (1|batch)), 
+  @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
-  contrasts=contrasts
+  contrasts = contrasts,
 )
 ```
 
-can be condensed to 
+can be condensed to
 
 ```{julia}
 #| code-fold: false
 #| eval: false
 dsm01 = fit(
   MixedModel,
-  @formula(yield ~ 1 + (1|batch)),
+  @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
-  contrasts
+  contrasts,
 )
 ```
 
@@ -858,8 +904,8 @@ Thus `dsm01` can be assigned as
 #| code-fold: false
 #| eval: false
 dsm01 = let
-    form = @formula(yield ~ 1 + (1|batch))
-    fit(MixedModel, form, dyestuff; contrasts)
+  form = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, form, dyestuff; contrasts)
 end
 ```
 
@@ -874,7 +920,7 @@ Furthermore, this conditional distribution is a spherical Gaussian with mean, $\
 That is,
 $$
 (\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim
-  \mathcal{N}(\mathbf{Z}\mathbf{b}+\mathbf{X}\mathbf{\beta}, \sigma^2\mathbf{I}_n) .
+\mathcal{N}(\mathbf{Z}\mathbf{b}+\mathbf{X}\mathbf{\beta}, \sigma^2\mathbf{I}_n) .
 $$
 The unconditional distribution of $\mathcal{B}$ has mean $\mathbf{0}$ and a parameterized $q\times q$ variance-covariance matrix, $\Sigma_\theta$.
 
@@ -891,4 +937,3 @@ Profile zeta plots allow us to visually assess the precision of individual param
 Density plots derived from the profile zeta function provide another way of examining the distribution of the estimators of the parameters.
 
 Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.
-

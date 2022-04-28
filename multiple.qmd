@@ -5,6 +5,7 @@ jupyter: julia-1.7
 # Models With Multiple Random-effects Terms {#sec-Multiple}
 
 Attach the packages to be used in this chapter
+
 ```{julia}
 #| code-fold: true
 #| output: false
@@ -85,25 +86,42 @@ Returns a `DataFrame` created from df with the levels of `grps` reordered accord
 `combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
 levels of `grps` reordered.
 """
-function _meanrespfrm(df, resp::Symbol, grps::Symbol; sumryf::Function=mean)
-    # ensure the relevant columns are types that Makie can deal with 
-    df = transform(df, resp => Array, grps => CategoricalArray; renamecols=false)
-    # create a summary table by mean resp
-    sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
-    glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
-    levels!(df[!, grps], glevs)
-    levels!(sumry[!, grps], glevs)
-    return df, sumry
+function _meanrespfrm(
+  df,
+  resp::Symbol,
+  grps::Symbol;
+  sumryf::Function = mean,
+)
+  # ensure the relevant columns are types that Makie can deal with 
+  df = transform(
+    df,
+    resp => Array,
+    grps => CategoricalArray;
+    renamecols = false,
+  )
+  # create a summary table by mean resp
+  sumry =
+    sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
+  glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
+  levels!(df[!, grps], glevs)
+  levels!(sumry[!, grps], glevs)
+  return df, sumry
 end
 
-let 
-    df, _ = _meanrespfrm(penicillin, :diameter, :plate)
-    sort!(df, [:plate, :sample])
+let
+  df, _ = _meanrespfrm(penicillin, :diameter, :plate)
+  sort!(df, [:plate, :sample])
 
-    mp = mapping(
-        :diameter => "Diameter of inhibition zone [mm]", :plate => "Plate"; color=:sample
-    )
-    draw(data(df) * mp * visual(ScatterLines; marker='○', markersize=12))
+  mp = mapping(
+    :diameter => "Diameter of inhibition zone [mm]",
+    :plate => "Plate";
+    color = :sample,
+  )
+  draw(
+    data(df) *
+    mp *
+    visual(ScatterLines; marker = '○', markersize = 12),
+  )
 end
 ```
 
@@ -113,7 +131,7 @@ Thus, we will use random effects for the `plate` factor.
 We will also use random effects for the `sample` factor because, as in the dyestuff example, we are more interested in the sample-to-sample variability in the penicillin samples than in the potency of a particular sample.
 
 In this experiment each sample is used on each plate.
-We say that the `plate` and `sample` factors are *crossed*, as opposed to *nested* factors, which we will describe in the next section. 
+We say that the `plate` and `sample` factors are *crossed*, as opposed to *nested* factors, which we will describe in the next section.
 By itself, the designation "crossed" just means that the factors are not nested.
 If we wish to be more specific, we could describe these factors as being *completely crossed*, which means that we have at least one observation for each combination of a
 level of `plate` and a level of `sample`.
@@ -137,9 +155,9 @@ A model incorporating random effects for both the `plate` and the `sample` is st
 
 ```{julia}
 pnm01 = let
-    contrasts = Dict(:plate => Grouping(), :sample => Grouping())
-    form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
-    fit(MixedModel, form, penicillin; contrasts, progress)
+  contrasts = Dict(:plate => Grouping(), :sample => Grouping())
+  form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
+  fit(MixedModel, form, penicillin; contrasts, progress)
 end
 println(pnm01)
 ```
@@ -151,14 +169,20 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for plate in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01platepred
-caterpillar!(Figure(; resolution=(800, 480)), ranefinfo(pnm01, :plate))
+caterpillar!(
+  Figure(; resolution = (800, 480)),
+  ranefinfo(pnm01, :plate),
+)
 ```
 
 ```{julia}
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for sample in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01samplepred
-caterpillar!(Figure(; resolution=(800, 160)), ranefinfo(pnm01, :sample))
+caterpillar!(
+  Figure(; resolution = (800, 160)),
+  ranefinfo(pnm01, :sample),
+)
 ```
 
 The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` has much less variability than does the conditional distribution of the random effects for `sample`.
@@ -176,7 +200,7 @@ vcat(transpose.(sparse.(pnm01.reterms))...)
 The relative covariance factor, $\boldsymbol{\Lambda}_{\boldsymbol\theta}$, for this model
 is block diagonal, with two blocks, one of size 24 and one of size 6, each of which is a multiple of the identity.
 The diagonal elements of the two blocks are $\theta_1$ and $\theta_2$, respectively.
-The numeric values of these parameters can be obtained as 
+The numeric values of these parameters can be obtained as
 
 ```{julia}
 pnm01.θ'
@@ -222,10 +246,13 @@ As for model `dsm01` the bootstrap parameter estimate of the fixed-effects param
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
 draw(
-    data(@subset(pnm01pars, :type == "β")) *
-    mapping(:value => "Bootstrap samples of β"; color=(:names => "Names")) *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450)),
+  data(@subset(pnm01pars, :type == "β")) *
+  mapping(
+    :value => "Bootstrap samples of β";
+    color = (:names => "Names"),
+  ) *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -243,10 +270,13 @@ The densities of the variance-components, on the scale of the standard deviation
 #| label: fig-pnm01bssigma
 #| code-fold: true
 draw(
-    data(@subset(pnm01pars, :type == "σ")) *
-    mapping(:value => "Bootstrap samples of σ"; color=(:group => "Group")) *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450)),
+  data(@subset(pnm01pars, :type == "σ")) *
+  mapping(
+    :value => "Bootstrap samples of σ";
+    color = (:group => "Group"),
+  ) *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -272,7 +302,8 @@ pastes = MixedModels.dataset(:pastes)
 ```
 
 ```{julia}
-pastes = @transform(DataFrame(pastes), :sample = string(:batch, :cask))
+pastes =
+  @transform(DataFrame(pastes), :sample = string(:batch, :cask))
 describe(pastes)
 ```
 
@@ -323,7 +354,7 @@ If we know that the `cask` should be considered as nested within the `batch` the
 
 In a small data set like we can quickly detect a factor being implicitly nested within another factor and take appropriate action.
 In a large data set, such as from a multi-center study, it is often assumed that, say, subject identifiers are unique to each center.
-Frequently this is not the case. 
+Frequently this is not the case.
 Especially when dealing with large data sets assumptions about nested identifiers should be checked carefully.
 
 ### Fitting a model with nested random effects {#sec-fittingPastes}
@@ -333,17 +364,17 @@ We include random-effects terms for each factor, as in
 
 ```{julia}
 psm01 = let
-    contrasts = Dict(:sample => Grouping(), :batch => Grouping())
-    form = @formula(strength ~ 1 + (1 | sample) + (1 | batch))
-    fit(MixedModel, form, pastes; contrasts, progress)
+  contrasts = Dict(:sample => Grouping(), :batch => Grouping())
+  form = @formula(strength ~ 1 + (1 | sample) + (1 | batch))
+  fit(MixedModel, form, pastes; contrasts, progress)
 end
 ```
 
 Not only is the model specification similar for nested and crossed factors, the internal calculations are performed according to the methods described in for each model type.
-Comparing the patterns in the matrices $\Lambda$, $\mathbf{Z}'\mathbf{Z}$ and $\mathbf{L}$ for this model 
+Comparing the patterns in the matrices $\Lambda$, $\mathbf{Z}'\mathbf{Z}$ and $\mathbf{L}$ for this model
 
 ```{julia}
-sparseL(psm01; full=true)
+sparseL(psm01; full = true)
 ```
 
 ```{julia}
@@ -370,7 +401,10 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| code-fold: true
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
-caterpillar!(Figure(resolution=(800, 300)), ranefinfo(psm01, :batch))
+caterpillar!(
+  Figure(resolution = (800, 300)),
+  ranefinfo(psm01, :batch),
+)
 ```
 
 confirm this impression in that all the prediction intervals for the random effects for contain zero.
@@ -378,7 +412,8 @@ confirm this impression in that all the prediction intervals for the random effe
 Furthermore, kernel density estimates from a parametric bootstrap sample of the estimated standard deviations of the random effects and residuals
 
 ```{julia}
-psm01samp = parametricbootstrap(Random.seed!(4567654), 10_000, psm01; hide_progress)
+Random.seed!(4567654)
+psm01samp = parametricbootstrap(10_000, psm01; hide_progress)
 psm01pars = DataFrame(psm01samp.allpars);
 ```
 
@@ -387,10 +422,13 @@ psm01pars = DataFrame(psm01samp.allpars);
 #| label: fig-psm01bssampdens
 #| code-fold: true
 draw(
-    data(@subset(psm01pars, :type == "σ")) *
-    mapping(:value => "Bootstrap samples of σ"; color=(:group => "Group")) *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450)),
+  data(@subset(psm01pars, :type == "σ")) *
+  mapping(
+    :value => "Bootstrap samples of σ";
+    color = (:group => "Group"),
+  ) *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -422,9 +460,9 @@ The restricted model fit
 
 ```{julia}
 psm02 = let
-    form = @formula(strength ~ 1 + (1 | sample))
-    contrasts = Dict(:sample => Grouping())
-    fit(MixedModel, form, pastes; contrasts, progress)
+  form = @formula(strength ~ 1 + (1 | sample))
+  contrasts = Dict(:sample => Grouping())
+  fit(MixedModel, form, pastes; contrasts, progress)
 end
 ```
 
@@ -453,7 +491,12 @@ DataFrame(shortestcovint(psm01samp))
 
 ```{julia}
 #| code-fold: true
-psm02samp = parametricbootstrap(Random.seed!(9753579), 10_000, psm02; hide_progress=true)
+psm02samp = parametricbootstrap(
+  Random.seed!(9753579),
+  10_000,
+  psm02;
+  hide_progress = true,
+)
 DataFrame(shortestcovint(psm02samp))
 ```
 
@@ -501,10 +544,10 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
 draw(
-    data(DataFrame(response = 1:5, count = counts(insteval.y))) *
-    mapping(:response => "Rating", :count => "Count") * 
-    visual(BarPlot);
-    figure = (; resolution=(800, 450)),
+  data(DataFrame(response = 1:5, count = counts(insteval.y))) *
+  mapping(:response => "Rating", :count => "Count") *
+  visual(BarPlot);
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -514,31 +557,38 @@ At this point we will fit models that have random effects for student, instructo
 In the next chapter we will fit models incorporating fixed-effects for instructor and department to these data.
 
 ```{julia}
+contrasts =
+  Dict(:s => Grouping(), :d => Grouping(), :dept => Grouping())
 iem01 = let
-    contrasts = Dict(:s => Grouping(), :d => Grouping(), :dept => Grouping())
-    form = @formula(y ~ 1 + (1|s) + (1|d) + (1|dept))
-    fit(MixedModel, form, insteval; contrasts, progress)
+  form = @formula(y ~ 1 + (1 | s) + (1 | d) + (1 | dept))
+  fit(MixedModel, form, insteval; contrasts, progress)
 end
 ```
 
 All three estimated standard deviations of the random effects are less than $\widehat{\sigma}$, with $\widehat{\sigma}_3$, the estimated standard deviation of the random effects for the `dept`, less than one-tenth the estimated residual standard deviation.
 
 It is not surprising that zero is within most of the prediction intervals on the random effects for this factor (@fig-iem01caterpillardept).
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
-caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
+caterpillar!(
+  Figure(resolution = (800, 400)),
+  ranefinfo(iem01, :dept),
+)
 ```
-However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$ 
+
+However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
+
 ```{julia}
 iem02 = let
-    form = @formula(y ~ 1 + (1|s) + (1|d))
-    contrasts=Dict(:s => Grouping(), :d => Grouping())
-    fit(MixedModel, form, insteval; contrasts, progress)
+  form = @formula(y ~ 1 + (1 | s) + (1 | d))
+  fit(MixedModel, form, insteval; contrasts, progress)
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
+
 is highly significant.
 That is, we have very strong evidence that we should reject $H_0$ in favor of $H_a$.
 
@@ -556,7 +606,7 @@ We could pursue other mixed-effects models here, such as using the factor and no
 Before leaving this model we examine the sparse Cholesky factor, $\mathbf{L}$, which is of size $4116\times4116$.
 
 ```{julia}
-sparseL(iem01; full=true)
+sparseL(iem01; full = true)
 ```
 
 Even as a sparse matrix this factor requires a considerable amount of memory, but as a triangular dense matrix it would require nearly 10 times as much.
@@ -570,7 +620,10 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| code-fold: true
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
 #| label: fig-iem01qqcaterpillard
-qqcaterpillar!(Figure(; resolution=(800, 650)), ranefinfo(iem01, :d))
+qqcaterpillar!(
+  Figure(; resolution = (800, 650)),
+  ranefinfo(iem01, :d),
+)
 ```
 
 shows the differences in precision due to different numbers of observations for different instructors.
@@ -580,10 +633,10 @@ shows the differences in precision due to different numbers of observations for 
 #| fig-cap: "Histogram of the number of observations per instructor in the insteval data"
 #| label: fig-iednobshist
 draw(
-    data(combine(groupby(insteval, :d), nrow => :n)) *
-    mapping(:n => "Number of observations") *
-    AlgebraOfGraphics.histogram(; bins=410);
-    figure = (; resolution=(800, 600))
+  data(combine(groupby(insteval, :d), nrow => :n)) *
+  mapping(:n => "Number of observations") *
+  AlgebraOfGraphics.histogram(; bins = 410);
+  figure = (; resolution = (800, 600)),
 )
 ```
 
@@ -592,7 +645,10 @@ The precision of the conditional distributions of the random effects, as measure
 We can determine the instructor, `I1258`, with the largest mean of the conditional distribution of the random effects
 
 ```{julia}
-last(sort(DataFrame(ranefinfotable(ranefinfo(iem01, :d))), :cmode), 5)
+last(
+  sort(DataFrame(ranefinfotable(ranefinfo(iem01, :d))), :cmode),
+  5,
+)
 ```
 
 but the conditional distribution of this random effect clearly overlaps significantly with others.
@@ -614,7 +670,7 @@ In the pastes data, levels of the factor cask are only meaningful within a parti
 A model formula of would result in a fitted model that did not appropriately reflect the sources of variability in the data.
 Following the simple rule that the factor should be defined so that distinct experimental or observational units correspond to distinct levels of the factor will avoid such ambiguity.
 
-For convenience, a model with multiple, nested random-effects terms can be specified as which internally is re-expressed as 
+For convenience, a model with multiple, nested random-effects terms can be specified as which internally is re-expressed as
 We will avoid terms of the form , preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
 
 The insteval data, described in @sec-insteval, illustrate some of the characteristics of the real data to which mixed-effects models are now fit.
@@ -625,6 +681,6 @@ The resulting emphasis on hierarchical or multilevel configurations is an artifa
 
 The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter.
 That is, profile-based confidence intervals on the fixed-effects parameter, $\beta_0$, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution and the logarithm of the residual standard deviation, $\log(\sigma)$, has a good normal approximation.
-Profile-based confidence intervals for the standard deviations of random effects ($\sigma_1$, $\sigma_2$, etc.) are symmetric on a logarithmic scale except for those that could be zero. 
+Profile-based confidence intervals for the standard deviations of random effects ($\sigma_1$, $\sigma_2$, etc.) are symmetric on a logarithmic scale except for those that could be zero.
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.

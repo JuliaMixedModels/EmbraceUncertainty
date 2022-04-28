@@ -11,10 +11,13 @@ book:
     - intro.qmd
     - multiple.qmd
     - longitudinal.qmd
-    - linalg.qmd
     - largescale.qmd
     - glmmbinomial.qmd
     - references.qmd
+  appendices: 
+    - linalg.qmd
+
+execute-dir: project
 
 bibliography: references.bib
 

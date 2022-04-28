@@ -18,6 +18,7 @@ const hide_progress = true
 using AlgebraOfGraphics
 using CairoMakie
 using CategoricalArrays
+using Chain
 using DataFrameMacros
 using DataFrames
 using MKL
@@ -29,8 +30,7 @@ using StatsBase
 
 In this chapter we consider mixed-effects models for data sets in which the response is *binary*, representing  yes/no or true/false or correct/incorrect responses.
 
-Because the response must be one of only two possible values we adapt our
-models to predict the probability of the positive response.
+Because the response must be one of only two possible values we adapt our models to predict the probability of the positive response.
 As for linear models and linear mixed-effects models, the mean response, $\boldsymbol{\mu}$, is determined by a *linear predictor*,
 $$
 \boldsymbol{\eta}=\mathbf{X}\boldsymbol{\beta}+\mathbf{Z}\mathbf{b}
@@ -49,12 +49,12 @@ One of the test data sets from the Center for Multilevel Modelling, University o
 The data are a subsample of 1934 women selected from 60 of the 64 political districts or *zila*, available as the `contra` data set in the `MixedModels` package.
 
 ```{julia}
-contra = MixedModels.dataset(:contra)
-```
-
-```{julia}
-contra = DataFrame(contra)
-describe(contra)
+contra = @chain :contra begin
+  MixedModels.dataset
+  @aside println(_)
+  DataFrame
+end;
+describe(contra, :mean, :min, :median, :max)
 ```
 
 The response of interest is `use` --- whether the woman chooses to use artificial contraception.
@@ -76,17 +76,21 @@ as in @fig-contradata
 #| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey
 #| label: fig-contradata
 draw(
-  data(@transform(
+  data(
+    @transform(
       contra,
       :numuse = Int(:use == "Y"),
       :urb = ifelse(:urban == "Y", "Urban", "Rural")
-      )) *
+    )
+  ) *
   mapping(
     :age => "Centered age (yr)",
     :numuse => "Frequency of contraception use";
     col = :urb,
-    color = :livch) * smooth();
-  figure=(; resolution=(800, 450)),
+    color = :livch,
+  ) *
+  smooth();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -108,12 +112,14 @@ As for a linear mixed-model, the first three arguments in a call to `fit` a gene
 The fourth argument describes the type of conditional distribution of the response given the random effects.
 
 ```{julia}
+contrasts = Dict(
+  :livch => EffectsCoding(; base = "0"),
+  :urban => HelmertCoding(),
+  :dist => Grouping(),
+)
 com01 = let
-  form = @formula(use ~ 1 + livch + (age + age^2) * urban + (1|dist))
-  contrasts = Dict(
-    :livch => EffectsCoding(; base="0"),
-    :urban => HelmertCoding(),
-    :dist => Grouping(),
+  form = @formula(
+    use ~ 1 + livch + (age + age^2) * urban + (1 | dist)
   )
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
@@ -148,10 +154,8 @@ we fit a reduced model.
 
 ```{julia}
 com02 = let
-  form = @formula(use ~ 1 + ch + (age + age^2) * urban + (1|dist))
-  contrasts = Dict(
-    :urban => HelmertCoding(),
-    :dist => Grouping(),
+  form = @formula(
+    use ~ 1 + ch + (age + age^2) * urban + (1 | dist)
   )
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
@@ -172,21 +176,21 @@ A plot of the smoothed observed proportions versus centered age according to `ur
 #| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey.  The livch factor has been collapsed to children/nochildren.
 #| label: fig-contradata2
 draw(
-    data(
-      @transform(
-        contra,
-        :numuse = Int(:use == "Y"),
-        :urb = ifelse(:urban == "Y", "Urban", "Rural")
-      )
-    ) *
-    mapping(
-      :age => "Centered age (yr)",
-      :numuse => "Frequency of contraception use";
-      col = :urb,
-      color = :ch
-    ) *
-    smooth();
-    figure=(; resolution=(800, 450)),
+  data(
+    @transform(
+      contra,
+      :numuse = Int(:use == "Y"),
+      :urb = ifelse(:urban == "Y", "Urban", "Rural")
+    )
+  ) *
+  mapping(
+    :age => "Centered age (yr)",
+    :numuse => "Frequency of contraception use";
+    col = :urb,
+    color = :ch,
+  ) *
+  smooth();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -195,10 +199,10 @@ Incorporating an interaction of `age` and `ch` allows for such a shift.
 
 ```{julia}
 com03 = let
-  form = @formula(use ~ 1 + (ch + age) * urban + age^2 + age^2 & urban + (1|dist))
-  contrasts = Dict(
-    :urban => HelmertCoding(),
-    :dist => Grouping(),
+  form = @formula(
+    use ~
+      1 + (ch + age) * urban + age^2 + age^2 & urban +
+      (1 | dist)
   )
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
@@ -216,8 +220,9 @@ Continuing with the model-building we turn our attention to the random effects s
 
 ```{julia}
 com04 = let
-  form = @formula(use ~ 1 + urban + ch * age + age^2 + (1|dist))
-  contrasts = Dict(:urban => HelmertCoding(), :dist => Grouping())
+  form = @formula(
+    use ~ 1 + urban + ch * age + age^2 + (1 | dist)
+  )
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
 ```
@@ -226,8 +231,9 @@ We fit a succession of models, described in the exercises for this chapter, befo
 
 ```{julia}
 com05 = let
-  form = @formula(use ~ 1 + urban + ch * age + age^2 + (1|dist&urban))
-  contrasts = Dict(:urban => HelmertCoding(), :dist => Grouping())
+  form = @formula(
+    use ~ 1 + urban + ch * age + age^2 + (1 | dist & urban)
+  )
   fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
 end
 ```
@@ -267,7 +273,7 @@ $\mu$ that has an unrestricted range. In the case of the Bernoulli
 distribution with the canonical link function we equate the linear
 predictor to the *log odds* or *logit* of the positive response. That is
 $$
-  \eta = \log\left(\frac{\mu}{1-\mu}\right) .
+\eta = \log\left(\frac{\mu}{1-\mu}\right) .
 $$ {#eq-logodds}
 
 To understand why this is called the "log odds" recall that $\mu$
@@ -275,9 +281,9 @@ corresponds to a probability in $[0,1]$. The corresponding odds ratio,
 $\frac{\mu}{1-\mu}$, is in $[0,\infty)$ and the logarithm of the odds
 ratio, $\mathrm{logit}(\mu)$, is in $(-\infty, \infty)$.
 
-The inverse of the logit link function, 
+The inverse of the logit link function,
 $$
-  \mu = \frac{1}{1+\exp(-\eta)} ,
+\mu = \frac{1}{1+\exp(-\eta)} ,
 $$ {#eq-logitinv}
 is called the *logistic* function and is shown in @fig-logitinv.
 
@@ -286,10 +292,15 @@ is called the *logistic* function and is shown in @fig-logitinv.
 #| fig-cap: 'The logistic function, which is the inverse to the logit link function.'
 #| label: fig-logitinv
 draw(
-  data(@transform(DataFrame(η = collect(-5.:0.02:5.)), :μ = inv(1 + exp(-:η)))) *
-  mapping(:η, :μ) * 
+  data(
+    @transform(
+      DataFrame(η = collect(-5.0:0.02:5.0)),
+      :μ = inv(1 + exp(-:η))
+    )
+  ) *
+  mapping(:η, :μ) *
   visual(Lines);
-  figure=(; resolution=(800,400))
+  figure = (; resolution = (800, 400)),
 )
 ```
 
@@ -304,8 +315,8 @@ A way of deriving the logit link that does generalize to a class of common distr
 The probability function for the Bernoulli distribution is $\mu$ for $y=1$ and $1-\mu$ for $y=0$.
 If we write this in a somewhat peculiar way as $\mu^y+(1-\mu)^{1-y}$ for $y\in\{0,1\}$ then the logarithm of the probability function becomes
 $$
-  \log\left(\mu^y+(1-\mu)^{1-y}\right) = \log(1-\mu) +
-  y\,\log\left(\frac{\mu}{1-\mu}\right) .
+\log\left(\mu^y+(1-\mu)^{1-y}\right) = \log(1-\mu) +
+y\,\log\left(\frac{\mu}{1-\mu}\right) .
 $$ {#eq-BernoulliProb}
 Notice that the logit link function is the multiple of $y$ in the last term.
 
@@ -314,7 +325,7 @@ This function is the canonical link.
 
 In the case of the Poisson distribution the probability function is $\frac{e^{-\mu}\mu^y}{y!}$ for $y\in\{0,1,2,\dots\}$ so the log probability function is
 $$
-  -\log(y!)-\mu+y\log(\mu) .
+-\log(y!)-\mu+y\log(\mu) .
 $$ {#eq-PoissonProb}
 and the canonical link function is $\log(\mu)$.
 
@@ -324,7 +335,7 @@ Returning to the interpretation of the estimated coefficients in model we apply 
 If we wish to express results in the probability scale then we should apply the function to whatever combination of coefficients is of interest to us.
 
 For example, we see from @fig-contradata2 that the observed proportion of childless women with a centered age of 0 living in a rural setting who use artificial contraception is about 20%.
-The fitted value of the log-odds for a typical district (i.e. with a random effect of zero) is corresponding to a fitted probability of 
+The fitted value of the log-odds for a typical district (i.e. with a random effect of zero) is corresponding to a fitted probability of
 
 or %.
 
@@ -335,7 +346,7 @@ corresponding to a probability of
 The predicted log-odds and predicted probability for a woman with children and at the same age and location are
 
 We should also be aware that the random effects are defined on the linear predictor scale and not on the probability scale.
-A normal probability plot of the conditional modes of the random effects for model 
+A normal probability plot of the conditional modes of the random effects for model
 
 shows that the smallest random effects are approximately -1 and the largest are approximately 1.
 The numerical values and the identifier of the combination of and for these extreme values can be obtained as
@@ -345,7 +356,7 @@ and
 The exponential of the random effect is the relative odds of a woman in a particular urban/district combination using artificial birth control compared to her counterpart (same age, same with/without children status, same urban/rural status) in a typical district.
 The odds of a rural woman in district 1 (i.e. the value of the interaction) using artifical contraception is
 
-or about 40% of that of her rural counterpart in a typical district.
+or about 40% of that of her urban counterpart in a typical district.
 
 Notice that there is considerable variability in the lengths of the prediction intervals in
 
@@ -363,4 +374,3 @@ The data contains responses from 54 rural women in district 1 but only 21 rural 
 Thus the bottom line in @fig-com05qqcaterpillar, from the level of the interaction, and
 based on 54 responses, is shorter than the line second from the bottom,
 for and based on 21 women only.
-

@@ -71,14 +71,14 @@ To summarize by item we group the trials by item and use `combine` to produce th
 
 ```{julia}
 byitem = @chain ldttrial begin
-    groupby(:item)
-    @combine(
-        :n = length(:acc),              # no. of obs
-        :nmiss = sum(ismissing, :acc),  # no. of missing acc
-        :nacc = sum(skipmissing(:acc)), # no. of accurate
-        :medianrt = median(:rt),
-    )
-    @transform!(:wrdlen = length(:item), :propacc = :nacc / :n)
+  groupby(:item)
+  @combine(
+    :n = length(:acc),              # no. of obs
+    :nmiss = sum(ismissing, :acc),  # no. of missing acc
+    :nacc = sum(skipmissing(:acc)), # no. of accurate
+    :medianrt = median(:rt),
+  )
+  @transform!(:wrdlen = length(:item), :propacc = :nacc / :n)
 end
 ```
 
@@ -92,9 +92,11 @@ describe(byitem)
 
 This table shows that some of the items were never identified correctly.
 These are
+
 ```{julia}
 @subset(byitem, iszero(:nacc))
 ```
+
 Notice that these are all words but somewhat obscure words such that none of the subjects exposed to the word identified it correctly.
 
 We can incorporate characteristics like `wrdlen` and `isword` back into the original trial table with a "left join".
@@ -104,22 +106,24 @@ If there is no matching row in the second table then missing values are inserted
 
 ```{julia}
 describe(
-    leftjoin!(
-        ldttrial,
-        select(byitem, :item, :wrdlen, :isword);
-        on = :item,
-    )
+  leftjoin!(
+    ldttrial,
+    select(byitem, :item, :wrdlen, :isword);
+    on = :item,
+  ),
 )
 ```
 
 Notice that the `wrdlen` and `isword` variables in this table allow for missing values, because they are derived from the second argument, but there are no missing values for these variables.
 If there is no need to allow for missing values, there is a slight advantage in disallowing them.
 This could be done separately for each column or for the whole data frame, as in
+
 ```{julia}
-describe(disallowmissing!(ldttrial; error=false))
+describe(disallowmissing!(ldttrial; error = false))
 ```
 
 A histogram of the word lengths, @fig-ldtwrdlenhist, shows that the majority of the items are between 3 and 14 characters.
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Histogram of word lengths in the items used in the lexical decision task."
@@ -127,60 +131,67 @@ A histogram of the word lengths, @fig-ldtwrdlenhist, shows that the majority of 
 draw(
   data(byitem) *
   mapping(:wrdlen => "Length of word") *
-  histogram(; bins=0.5:21.5)
+  histogram(; bins = 0.5:21.5),
 )
 ```
 
 To examine trends in accuracy by word length we use a scatterplot smoother on the binary response, as in @sec-plottingbinary.
 The resulting plot, @fig-ldtaccsmooth, shows the accuracy of identifying nonwords is more-or-less constant at around 85%,
 but accuracy decreases with increasing word length for the words.
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Smoothed curves of accuracy versus word length in the lexical decision task."
 #| label: fig-ldtaccsmooth
 draw(
-  data(@subset(ldttrial, !ismissing(:acc))) * 
+  data(@subset(ldttrial, !ismissing(:acc))) *
   mapping(
     :wrdlen => "Word length",
     :acc => "Accuracy";
-    color=:isword,
-  ) * smooth();
-  figure=(; resolution=(800, 450))
+    color = :isword,
+  ) *
+  smooth();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
 ### Summaries by subject {#sec-elpsumrysubj}
 
 A summary of accuracy and median response time by subject
+
 ```{julia}
 bysubj = @chain ldttrial begin
-    groupby(:subj)
-    @combine(
-        :n = length(:acc),              # no. of obs
-        :nmiss = sum(ismissing, :acc),  # no. of missing acc
-        :nacc = sum(skipmissing(:acc)), # no. of accurate
-        :medianrt = median(:rt),
-    )
-    @transform!(:propacc = :nacc / :n)
+  groupby(:subj)
+  @combine(
+    :n = length(:acc),              # no. of obs
+    :nmiss = sum(ismissing, :acc),  # no. of missing acc
+    :nacc = sum(skipmissing(:acc)), # no. of accurate
+    :medianrt = median(:rt),
+  )
+  @transform!(:propacc = :nacc / :n)
 end
 ```
+
 shows some anomalies
+
 ```{julia}
 describe(bysubj)
 ```
 
 First, some subjects are accurate on only around half of their trials, which is what would be expected from random guessing.
 A plot of the median response time versus proportion accurate, @fig-ldtmedianrtvspropacc, shows that the subjects with lower accuracy are some of the fastest responders, indicating again that these subjects may just be guessing.
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Median response time versus proportion accurate by subject in the LDT."
 #| label: fig-ldtmedianrtvspropacc
 draw(
-    data(bysubj) * 
-    mapping(
-        :propacc => "Proportion accurate", 
-        :medianrt => "Median response time",
-    ) * (smooth() + visual(Scatter));
+  data(bysubj) *
+  mapping(
+    :propacc => "Proportion accurate",
+    :medianrt => "Median response time",
+  ) *
+  (smooth() + visual(Scatter));
 )
 ```
 
@@ -195,11 +206,7 @@ For this example we only use the responses between 333 and 4000 ms.
 
 ```{julia}
 pruned = dropmissing!(
-    @subset(
-        ldttrial,
-        coalesce(:acc, false),
-        333 ≤ :rt ≤ 4000,
-    )
+  @subset(ldttrial, coalesce(:acc, false), 333 ≤ :rt ≤ 4000,)
 )
 size(pruned)
 ```
@@ -215,10 +222,10 @@ A density plot of the pruned response times, @fig-elpldtrtdens, shows they are s
 #| fig-cap: Kernel density plot of the pruned response times (ms.) in the LDT.
 #| label: fig-elpldtrtdens
 draw(
-    data(pruned) *
-    mapping(:rt => "Response time (ms.) for correct responses") *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450))
+  data(pruned) *
+  mapping(:rt => "Response time (ms.) for correct responses") *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
@@ -235,42 +242,45 @@ The density of the response speed, in responses per second, is shown in @fig-elp
 #| fig-cap: Kernel density plot of the pruned response speed in the LDT.
 #| label: fig-elpldtspeeddens
 draw(
-    data(pruned) *
-    mapping(:speed => "Response speed (s⁻¹) for correct responses") *
-    AlgebraOfGraphics.density();
-    figure=(; resolution = (800, 450))
+  data(pruned) *
+  mapping(:speed => "Response speed (s⁻¹) for correct responses") *
+  AlgebraOfGraphics.density();
+  figure = (; resolution = (800, 450)),
 )
 ```
 
 As noted in @Box1964, a transformation of the response that produces a more Gaussian distribution often will also produce a simpler model structure.
 For example, @fig-ldtrtvswrdlen shows the smoothed relationship between word length and response time for words and non-words separately,
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Scatterplot smooths of response time versus word length in the LDT."
 #| label: fig-ldtrtvswrdlen
 draw(
-    data(pruned) *
-    mapping(
-        :wrdlen => "Word length",
-        :rt => "Response time (ms)";
-        :color => :isword,
-    ) *
-    smooth();
+  data(pruned) *
+  mapping(
+    :wrdlen => "Word length",
+    :rt => "Response time (ms)";
+    :color => :isword,
+  ) *
+  smooth();
 )
 ```
+
 and @fig-ldtspeedvswrdlen shows the similar relationships for speed
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Scatterplot smooths of speed time versus word length in the LDT."
 #| label: fig-ldtspeedvswrdlen
 draw(
-    data(pruned) *
-    mapping(
-        :wrdlen => "Word length",
-        :speed => "Speed of response (s⁻¹)";
-        :color => :isword,
-    ) *
-    smooth();
+  data(pruned) *
+  mapping(
+    :wrdlen => "Word length",
+    :speed => "Speed of response (s⁻¹)";
+    :color => :isword,
+  ) *
+  smooth();
 )
 ```
 
@@ -283,15 +293,15 @@ Finally, we fit a first model with simple, scalar, random effects for `subj` and
 
 ```{julia}
 elm01 = let
-    contrasts = Dict(
-        :subj => Grouping(),
-        :item => Grouping(),
-        :isword => DummyCoding(; base=true),
-    )
-    form = @formula(
-        speed ~ 1 + isword * wrdlen + (1|item) + (1|subj)
-    )
-    fit(MixedModel, form, pruned; contrasts, progress)
+  contrasts = Dict(
+    :subj => Grouping(),
+    :item => Grouping(),
+    :isword => DummyCoding(; base = true),
+  )
+  form = @formula(
+    speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+  )
+  fit(MixedModel, form, pruned; contrasts, progress)
 end
 println(elm01)
 ```
@@ -307,18 +317,18 @@ saveoptsum("./optsums/elm01.json", elm01);
 
 ```{julia}
 elm01a = restoreoptsum!(
-    let
-        contrasts = Dict(
-            :subj => Grouping(),
-            :item => Grouping(),
-            :isword => DummyCoding(; base=true),
-        )
-        form = @formula(
-            speed ~ 1 + isword * wrdlen + (1|item) + (1|subj)
-        )
-        MixedModel(form, pruned; contrasts)
-    end,
-    "./optsums/elm01.json",
+  let
+    contrasts = Dict(
+      :subj => Grouping(),
+      :item => Grouping(),
+      :isword => DummyCoding(; base = true),
+    )
+    form = @formula(
+      speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+    )
+    MixedModel(form, pruned; contrasts)
+  end,
+  "./optsums/elm01.json",
 )
 ```
 
@@ -343,6 +353,8 @@ A caterpillar plot, @fig-elm01caterpillarsubj,
 #| code-fold: true
 #| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm01.
 #| label: fig-elm01caterpillarsubj
-qqcaterpillar!(Figure(resolution=(800, 650)), ranefinfo(elm01, :subj))
+qqcaterpillar!(
+  Figure(resolution = (800, 650)),
+  ranefinfo(elm01, :subj),
+)
 ```
-
