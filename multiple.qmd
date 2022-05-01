@@ -1,18 +1,33 @@
----
-jupyter: julia-1.7
----
-
 # Models With Multiple Random-effects Terms {#sec-Multiple}
+
+::: {.hidden}
+$$
+\newcommand\bbA{{\mathbf{A}}}
+\newcommand\bbb{{\mathbf{b}}}
+\newcommand\bbI{{\mathbf{I}}}
+\newcommand\bbL{{\mathbf{L}}}
+\newcommand\bbR{{\mathbf{R}}}
+\newcommand\bbX{{\mathbf{X}}}
+\newcommand\bbx{{\mathbf{x}}}
+\newcommand\bby{{\mathbf{y}}}
+\newcommand\bbZ{{\mathbf{Z}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbeta{{\boldsymbol{\eta}}}
+\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
+\newcommand\bbOmega{{\boldsymbol{\Omega}}}
+\newcommand\bbmu{{\boldsymbol{\mu}}}
+\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+\newcommand\mcN{{\mathcal{N}}}
+\newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcY{{\mathcal{Y}}}
+$$
+:::
 
 Attach the packages to be used in this chapter
 
 ```{julia}
 #| code-fold: true
-#| output: false
-using Pkg
-Pkg.activate(@__DIR__)
-
-const progress = false
 const hide_progress = true
 
 using AlgebraOfGraphics
@@ -20,11 +35,18 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
-using MKL
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL
+end
 using MixedModels
 using MixedModelsMakie
+using ProgressMeter
 using Random
+using RCall
 using StatsBase
+
+ProgressMeter.ijulia_behavior(:clear);
+CairoMakie.activate!(; type="svg")
 ```
 
 The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient.
@@ -157,7 +179,7 @@ A model incorporating random effects for both the `plate` and the `sample` is st
 pnm01 = let
   contrasts = Dict(:plate => Grouping(), :sample => Grouping())
   form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
-  fit(MixedModel, form, penicillin; contrasts, progress)
+  fit(MixedModel, form, penicillin; contrasts)
 end
 println(pnm01)
 ```
@@ -190,14 +212,14 @@ However, the conditional distribution of the random effect for a particular samp
 That is, the lines in @fig-pnm01samplepred are wider than the lines in @fig-pnm01platepred, even after taking the different axis scales into account.
 This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.
 
-In @sec-examlmm we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, $\mathbf{Z}$, that is the matrix of indicators of the levels of the grouping factor.
-When we have multiple, simple, scalar random-effects terms, as in model `m3`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\mathbf{Z}$ whose transpose is
+In @sec-examlmm we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, $\bbZ$, that is the matrix of indicators of the levels of the grouping factor.
+When we have multiple, simple, scalar random-effects terms, as in model `m3`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\bbZ$ whose transpose is
 
 ```{julia}
 vcat(transpose.(sparse.(pnm01.reterms))...)
 ```
 
-The relative covariance factor, $\boldsymbol{\Lambda}_{\boldsymbol\theta}$, for this model
+The relative covariance factor, $\bbLambda_{\bbtheta}$, for this model
 is block diagonal, with two blocks, one of size 24 and one of size 6, each of which is a multiple of the identity.
 The diagonal elements of the two blocks are $\theta_1$ and $\theta_2$, respectively.
 The numeric values of these parameters can be obtained as
@@ -208,8 +230,8 @@ pnm01.θ'
 
 The first parameter is the relative standard deviation of the random effects for plate, which has the value $0.845565/0.549933=1.53758$ at convergence, and the second is the relative standard deviation of the sample random effects ($1.770648/0.549933=3.21975$).
 
-Because $\boldsymbol{\Lambda}_{\boldsymbol\theta}$ is diagonal, the pattern of non-zeros in $\Lambda_\theta'\mathbf{Z}'\mathbf{Z}\Lambda_\theta+\mathbf{I}$ will be the same as that in $\mathbf{Z}'\mathbf{Z}$.
-The sparse Cholesky factor, $\mathbf{L}$, is lower triangular and has non-zero elements in the lower right hand corner in positions where $\mathbf{Z}'\mathbf{Z}$ has systematic zeros.
+Because $\bbLambda_{\bbtheta}$ is diagonal, the pattern of non-zeros in $\Lambda_\theta'\bbZ'\bbZ\Lambda_\theta+\bbI$ will be the same as that in $\bbZ'\bbZ$.
+The sparse Cholesky factor, $\bbL$, is lower triangular and has non-zero elements in the lower right hand corner in positions where $\bbZ'\bbZ$ has systematic zeros.
 
 ```{julia}
 sparseL(pnm01)
@@ -316,15 +338,33 @@ It would be fine to do this within a batch but the plot would be misleading if w
 There is no relationship between cask 'a' in batch 'A' and cask 'a' in batch 'B'.
 The labels 'a', 'b' and 'c' are used only to distinguish the three samples within a batch; they do not have a meaning across batches.
 
-In @fig-Pastesplot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
+```{julia}
+#| code-fold: true
+#| fig-cap: "Strength of paste preparations according to sample within batch"
+#| label: fig-pastesdot
+
+RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=8)
+R"""
+require("lattice", quietly=TRUE)
+pp <- $pastes
+pp <- within(pp, bb <- reorder(batch, strength))
+dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
+        strip.left = TRUE, layout = c(1, 10),
+        scales = list(y = list(relation = "free")),
+        ylab = "Sample within batch", type = c("p", "a"),
+        xlab = "Paste strength", jitter.y = TRUE)
+"""
+```
+
+In @fig-pastesdot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
 The perceptive reader will have noticed that the levels of the factors on the vertical axis in this figure, and in @fig-dyestuffdata, and @fig-penicillindot, have been reordered  according to increasing average response.
 In all these cases there is no inherent ordering of the levels of the covariate such as batch or plate.
 Rather than confuse our interpretation of the plot by determining the vertical displacement of points according to a random ordering, we impose an ordering according to increasing mean response.
 This allows us to more easily check for structure in the data, including undesirable characteristics like increasing variability of the response with increasing mean level of the response.
 
-In @fig-Pastesplot we order the samples within each batch separately then order the batches according to increasing mean strength.
+In @fig-pastesdot we order the samples within each batch separately then order the batches according to increasing mean strength.
 
-@fig-Pastesplot shows considerable variability in strength between samples relative to the variability within samples.
+@fig-pastesdot shows considerable variability in strength between samples relative to the variability within samples.
 There is some indication of variability between batches, in addition to the variability induced by the samples, but not a strong indication of a batch effect.
 For example, batches I and D, with low mean strength relative to the other batches, each contained one sample (I:b and D:c, respectively) that had high mean strength relative to the other samples.
 Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength.
@@ -366,12 +406,12 @@ We include random-effects terms for each factor, as in
 psm01 = let
   contrasts = Dict(:sample => Grouping(), :batch => Grouping())
   form = @formula(strength ~ 1 + (1 | sample) + (1 | batch))
-  fit(MixedModel, form, pastes; contrasts, progress)
+  fit(MixedModel, form, pastes; contrasts)
 end
 ```
 
 Not only is the model specification similar for nested and crossed factors, the internal calculations are performed according to the methods described in for each model type.
-Comparing the patterns in the matrices $\Lambda$, $\mathbf{Z}'\mathbf{Z}$ and $\mathbf{L}$ for this model
+Comparing the patterns in the matrices $\bbLambda$, $\bbZ'\bbZ$ and $\bbL$ for this model
 
 ```{julia}
 sparseL(psm01; full = true)
@@ -381,9 +421,9 @@ sparseL(psm01; full = true)
 BlockDescription(psm01)
 ```
 
-Comparing the block structure of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\mathbf{L}$.
+Comparing the block structure of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
 This type of structure has the desirable property that there is no "fill-in" during calculation of the Cholesky factor.
-In other words, the number of non-zeros in $\mathbf{L}$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\Lambda'\mathbf{Z}'\mathbf{Z}\Lambda+\mathbf{I}$ (which, because $\Lambda$ is diagonal, has the same structure as $\mathbf{Z}'\mathbf{Z}$).
+In other words, the number of non-zeros in $\bbL$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\Lambda'\bbZ'\bbZ\Lambda+\bbI$ (which, because $\Lambda$ is diagonal, has the same structure as $\bbZ'\bbZ$).
 
 Fill-in of the Cholesky factor is not an important issue when we have a few dozen random effects, as we do here.
 It is an important issue when we have millions of random effects in complex configurations, as has been the case in some of the models that have been fit using MixedModels.
@@ -392,8 +432,8 @@ It is an important issue when we have millions of random effects in complex conf
 
 The parameter estimates are: $\widehat{\sigma_1}=$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}=$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}=$, the standard deviation of the residual noise term; and $\widehat{\beta_1}=$, the overall mean response, which is labeled `(Intercept)` in these models.
 
-The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig-Pastesplot.
-Indeed our conclusion from @fig-Pastesplot was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.
+The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig-pastesdot.
+Indeed our conclusion from @fig-pastesdot was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.
 
 Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpillar)
 
@@ -462,7 +502,7 @@ The restricted model fit
 psm02 = let
   form = @formula(strength ~ 1 + (1 | sample))
   contrasts = Dict(:sample => Grouping())
-  fit(MixedModel, form, pastes; contrasts, progress)
+  fit(MixedModel, form, pastes; contrasts)
 end
 ```
 
@@ -561,7 +601,7 @@ contrasts =
   Dict(:s => Grouping(), :d => Grouping(), :dept => Grouping())
 iem01 = let
   form = @formula(y ~ 1 + (1 | s) + (1 | d) + (1 | dept))
-  fit(MixedModel, form, insteval; contrasts, progress)
+  fit(MixedModel, form, insteval; contrasts)
 end
 ```
 
@@ -584,7 +624,7 @@ However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
 ```{julia}
 iem02 = let
   form = @formula(y ~ 1 + (1 | s) + (1 | d))
-  fit(MixedModel, form, insteval; contrasts, progress)
+  fit(MixedModel, form, insteval; contrasts)
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
@@ -601,9 +641,9 @@ We could profile this model fit but doing so would take a very long time and, in
 
 We could pursue other mixed-effects models here, such as using the factor and not the interaction to define random effects, but we will revisit these data in the next chapter and follow up on some of these variations there.
 
-### Structure of $\mathbf{L}$ for model iem01 {#sec-iem01L}
+### Structure of $\bbL$ for model iem01 {#sec-iem01L}
 
-Before leaving this model we examine the sparse Cholesky factor, $\mathbf{L}$, which is of size $4116\times4116$.
+Before leaving this model we examine the sparse Cholesky factor, $\bbL$, which is of size $4116\times4116$.
 
 ```{julia}
 sparseL(iem01; full = true)

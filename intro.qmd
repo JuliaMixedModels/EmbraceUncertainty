@@ -1,8 +1,27 @@
----
-jupyter: julia-1.7
----
-
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
+
+::: {.hidden}
+$$
+\newcommand\bbA{{\mathbf{A}}}
+\newcommand\bbb{{\mathbf{b}}}
+\newcommand\bbI{{\mathbf{I}}}
+\newcommand\bbR{{\mathbf{R}}}
+\newcommand\bbX{{\mathbf{X}}}
+\newcommand\bbx{{\mathbf{x}}}
+\newcommand\bby{{\mathbf{y}}}
+\newcommand\bbZ{{\mathbf{Z}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbeta{{\boldsymbol{\eta}}}
+\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
+\newcommand\bbOmega{{\boldsymbol{\Omega}}}
+\newcommand\bbmu{{\boldsymbol{\mu}}}
+\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+\newcommand\mcN{{\mathcal{N}}}
+\newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcY{{\mathcal{Y}}}
+$$
+:::
 
 In this book we describe the theory behind a type of statistical model called *mixed-effects* models and the practice of fitting and analyzing such models using the [MixedModels](https://github.com/JuliaStats/MixedModels.jl) package for [Julia](https://julialang.org).
 These models are used in many different disciplines.
@@ -43,13 +62,13 @@ Adding more data, either from more school districts or from results on previous 
 Because of the way that we will define random effects, a model with random effects always includes at least one fixed-effects parameter.
 Thus, any model with random effects is a mixed model.
 
-We characterize the statistical model in terms of two random variables: a $q$-dimensional vector of random effects represented by the random variable $\mathcal{B}$ and an $n$-dimensional response vector represented by the random variable $\mathcal{Y}$.
+We characterize the statistical model in terms of two random variables: a $q$-dimensional vector of random effects represented by the random variable $\mcB$ and an $n$-dimensional response vector represented by the random variable $\mcY$.
 (We use upper-case "script" characters to denote random variables.
 The corresponding lower-case upright letter denotes a particular value of the random variable, with vector-valued random variable values in boldface.)
-We observe the value, $\mathbf{y}$, of $\mathcal{Y}$.
-We do not observe the value, $\mathbf{b}$, of $\mathcal{B}$.
+We observe the value, $\bby$, of $\mcY$.
+We do not observe the value, $\bbb$, of $\mcB$.
 
-When formulating the model we describe the unconditional distribution of $\mathcal{B}$ and the conditional distribution, $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$.
+When formulating the model we describe the unconditional distribution of $\mcB$ and the conditional distribution, $(\mcY|\mcB=\bbb)$.
 The descriptions of the distributions involve the form of the distribution and the values of certain parameters.
 We use the observed values of the response and the covariates to estimate these
 parameters and to make inferences about them.
@@ -79,34 +98,30 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 > standard colour was determined by dye-trial.
 
 To access these data within `Julia` we must first attach this package, and others that we will use, to our session.
-We use a local project specification for packages so we begin by activating the local project.
 
 ```{julia}
-#| output: false
-using Pkg
-Pkg.activate(@__DIR__)
-```
+using AlgebraOfGraphics # high-level graphics
+using CairoMakie        # graphics back-end
+using CategoricalArrays # factors and ordered factors
+using DataFrameMacros   # elegant DataFrame manipulation
+using DataFrames        # DataFrame implementation
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL             # faster LAPACK on Intel processors
+end
+using Markdown          # utilities for generating markdown text
+using MixedModels       # fit and examine mixed-effects models
+using MixedModelsMakie  # graphics for mixed-effects models
+using Printf            # formatted printing
+using ProgressMeter     # progress of optimizer iterations
+using Random            # random number generation
+using StatsBase         # basic statistical summaries
 
-then attach the other packages to be used
-
-```{julia}
-using AlgebraOfGraphics   # high-level graphics
-using CairoMakie          # graphics back-end
-using CategoricalArrays   # factors and ordered factors
-using DataFrameMacros     # elegant DataFrame manipulation
-using DataFrames          # DataFrame implementation
-using MKL                 # faster LAPACK on Intel processors
-using Markdown            # utilities for generating markdown text
-using MixedModels         # fit and examine mixed-effects models
-using MixedModelsMakie    # graphics for mixed-effects models
-using Printf              # formatted printing
-using Random              # random number generation
-using StatsBase           # basic statistical summaries
+ProgressMeter.ijulia_behavior(:clear);
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
 If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s).
-If you are using Julia version 1.7.0 or later the error report will include instructions on how to do this.
+If you are using Julia version 1.8.0 or later the error report will include instructions on how to do this.
 
 In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.
 
@@ -210,12 +225,7 @@ function _meanrespfrm(
   return df, sumry
 end
 let
-  df, sumry = _meanrespfrm(
-    DataFrame(MixedModels.dataset(:dyestuff)),
-    :yield,
-    :batch,
-  )
-
+  df, sumry = _meanrespfrm(dyestuff, :yield, :batch)
   mp = mapping(
     :yield => "Yield of dyestuff [g]",
     :batch => "Batch of intermediate product",
@@ -241,6 +251,11 @@ This plot, and essentially all the other plots in this book, were created using 
 In `yet-to-be-written-appendix` we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot.
 For example, in this plot the levels of `batch` are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are *jittered* to avoid overplotting of points.
 (Note that the two lowest yields of samples from batch `A` are identical.)
+
+::: {.callout-note}
+Jittering has not yet been added.
+:::
+
 At this point we will concentrate on the information conveyed by the plot and not on how the plot is created.
 
 In @sec-fittinglmms we will use mixed models to quantify the variability in yield between batches.
@@ -309,21 +324,18 @@ We will explain the structure of the formula after we have considered an example
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
 ```{julia}
-const progress = false # suppress the progress bar in the fit
 dsm01 = let
   form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff; progress)
+  fit(MixedModel, form, dyestuff)
 end
-println(dsm01)
 ```
 
-:::{.callout-note}
-In this code block the model is "printed" using `println` after being fit.
-By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, are shown more compactly.
+By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, are shown compactly like this.
+To obtain more information we can `print` the model, as in
 :::
 
 ```{julia}
-dsm01
+println(dsm01)
 ```
 
 The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) parameter estimates, assigns the results to the name `dsm01`, and displays a summary of the fitted model.
@@ -390,7 +402,7 @@ Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\
 ```{julia}
 dsm02 = let
   form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff2; progress)
+  fit(MixedModel, form, dyestuff2)
 end
 println(dsm02)
 ```
@@ -422,21 +434,21 @@ A common way of writing the statistical model being fit in `dsm01` and `dsm02` i
 $$
 y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 $$
-with the further specification that the per-observation noise terms, $\epsilon_{i,j}$, are independently and identically distributed as $\mathcal{N}(0, \sigma^2)$ and the random effects, $b_j$, are independently and identically distributed as $\mathcal{N}(0, \sigma_1^2)$.
+with the further specification that the per-observation noise terms, $\epsilon_{i,j}$, are independently and identically distributed as $\mcN(0, \sigma^2)$ and the random effects, $b_j$, are independently and identically distributed as $\mcN(0, \sigma_1^2)$.
 The three parameters in the model are the overall mean, $\mu$, the standard deviation of the random effects, $\sigma_1$, and the standard deviation of the per-observation noise, $\sigma$.
 
 Generalizing this formulation to unbalanced data sets and more complex models can become unwieldy.
 For the range of models shown in this book it is more convenient to use a matrix-vector representation in which the random effects are described as a $q$-dimensional multivariate Gaussian random variable
 $$
-\mathcal{B}\sim\mathcal{N}(\mathbf{0},\sigma_1^2\mathbf{I}) .
+\mcB\sim\mcN(\mathbf{0},\sigma_1^2\bbI) .
 $$ {#eq-mvbdist}
 The multivariate Gaussian distribution is described in more detail in @sec-mvgaussian.
 At this point the important thing to know is that @eq-mvbdist describes a vector of independent Gaussian random variables, each of which has mean $0$ and variance $\sigma_1^2$.
 
-The random effects are associated with the observations through a *model matrix*, $\mathbf{Z}$.
-For a model with $n$ observations and a total of $q$ random effects, $\mathbf{Z}$ will be of size $n\times q$.
+The random effects are associated with the observations through a *model matrix*, $\bbZ$.
+For a model with $n$ observations and a total of $q$ random effects, $\bbZ$ will be of size $n\times q$.
 Furthermore, it is sparse - meaning that most of the elements of the matrix are zeros.
-In this case, $\mathbf{Z}$ is the indicator matrix for the `batch` covariate.
+In this case, $\bbZ$ is the indicator matrix for the `batch` covariate.
 
 ```{julia}
 Zdsm01 = Int.(Matrix(only(dsm01.reterms)))
@@ -456,7 +468,7 @@ or, even more compact, as a sparse matrix pattern
 sparse(Zdsm01')
 ```
 
-The fixed-effects parameters, of which there is only one here, are gathered into a vector, $\boldsymbol{\beta}$, of length $p$, and multiplied by another model matrix, $\mathbf{X}$, of size $n\times p$.
+The fixed-effects parameters, of which there is only one here, are gathered into a vector, $\bbbeta$, of length $p$, and multiplied by another model matrix, $\bbX$, of size $n\times p$.
 
 ```{julia}
 dsm01.β
@@ -466,34 +478,34 @@ dsm01.β
 Int.(dsm01.X')
 ```
 
-A linear model without random effects can be described as $\mathcal{Y}\sim\mathcal{N}(\mathbf{X}\boldsymbol{\beta}, \sigma^2\mathbf{I})$.
-That is, the expected value of the response vector is the *linear predictor*, $\mathbf{X}\boldsymbol{\beta}$, and the covariance matrix of the multivariate Gaussian distribution for the response is $\sigma^2\mathbf{I}$, corresponding to independent, constant variance per-observation noise terms.
+A linear model without random effects can be described as $\mcY\sim\mcN(\bbX\bbbeta, \sigma^2\bbI)$.
+That is, the expected value of the response vector is the *linear predictor*, $\bbX\bbbeta$, and the covariance matrix of the multivariate Gaussian distribution for the response is $\sigma^2\bbI$, corresponding to independent, constant variance per-observation noise terms.
 
-For the linear mixed model, we describe the conditional distribution of the response, given a particular value, $\mathbf{b}$, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, $\mathbf{b}$, and the fixed-effects parameter vector $\boldsymbol{\beta}$.
+For the linear mixed model, we describe the conditional distribution of the response, given a particular value, $\bbb$, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, $\bbb$, and the fixed-effects parameter vector $\bbbeta$.
 $$
-(\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim\mathcal{N}(\mathbf{X}\mathbf{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})
+(\mcY|\mcB=\bbb)\sim\mcN(\bbX\bbbeta+\bbZ\bbb,\sigma^2\bbI)
 $$
 
 The complete model can be written as
 $$
 \begin{aligned}
-(\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mathcal{N}(\mathbf{X}\mathbf{\beta}+\mathbf{Z}\mathbf{b},\sigma^2\mathbf{I})\\
-\mathcal{B}&\sim\mathcal{N}(\mathbf{0},\Sigma_\theta) .
+(\mcY|\mcB=\bbb)&\sim\mcN(\bbX\bbbeta+\bbZ\bbb,\sigma^2\bbI)\\
+\mcB&\sim\mcN(\mathbf{0},\bbSigma_\theta) .
 \end{aligned}
 $$ {#eq-lmmdist}
 
-From these two distributions, the joint distribution of $\mathcal{Y}$ and $\mathcal{B}$, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value $\mathbf{y}$ of $\mathcal{Y}$.
+From these two distributions, the joint distribution of $\mcY$ and $\mcB$, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value $\bby$ of $\mcY$.
 
 Details on the derivation and evaluation of the log-likelihood are given in @sec-lmmtheory.
 At this point the important results are that the *profiled* log-likelihood for models `dsm01` and `dsm02` can be evaluated directly (i.e. without an iterative optimization) from a single parameter, $\theta=\sigma_1/\sigma$.
 
-Furthermore, this profiled log-likelihood can be evaluated from a matrix of $\mathbf{X}'\mathbf{X}$-like products,
+Furthermore, this profiled log-likelihood can be evaluated from a matrix of $\bbX'\bbX$-like products,
 $$
-\mathbf{A}=
+\bbA=
 \begin{bmatrix}
-\mathbf{Z}'\mathbf{Z} & \mathbf{Z}'\mathbf{X} & \mathbf{Z}'\mathbf{y} \\
-\mathbf{X}'\mathbf{Z} & \mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
-\mathbf{y}'\mathbf{Z} & \mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+\bbZ'\bbZ & \bbZ'\bbX & \bbZ'\bby \\
+\bbX'\bbZ & \bbX'\bbX & \bbX'\bby \\
+\bby'\bbZ & \bby'\bbX & \bby'\bby
 \end{bmatrix}
 $$
 which is stored in three pieces
@@ -510,34 +522,34 @@ dsm01.A[2]
 last(dsm01.A)
 ```
 
-The first, diagonal matrix is $\mathbf{Z}'\mathbf{Z}$.
-A simple, scalar random effects term like `(1|batch)` in the formula for models `dsm01` and `dsm02` results in $\mathbf{Z}$ being the indicator matrix for the levels of the grouping factor and, hence, in a diagonal $\mathbf{Z}'\mathbf{Z}$, whose diagonal elements are the frequencies of the levels.
+The first, diagonal matrix is $\bbZ'\bbZ$.
+A simple, scalar random effects term like `(1|batch)` in the formula for models `dsm01` and `dsm02` results in $\bbZ$ being the indicator matrix for the levels of the grouping factor and, hence, in a diagonal $\bbZ'\bbZ$, whose diagonal elements are the frequencies of the levels.
 Thus this block shows that there are exactly 5 observations on each of the 6 batches.
 
 The second, rectangular matrix is $\begin{bmatrix}
-\mathbf{Z}'\mathbf{X} \\
-\mathbf{Z}'\mathbf{y}
+\bbZ'\bbX \\
+\bbZ'\bby
 \end{bmatrix}$.
-Again, the fact that $\mathbf{Z}$ is the indicator matrix for the levels of the grouping factor and that $\mathbf{X}$ is a single column of 1's results in the frequencies of the levels of the factor in the first row of this block.
+Again, the fact that $\bbZ$ is the indicator matrix for the levels of the grouping factor and that $\bbX$ is a single column of 1's results in the frequencies of the levels of the factor in the first row of this block.
 The second row of this block consists of the sums of the yields for each batch.
 
 The third, square symmetric matrix is
 $$
 \begin{bmatrix}
-\mathbf{X}'\mathbf{X} & \mathbf{X}'\mathbf{y} \\
-\mathbf{y}'\mathbf{X} & \mathbf{y}'\mathbf{y}
+\bbX'\bbX & \bbX'\bby \\
+\bby'\bbX & \bby'\bby
 \end{bmatrix}
 $$
 
-The parameters enter into the computation via a *relative covariance factor*, $\boldsymbol{\Lambda}_{\boldsymbol\theta}$, which is the $6\times 6$ matrix $\theta\,\mathbf{I}$ in this case.
+The parameters enter into the computation via a *relative covariance factor*, $\bbLambda_{\boldsymbol\theta}$, which is the $6\times 6$ matrix $\theta\,\bbI$ in this case.
 
 The method hinges on being able to evaluate efficiently the *Cholesky factor* (see @sec-cholesky for details) of
 $$
 \begin{bmatrix}
-\boldsymbol{\Lambda}_\theta'\mathbf{Z'Z}\boldsymbol{\Lambda}_\theta+\mathbf{I} &
-\boldsymbol{\Lambda}_\theta'\mathbf{Z'X} & \boldsymbol{\Lambda}_\theta'\mathbf{Z'y} \\
-\mathbf{X'Z}\boldsymbol{\Lambda}_\theta & \mathbf{X'X} & \mathbf{X'y} \\
-\mathbf{y'Z}\boldsymbol{\Lambda}_\theta & \mathbf{y'X} & \mathbf{y'y}
+\bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI &
+\bbLambda_\theta'\mathbf{Z'X} & \bbLambda_\theta'\mathbf{Z'y} \\
+\mathbf{X'Z}\bbLambda_\theta & \mathbf{X'X} & \mathbf{X'y} \\
+\mathbf{y'Z}\bbLambda_\theta & \mathbf{y'X} & \mathbf{y'y}
 \end{bmatrix}
 $$
 
@@ -745,7 +757,6 @@ dsm01trace = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   thin = 1,
-  progress,
 )
 DataFrame(dsm01trace.optsum.fitlog)
 ```
@@ -761,24 +772,24 @@ Here the algorithm converges after 18 function evaluations to a profiled devianc
 
 ## Assessing the random effects {#sec-assessRE}
 
-What are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mathcal{B}$, are the mode (location of the maximum probability density) of the conditional distribution, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$, evaluated at the parameter estimates and the observed response vector, $\mathbf{y}$.
+What are sometimes called the BLUPs (or best linear unbiased predictors) of the random effects, $\mcB$, are the mode (location of the maximum probability density) of the conditional distribution, $(\mcB|\mcY=\bby)$, evaluated at the parameter estimates and the observed response vector, $\bby$.
 Although BLUP is an appealing acronym, we don't find the term particularly instructive (what is a "linear unbiased predictor" and in what sense are these the "best"?) and prefer the term "conditional mode" to describe this value.
 
 These values are often considered as some sort of "estimates" of the random effects.
 It can be helpful to think of them this way but it can also be misleading.
 As we have stated, the random effects are not, strictly speaking, parameters --- they are unobserved random variables.
 We don't estimate the random effects in the same sense that we estimate parameters.
-Instead, we consider the conditional distribution of $\mathcal{B}$ given the observed data, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
+Instead, we consider the conditional distribution of $\mcB$ given the observed data, $(\mcB|\mcY=\bby)$.
 
-Because the unconditional distribution, $\mathcal{B}\sim\mathcal{N}(\mathbf{0},\Sigma_\theta)$ is continuous, the conditional distribution, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$ will also be continuous.
+Because the unconditional distribution, $\mcB\sim\mcN(\mathbf{0},\Sigma_\theta)$ is continuous, the conditional distribution, $(\mcB|\mcY=\bby)$ will also be continuous.
 In general, the mode of a probability density is the point of maximum density, so the phrase "conditional mode" refers to the point at which this conditional density is maximized.
 Because this definition relates to the probability model, the values of the parameters are assumed to be known.
 In practice, of course, we don't know the values of the parameters (if we did there would be no purpose in forming the parameter estimates), so we use the estimated values of the parameters to evaluate the conditional modes.
 
-Those who are familiar with the multivariate Gaussian distribution may recognize that, because both $\mathcal{B}$ and $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$ are multivariate Gaussian, $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$ will also be multivariate Gaussian and the conditional mode will also be the conditional mean of $\mathcal{B}$, given $\mathcal{Y}=\mathbf{y}$.
+Those who are familiar with the multivariate Gaussian distribution may recognize that, because both $\mcB$ and $(\mcY|\mcB=\bbb)$ are multivariate Gaussian, $(\mcB|\mcY=\bby)$ will also be multivariate Gaussian and the conditional mode will also be the conditional mean of $\mcB$, given $\mcY=\bby$.
 This is the case for a linear mixed model but it does not carry over to other forms of mixed models.
-In the general case all we can say about $\tilde{\mathbf{b}}$ is that they maximize a conditional density, which is why we use the term "conditional mode" to describe these values.
-We will only use the term "conditional mean" and the symbol, $\mathbf{\mu}$, in reference to $\mathrm{E}(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, which is the conditional mean of $\mathcal{Y}$ given $\mathcal{B}$, and an important part of the formulation of all types of mixed-effects models.
+In the general case all we can say about $\tilde{\bbb}$ is that they maximize a conditional density, which is why we use the term "conditional mode" to describe these values.
+We will only use the term "conditional mean" and the symbol, $\bbmu$, in reference to $\mathrm{E}(\mcY|\mcB=\bbb)$, which is the conditional mean of $\mcY$ given $\mcB$, and an important part of the formulation of all types of mixed-effects models.
 
 The conditional modes are available as a vector of matrices
 
@@ -793,8 +804,8 @@ To make this more explicit, random-effects terms in the model formula are those 
 The variable or expression on the right of the `|` is the grouping factor for the random effects generated by this term.
 If the expression on the left of the vertical bar is `1`, as it is here, we describe the term as a *simple, scalar, random-effects term*.
 The designation "scalar" means there will be exactly one random effect generated for each level of the grouping factor.
-A simple, scalar term generates a block of indicator columns --- the indicators for the grouping factor --- in $\mathbf{Z}$.
-Because there is only one random-effects term in this model and because that term is a simple, scalar term, the model matrix $\mathbf{Z}$ for this model is the indicator matrix for the levels of `batch`, as shown earlier in this section.
+A simple, scalar term generates a block of indicator columns --- the indicators for the grouping factor --- in $\bbZ$.
+Because there is only one random-effects term in this model and because that term is a simple, scalar term, the model matrix $\bbZ$ for this model is the indicator matrix for the levels of `batch`, as shown earlier in this section.
 
 In the next chapter we fit models with multiple simple, scalar terms and, in subsequent chapters, we extend random-effects terms beyond simple, scalar terms.
 When we have only simple, scalar terms in the model, each term has a unique grouping factor and the elements of the list returned by can be considered as associated with terms or with grouping factors.
@@ -802,7 +813,7 @@ In more complex models a particular grouping factor may occur in more than one t
 In such cases the terms associated with the same grouping factor are internally amalgamated into a single term.
 Thus internally the random effects are associated with grouping factors, not the terms in the model formula.
 
-Given the data, $\mathbf{y}$, and the parameter estimates, we can evaluate a measure of the dispersion of $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
+Given the data, $\bby$, and the parameter estimates, we can evaluate a measure of the dispersion of $(\mcB|\mcY=\bby)$.
 In the case of a linear mixed model, this is the conditional standard deviation, from which we can obtain a prediction interval.
 A plot of these prediction intervals is sometimes called a *caterpillar plot* because it can look like a fuzzy caterpillar when there are many levels of the grouping factor.
 
@@ -914,22 +925,22 @@ end
 A considerable amount of material has been presented in this chapter, especially considering the word "simple" in its title (it's the model that is simple, not the material).
 A summary may be in order.
 
-A mixed-effects model incorporates fixed-effects parameters and random effects, which are unobserved random variables, $\mathcal{B}$.
-In a linear mixed model, both the unconditional distribution of $\mathcal{B}$ and the conditional distribution, $(\mathcal{Y}|\mathcal{B}=\mathbf{b})$, are multivariate Gaussian distributions.
-Furthermore, this conditional distribution is a spherical Gaussian with mean, $\mathbf{\mu}$, determined by the linear predictor, $\mathbf{Z}\mathbf{b}+\mathbf{X}\mathbf{\beta}$.
+A mixed-effects model incorporates fixed-effects parameters and random effects, which are unobserved random variables, $\mcB$.
+In a linear mixed model, both the unconditional distribution of $\mcB$ and the conditional distribution, $(\mcY|\mcB=\bbb)$, are multivariate Gaussian distributions.
+Furthermore, this conditional distribution is a spherical Gaussian with mean, $\bbmu$, determined by the linear predictor, $\bbZ\bbb+\bbX\bbbeta$.
 That is,
 $$
-(\mathcal{Y}|\mathcal{B}=\mathbf{b})\sim
-\mathcal{N}(\mathbf{Z}\mathbf{b}+\mathbf{X}\mathbf{\beta}, \sigma^2\mathbf{I}_n) .
+(\mcY|\mcB=\bbb)\sim
+\mcN(\bbZ\bbb+\bbX\bbbeta, \sigma^2\bbI_n) .
 $$
-The unconditional distribution of $\mathcal{B}$ has mean $\mathbf{0}$ and a parameterized $q\times q$ variance-covariance matrix, $\Sigma_\theta$.
+The unconditional distribution of $\mcB$ has mean $\mathbf{0}$ and a parameterized $q\times q$ variance-covariance matrix, $\Sigma_\theta$.
 
-In the models we considered in this chapter, $\Sigma_\theta$, is a scalar multiple of the identity matrix, $\mathbf{I}_6$.
+In the models we considered in this chapter, $\Sigma_\theta$, is a scalar multiple of the identity matrix, $\bbI_6$.
 This matrix is always a multiple of the identity in models with just one random-effects term that is a simple, scalar term.
 The reason for introducing all the machinery that we did is to allow for more general model specifications.
 
 The maximum likelihood estimates of the parameters are obtained by minimizing the deviance.
-For linear mixed models we can minimize the profiled deviance, which is a function of $\mathbf{\theta}$ only, thereby considerably simplifying the optimization problem.
+For linear mixed models we can minimize the profiled deviance, which is a function of $\bbtheta$ only, thereby considerably simplifying the optimization problem.
 
 To assess the precision of the parameter estimates, we profile the deviance function with respect to each parameter and apply a signed square root transformation to the likelihood ratio test statistic, producing a profile zeta function for each parameter.
 These functions provide likelihood-based confidence intervals for the parameters.

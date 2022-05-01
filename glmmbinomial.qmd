@@ -1,18 +1,32 @@
----
-jupyter: julia-1.7
----
-
 # Generalized Linear Mixed Models for Binary Responses {#sec-glmmbinomial}
+
+::: {.hidden}
+$$
+\newcommand\bbA{{\mathbf{A}}}
+\newcommand\bbb{{\mathbf{b}}}
+\newcommand\bbI{{\mathbf{I}}}
+\newcommand\bbR{{\mathbf{R}}}
+\newcommand\bbX{{\mathbf{X}}}
+\newcommand\bbx{{\mathbf{x}}}
+\newcommand\bby{{\mathbf{y}}}
+\newcommand\bbZ{{\mathbf{Z}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbeta{{\boldsymbol{\eta}}}
+\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
+\newcommand\bbOmega{{\boldsymbol{\Omega}}}
+\newcommand\bbmu{{\boldsymbol{\mu}}}
+\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+\newcommand\mcN{{\mathcal{N}}}
+\newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcY{{\mathcal{Y}}}
+$$
+:::
 
 Attach the packages to be used in this chapter
 
 ```{julia}
 #| code-fold: true
-#| output: false
-using Pkg
-Pkg.activate(@__DIR__)
-
-const progress = false
 const hide_progress = true
 
 using AlgebraOfGraphics
@@ -21,25 +35,31 @@ using CategoricalArrays
 using Chain
 using DataFrameMacros
 using DataFrames
-using MKL
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL
+end
 using MixedModels
 using MixedModelsMakie
+using ProgressMeter
 using Random
 using StatsBase
+
+CairoMakie.activate!(; type="svg")
+ProgressMeter.ijulia_behavior(:clear);
 ```
 
 In this chapter we consider mixed-effects models for data sets in which the response is *binary*, representing  yes/no or true/false or correct/incorrect responses.
 
 Because the response must be one of only two possible values we adapt our models to predict the probability of the positive response.
-As for linear models and linear mixed-effects models, the mean response, $\boldsymbol{\mu}$, is determined by a *linear predictor*,
+As for linear models and linear mixed-effects models, the mean response, $\bbmu$, is determined by a *linear predictor*,
 $$
-\boldsymbol{\eta}=\mathbf{X}\boldsymbol{\beta}+\mathbf{Z}\mathbf{b}
+\bbeta=\bbX\bbbeta+\bbZ\bbb
 $$ {#eq-linearpred}
-depending on the fixed-effects parameters, $\boldsymbol{\beta}$, the random effects, $\mathbf{b}$, and the model matrices, $\mathbf{X}$ and $\mathbf{Z}$.
-For a linear model the mean response, $\boldsymbol{\mu}$, is the linear predictor, $\boldsymbol{\eta}$.
-But for a generalized linear model $\boldsymbol{\eta}$ determines $\boldsymbol{\mu}$ according to a *link function*, $g$.
-For historical reasons it is the function taking an element of $\boldsymbol{\mu}$ to the corresponding element of $\boldsymbol{\eta}$ that is called the link.
-The transformation in the opposite direction, from $\boldsymbol{\eta}$ to $\boldsymbol{\mu}$, is called the *inverse link*.
+depending on the fixed-effects parameters, $\bbbeta$, the random effects, $\bbb$, and the model matrices, $\bbX$ and $\bbZ$.
+For a linear model the mean response, $\bbmu$, is the linear predictor, $\bbeta$.
+But for a generalized linear model $\bbeta$ determines $\bbmu$ according to a *link function*, $g$.
+For historical reasons it is the function taking an element of $\bbmu$ to the corresponding element of $\bbeta$ that is called the link.
+The transformation in the opposite direction, from $\bbeta$ to $\bbmu$, is called the *inverse link*.
 
 As in previous chapters, we will begin with an example to help illustrate these ideas.
 
@@ -121,7 +141,7 @@ com01 = let
   form = @formula(
     use ~ 1 + livch + (age + age^2) * urban + (1 | dist)
   )
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
+  fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 println(com01)
 ```
@@ -157,7 +177,7 @@ com02 = let
   form = @formula(
     use ~ 1 + ch + (age + age^2) * urban + (1 | dist)
   )
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
+  fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 ```
 
@@ -204,7 +224,7 @@ com03 = let
       1 + (ch + age) * urban + age^2 + age^2 & urban +
       (1 | dist)
   )
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
+  fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 ```
 
@@ -223,7 +243,7 @@ com04 = let
   form = @formula(
     use ~ 1 + urban + ch * age + age^2 + (1 | dist)
   )
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
+  fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 ```
 
@@ -234,7 +254,7 @@ com05 = let
   form = @formula(
     use ~ 1 + urban + ch * age + age^2 + (1 | dist & urban)
   )
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, progress)
+  fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 ```
 

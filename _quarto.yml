@@ -27,4 +27,4 @@ format:
   pdf:
     documentclass: scrreprt
 
-jupyter: julia-1.7
+jupyter: julia-1.8

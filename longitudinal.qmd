@@ -1,18 +1,33 @@
----
-jupyter: julia-1.7
----
-
 # Models for Longitudinal Data {#sec-longitudinal}
+
+::: {.hidden}
+$$
+\newcommand\bbA{{\mathbf{A}}}
+\newcommand\bbb{{\mathbf{b}}}
+\newcommand\bbI{{\mathbf{I}}}
+\newcommand\bbR{{\mathbf{R}}}
+\newcommand\bbX{{\mathbf{X}}}
+\newcommand\bbx{{\mathbf{x}}}
+\newcommand\bby{{\mathbf{y}}}
+\newcommand\bbZ{{\mathbf{Z}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbeta{{\boldsymbol{\eta}}}
+\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
+\newcommand\bbOmega{{\boldsymbol{\Omega}}}
+\newcommand\bbmu{{\boldsymbol{\mu}}}
+\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+\newcommand\mcN{{\mathcal{N}}}
+\newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcY{{\mathcal{Y}}}
+$$
+:::
 
 Load the packages to be used.
 
 ```{julia}
 #| code-fold: true
 #| output: false
-using Pkg
-Pkg.activate(@__DIR__)
-
-const progress = false   # used in calls to `fit(MixedModel,...) to suppress progress bars
 
 using AlgebraOfGraphics
 using Arrow
@@ -21,11 +36,16 @@ using CategoricalArrays
 using DataFrameMacros
 using DataFrames
 using LinearAlgebra
-using MKL
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL
+end
 using MixedModels
 using MixedModelsMakie
+using ProgressMeter
 using Random
 using StandardizedPredictors
+
+ProgressMeter.ijulia_behavior(:clear);
 ```
 
 Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time.
@@ -105,7 +125,7 @@ Although it seems that there isn't a strong correlation between initial bone len
 egm01 = let
   form = @formula(resp ~ 1 + time + (1 + time | Subj))
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, egdf; contrasts, progress)
+  fit(MixedModel, form, egdf; contrasts)
 end
 println(egm01)
 ```
@@ -153,7 +173,7 @@ A model with `time` centered at 8 years of age can be fit as
 egm02 = let
   form = @formula(resp ~ 1 + time + (1 + time | Subj))
   contrasts = Dict(:time => Center(8), :Subj => Grouping())
-  fit(MixedModel, form, egdf; contrasts, progress)
+  fit(MixedModel, form, egdf; contrasts)
 end
 println(egm02)
 ```
@@ -179,7 +199,7 @@ A third option is to center the `time` covariate at the mean of the original `ti
 egm03 = let
   form = @formula(resp ~ 1 + time + (1 + time | Subj))
   contrasts = Dict(:Subj => Grouping(), :time => Center())
-  fit(MixedModel, form, egdf; contrasts, progress)
+  fit(MixedModel, form, egdf; contrasts)
 end
 println(egm03)
 ```
@@ -195,16 +215,16 @@ Notice that in this model the estimated correlation of the random effects for `S
 
 ## Shrinkage plots
 
-One way of assessing a random-effects term in a linear mixed model is with a caterpillar plot, which shows two important characteristics, location and spread, of the conditional distribution $(\mathcal{B}|\mathcal{Y}=\mathbf{y})$.
+One way of assessing a random-effects term in a linear mixed model is with a caterpillar plot, which shows two important characteristics, location and spread, of the conditional distribution $(\mcB|\mcY=\bby)$.
 
 Another plot of interest is to show the extent to which the conditional means have been "shrunk" towards the origin by the mixed-model, which represents a compromise between fidelity to the data, measured by the sum of squared residuals, and simplicity of the model.
 
-The model with the highest fidelity to the data corresponds to a fixed-effects model with the random effects model matrix, $\mathbf{Z}$, incorporated into the fixed-effects model matrix, $\mathbf{X}$.
-There are technical problems (rank deficiency) with trying to estimate parameters in this model but such "unconstrained" random effects can be approximated as the conditional means for a very large $\boldsymbol{\Sigma}$ matrix.  (In practice we use a large multiple, say 1000, of the identity matrix as the value of $\boldsymbol{\Sigma}$.)
+The model with the highest fidelity to the data corresponds to a fixed-effects model with the random effects model matrix, $\bbZ$, incorporated into the fixed-effects model matrix, $\bbX$.
+There are technical problems (rank deficiency) with trying to estimate parameters in this model but such "unconstrained" random effects can be approximated as the conditional means for a very large $\bbSigma$ matrix.  (In practice we use a large multiple, say 1000, of the identity matrix as the value of $\bbSigma$.)
 
-At the other end of the spectrum is the limit as $\boldsymbol{\Sigma}\rightarrow\mathbf{0}$, which is the simplest model, involving only the fixed-effects parameters, but usually with a comparatively poor fit.
+At the other end of the spectrum is the limit as $\bbSigma\rightarrow\mathbf{0}$, which is the simplest model, involving only the fixed-effects parameters, but usually with a comparatively poor fit.
 
-A *shrinkage plot* shows the conditional means of the random effects from the model that was fit and those for a "large" $\boldsymbol{\Sigma}$.
+A *shrinkage plot* shows the conditional means of the random effects from the model that was fit and those for a "large" $\bbSigma$.
 
 ```{julia}
 #| code-fold: true
@@ -237,7 +257,7 @@ egm04 = let
   )
   dat = @transform(egdf, :ctime = :time - 8.75)
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, dat; contrasts, progress)
+  fit(MixedModel, form, dat; contrasts)
 end
 println(egm04)
 ```
@@ -412,7 +432,7 @@ bxm01 = let
       (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
   )
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, bxdf; contrasts, progress)
+  fit(MixedModel, form, bxdf; contrasts)
 end
 println(bxm01)
 ```
@@ -426,7 +446,7 @@ bxm02 = let
       1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
   )
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, bxdf; contrasts, progress)
+  fit(MixedModel, form, bxdf; contrasts)
 end
 println(bxm02)
 ```
@@ -462,7 +482,7 @@ bxm03 = let
     resp ~ 1 + time + time^2 & Group + (1 + time + time^2 | Subj)
   )
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, bxdf; contrasts, progress)
+  fit(MixedModel, form, bxdf; contrasts)
 end
 println(bxm03)
 ```
@@ -624,7 +644,7 @@ bxm04 = let
   form =
     @formula(resp ~ 1 + time + time^2 & Group + (1 + time | Subj))
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, bxdf; contrasts, progress)
+  fit(MixedModel, form, bxdf; contrasts)
 end
 ```
 
@@ -645,7 +665,7 @@ bxm05 = let
       (0 + time^2 | Subj)
   )
   contrasts = Dict(:Subj => Grouping())
-  fit(MixedModel, form, bxdf; contrasts, progress)
+  fit(MixedModel, form, bxdf; contrasts)
 end
 ```
 

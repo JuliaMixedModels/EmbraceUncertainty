@@ -1,19 +1,9 @@
----
-jupyter: julia-1.7
----
-
 # Applications to large-scale studies {#sec-largescale}
 
 Load the packages to be used.
 
 ```{julia}
 #| code-fold: true
-#| output: false
-using Pkg
-Pkg.activate(@__DIR__)
-
-const progress = false   # used in calls to `fit(MixedModel,...) to suppress progress bars
-
 using AlgebraOfGraphics
 using Arrow
 using CairoMakie
@@ -21,11 +11,17 @@ using Chain
 using DataFrameMacros
 using DataFrames
 using LinearAlgebra
-using MKL
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL
+end
 using MixedModels
 using MixedModelsMakie
+using ProgressMeter
 using StandardizedPredictors
 using StatsBase
+
+CairoMakie.activate!(; type="svg")
+ProgressMeter.ijulia_behavior(:clear);
 ```
 
 As with many techniques in data science, the place where "the rubber meets the road", as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.
@@ -301,9 +297,8 @@ elm01 = let
   form = @formula(
     speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
   )
-  fit(MixedModel, form, pruned; contrasts, progress)
+  fit(MixedModel, form, pruned; contrasts)
 end
-println(elm01)
 ```
 
 This model takes only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.
