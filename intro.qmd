@@ -207,14 +207,14 @@ function _meanrespfrm(
   df,
   resp::Symbol,
   grps::Symbol;
-  sumryf::Function = mean,
+  sumryf::Function=mean,
 )
   # ensure the relevant columns are types that Makie can deal with 
   df = transform(
     df,
     resp => Array,
     grps => CategoricalArray;
-    renamecols = false,
+    renamecols=false,
   )
   # create a summary table by mean resp
   sumry =
@@ -231,12 +231,9 @@ let
     :batch => "Batch of intermediate product",
   )
   draw(
-    (
-      data(df) *
-      mp *
-      visual(Scatter; marker = '○', markersize = 12)
-    ) + (data(sumry) * mp * visual(Lines));
-    figure = (; resolution = (800, 400)),
+    (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
+    (data(sumry) * mp * visual(Lines));
+    figure=(; resolution=(800, 400)),
   )
 end
 ```
@@ -295,12 +292,9 @@ let
   df, sumry = _meanrespfrm(dyestuff2, :yield, :batch)
   mp = mapping(:yield => "Simulated yield", :batch => "Batch")
   draw(
-    (
-      data(df) *
-      mp *
-      visual(Scatter; marker = '○', markersize = 12)
-    ) + (data(sumry) * mp * visual(Lines));
-    figure = (; resolution = (800, 400)),
+    (data(df) * mp * visual(Scatter; marker='○', markersize=12)) +
+    (data(sumry) * mp * visual(Lines));
+    figure=(; resolution=(800, 400)),
   )
 end
 ```
@@ -562,7 +556,7 @@ only(dsm01.θ)
 producing a lower Cholesky factor of
 
 ```{julia}
-sparseL(dsm01; full = true)
+sparseL(dsm01; full=true)
 ```
 
 ## Variability of parameter estimates {#sec-furtherassess}
@@ -614,10 +608,10 @@ draw(
   data(@subset(dsm01pars, :type == "β")) *
   mapping(
     :value => "Bootstrap samples of β";
-    color = (:names => "Names"),
+    color=(:names => "Names"),
   ) *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -649,10 +643,10 @@ draw(
   data(@subset(dsm01pars, :type == "σ")) *
   mapping(
     :value => "Bootstrap samples of σ";
-    color = (:group => "Group"),
+    color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -683,10 +677,10 @@ draw(
   data(@subset(dsm01pars, :type == "σ")) *
   mapping(
     :value => "Bootstrap parameter estimates of σ";
-    color = (:group => "Group"),
+    color=(:group => "Group"),
   ) *
-  AlgebraOfGraphics.histogram(; bins = 80);
-  figure = (; resolution = (800, 450)),
+  AlgebraOfGraphics.histogram(; bins=80);
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -711,10 +705,10 @@ draw(
   data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
   mapping(
     :value_abs2 => "Bootstrap sample of estimates of σ²",
-    color = :group,
+    color=:group,
   ) *
-  histogram(; bins = 200);
-  figure = (; resolution = (800, 450)),
+  histogram(; bins=200);
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -756,7 +750,7 @@ dsm01trace = fit(
   MixedModel,
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
-  thin = 1,
+  thin=1,
 )
 DataFrame(dsm01trace.optsum.fitlog)
 ```
@@ -822,7 +816,7 @@ A plot of these prediction intervals is sometimes called a *caterpillar plot* be
 #| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
 caterpillar!(
-  Figure(resolution = (800, 250)),
+  Figure(resolution=(800, 250)),
   ranefinfo(dsm01, :batch),
 )
 ```
@@ -836,7 +830,7 @@ An alternative
 #| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
 qqcaterpillar!(
-  Figure(resolution = (800, 250)),
+  Figure(resolution=(800, 250)),
   ranefinfo(dsm01, :batch),
 )
 ```
@@ -881,7 +875,7 @@ dsm01 = fit(
   MixedModel,
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
-  contrasts = contrasts,
+  contrasts=contrasts,
 )
 ```
 

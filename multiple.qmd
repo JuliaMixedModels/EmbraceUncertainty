@@ -112,14 +112,14 @@ function _meanrespfrm(
   df,
   resp::Symbol,
   grps::Symbol;
-  sumryf::Function = mean,
+  sumryf::Function=mean,
 )
   # ensure the relevant columns are types that Makie can deal with 
   df = transform(
     df,
     resp => Array,
     grps => CategoricalArray;
-    renamecols = false,
+    renamecols=false,
   )
   # create a summary table by mean resp
   sumry =
@@ -137,12 +137,10 @@ let
   mp = mapping(
     :diameter => "Diameter of inhibition zone [mm]",
     :plate => "Plate";
-    color = :sample,
+    color=:sample,
   )
   draw(
-    data(df) *
-    mp *
-    visual(ScatterLines; marker = '○', markersize = 12),
+    data(df) * mp * visual(ScatterLines; marker='○', markersize=12),
   )
 end
 ```
@@ -192,7 +190,7 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| code-fold: true
 #| label: fig-pnm01platepred
 caterpillar!(
-  Figure(; resolution = (800, 480)),
+  Figure(; resolution=(800, 480)),
   ranefinfo(pnm01, :plate),
 )
 ```
@@ -202,7 +200,7 @@ caterpillar!(
 #| code-fold: true
 #| label: fig-pnm01samplepred
 caterpillar!(
-  Figure(; resolution = (800, 160)),
+  Figure(; resolution=(800, 160)),
   ranefinfo(pnm01, :sample),
 )
 ```
@@ -271,10 +269,10 @@ draw(
   data(@subset(pnm01pars, :type == "β")) *
   mapping(
     :value => "Bootstrap samples of β";
-    color = (:names => "Names"),
+    color=(:names => "Names"),
   ) *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -295,10 +293,10 @@ draw(
   data(@subset(pnm01pars, :type == "σ")) *
   mapping(
     :value => "Bootstrap samples of σ";
-    color = (:group => "Group"),
+    color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -414,7 +412,7 @@ Not only is the model specification similar for nested and crossed factors, the 
 Comparing the patterns in the matrices $\bbLambda$, $\bbZ'\bbZ$ and $\bbL$ for this model
 
 ```{julia}
-sparseL(psm01; full = true)
+sparseL(psm01; full=true)
 ```
 
 ```{julia}
@@ -442,7 +440,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
 caterpillar!(
-  Figure(resolution = (800, 300)),
+  Figure(resolution=(800, 300)),
   ranefinfo(psm01, :batch),
 )
 ```
@@ -465,10 +463,10 @@ draw(
   data(@subset(psm01pars, :type == "σ")) *
   mapping(
     :value => "Bootstrap samples of σ";
-    color = (:group => "Group"),
+    color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -535,7 +533,7 @@ psm02samp = parametricbootstrap(
   Random.seed!(9753579),
   10_000,
   psm02;
-  hide_progress = true,
+  hide_progress=true,
 )
 DataFrame(shortestcovint(psm02samp))
 ```
@@ -584,10 +582,10 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
 draw(
-  data(DataFrame(response = 1:5, count = counts(insteval.y))) *
+  data(DataFrame(response=1:5, count=counts(insteval.y))) *
   mapping(:response => "Rating", :count => "Count") *
   visual(BarPlot);
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -613,10 +611,7 @@ It is not surprising that zero is within most of the prediction intervals on the
 #| code-fold: true
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
-caterpillar!(
-  Figure(resolution = (800, 400)),
-  ranefinfo(iem01, :dept),
-)
+caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
 ```
 
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
@@ -646,7 +641,7 @@ We could pursue other mixed-effects models here, such as using the factor and no
 Before leaving this model we examine the sparse Cholesky factor, $\bbL$, which is of size $4116\times4116$.
 
 ```{julia}
-sparseL(iem01; full = true)
+sparseL(iem01; full=true)
 ```
 
 Even as a sparse matrix this factor requires a considerable amount of memory, but as a triangular dense matrix it would require nearly 10 times as much.
@@ -661,7 +656,7 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
 #| label: fig-iem01qqcaterpillard
 qqcaterpillar!(
-  Figure(; resolution = (800, 650)),
+  Figure(; resolution=(800, 650)),
   ranefinfo(iem01, :d),
 )
 ```
@@ -675,8 +670,8 @@ shows the differences in precision due to different numbers of observations for 
 draw(
   data(combine(groupby(insteval, :d), nrow => :n)) *
   mapping(:n => "Number of observations") *
-  AlgebraOfGraphics.histogram(; bins = 410);
-  figure = (; resolution = (800, 600)),
+  AlgebraOfGraphics.histogram(; bins=410);
+  figure=(; resolution=(800, 600)),
 )
 ```
 

@@ -106,11 +106,11 @@ draw(
   mapping(
     :age => "Centered age (yr)",
     :numuse => "Frequency of contraception use";
-    col = :urb,
-    color = :livch,
+    col=:urb,
+    color=:livch,
   ) *
   smooth();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -133,14 +133,13 @@ The fourth argument describes the type of conditional distribution of the respon
 
 ```{julia}
 contrasts = Dict(
-  :livch => EffectsCoding(; base = "0"),
+  :livch => EffectsCoding(; base="0"),
   :urban => HelmertCoding(),
   :dist => Grouping(),
 )
 com01 = let
-  form = @formula(
-    use ~ 1 + livch + (age + age^2) * urban + (1 | dist)
-  )
+  form =
+    @formula(use ~ 1 + livch + (age + age^2) * urban + (1 | dist))
   fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 println(com01)
@@ -174,9 +173,7 @@ we fit a reduced model.
 
 ```{julia}
 com02 = let
-  form = @formula(
-    use ~ 1 + ch + (age + age^2) * urban + (1 | dist)
-  )
+  form = @formula(use ~ 1 + ch + (age + age^2) * urban + (1 | dist))
   fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 ```
@@ -206,11 +203,11 @@ draw(
   mapping(
     :age => "Centered age (yr)",
     :numuse => "Frequency of contraception use";
-    col = :urb,
-    color = :ch,
+    col=:urb,
+    color=:ch,
   ) *
   smooth();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -221,8 +218,7 @@ Incorporating an interaction of `age` and `ch` allows for such a shift.
 com03 = let
   form = @formula(
     use ~
-      1 + (ch + age) * urban + age^2 + age^2 & urban +
-      (1 | dist)
+      1 + (ch + age) * urban + age^2 + age^2 & urban + (1 | dist)
   )
   fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
@@ -240,9 +236,7 @@ Continuing with the model-building we turn our attention to the random effects s
 
 ```{julia}
 com04 = let
-  form = @formula(
-    use ~ 1 + urban + ch * age + age^2 + (1 | dist)
-  )
+  form = @formula(use ~ 1 + urban + ch * age + age^2 + (1 | dist))
   fit(MixedModel, form, contra, Bernoulli(); contrasts)
 end
 ```
@@ -314,13 +308,13 @@ is called the *logistic* function and is shown in @fig-logitinv.
 draw(
   data(
     @transform(
-      DataFrame(η = collect(-5.0:0.02:5.0)),
+      DataFrame(η=collect(-5.0:0.02:5.0)),
       :μ = inv(1 + exp(-:η))
     )
   ) *
   mapping(:η, :μ) *
   visual(Lines);
-  figure = (; resolution = (800, 400)),
+  figure=(; resolution=(800, 400)),
 )
 ```
 

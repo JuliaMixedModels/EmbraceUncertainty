@@ -105,7 +105,7 @@ describe(
   leftjoin!(
     ldttrial,
     select(byitem, :item, :wrdlen, :isword);
-    on = :item,
+    on=:item,
   ),
 )
 ```
@@ -115,7 +115,7 @@ If there is no need to allow for missing values, there is a slight advantage in 
 This could be done separately for each column or for the whole data frame, as in
 
 ```{julia}
-describe(disallowmissing!(ldttrial; error = false))
+describe(disallowmissing!(ldttrial; error=false))
 ```
 
 A histogram of the word lengths, @fig-ldtwrdlenhist, shows that the majority of the items are between 3 and 14 characters.
@@ -127,7 +127,7 @@ A histogram of the word lengths, @fig-ldtwrdlenhist, shows that the majority of 
 draw(
   data(byitem) *
   mapping(:wrdlen => "Length of word") *
-  histogram(; bins = 0.5:21.5),
+  histogram(; bins=0.5:21.5),
 )
 ```
 
@@ -144,10 +144,10 @@ draw(
   mapping(
     :wrdlen => "Word length",
     :acc => "Accuracy";
-    color = :isword,
+    color=:isword,
   ) *
   smooth();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -221,7 +221,7 @@ draw(
   data(pruned) *
   mapping(:rt => "Response time (ms.) for correct responses") *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -241,7 +241,7 @@ draw(
   data(pruned) *
   mapping(:speed => "Response speed (s⁻¹) for correct responses") *
   AlgebraOfGraphics.density();
-  figure = (; resolution = (800, 450)),
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -292,7 +292,7 @@ elm01 = let
   contrasts = Dict(
     :subj => Grouping(),
     :item => Grouping(),
-    :isword => DummyCoding(; base = true),
+    :isword => DummyCoding(; base=true),
   )
   form = @formula(
     speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
@@ -316,7 +316,7 @@ elm01a = restoreoptsum!(
     contrasts = Dict(
       :subj => Grouping(),
       :item => Grouping(),
-      :isword => DummyCoding(; base = true),
+      :isword => DummyCoding(; base=true),
     )
     form = @formula(
       speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
@@ -349,7 +349,7 @@ A caterpillar plot, @fig-elm01caterpillarsubj,
 #| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm01.
 #| label: fig-elm01caterpillarsubj
 qqcaterpillar!(
-  Figure(resolution = (800, 650)),
+  Figure(resolution=(800, 650)),
   ranefinfo(elm01, :subj),
 )
 ```

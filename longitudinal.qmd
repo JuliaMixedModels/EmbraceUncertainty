@@ -82,7 +82,7 @@ egplt =
   mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
 draw(
   egplt *
-  mapping(; color = :Subj) *
+  mapping(; color=:Subj) *
   (visual(Scatter) + visual(Lines)),
 )
 ```
@@ -98,15 +98,15 @@ A preferred alternative is to plot response versus time with each subject's data
 if "orderedsubj" ∉ names(egdf)
   egdf.orderedsubj = CategoricalArray(
     egdf.Subj;
-    levels = @sort(@subset(egdf, :time == 8.0), :resp).Subj,
+    levels=@sort(@subset(egdf, :time == 8.0), :resp).Subj,
   )
 end
 egplt =
   data(egdf) *
   mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
 egplt2 =
-  egplt * mapping(; layout = :orderedsubj) * visual(ScatterLines)
-draw(egplt2; axis = (height = 300, width = 120))
+  egplt * mapping(; layout=:orderedsubj) * visual(ScatterLines)
+draw(egplt2; axis=(height=300, width=120))
 ```
 
 To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
@@ -141,10 +141,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| code-fold: true
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
-caterpillar!(
-  Figure(resolution = (800, 500)),
-  ranefinfo(egm01, :Subj),
-)
+caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
 ```
 
 ### Centering the time values
@@ -187,10 +184,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02
 #| label: fig-egm02caterpillar
 #| code-fold: true
-caterpillar!(
-  Figure(resolution = (800, 550)),
-  ranefinfo(egm02, :Subj),
-)
+caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
 ```
 
 A third option is to center the `time` covariate at the mean of the original `time` values.
@@ -230,7 +224,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm02shrinkage
-shrinkageplot!(Figure(; resolution = (600, 600)), egm02)
+shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
 ```
 
 @fig-egm02shrinkage reinforces some of the conclusions from @fig-egm02caterpillar.
@@ -271,7 +265,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm04shrinkage
-shrinkageplot!(Figure(; resolution = (800, 800)), egm04)
+shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
 ```
 
 Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.
@@ -332,7 +326,7 @@ bxaxes =
 draw(
   data(@subset(bxdf, :Group == "Control")) *
   bxaxes *
-  mapping(; color = :Subj) *
+  mapping(; color=:Subj) *
   (visual(Scatter) + visual(Lines)),
 )
 ```
@@ -347,15 +341,15 @@ let
   df = @subset(bxdf, :Group == "Control")
   df.orderedsubj = CategoricalArray(
     df.Subj;
-    levels = sort(@subset(df, iszero(:time)), :resp).Subj,
-    ordered = true,
+    levels=sort(@subset(df, iszero(:time)), :resp).Subj,
+    ordered=true,
   )
   draw(
     data(df) *
     bxaxes *
-    mapping(; layout = :orderedsubj) *
+    mapping(; layout=:orderedsubj) *
     visual(ScatterLines);
-    axis = (height = 250, width = 150),
+    axis=(height=250, width=150),
   )
 end
 ```
@@ -372,15 +366,15 @@ let
   df = @subset(bxdf, :Group == "Thioracil")
   df.orderedsubj = CategoricalArray(
     df.Subj;
-    levels = sort(@subset(df, iszero(:time)), :resp).Subj,
-    ordered = true,
+    levels=sort(@subset(df, iszero(:time)), :resp).Subj,
+    ordered=true,
   )
   draw(
     data(df) *
     bxaxes *
-    mapping(; layout = :orderedsubj) *
+    mapping(; layout=:orderedsubj) *
     visual(ScatterLines);
-    axis = (height = 250, width = 150),
+    axis=(height=250, width=150),
   )
 end
 ```
@@ -397,15 +391,15 @@ let
   df = @subset(bxdf, :Group == "Thyroxin")
   df.orderedsubj = CategoricalArray(
     df.Subj;
-    levels = sort(@subset(df, iszero(:time)), :resp).Subj,
-    ordered = true,
+    levels=sort(@subset(df, iszero(:time)), :resp).Subj,
+    ordered=true,
   )
   draw(
     data(df) *
     bxaxes *
-    mapping(; layout = :orderedsubj) *
+    mapping(; layout=:orderedsubj) *
     visual(ScatterLines);
-    axis = (height = 250, width = 150),
+    axis=(height=250, width=150),
   )
 end
 ```
@@ -508,7 +502,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-bxm03shrinkage
-shrinkageplot!(Figure(; resolution = (800, 800)), bxm03)
+shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
 ```
 
 shows that the random effects are considerably shrunk towards the origin, relative to the "unconstrained" values from within-subject fits, but none of the panels shows them collapsing to a line.
@@ -546,7 +540,7 @@ let
   zlabel = "time²"
   perspectiveness = 0.5
   aspect = :data
-  f = Figure(; resolution = (1200, 500))
+  f = Figure(; resolution=(1200, 500))
   u, v, w = -Upts[2]    # second principle direction flipped to get positive w
   elevation = asin(w)
   azimuth = atan(v, u)
@@ -562,8 +556,8 @@ let
     elevation,
     azimuth,
   )
-  scatter!(ax1, bpts; marker = '∘', markersize = 20)
-  scatter!(ax2, bpts; marker = '∘', markersize = 20)
+  scatter!(ax1, bpts; marker='∘', markersize=20)
+  scatter!(ax2, bpts; marker='∘', markersize=20)
   for p in Upts
     seg = [origin, p]
     lines!(ax1, seg)
@@ -591,7 +585,7 @@ bxm03samp = parametricbootstrap(
   Xoshiro(8642468),
   10_000,
   bxm03;
-  hide_progress = true,
+  hide_progress=true,
 )
 bxm03pars = DataFrame(bxm03samp.allpars)
 DataFrame(shortestcovint(bxm03samp))
@@ -609,7 +603,7 @@ draw(
   data(@subset(bxm03pars, :type == "ρ")) *
   mapping(
     :value => "Bootstrap replicates of correlation estimates";
-    color = (:names => "Variables"),
+    color=(:names => "Variables"),
   ) *
   AlgebraOfGraphics.density();
 )
@@ -628,11 +622,11 @@ let
   )
   mp = mapping(
     :z => "Fisher's z transformation of correlation estimates";
-    color = (:names => "Variables"),
+    color=(:names => "Variables"),
   )
   draw(
     data(dat) * mp * AlgebraOfGraphics.density();
-    figure = (; resolution = (800, 450)),
+    figure=(; resolution=(800, 450)),
   )
 end
 ```
@@ -698,40 +692,40 @@ let
     vcat(z257, times², z257),
     vcat(z257, z257, times²),
   )
-  grp = repeat(["Control", "Thioracil", "Thyroxin"]; inner = 257)
+  grp = repeat(["Control", "Thioracil", "Thyroxin"]; inner=257)
   draw(
     data(
       append!(
         append!(
           DataFrame(;
-            times = tmat[:, 2],
-            wt = tmat * Float32.(bxm03.beta),
-            Group = grp,
-            model = "bxm03",
+            times=tmat[:, 2],
+            wt=tmat * Float32.(bxm03.beta),
+            Group=grp,
+            model="bxm03",
           ),
           DataFrame(;
-            times = tmat[:, 2],
-            wt = tmat * Float32.(bxm04.beta),
-            Group = grp,
-            model = "bxm04",
+            times=tmat[:, 2],
+            wt=tmat * Float32.(bxm04.beta),
+            Group=grp,
+            model="bxm04",
           ),
         ),
         DataFrame(;
-          times = tmat[:, 2],
-          wt = tmat * Float32.(bxm05.beta),
-          Group = grp,
-          model = "bxm05",
+          times=tmat[:, 2],
+          wt=tmat * Float32.(bxm05.beta),
+          Group=grp,
+          model="bxm05",
         ),
       ),
     ) *
     mapping(
       :times => "Time in trial (wk)",
       :wt => "Weight (gm)";
-      color = :Group,
-      col = :model,
+      color=:Group,
+      col=:model,
     ) *
     visual(Lines);
-    axis = (width = 350, height = 350),
+    axis=(width=350, height=350),
   )
 end
 ```
