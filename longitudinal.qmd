@@ -45,6 +45,8 @@ using ProgressMeter
 using Random
 using StandardizedPredictors
 
+using CairoMakie: scatter! # PA I have no idea why this is failing to resolve later since this exported
+
 ProgressMeter.ijulia_behavior(:clear);
 ```
 
@@ -740,7 +742,7 @@ end
 Other points to make:
 
     1. Standard errors are different, largest for `bxm05`, smallest for `bxm04`
-    2. Real interest should center on the differences in the quadratic coef - trt vs control 
+    2. Real interest should center on the differences in the quadratic coef - trt vs control
     3. Not sure how to code that up
     4. More complex models require more iterations and more work per iteration
     5. Probably go with `bxm03` in this case, even though it gives a degenerate dist'n of random effects.  The idea is that the random effects are absorbing a form of rat-to-rat variability.  The residual standard deviation does reflect this.
