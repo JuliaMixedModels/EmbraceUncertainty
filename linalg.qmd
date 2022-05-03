@@ -18,7 +18,10 @@ $$
 \newcommand\bbtheta{{\boldsymbol{\theta}}}
 \newcommand\mcN{{\mathcal{N}}}
 \newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcU{{\mathcal{U}}}
+\newcommand\mcX{{\mathcal{X}}}
 \newcommand\mcY{{\mathcal{Y}}}
+\newcommand\mcZ{{\mathcal{Z}}}
 $$
 :::
 
@@ -195,38 +198,38 @@ $$
 \mathbf{Lz}=\bbx-\bbmu .
 $$ {#eq-mvnstandardizingsol}
 
-Note that the standardizing transformation gives us a way to simulate values from a general $n$-dimensional multivariate Gaussian, $\mathcal{X}\sim\mcN(\bbmu,\bbSigma)$ as
+Note that the standardizing transformation gives us a way to simulate values from a general $n$-dimensional multivariate Gaussian, $\mcX\sim\mcN(\bbmu,\bbSigma)$ as
 $$
 \bbx=\bbmu+\mathbf{L}\mathbf{z}
 $$ {#eq-simulatemvn}
-where $\mathbf{z}$ is simulated from the $n$-dimensional *standard multivariate Gaussian*, $\mathcal{Z}\sim\mcN(\mathbf{0},\bbI)$, which is $n$ independent univariate standard normal distributions.
+where $\mathbf{z}$ is simulated from the $n$-dimensional *standard multivariate Gaussian*, $\mcZ\sim\mcN(\mathbf{0},\bbI)$, which is $n$ independent univariate standard normal distributions.
 
 ### Linear functions of a multivariate Gaussian
 
-In general, if $\mathcal{X}$ is an $n$-dimensional random variable with mean $\bbmu$ and covariance matrix $\bbSigma$, and $\mathbf{A}$ is a matrix with $n$ columns then the mean and variance of $\mathcal{U}=\mathbf{A}\mathcal{X}$ are given by
+In general, if $\mcX$ is an $n$-dimensional random variable with mean $\bbmu$ and covariance matrix $\bbSigma$, and $\mathbf{A}$ is a matrix with $n$ columns then the mean and variance of $\mcU=\mathbf{A}\mcX$ are given by
 $$
 \require{unicode}
-𝔼\left[\mathcal{U}\right] =
-𝔼\left[\mathbf{A}\mathcal{X}\right] =
-\mathbf{A}𝔼\left[\mathcal{X}\right] =
+𝔼\left[\mcU\right] =
+𝔼\left[\mathbf{A}\mcX\right] =
+\mathbf{A}𝔼\left[\mcX\right] =
 \mathbf{A}\bbmu
 $$ {#eq-mvexpectedlin}
 and
 $$
 \begin{aligned}
-\text{Var}\left(\mathcal{U}\right)
-&=𝔼\left[\left(\mathcal{U}-𝔼\left[\mathcal{U}\right]\right)\left(\mathcal{U}-𝔼\left[\mathcal{U}\right]\right)'\right]\\
-&=𝔼\left[\left(\mathbf{A}\mathcal{X}-\mathbf{A}\bbmu\right)\left(\mathbf{A}\mathcal{X}-\mathbf{A}\bbmu\right)'\right]\\
-&=𝔼\left[\mathbf{A}\left(\mathcal{X}-\bbmu\right)\left(\mathcal{X}-\bbmu\right)'\mathbf{A}'\right]\\
-&=\mathbf{A}\,𝔼\left[\left(\mathcal{X}-\bbmu\right)\left(\mathcal{X}-\bbmu\right)'\right]\mathbf{A}'\\
-&=\mathbf{A}\text{Var}(\mathcal{X})\mathbf{A}'\\
+\text{Var}\left(\mcU\right)
+&=𝔼\left[\left(\mcU-𝔼\left[\mcU\right]\right)\left(\mcU-𝔼\left[\mcU\right]\right)'\right]\\
+&=𝔼\left[\left(\mathbf{A}\mcX-\mathbf{A}\bbmu\right)\left(\mathbf{A}\mcX-\mathbf{A}\bbmu\right)'\right]\\
+&=𝔼\left[\mathbf{A}\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\mathbf{A}'\right]\\
+&=\mathbf{A}\,𝔼\left[\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\right]\mathbf{A}'\\
+&=\mathbf{A}\text{Var}(\mcX)\mathbf{A}'\\
 &=\mathbf{A}\bbSigma\mathbf{A}'
 \end{aligned}
 $$ {#eq-mvvarlin}
 
-A linear function, $\mathcal{U}=\mathbf{A}\mathcal{X}$, of a multivariate Gaussian distribution, $\mathcal{X}\sim\mcN(\bbmu,\bbSigma)$, is also Gaussian and these relationships imply that
+A linear function, $\mcU=\mathbf{A}\mcX$, of a multivariate Gaussian distribution, $\mcX\sim\mcN(\bbmu,\bbSigma)$, is also Gaussian and these relationships imply that
 $$
-\mathcal{U}\sim\mcN(\mathbf{A}\bbmu, \mathbf{A}\bbSigma\mathbf{A}')
+\mcU\sim\mcN(\mathbf{A}\bbmu, \mathbf{A}\bbSigma\mathbf{A}')
 $$ {#eq-mvnlinfunc}
 
 For the special case of $\mathbf{A}$ being of dimension $1\times n$ (i.e. a *row vector*), the expression for the $1\times 1$ covariance matrix is the quadratic form defined by $\bbSigma$, which is why $\bbSigma$ must be positive definite for the conditional distributions to be non-degenerate.
@@ -244,7 +247,7 @@ f(\bby; \bbbeta, \sigma^2)&=
 \end{aligned}
 $$ {#eq-linmoddensity}
 
-@eq-linmoddensity describes the density of the random variable, $\mathcal{Y}$, representing the observations, given the values of the parameters, $\bbbeta$ and $\sigma^2$.
+@eq-linmoddensity describes the density of the random variable, $\mcY$, representing the observations, given the values of the parameters, $\bbbeta$ and $\sigma^2$.
 For parameter estimation we use the *likelihood function*, which is the same expression as @eq-linmoddensity but regarded as function of the parameters, $\bbbeta$ and $\sigma^2$, with the observed response, $\bby$, fixed.
 $$
 L(\bbbeta,\sigma^2;\bby)=
@@ -356,11 +359,9 @@ r^2(\bbbeta)&=\|\bby-\bbX\bbbeta\|^2\\
 \bbbeta\\
 -1
 \end{bmatrix}\right\|^2\\
-&=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2
-
-  - r_{yy}^2
-    \end{aligned}
-    $$ {#eq-extendedqf}
+&=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2- r_{yy}^2
+\end{aligned}
+$$ {#eq-extendedqf}
 
 The first term, $\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2$, is non-negative and can be made zero by solving @eq-betahatchol for $\widehat{\bbbeta}$.
 Thus, the minimum sum of squared residuals is $r_{yy}^2$.
@@ -533,9 +534,11 @@ Xsvd = svd(X)
 ```
 
 If all the singular values are non-zero, as is the case here, the least squares solution $\widehat{\bbbeta}$ can be obtained as
+
 $$
 \mathbf{V}\mathbf{S}^{-1}\mathbf{U}'\bby
 $$ {#eq-pseudoinv}
+
 for the diagonal $\mathbf{S}$.
 
 ```{julia}
@@ -546,18 +549,20 @@ In the extensions to linear mixed-effects models we will emphasize the Cholesky 
 
 ## Linear mixed-effects models {#sec-lmmtheory}
 
-As described in @bates.maechler.etal:2015 , a linear mixed-effects model is based on two vector-valued random variables: the $q$-dimensional vector of random effects, $\mathcal{B}$, and the $n$-dimensional response vector, $\mathcal{Y}$. @eq-lmmdist defines the unconditional distribution of $\mathcal{B}$ and the conditional distribution of $\mathcal{Y}$, given $\mathcal{B}=\mathbf{b}$, as multivariate Gaussian distributions of the form
+As described in @bates.maechler.etal:2015 , a linear mixed-effects model is based on two vector-valued random variables: the $q$-dimensional vector of random effects, $\mcB$, and the $n$-dimensional response vector, $\mcY$. @eq-lmmdist defines the unconditional distribution of $\mcB$ and the conditional distribution of $\mcY$, given $\mcB=\mathbf{b}$, as multivariate Gaussian distributions of the form
 $$
 \begin{aligned}
-(\mathcal{Y}|\mathcal{B}=\mathbf{b})&\sim\mcN(\bbX\bbbeta+\mathbf{Z}\mathbf{b},\sigma^2\bbI)\\
-\mathcal{B}&\sim\mcN(\mathbf{0},\bbSigma_\theta) .
+(\mcY|\mcB=\mathbf{b})&\sim\mcN(\bbX\bbbeta+\mathbf{Z}\mathbf{b},\sigma^2\bbI)\\
+\mcB&\sim\mcN(\mathbf{0},\bbSigma_\theta) .
 \end{aligned}
 $$
 
-The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mathcal{B})=\bbSigma_\theta$, depends on the *variance-component parameter vector*, $\bbtheta$, through a lower triangular *relative covariance factor*, $\Lambda_\theta$ as
+The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mcB)=\bbSigma_\theta$, depends on the *variance-component parameter vector*, $\bbtheta$, through a lower triangular *relative covariance factor*, $\Lambda_\theta$ as
+
 $$
 \bbSigma_\theta=\sigma^2\bbLambda_\theta\bbLambda_\theta' .
 $$ {#eq-relcovfac}
+
 (Recall that the lower Cholesky factor is generally written $\mathbf{L}$.
 In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, $\Lambda$.)
 
@@ -569,7 +574,7 @@ Moreover, during the course of the numerical optimization by which the parameter
 Because of this we will take care to use computational methods that can be applied even when $\bbSigma_\theta$ is singular and are stable as $\bbSigma_\theta$ approaches singularity.
 
 According to @eq-relcovfac, $\bbSigma$ depends on both $\sigma$ and $\theta$, and we should write it as $\bbSigma_{\sigma,\theta}$.
-However, we will blur that distinction and continue to write $\text{Var}(\mathcal{B})=\bbSigma_\theta$.
+However, we will blur that distinction and continue to write $\text{Var}(\mcB)=\bbSigma_\theta$.
 
 Another technicality is that the *common scale parameter*, $\sigma$, could, in theory, be zero.
 However, the only way for its estimate, $\widehat{\sigma}$, to be zero is for the fitted values from the fixed-effects only, $\bbX\widehat{\bbbeta}$, to be exactly equal to the observed data.
@@ -580,51 +585,59 @@ However, $\Lambda_\theta$, like $\bbSigma_\theta$, can be singular.
 The computational methods in the *MixedModels* package are based on $\Lambda_\theta$ and do not require evaluation of $\bbSigma_\theta$.
 In fact, $\bbSigma_\theta$ is explicitly evaluated only at the converged parameter estimates.
 
-The spherical random effects, $\mathcal{U}\sim\mcN(\mathbf{0},\sigma^2\bbI_q)$, determine $\mathcal{B}$ as
-$$
-\mathcal{B}=\Lambda_\theta\mathcal{U} .
-$$ {#eq-sphericalre}
-Although it may seem more intuitive to write $\mathcal{U}$ as a linear transformation of $\mathcal{B}$, we cannot do that when $\Lambda_\theta$ is singular, which is why @eq-sphericalre is in the form shown.
+The spherical random effects, $\mcU\sim\mcN(\mathbf{0},\sigma^2\bbI_q)$, determine $\mcB$ as
 
-We can easily verify that @eq-sphericalre provides the desired distribution for $\mathcal{B}$.
-As a linear transformation of a multivariate Gaussian random variable, $\mathcal{B}$ will also be multivariate Gaussian with mean
 $$
-𝔼\left[\mathcal{B}\right]=
-𝔼\left[\bbLambda_\theta\mathcal{U}\right]=
-\bbLambda_\theta\,𝔼\left[\mathcal{U}\right]=
+\mcB=\Lambda_\theta\mcU .
+$$ {#eq-sphericalre}
+
+Although it may seem more intuitive to write $\mcU$ as a linear transformation of $\mcB$, we cannot do that when $\Lambda_\theta$ is singular, which is why @eq-sphericalre is in the form shown.
+
+We can easily verify that @eq-sphericalre provides the desired distribution for $\mcB$.
+As a linear transformation of a multivariate Gaussian random variable, $\mcB$ will also be multivariate Gaussian with mean
+
+$$
+𝔼\left[\mcB\right]=
+𝔼\left[\bbLambda_\theta\mcU\right]=
+\bbLambda_\theta\,𝔼\left[\mcU\right]=
 \bbLambda_\theta\mathbf{0}=\mathbf{0}
 $$
+
 and covariance matrix
+
 $$
-\text{Var}(\mathcal{B})=
-\bbLambda_\theta\text{Var}(\mathcal{U})\bbLambda\theta'=
+\text{Var}(\mcB)=
+\bbLambda_\theta\text{Var}(\mcU)\bbLambda\theta'=
 \sigma^2\bbLambda_\theta\bbLambda_\theta'=\bbSigma_\theta
 $$
 
-Just as we concentrate on how $\bbtheta$ determines $\Lambda_\theta$, not $\bbSigma_\theta$, we will concentrate on properties of $\mathcal{U}$ rather than $\mathcal{B}$.
+Just as we concentrate on how $\bbtheta$ determines $\Lambda_\theta$, not $\bbSigma_\theta$, we will concentrate on properties of $\mcU$ rather than $\mcB$.
 In particular, we now define the model according to the distributions
+
 $$
 \begin{aligned}
-(\mathcal{Y}|\mathcal{U}=\mathbf{u})&\sim\mcN(\mathbf{Z}\Lambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
-\mathcal{U}&\sim\mcN(\mathbf{0},\sigma^2\bbI_q) .
+(\mcY|\mcU=\mathbf{u})&\sim\mcN(\mathbf{Z}\Lambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
+\mcU&\sim\mcN(\mathbf{0},\sigma^2\bbI_q) .
 \end{aligned}
 $$ {#eq-condygivenu}
 
-The joint density for $\mathcal{Y}$ and $\mathcal{U}$ is the product of densities of the two distributions shown in @eq-condygivenu.
+The joint density for $\mcY$ and $\mcU$ is the product of densities of the two distributions shown in @eq-condygivenu.
 That is
+
 $$
-f_{\mathcal{Y},\mathcal{U}}(\bby,\mathbf{u})=
+f_{\mcY,\mcU}(\bby,\mathbf{u})=
 \frac{1}{\left(2\pi\sigma^2\right)^{-(n+q)/2}}\exp
 \left(\frac{\left\|\bby-\bbX\bbbeta
 -\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+
 \left\|\mathbf{u}\right\|^2}{-2\sigma^2}\right) .
 $$ {#eq-yujointdensity}
 
-To evaluate the likelihood for the parameters, $\bbtheta$, $\bbbeta$, and $\sigma^2$, given the observed response, $\bby$, we must evaluate the marginal distribution of $\mathcal{Y}$, which is the integral of $f_{\mathcal{Y},\mathcal{U}}(\bby,\mathbf{u})$ with respect to $\mathbf{u}$.
+To evaluate the likelihood for the parameters, $\bbtheta$, $\bbbeta$, and $\sigma^2$, given the observed response, $\bby$, we must evaluate the marginal distribution of $\mcY$, which is the integral of $f_{\mcY,\mcU}(\bby,\mathbf{u})$ with respect to $\mathbf{u}$.
 
 This is much simpler if we first rewrite the *penalized sum of squared residuals*, $\left\|\bby-\bbX\bbbeta
 -\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+
 \left\|\mathbf{u}\right\|^2$, in @eq-yujointdensity, which is a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
+
 $$
 \begin{aligned}
 r^2_\theta(\mathbf{u},\bbbeta)
@@ -695,7 +708,9 @@ r^2_\theta(\mathbf{u},\bbbeta)
 \| \mathbf{r}_{Xy}-\bbR_{XX}\bbbeta\|^2 + r_{yy}^2 ,
 \end{aligned}
 $$ {#eq-penalized-rss}
+
 using the Cholesky factor of the blocked matrix,
+
 $$
 \begin{aligned}
 \bbOmega_\theta&=
@@ -720,24 +735,31 @@ $$
 $$ {#eq-bigCholfac}
 
 Note that the block in the upper left, $\bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI$, is positive definite even when $\bbLambda_\theta$ is singular, because
+
 $$
 \mathbf{u}'\left(\bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI\right)\mathbf{u} = \left\|\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2
 +\left\|\mathbf{u}\right\|^2
 $$ {#eq-Cholfacupperleft}
+
 and the first term is non-negative while the second is positive if $\mathbf{u}\ne\mathbf{0}$.
 
 Thus $\bbR_{ZZ}$, with positive diagonal elements, can be evaluated and its determinant, $\left|\bbR_{ZZ}\right|$, is positive.
-This determinant appears in the marginal density of $\mathcal{Y}$, from which the likelihood of the parameters is evaluated.
+This determinant appears in the marginal density of $\mcY$, from which the likelihood of the parameters is evaluated.
 
 To evaluate the likelihood,
+
 $$
-L(\bbtheta,\bbbeta,\sigma|\bby) = \int_\mathbf{u} f_{\mathcal{Y},\mathcal{U}}(\bby,\mathbf{u})\, d\mathbf{u}
+L(\bbtheta,\bbbeta,\sigma|\bby) = \int_\mathbf{u} f_{\mcY,\mcU}(\bby,\mathbf{u})\, d\mathbf{u}
 $$ {#eq-likelihood-abstract}
+
 we isolate the part of the joint density that depends on $\mathbf{u}$ and perform a change of variable
+
 $$
 \mathbf{v}=\bbR_{ZZ}\mathbf{u}+\bbR_{ZX}\bbbeta-\mathbf{r}_{Zy} .
 $$ {#eq-u-system}
+
 From the properties of the multivariate Gaussian distribution
+
 $$
 \begin{aligned}
 \int_{\mathbf{u}}\frac{1}{(2\pi\sigma^2)^{q/2}}
@@ -748,12 +770,15 @@ $$
 &=|\bbR_{ZZ}|^{-1}
 \end{aligned}
 $$ {#eq-likelihood-integral}
+
 from which we obtain the likelihood as
+
 $$
 L(\bbtheta,\bbbeta,\sigma;\bby)=
 \frac{|\bbR_{ZZ}|^{-1}}{(2\pi\sigma^2)^{n/2}}
 \exp\left(-\frac{r_{yy}^2 + \|\bbR_{XX}(\bbbeta-\widehat{\bbbeta})\|^2}{2\sigma^2}\right) ,
 $$ {#eq-likelihood}
+
 where the conditional estimate, $\widehat{\bbbeta}$, given $\bbtheta$, satisfies
 $$
 \bbR_{XX}\widehat{\bbbeta} = \mathbf{r}_{Xy} .
@@ -762,12 +787,15 @@ $$
 Setting $\bbbeta=\widehat{\bbbeta}$
 and taking the logarithm provides the estimate of $\sigma^2$,
 given $\bbtheta$, as
+
 $$
 \widehat{\sigma^2}=\frac{r_\mathbf{yy}^2}{n}
 $$ {#eq-sigma-hat}
+
 which gives the *profiled log-likelihood*,
 $\ell(\bbtheta|\bby)=\log L(\bbtheta,\widehat{\bbbeta},\widehat{\sigma})$,
 on the deviance scale, as
+
 $$
 -2\ell(\bbtheta|\bby)=2\log(|\bbR_{ZZ}|) +
 n\left(1+\log\left(\frac{2\pi r_{yy}^2(\bbtheta)}{n}\right)\right)
@@ -777,6 +805,7 @@ One of the interesting aspects of this formulation is that it is not necessary t
 The two values needed for the log-likelihood evaluation, $2\log(|\bbR_{ZZ}|)$ and $r_\mathbf{yy}^2$, are obtained directly from the diagonal elements of the Cholesky factor.
 
 Furthermore, $\bbOmega_{\theta}$ and, from that, the Cholesky factor, $\bbR_{\theta}$, and the objective to be optimized can be evaluated for a given value of $\bbtheta$ from
+
 $$
 \mathbf{A} = \begin{bmatrix}
 \mathbf{Z}^\prime\mathbf{Z} & \mathbf{Z}^\prime\bbX & \mathbf{Z}^\prime\bby \\
@@ -784,6 +813,7 @@ $$
 \bby^\prime\mathbf{Z} & \bby^\prime\bbX & \bby^\prime\bby
 \end{bmatrix}
 $$ {#eq-A}
+
 and $\bbLambda_{\theta}$.
 
 In the `MixedModels` package the `LinearMixedModel` struct contains a symmetric blocked array in the `A` field and a similarly structured lower-triangular blocked array in the `L` field.
@@ -794,14 +824,19 @@ Evaluation of the objective simply involves updating the template matrices, $\la
 The so-called REML estimates of variance components are often preferred to the maximum likelihood estimates.
 ("REML" can be considered to be an acronym for "restricted" or "residual" maximum likelihood, although neither term is completely accurate because these estimates do not maximize a likelihood.)
 We can motivate the use of the REML criterion by considering a linear regression model,
+
 $$
-\mathcal{Y}\sim\mcN(\bbX\bbbeta,\sigma^2\bbI_n),
+\mcY\sim\mcN(\bbX\bbbeta,\sigma^2\bbI_n),
 $$ {#eq-20}
+
 in which we typically estimate $\sigma^2$ as
+
 $$
 \widehat{\sigma^2_R}=\frac{\|\bby-\bbX\widehat{\bbbeta}\|^2}{n-p}
 $$ {#eq-21}
+
 even though the maximum likelihood estimate of $\sigma^2$ is
+
 $$
 \widehat{\sigma^2_{L}}=\frac{\|\bby-\vec
 X\widehat{\bbbeta}\|^2}{n} .
@@ -821,30 +856,39 @@ This is all to say that the distinction between REML and ML estimates of varianc
 Nevertheless it is worthwhile seeing how the computational techniques described in this chapter apply to the REML criterion because the REML parameter estimates $\widehat{\bbtheta}_R$ and $\widehat{\sigma_R^2}$ for a linear mixed model have the property that they would specialize to $\widehat{\sigma^2_R}$ from #eq-21 for a linear regression model, as seen in @sec-dyestuff2lmm.
 
 Although not usually derived in this way, the REML criterion (on the deviance scale) can be expressed as
+
 $$
 d_R(\bbtheta,\sigma|\bby)=-2\log
 \int_{\mathbb{R}^p}L(\bbtheta,\bbbeta,\sigma|\bby)\,d\bbbeta .
 $$ {#eq-23}
+
 The REML estimates $\widehat{\bbtheta}_R$ and $\widehat{\sigma_R^2}$
 minimize $d_R(\bbtheta,\sigma|\bby)$.
 
 To evaluate this integral we form an expansion, similar to @eq-likelihood, of $r^2_{\theta,\beta}$ about $\widehat{\bbbeta}_\theta$
+
 $$
 r^2_{\theta,\beta}=r^2_\theta+\|\bbR_{XX}(\bbbeta-\widehat{\bbbeta}_\theta)\|^2 .
 $$ {#eq-rsqbetathetaexp}
+
 from which we can derive
+
 $$
 \int_{\mathbb{R}^p}\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
 {(2\pi\sigma^2)^{n/2}|\bbR_{ZZ}|} \,d\bbbeta=
 \frac{\exp\left(-\frac{r^2_\theta}{2\sigma^2}\right)}
 {(2\pi\sigma^2)^{(n-p)/2}|\bbR_{ZZ}||\bbR_X|}
 $$ {#eq-betaintegral}
+
 corresponding to a REML criterion on the deviance scale of
+
 $$
 d_R(\bbtheta,\sigma|\bby)=(n-p)\log(2\pi\sigma^2)+
 2\log\left(|\bbR_{ZZ}||\bbR_X|\right)+\frac{r^2_\theta}{\sigma^2} .
 $$ {#eq-remldev}
+
 Plugging in the conditional REML estimate, $\widehat{\sigma^2}_R=r^2_\theta/(n-p)$, provides the profiled REML criterion
+
 $$
 \tilde{d}_R(\bbtheta|\bby)=
 2\log\left(|\bbR_{ZZ}||\bbR_X|\right)+(n-p)
@@ -852,11 +896,17 @@ $$
 $$ {#eq-24}
 
 The REML estimate of $\bbtheta$ is
+
 $$
 \widehat{\bbtheta}_R=\arg\min_{\bbtheta}\tilde{d}_R(\bbtheta|\bby) ,
 $$ {#eq-31}
+
 and the REML estimate of $\sigma^2$ is the conditional REML estimate of $\sigma^2$ at $\widehat{\bbtheta}_R$,
-$$ \widehat{\sigma^2_R}=r^2_{\widehat\theta_R}/(n-p) . $$ {#eq-remlsigmasq}
+
+$$
+\widehat{\sigma^2_R}=r^2_{\widehat\theta_R}/(n-p) .
+$$ {#eq-remlsigmasq}
+
 It is not entirely clear how one would define a "REML estimate" of $\bbbeta$
 because the REML criterion, $d_R(\bbtheta,\sigma|\bby)$, defined in @eq-remldev, does not depend on $\bbbeta$.
 However, it is customary (and not unreasonable) to use
