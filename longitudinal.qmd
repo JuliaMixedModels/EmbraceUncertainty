@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.8
+---
+
 # Models for Longitudinal Data {#sec-longitudinal}
 
 ::: {.hidden}

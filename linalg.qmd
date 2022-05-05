@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.8
+---
+
 # Linear Algebra for Linear Models {#sec.LinAlg}
 
 ::: {.hidden}

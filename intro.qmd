@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.8
+---
+
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
 
 ::: {.hidden}

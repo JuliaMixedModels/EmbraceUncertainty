@@ -1,3 +1,7 @@
+---
+jupyter: julia-1.8
+---
+
 # Models With Multiple Random-effects Terms {#sec-Multiple}
 
 ::: {.hidden}
