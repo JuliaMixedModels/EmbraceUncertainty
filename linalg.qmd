@@ -174,7 +174,7 @@ $$ {#eq-cholimpliesposdef}
 where $\left\|\mathbf{v}\right\|^2$ is the squared length of the vector $\mathbf{v}$.
 Because $\bbR$ is non-singular, $\bbx\ne\mathbf{0}\implies\mathbf{Rx}\ne\mathbf{0}$ and the squared length in @eq-cholimpliesposdef is greater than zero.
 
-The other direction is a bit more complicated to prove but essentially it amounts to showing that if the process of the generating the Cholesky factor requires the square root of a non-positive number to obtain a diagonal element then there is a direction in which the quadratic form gives a non-positive result.
+The other direction is a bit more complicated to prove but essentially it amounts to showing that if the process of generating the Cholesky factor requires the square root of a non-positive number to obtain a diagonal element then there is a direction in which the quadratic form gives a non-positive result.
 
 In practice, the easiest way to check a symmetric matrix to see if it is positive definite is to attempt to evaluate the Cholesky factor and check whether that succeeds.
 This is exactly what the `isposdef` methods in the *LinearAlgebra* package do.
@@ -857,7 +857,7 @@ If we were to transform to a more symmetric scale, such as the estimator of the 
 Furthermore, this property of unbiasedness of variance estimators does not generalize from the linear regression model to linear mixed models.
 This is all to say that the distinction between REML and ML estimates of variances and variance components is probably less important than many people believe.
 
-Nevertheless it is worthwhile seeing how the computational techniques described in this chapter apply to the REML criterion because the REML parameter estimates $\widehat{\bbtheta}_R$ and $\widehat{\sigma_R^2}$ for a linear mixed model have the property that they would specialize to $\widehat{\sigma^2_R}$ from #eq-21 for a linear regression model, as seen in @sec-dyestuff2lmm.
+Nevertheless it is worthwhile seeing how the computational techniques described in this chapter apply to the REML criterion because the REML parameter estimates $\widehat{\bbtheta}_R$ and $\widehat{\sigma_R^2}$ for a linear mixed model have the property that they would specialize to $\widehat{\sigma^2_R}$ from @eq-21 for a linear regression model, as seen in @sec-dyestuff2lmm.
 
 Although not usually derived in this way, the REML criterion (on the deviance scale) can be expressed as
 

@@ -332,7 +332,6 @@ end
 
 By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, are shown compactly like this.
 To obtain more information we can `print` the model, as in
-:::
 
 ```{julia}
 println(dsm01)
@@ -340,7 +339,7 @@ println(dsm01)
 
 The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) parameter estimates, assigns the results to the name `dsm01`, and displays a summary of the fitted model.
 
-### Details of the printed display
+### Details of the printed display {#sec-printeddetails}
 
 The display of the fitted model has four major sections:
 
@@ -616,7 +615,7 @@ draw(
     :value => "Bootstrap samples of β";
     color=(:names => "Names"),
   ) *
-  AlgebraOfGraphics.density();
+  AoG.density();
   figure=(; resolution=(800, 450)),
 )
 ```
@@ -651,7 +650,7 @@ draw(
     :value => "Bootstrap samples of σ";
     color=(:group => "Group"),
   ) *
-  AlgebraOfGraphics.density();
+  AoG.density();
   figure=(; resolution=(800, 450)),
 )
 ```
@@ -701,7 +700,7 @@ The distribution of the estimator of $\sigma_1$ with this point mass at zero is 
 This is why characterizing the uncertainty of these parameter estimates with a standard error is misleading.
 Quoting an estimate and a standard error for the estimate is only meaningful if these values adequately characterize the distribution of the values of the estimator.
 
-In many cases standard errors are quoted for estimates of the variance components, $\sigma_1^2$ and $\sigma^2$, whose distribution (@fig-dsm01_bs_sigmasqr_hist) in the bootstrap sample is even less like a normal or Gaussian distribution.
+In many cases standard errors are quoted for estimates of the variance components, $\sigma_1^2$ and $\sigma^2$, whose distribution (@fig-dsm01_bs_sigmasqr_hist) in the bootstrap sample is even less like a normal or Gaussian distribution than is the distribution of estimates of $\sigma_1$.
 
 ```{julia}
 #| code-fold: true
@@ -942,9 +941,8 @@ The reason for introducing all the machinery that we did is to allow for more ge
 The maximum likelihood estimates of the parameters are obtained by minimizing the deviance.
 For linear mixed models we can minimize the profiled deviance, which is a function of $\bbtheta$ only, thereby considerably simplifying the optimization problem.
 
-To assess the precision of the parameter estimates, we profile the deviance function with respect to each parameter and apply a signed square root transformation to the likelihood ratio test statistic, producing a profile zeta function for each parameter.
-These functions provide likelihood-based confidence intervals for the parameters.
-Profile zeta plots allow us to visually assess the precision of individual parameters.
-Density plots derived from the profile zeta function provide another way of examining the distribution of the estimators of the parameters.
+To assess the precision of the parameter estimates we use a parametric bootstrap sample, when feasible.
+Re-fitting a simple model, such as those shown in this chapter, to a randomly generated response vector is quite fast and it is reasonable to work with bootstrap samples of tens of thousands of replicates.
+With larger data sets and more complex models, large bootstrap samples of parameter estimates could take much longer.
 
 Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.
