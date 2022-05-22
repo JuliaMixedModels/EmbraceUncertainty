@@ -50,7 +50,7 @@ using RCall
 using StatsBase
 
 ProgressMeter.ijulia_behavior(:clear);
-CairoMakie.activate!(; type="svg")
+CairoMakie.activate!(; type="svg");
 ```
 
 The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient.
@@ -150,7 +150,7 @@ end
 ```
 
 The variation in the diameter is associated with the plates and with the samples.
-Because each plate is used only for the six samples shown here we are not interested in the contributions of specific plates as much as we are interested in the variation due to plates and in assessing the potency of the samples after accounting for this variation.
+Because each plate is used only for the six samples shown here we are not interested in the contributions of specific plates as much as we are interested in the variation due to plates, and in assessing the potency of the samples after accounting for this variation.
 Thus, we will use random effects for the `plate` factor.
 We will also use random effects for the `sample` factor because, as in the dyestuff example, we are more interested in the sample-to-sample variability in the penicillin samples than in the potency of a particular sample.
 
@@ -209,13 +209,13 @@ caterpillar!(
 )
 ```
 
-The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` has much less variability than does the conditional distribution of the random effects for `sample`.
+The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` much less variability than does the conditional distribution of the random effects for `sample`.  (Note that the horizontal scales on these two plots are different.)
 However, the conditional distribution of the random effect for a particular sample, say sample `F`, has less variability than the conditional distribution of the random effect for a particular plate, say plate `m`.
 That is, the lines in @fig-pnm01samplepred are wider than the lines in @fig-pnm01platepred, even after taking the different axis scales into account.
 This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.
 
 In @sec-examlmm we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, $\bbZ$, that is the matrix of indicators of the levels of the grouping factor.
-When we have multiple, simple, scalar random-effects terms, as in model `m3`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\bbZ$ whose transpose is
+When we have multiple, simple, scalar random-effects terms, as in model `pnm01`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\bbZ$ whose transpose is
 
 ```{julia}
 vcat(transpose.(sparse.(pnm01.reterms))...)
@@ -232,7 +232,7 @@ pnm01.θ'
 
 The first parameter is the relative standard deviation of the random effects for plate, which has the value $0.845565/0.549933=1.53758$ at convergence, and the second is the relative standard deviation of the sample random effects ($1.770648/0.549933=3.21975$).
 
-Because $\bbLambda_{\bbtheta}$ is diagonal, the pattern of non-zeros in $\Lambda_\theta'\bbZ'\bbZ\Lambda_\theta+\bbI$ will be the same as that in $\bbZ'\bbZ$.
+Because $\bbLambda_{\bbtheta}$ is diagonal, the pattern of non-zeros in $\bbLambda_\bbtheta'\bbZ'\bbZ\bbLambda_\bbtheta+\bbI$ will be the same as that in $\bbZ'\bbZ$.
 The sparse Cholesky factor, $\bbL$, is lower triangular and has non-zero elements in the lower right hand corner in positions where $\bbZ'\bbZ$ has systematic zeros.
 
 ```{julia}
@@ -243,10 +243,7 @@ We say that "fill-in" has occurred when forming the sparse Cholesky decompositio
 In this case there is a relatively minor amount of fill but in other cases there can be a substantial amount of fill.
 The computational methods are tuned to reduce the amount of fill.
 
-The lack of precision in the estimate of $\sigma_2$ is a consequence of only having 6 distinct levels of the sample factor.
-The plate factor, on the other hand, has 24 distinct levels.
-In general it is more difficult to estimate a measure of spread, such as the standard deviation, than to estimate a measure of location, such as a mean, especially when the number of levels of the factor is small.
-Six levels are about the minimum number required for obtaining sensible estimates of standard deviations for simple, scalar random effects terms.
+### Precision of parameter estimates in the Pencillin model {#sec-Penicillinprecision}
 
 A parametric bootstrap sample of the parameter estimates
 
@@ -263,7 +260,7 @@ can be used to create shortest 95% coverage intervals for the parameters in the 
 DataFrame(shortestcovint(pnm01samp))
 ```
 
-As for model `dsm01` the bootstrap parameter estimate of the fixed-effects parameter are have approximately a "normal" or Gaussian shape, as shown in the kernel density plot(@fig-pnm01bsbeta)
+As for model `dsm01` the bootstrap parameter estimates of the fixed-effects parameter have approximately a "normal" or Gaussian shape, as shown in the kernel density plot (@fig-pnm01bsbeta)
 
 ```{julia}
 #| code-fold: true
@@ -303,6 +300,11 @@ draw(
   figure=(; resolution=(800, 450)),
 )
 ```
+
+The lack of precision in the estimate of $\sigma_2$, the standard deviation of the random effects for `sample`, is a consequence of only having 6 distinct levels of the `sample` factor.
+The `plate` factor, on the other hand, has 24 distinct levels.
+In general it is more difficult to estimate a measure of spread, such as the standard deviation, than to estimate a measure of location, such as a mean, especially when the number of levels of the factor is small.
+Six levels are about the minimum number required for obtaining sensible estimates of standard deviations for simple, scalar random effects terms.
 
 ## A model with nested random effects {#sec-NestedRE}
 
@@ -397,7 +399,7 @@ If we know that the `cask` should be considered as nested within the `batch` the
 In a small data set like we can quickly detect a factor being implicitly nested within another factor and take appropriate action.
 In a large data set, such as from a multi-center study, it is often assumed that, say, subject identifiers are unique to each center.
 Frequently this is not the case.
-Especially when dealing with large data sets assumptions about nested identifiers should be checked carefully.
+Especially when dealing with large data sets, assumptions about nested identifiers should be checked carefully.
 
 ### Fitting a model with nested random effects {#sec-fittingPastes}
 
@@ -413,7 +415,7 @@ end
 ```
 
 Not only is the model specification similar for nested and crossed factors, the internal calculations are performed according to the methods described in for each model type.
-Comparing the patterns in the matrices $\bbLambda$, $\bbZ'\bbZ$ and $\bbL$ for this model
+Comparing the patterns in the matrices $\bbLambda$, $\bbZ'\bbZ$ and $\bbL$ and the block structure
 
 ```{julia}
 sparseL(psm01; full=true)
@@ -423,16 +425,16 @@ sparseL(psm01; full=true)
 BlockDescription(psm01)
 ```
 
-Comparing the block structure of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
+of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
 This type of structure has the desirable property that there is no "fill-in" during calculation of the Cholesky factor.
-In other words, the number of non-zeros in $\bbL$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\Lambda'\bbZ'\bbZ\Lambda+\bbI$ (which, because $\Lambda$ is diagonal, has the same structure as $\bbZ'\bbZ$).
+In other words, the number of non-zeros in $\bbL$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\bbLambda'\bbZ'\bbZ\bbLambda+\bbI$ (which, because $\bbLambda$ is diagonal, has the same structure as $\bbZ'\bbZ$).
 
 Fill-in of the Cholesky factor is not an important issue when we have a few dozen random effects, as we do here.
 It is an important issue when we have millions of random effects in complex configurations, as has been the case in some of the models that have been fit using MixedModels.
 
 ### Assessing parameter estimates in psm01 {#sec-assessingfm04}
 
-The parameter estimates are: $\widehat{\sigma_1}=$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}=$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}=$, the standard deviation of the residual noise term; and $\widehat{\beta_1}=$, the overall mean response, which is labeled `(Intercept)` in these models.
+The parameter estimates are: $\widehat{\sigma_1}$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}$, the standard deviation of the residual noise term; and $\widehat{\beta_1}=$, the overall mean response, which is labeled `(Intercept)` in these models.
 
 The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig-pastesdot.
 Indeed our conclusion from @fig-pastesdot was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.
@@ -494,7 +496,7 @@ These are the general principles of statistical hypothesis tests.
 To perform a test in practice we must specify the criterion for comparing the model fits, the method for calculating the p-value from an observed value of the criterion, and the standard by which we will determine if the p-value is "small" or not.
 The criterion is called the *test statistic*, the p-value is calculated from a *reference distribution* for the test statistic, and the standard for small p-values is called the *level* of the test.
 
-In we referred to likelihood ratio tests (LRTs) for which the test statistic is the difference in the deviance.
+In @sec-printeddetails we referred to likelihood ratio tests (LRTs) for which the test statistic is the difference in the deviance.
 That is, the LRT statistic is $d_0-d_a$ where $d_a$ is the deviance in the more general ($H_a$) model fit and $d_0$ is the deviance in the constrained ($H_0$) model.
 An approximate reference distribution for an LRT statistic is the $\chi^2_\nu$ distribution where $\nu$, the degrees of freedom, is determined by the number of constraints imposed on the parameters of $H_a$ to produce $H_0$.
 
@@ -514,7 +516,7 @@ is compared to model `psm01` as
 MixedModels.likelihoodratiotest(psm02, psm01)
 ```
 
-which provides a p-value of .
+which provides a p-value of 52%.
 Because typical standards for "small" p-values are 5% or 1%, a p-value over 50% would not be considered significant at any reasonable level.
 
 We do need to be cautious in quoting this p-value, however, because the parameter value being tested, $\sigma_2=0$, is on the boundary of set of possible values, $\sigma_2\ge 0$, for this parameter.
@@ -542,8 +544,8 @@ psm02samp = parametricbootstrap(
 DataFrame(shortestcovint(psm02samp))
 ```
 
-The confidence intervals on $\log(\sigma)$ and $\beta_0$ are similar for the two models.
-The confidence interval on $\sigma_1$ is slightly wider in model than in , because the variability that is attributed to in is incorporated into the variability due to in .
+The confidence intervals on $\sigma$ and $\beta_0$ are similar for the two models.
+The confidence interval on $\sigma_1$ is slightly wider and incorporates larger values in model `psm02` than in model `psm01`, because the variability that is attributed to `batch` in `psm01` is incorporated into the variability due to `sample` in `psm02`.
 
 ## A model with partially crossed random effects {#sec-partially}
 
@@ -595,8 +597,7 @@ draw(
 
 it is sufficiently diffuse to warrant treating it as if it were a continuous response.
 
-At this point we will fit models that have random effects for student, instructor, and department (or the combination) to these data.
-In the next chapter we will fit models incorporating fixed-effects for instructor and department to these data.
+At this point we will fit models that have random effects for student, instructor, and department (or the combination of department and service) to these data.
 
 ```{julia}
 contrasts =
@@ -636,11 +637,9 @@ When a model is fit to a large sample even the most subtle of differences can be
 The researcher or data analyst must then decide if these terms have practical significance, beyond the apparent statistical significance.
 
 The large sample size also helps to assure that the parameters have good normal approximations.
-We could profile this model fit but doing so would take a very long time and, in this particular case, the analysts are more interested in a model that uses fixed-effects parameters for the instructors, which we will describe in the next chapter.
+We could profile this model fit but doing so would take a very long time and, in this particular case, the analysts are more interested in a model that uses fixed-effects parameters for the instructors.
 
-We could pursue other mixed-effects models here, such as using the factor and not the interaction to define random effects, but we will revisit these data in the next chapter and follow up on some of these variations there.
-
-### Structure of $\bbL$ for model iem01 {#sec-iem01L}
+### Structure of L for model iem01 {#sec-iem01L}
 
 Before leaving this model we examine the sparse Cholesky factor, $\bbL$, which is of size $4116\times4116$.
 
@@ -649,7 +648,28 @@ sparseL(iem01; full=true)
 ```
 
 Even as a sparse matrix this factor requires a considerable amount of memory, but as a triangular dense matrix it would require nearly 10 times as much.
-There are $(4116\times 4117)/2$ elements on and below the diagonal, each of which would  require 8 bytes of storage.
+There are $(4116\times 4117)/2$ elements on and below the diagonal, each of which would require 8 bytes of storage.
+
+### Effect of service courses
+
+It is sometimes felt that it is more difficult to achieve favorable ratings from students in a service course (i.e. a course taught to students majoring in another program) as opposed to students taking a course in their major.
+
+There are several ways in which `service` can be incorporated in a model like this.
+The simplest approach is to add `service` to the fixed-effects specification
+
+```{julia}
+iem03 = let
+  form = @formula(y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept))
+  fit(MixedModel, form, insteval; contrasts)
+end
+```
+
+In model `iem03` the effect of `service` is considered to be constant across departments and is modeled with a single fixed-effects parameter, which is the difference in a typical rating in a service course to a non-service course.
+This parameter also affects the interpretation of the `(Intercept)` coefficient.
+With the `service` term in the model the `(Intercept)` becomes a typical rating at the reference level (i.e. non-service or `service: N`) because the default coding for the `service` term is zero at the reference level and one for `service: Y`.
+
+The coding can be changed by specifying a non-default contrast for `service`.
+For example, the `EffectsCoding` and `HelmerCoding` contrasts will both assign -1 to the first level (`N` in this case) and +1 to the second level (`Y`).
 
 ### "Best-liked"
 
@@ -681,7 +701,7 @@ draw(
 
 The precision of the conditional distributions of the random effects, as measured by the width of the intervals, varies considerably between instructors.
 
-We can determine the instructor, `I1258`, with the largest mean of the conditional distribution of the random effects
+We can determine that instructor `I1258` has the largest mean of the conditional distributions of the random effects
 
 ```{julia}
 last(
@@ -695,7 +715,7 @@ but the conditional distribution of this random effect clearly overlaps signific
 ## Chapter summary {#sec-MultSummary}
 
 A simple, scalar random effects term in an model formula is of the form , where is an expression whose value is the *grouping factor* of the set of random effects generated by this term.
-Typically, `F` is simply the name of a factor, such as in the terms or in the examples in this chapter.
+Typically, `F` is simply the name of a factor, as in most of the examples in this chapter.
 However, the grouping factor can be the value of an expression, such as in the last example.
 
 Because simple, scalar random-effects terms can differ only in the description of the grouping factor we refer to configurations such as crossed or nested as applying to the terms or to the random effects, although it is more accurate to refer to the configuration as applying to the grouping factors.
