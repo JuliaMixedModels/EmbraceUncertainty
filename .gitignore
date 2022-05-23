@@ -4,3 +4,6 @@ _gen/
 Manifest.toml
 .vscode/
 .DS_Store
+
+/.quarto/
+/_book/

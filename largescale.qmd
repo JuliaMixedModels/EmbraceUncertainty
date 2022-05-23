@@ -1,0 +1,444 @@
+---
+jupyter: julia-1.8
+---
+
+# A large-scale study {#sec-largescale}
+
+Load the packages to be used.
+
+```{julia}
+#| code-fold: true
+using AlgebraOfGraphics
+using Arrow
+using CairoMakie
+using Chain
+using DataFrameMacros
+using DataFrames
+using LinearAlgebra
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL
+end
+using MixedModels
+using MixedModelsMakie
+using ProgressMeter
+using StandardizedPredictors
+using StatsBase
+
+const contrasts = Dict{Symbol,Any}();
+CairoMakie.activate!(; type="svg");
+ProgressMeter.ijulia_behavior(:clear);
+```
+
+As with many techniques in data science, the place where "the rubber meets the road", as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.
+
+One such study is the English Lexicon Project [@Balota_2007] --- a multicenter study incorporating both a lexical decision task and a word recognition task.
+Different groups of subjects participated in the different tasks.
+
+Compared to our previous examples, these are large data sets.
+Data manipulation and model fitting in cases like these requires considerable care.
+
+## Trial-level data from the LDT
+
+In the lexical decision task the study participant is shown a character string, under carefully controlled conditions, and responds according to whether they identify the string as a word or not.
+Two responses are recorded: whether the choice of word/non-word is correct and the time that elapsed between exposure to the string and registering a decision.
+
+Several covariates, some relating to the subject and some relating to the target, were recorded.
+Initially we consider only the trial-level data.
+
+```{julia}
+ldttrial = Arrow.Table("./data/ELP_ldt_trial.arrow")
+```
+
+::: {.callout-note}
+Come up with a better way of defining a path to `./data/`, perhaps
+
+```jl
+datadir(paths::AbstractString...) = joinpath(".", "data", paths...)
+```
+
+:::
+
+```{julia}
+ldttrial = @transform!(DataFrame(ldttrial), :S2 = :seq > 2000)
+describe(ldttrial)
+```
+
+The two response variables are `acc` - the accuracy of the response - and `rt`, the response time in milliseconds.
+There is one trial-level covariate, `seq`, the sequence number of the trial within subj.
+Each subject participated in two sessions on different days, with 2000 trials recorded on the first day.
+The `S2` variable added to the data frame using `@transform!` is a Boolean value indicating if the trial is in the second session.
+
+## Initial data exploration {#sec-ldtinitialexplore}
+
+From the basic summary of `ldttrial` we can see that there are questionable response times, such as negative values and values over 32 seconds.
+Because of obvious outliers we will use the median response time, which is not strongly influenced by outliers, rather than the mean response time when summarizing by item or by subject.
+
+Also, there are missing values of the accuracy.
+We should check if these are associated with particular subjects or particular items.
+
+### Summaries by item
+
+To summarize by item we group the trials by item and use `combine` to produce the various summary statistics.
+As we will create similar summaries by subject, we incorporate an 'i' in the names of these summaries (and an 's' in the name of the summaries by subject).
+
+```{julia}
+byitem = @chain ldttrial begin
+  groupby(:item)
+  @combine(
+    :ni = length(:acc),             # no. of obs
+    :imiss = sum(ismissing, :acc),  # no. of missing acc
+    :iacc = sum(skipmissing(:acc)), # no. of accurate
+    :imedianrt = median(:rt),
+  )
+  @transform!(:wrdlen = length(:item), :ipropacc = :iacc / :ni)
+end
+```
+
+It can be seen that the items occur in word/nonword pairs and the pairs are sorted alphabetically by the word in the pair (ignoring case).
+We can add the word/nonword status for the items as
+
+```{julia}
+byitem.isword = isodd.(eachindex(byitem.item))
+describe(byitem)
+```
+
+This table shows that some of the items were never identified correctly.
+These are
+
+```{julia}
+@subset(byitem, iszero(:iacc))
+```
+
+Notice that these are all words but somewhat obscure words such that none of the subjects exposed to the word identified it correctly.
+
+We can incorporate characteristics like `wrdlen` and `isword` back into the original trial table with a "left join".
+This operation joins two tables by values in a common column.
+It is called a *left* join because the left (or first) table takes precedence, in the sense that every row in the left table is present in the result.
+If there is no matching row in the second table then missing values are inserted for the columns from the right table in the result.
+
+```{julia}
+describe(
+  leftjoin!(
+    ldttrial,
+    select(byitem, :item, :wrdlen, :isword);
+    on=:item,
+  ),
+)
+```
+
+Notice that the `wrdlen` and `isword` variables in this table allow for missing values, because they are derived from the second argument, but there are no missing values for these variables.
+If there is no need to allow for missing values, there is a slight advantage in disallowing them in the element type, because the code to check for and handle missing values is not needed.
+
+This could be done separately for each column or for the whole data frame, as in
+
+```{julia}
+describe(disallowmissing!(ldttrial; error=false))
+```
+
+::: {.callout-note}
+The named argument `error=false` is required because there is one column, `acc`, that does incorporate missing values.
+If `error=false` were not given then the error thrown when trying to `disallowmissing` on the `acc` column would be propagated and the top-level call would fail.
+:::
+
+A histogram of the word lengths, @fig-ldtwrdlenhist, shows that the majority of the items are between 3 and 14 characters.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Histogram of word lengths in the items used in the lexical decision task."
+#| label: fig-ldtwrdlenhist
+draw(
+  data(byitem) *
+  mapping(:wrdlen => "Length of word") *
+  histogram(; bins=0.5:21.5),
+)
+```
+
+To examine trends in accuracy by word length we use a scatterplot smoother on the binary response, as described in @sec-plottingbinary.
+The resulting plot, @fig-ldtaccsmooth, shows the accuracy of identifying nonwords is more-or-less constant at around 85%,
+but accuracy decreases with increasing word length for the words.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Smoothed curves of accuracy versus word length in the lexical decision task."
+#| label: fig-ldtaccsmooth
+draw(
+  data(@subset(ldttrial, !ismissing(:acc))) *
+  mapping(
+    :wrdlen => "Word length",
+    :acc => "Accuracy";
+    color=:isword,
+  ) *
+  smooth();
+  figure=(; resolution=(800, 450)),
+)
+```
+
+### Summaries by subject {#sec-elpsumrysubj}
+
+A summary of accuracy and median response time by subject
+
+```{julia}
+bysubj = @chain ldttrial begin
+  groupby(:subj)
+  @combine(
+    :ns = length(:acc),             # no. of obs
+    :smiss = sum(ismissing, :acc),  # no. of missing acc
+    :sacc = sum(skipmissing(:acc)), # no. of accurate
+    :smedianrt = median(:rt),
+  )
+  @transform!(:spropacc = :sacc / :ns)
+end
+```
+
+shows some anomalies
+
+```{julia}
+describe(bysubj)
+```
+
+First, some subjects are accurate on only about half of their trials, which is the proportion that would be expected from random guessing.
+A plot of the median response time versus proportion accurate, @fig-ldtmedianrtvspropacc, shows that the subjects with lower accuracy are some of the fastest responders, further indicating that these subjects are sacrificing accuracy for speed.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Median response time versus proportion accurate by subject in the LDT."
+#| label: fig-ldtmedianrtvspropacc
+draw(
+  data(bysubj) *
+  mapping(
+    :spropacc => "Proportion accurate",
+    :smedianrt => "Median response time",
+  ) *
+  (smooth() + visual(Scatter));
+)
+```
+
+The majority of the subjects whose median response time is less than 500 ms. are accurate on less than 75% of their trials.
+Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.
+
+```{julia}
+minimum(@subset(bysubj, :spropacc > 0.9).smedianrt)
+```
+
+In a lexical discrimination task the response times for accurate identifications only within some range of "reasonable" values are analyzed.
+We will use the response times in the range of 1/3 of a second (333 ms.) to 4 seconds (4000 ms.) in the `pruned` data frame.
+
+```{julia}
+pruned = @chain ldttrial begin
+  @subset(coalesce(:acc, false), 333 ≤ :rt ≤ 4000,)
+  leftjoin!(select(bysubj, :subj, :spropacc); on=:subj)
+  dropmissing!
+end
+size(pruned)
+```
+
+::: {.callout-note}
+The `coalesce` function returns the first of its arguments that is not missing.
+Thus the expression `coalesce(:acc, false)` in the `@subset` macro call returns `true` only for the the rows in which `acc` is `true`, skipping the rows where `acc` is missing.
+The second restriction requires that `rt` is between 1/3 of a second and 4 seconds.
+:::
+
+```{julia}
+describe(pruned)
+```
+
+We have again used a "left-join" to incorporate the subject's proportion of accurate trials into this trial-level data frame.
+If we fit a model to the entire `pruned` data frame it will incorporate the times of accurate responses between 1/3 of a second and 4 seconds from all subjects, including those with low accuracy.
+But we can also subset the data to only those observations on subjects with higher accuracy rates to see if this changes our conclusions.
+
+We will use 75% accuracy and 90% accuracy as our cut-off values.
+Note that restricting to the responses from subjects with at least 90% accuracy severely reduces the number of trials, from 2.33 million to 0.69 million.
+
+```{julia}
+nrow(@subset(pruned, :spropacc > 0.9))
+```
+
+and from 814 subjects to 222
+
+```{julia}
+nrow(@subset(bysubj, :spropacc > 0.9))
+```
+
+### Choice of response time scale {#sec-ldtrtscale}
+
+As we have indicated, generally the response times are analyzed for the correct identifications only.
+Furthermore, unrealistically large or small response times are eliminated.
+For this example we only use the responses between 333 and 4000 ms.
+
+A density plot of the pruned response times, @fig-elpldtrtdens, shows they are skewed to the right.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Kernel density plot of the pruned response times (ms.) in the LDT.
+#| label: fig-elpldtrtdens
+draw(
+  data(pruned) *
+  mapping(:rt => "Response time (ms.) for correct responses") *
+  AlgebraOfGraphics.density();
+  figure=(; resolution=(800, 450)),
+)
+```
+
+In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.
+
+```{julia}
+describe(@transform!(pruned, :speed = 1000 / :rt)) # speed in s⁻¹
+```
+
+The density of the response speed, in responses per second, is shown in @fig-elpldtspeeddens.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Kernel density plot of the pruned response speed in the LDT.
+#| label: fig-elpldtspeeddens
+draw(
+  data(pruned) *
+  mapping(:speed => "Response speed (s⁻¹) for correct responses") *
+  AlgebraOfGraphics.density();
+  figure=(; resolution=(800, 450)),
+)
+```
+
+As noted in @Box1964, a transformation of the response that produces a more Gaussian distribution often will also produce a simpler model structure.
+For example, @fig-ldtrtvswrdlen shows the smoothed relationship between word length and response time for words and non-words separately,
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Scatterplot smooths of response time versus word length in the LDT."
+#| label: fig-ldtrtvswrdlen
+draw(
+  data(pruned) *
+  mapping(
+    :wrdlen => "Word length",
+    :rt => "Response time (ms)";
+    :color => :isword,
+  ) *
+  smooth();
+)
+```
+
+and @fig-ldtspeedvswrdlen shows the similar relationships for speed
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Scatterplot smooths of speed time versus word length in the LDT."
+#| label: fig-ldtspeedvswrdlen
+draw(
+  data(pruned) *
+  mapping(
+    :wrdlen => "Word length",
+    :speed => "Speed of response (s⁻¹)";
+    :color => :isword,
+  ) *
+  smooth();
+)
+```
+
+For the most part the smoother lines in @fig-ldtspeedvswrdlen are reasonably straight.
+The small amount of curvature is associated with short word lengths, say less than 4 characters, of which there are comparatively few in the study.
+
+## Models with scalar random effects {#sec-ldtinitialmodel}
+
+### Establish the contrasts
+
+Because there are a large number of items in the data set it is important to assign a `Grouping()` contrast to `item` (and, less importantly, to `subj`).
+For the `isword` factor we will use an `EffectsCoding` contrast with the base level as `false`.
+The non-words are assigned -1 in this contrast and the words are assigned +1.
+The `wrdlen` covariate is on its original scale but centered at 8 characters.
+
+Thus the `(Intercept)` coefficient is the predicted speed of response for a typical subject and typical item (without regard to word/non-word status) of 8 characters.
+
+Set these contrasts
+
+```{julia}
+contrasts[:subj] = Grouping();
+contrasts[:item] = Grouping();
+contrasts[:isword] = DummyCoding(; base=false);
+contrasts[:wrdlen] = Center(8);
+```
+
+and fit a first model with simple, scalar, random effects for `subj` and `item`.
+
+```{julia}
+elm01 = let
+  form = @formula(
+    speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+  )
+  fit(MixedModel, form, pruned; contrasts)
+end
+print(elm01)
+```
+
+If we restrict to only those subjects with 75% accuracy or greater the model becomes
+
+```{julia}
+elm02 = let
+  form = @formula(
+    speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+  )
+  dat = @subset(pruned, :spropacc > 0.75)
+  fit(MixedModel, form, dat; contrasts)
+end
+print(elm02)
+```
+
+Restricting to subjects with at least 90% accuracy produces
+
+```{julia}
+elm03 = let
+  form = @formula(
+    speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+  )
+  dat = @subset(pruned, :spropacc > 0.90)
+  fit(MixedModel, form, dat; contrasts)
+end
+print(elm03)
+```
+
+These models take only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.
+
+The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers.
+We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the `MixedModel` object followed by restoring the `optsum` object.
+
+```{julia}
+saveoptsum("./optsums/elm01.json", elm01);
+```
+
+```{julia}
+elm01a = restoreoptsum!(
+  let
+    form = @formula(
+      speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+    )
+    MixedModel(form, pruned; contrasts)
+  end,
+  "./optsums/elm01.json",
+)
+```
+
+Other covariates associated with the item are available as
+
+```{julia}
+elpldtitem = DataFrame(Arrow.Table("./data/ELP_ldt_item.arrow"))
+describe(elpldtitem)
+```
+
+and those associated with the subject are
+
+```{julia}
+elpldtsubj = DataFrame(Arrow.Table("./data/ELP_ldt_subj.arrow"))
+describe(elpldtsubj)
+```
+
+For the simple model `elm01` the estimated standard deviation of the random effects for subject is greater than that of the random effects for item, a common occurrence.
+A caterpillar plot, @fig-elm01caterpillarsubj,
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm01.
+#| label: fig-elm01caterpillarsubj
+qqcaterpillar!(
+  Figure(resolution=(800, 650)),
+  ranefinfo(elm01, :subj),
+)
+```

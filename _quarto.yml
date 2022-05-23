@@ -1,0 +1,30 @@
+project:
+  type: book
+
+book:
+  title: "Embrace Uncertainty"
+  subtitle: "Mixed-effects models with Julia"
+  author: "Phillip Alday, Reinhold Kliegl, and Douglas Bates"
+  date: today
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - multiple.qmd
+    - longitudinal.qmd
+    - largescale.qmd
+    - glmmbinomial.qmd
+    - references.qmd
+  appendices: 
+    - linalg.qmd
+
+execute-dir: project
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+jupyter: julia-1.8
