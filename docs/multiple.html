@@ -332,7 +332,7 @@ div.csl-indent {
 <p>In the past it was difficult to fit mixed models with multiple, crossed grouping factors to large, possibly unbalanced, data sets. The methods in <code>MixedModels.jl</code> are able to do this. To introduce the methods let us first consider a small, balanced data set with crossed grouping factors.</p>
 <section id="sec-penicillin" class="level3" data-number="2.1.1">
 <h3 data-number="2.1.1" class="anchored" data-anchor-id="sec-penicillin"><span class="header-section-number">2.1.1</span> The penicillin data</h3>
-<p>The data are derived from Table&nbsp;6.6, p.&nbsp;144 of <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies and Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>)</span> where they are described as coming from an investigation to</p>
+<p>The data are derived from Table&nbsp;6.6, p.&nbsp;144 of <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies &amp; Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>)</span> where they are described as coming from an investigation to</p>
 <blockquote class="blockquote">
 <p>assess the variability between samples of penicillin by the <em>B.&nbsp;subtilis</em> method. In this test method a bulk-innoculated nutrient agar medium is poured into a Petri dish of approximately 90 mm. diameter, known as a plate. When the medium has set, six small hollow cylinders or pots (about 4 mm. in diameter) are cemented onto the surface at equally spaced intervals. A few drops of the penicillin solutions to be compared are placed in the respective cylinders, and the whole plate is placed in an incubator for a given time. Penicillin diffuses from the pots into the agar, and this produces a clear circular zone of inhibition of growth of the organisms, which can be readily measured. The diameter of the zone is related in a known way to the concentration of penicillin in the solution.</p>
 </blockquote>
@@ -427,7 +427,7 @@ div.csl-indent {
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(pnm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 45    Time: 0:00:00 (16.22 ms/it)</code></pre>
+<pre><code>Minimizing 45    Time: 0:00:00 (19.81 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
@@ -616,7 +616,7 @@ Residual              0.302426 0.549933
 <p>In this section we again consider a simple example, this time fitting a model with <em>nested</em> grouping factors for the random effects.</p>
 <section id="sec-pastesData" class="level3" data-number="2.2.1">
 <h3 data-number="2.2.1" class="anchored" data-anchor-id="sec-pastesData"><span class="header-section-number">2.2.1</span> The pastes data</h3>
-<p>The third example from <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies and Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>, Table&nbsp;6.5, p.&nbsp;138)</span> is described as coming from</p>
+<p>The third example from <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies &amp; Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>, Table&nbsp;6.5, p.&nbsp;138)</span> is described as coming from</p>
 <blockquote class="blockquote">
 <p>deliveries of a chemical paste product contained in casks where, in addition to sampling and testing errors, there are variations in quality between deliveries …As a routine, three casks selected at random from each delivery were sampled and the samples were kept for reference. …Ten of the delivery batches were sampled at random and two analytical tests carried out on each of the 30 samples.</p>
 </blockquote>
@@ -639,7 +639,7 @@ Residual              0.302426 0.549933
 <div class="data-frame"><p>4 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>batch</td><td></td><td>A</td><td></td><td>J</td><td>0</td><td>String</td></tr><tr><th>2</th><td>cask</td><td></td><td>a</td><td></td><td>c</td><td>0</td><td>String</td></tr><tr><th>3</th><td>strength</td><td>60.0533</td><td>54.2</td><td>59.3</td><td>66.0</td><td>0</td><td>Float64</td></tr><tr><th>4</th><td>sample</td><td></td><td>Aa</td><td></td><td>Jc</td><td>0</td><td>String</td></tr></tbody></table></div>
 </div>
 </div>
-<p>As stated in the description in <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies and Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>)</span>, there are 30 samples, three from each of the 10 delivery batches. We have created a <code>sample</code> factor by concatenating the label of the <code>batch</code> factor with ‘a’, ‘b’ or ‘c’ to distinguish the three samples taken from that batch.</p>
+<p>As stated in the description in <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies &amp; Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>)</span>, there are 30 samples, three from each of the 10 delivery batches. We have created a <code>sample</code> factor by concatenating the label of the <code>batch</code> factor with ‘a’, ‘b’ or ‘c’ to distinguish the three samples taken from that batch.</p>
 <p>When plotting the strength versus batch and cask in the data we should remember that we have two strength measurements on each of the 30 samples. It is tempting to use the cask designation (‘a’, ‘b’ and ‘c’) to determine, say, the plotting symbol within a batch. It would be fine to do this within a batch but the plot would be misleading if we used the same symbol for cask ‘a’ in different batches. There is no relationship between cask ‘a’ in batch ‘A’ and cask ‘a’ in batch ‘B’. The labels ‘a’, ‘b’ and ‘c’ are used only to distinguish the three samples within a batch; they do not have a meaning across batches.</p>
 <div id="fig-pastesdot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -680,7 +680,7 @@ Residual              0.302426 0.549933
 </section>
 <section id="sec-nestedcrossed" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="sec-nestedcrossed"><span class="header-section-number">2.2.2</span> Nested Factors</h3>
-<p>Because each level of <code>sample</code> occurs with one and only one level of <code>batch</code> we say that <code>sample</code> is <em>nested within</em> <code>batch</code>. Some presentations of mixed-effects models, especially those related to <em>multilevel modeling</em>&nbsp;<span class="citation" data-cites="MLwiNUser:2000">(<a href="references.html#ref-MLwiNUser:2000" role="doc-biblioref">Rasbash et al. 2000</a>)</span> or <em>hierarchical linear models</em>&nbsp;<span class="citation" data-cites="Rauden:Bryk:2002">(<a href="references.html#ref-Rauden:Bryk:2002" role="doc-biblioref">Raudenbush and Bryk 2002</a>)</span>, leave the impression that one can only define random effects with respect to factors that are nested. This is the origin of the terms “multilevel”, referring to multiple, nested levels of variability, and “hierarchical”, also invoking the concept of a hierarchy of levels. To be fair, both those references do describe the use of models with random effects associated with non-nested factors, but such models tend to be treated as a special case.</p>
+<p>Because each level of <code>sample</code> occurs with one and only one level of <code>batch</code> we say that <code>sample</code> is <em>nested within</em> <code>batch</code>. Some presentations of mixed-effects models, especially those related to <em>multilevel modeling</em>&nbsp;<span class="citation" data-cites="MLwiNUser:2000">(<a href="references.html#ref-MLwiNUser:2000" role="doc-biblioref">Rasbash et al., 2000</a>)</span> or <em>hierarchical linear models</em>&nbsp;<span class="citation" data-cites="Rauden:Bryk:2002">(<a href="references.html#ref-Rauden:Bryk:2002" role="doc-biblioref">Raudenbush &amp; Bryk, 2002</a>)</span>, leave the impression that one can only define random effects with respect to factors that are nested. This is the origin of the terms “multilevel”, referring to multiple, nested levels of variability, and “hierarchical”, also invoking the concept of a hierarchy of levels. To be fair, both those references do describe the use of models with random effects associated with non-nested factors, but such models tend to be treated as a special case.</p>
 <p>The blurring of mixed-effects models with the concept of multiple, hierarchical levels of variation results in an unwarranted emphasis on “levels” when defining a model and leads to considerable confusion. It is perfectly legitimate to define models having random effects associated with non-nested factors. The reasons for the emphasis on defining random effects with respect to nested factors only are that such cases do occur frequently in practice and that some of the computational methods for estimating the parameters in the models can only be easily applied to nested factors.</p>
 <p>This is not the case for the methods used <code>MixedModels.jl</code>. Indeed there is nothing special done for models with random effects for nested factors. When random effects are associated with multiple factors exactly the same computational methods are used whether the factors form a nested sequence or are partially crossed or are completely crossed.</p>
 <p>There is, however, one aspect of nested grouping factors that we should emphasize, which is the possibility of a factor that is <em>implicitly nested</em> within another factor. Suppose, for example, that the factor <code>sample</code> had been defined as having three levels instead of 30 with the implicit assumption that <code>sample</code> is nested within batch. It may seem silly to try to distinguish 30 different batches with only three levels of a factor but, unfortunately, data are frequently organized and presented like this, especially in text books. The factor <code>cask</code> in the data is exactly such an implicitly nested factor. If we cross-tabulate <code>cask</code> and <code>batch</code> we get the impression that these factors are crossed, not nested. If we know that the <code>cask</code> should be considered as nested within the <code>batch</code> then we should create a new categorical variable giving the batch-cask combination, which is exactly what the <code>sample</code> factor is.</p>
@@ -696,7 +696,7 @@ Residual              0.302426 0.549933
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, pastes; contrasts)</span>
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 36    Time: 0:00:00 ( 9.25 ms/it)</code></pre>
+<pre><code>Minimizing 36    Time: 0:00:00 (10.31 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="20">
 <table class="table table-sm table-striped">
@@ -919,7 +919,7 @@ Residual              0.302426 0.549933
 </tbody>
 </table>
 <p>which provides a p-value of 52%. Because typical standards for “small” p-values are 5% or 1%, a p-value over 50% would not be considered significant at any reasonable level.</p>
-<p>We do need to be cautious in quoting this p-value, however, because the parameter value being tested, <span class="math inline">\(\sigma_2=0\)</span>, is on the boundary of set of possible values, <span class="math inline">\(\sigma_2\ge 0\)</span>, for this parameter. The argument for using a <span class="math inline">\(\chi^2_1\)</span> distribution to calculate a p-value for the change in the deviance does not apply when the parameter value being tested is on the boundary. As shown in <span class="citation" data-cites="pinheiro00:_mixed_effec_model_in_s">Pinheiro and Bates (<a href="references.html#ref-pinheiro00:_mixed_effec_model_in_s" role="doc-biblioref">2000</a>, Sect.&nbsp;2.5)</span>, the p-value from the <span class="math inline">\(\chi^2_1\)</span> distribution will be “conservative” in the sense that it is larger than a simulation-based p-value would be. In the worst-case scenario the <span class="math inline">\(\chi^2\)</span>-based p-value will be twice as large as it should be but, even if that were true, an effective p-value of 26% would not cause us to reject <span class="math inline">\(H_0\)</span> in favor of <span class="math inline">\(H_a\)</span>.</p>
+<p>We do need to be cautious in quoting this p-value, however, because the parameter value being tested, <span class="math inline">\(\sigma_2=0\)</span>, is on the boundary of set of possible values, <span class="math inline">\(\sigma_2\ge 0\)</span>, for this parameter. The argument for using a <span class="math inline">\(\chi^2_1\)</span> distribution to calculate a p-value for the change in the deviance does not apply when the parameter value being tested is on the boundary. As shown in <span class="citation" data-cites="pinheiro00:_mixed_effec_model_in_s">Pinheiro &amp; Bates (<a href="references.html#ref-pinheiro00:_mixed_effec_model_in_s" role="doc-biblioref">2000</a>, Sect.&nbsp;2.5)</span>, the p-value from the <span class="math inline">\(\chi^2_1\)</span> distribution will be “conservative” in the sense that it is larger than a simulation-based p-value would be. In the worst-case scenario the <span class="math inline">\(\chi^2\)</span>-based p-value will be twice as large as it should be but, even if that were true, an effective p-value of 26% would not cause us to reject <span class="math inline">\(H_0\)</span> in favor of <span class="math inline">\(H_a\)</span>.</p>
 </section>
 <section id="sec-assessReduced" class="level3" data-number="2.2.6">
 <h3 data-number="2.2.6" class="anchored" data-anchor-id="sec-assessReduced"><span class="header-section-number">2.2.6</span> Assessing the reduced model, psm02</h3>
@@ -1014,7 +1014,7 @@ Residual              0.302426 0.549933
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, insteval; contrasts)</span>
 <span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 102   Time: 0:00:01 (11.50 ms/it)</code></pre>
+<pre><code>Minimizing 102   Time: 0:00:01 (13.78 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="33">
 <table class="table table-sm table-striped">
@@ -1089,7 +1089,7 @@ Residual              0.302426 0.549933
 <span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(iem02, iem01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 47    Time: 0:00:00 ( 9.10 ms/it)</code></pre>
+<pre><code>Minimizing 47    Time: 0:00:00 (10.81 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="35">
 <table class="table table-sm table-striped">
@@ -1177,7 +1177,7 @@ Residual              0.302426 0.549933
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, insteval; contrasts)</span>
 <span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 125   Time: 0:00:01 (11.31 ms/it)</code></pre>
+<pre><code>Minimizing 125   Time: 0:00:01 (13.27 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="37">
 <table class="table table-sm table-striped">
@@ -1308,18 +1308,18 @@ Residual              0.302426 0.549933
 <p>Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be “statistically significant” even when its practical significance is questionable.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="doc-bibliography" style="display: none">
 <div id="ref-davies72:_statis_method_in_resear_and_produc" class="csl-entry" role="doc-biblioentry">
-Davies, Owen L., and Peter L. Goldsmith, eds. 1972. <em>Statistical Methods in Research and Production</em>. 4th ed. Hafner.
+Davies, O. L., &amp; Goldsmith, P. L. (Eds.). (1972). <em>Statistical methods in research and production</em> (4th ed.). Hafner.
 </div>
 <div id="ref-pinheiro00:_mixed_effec_model_in_s" class="csl-entry" role="doc-biblioentry">
-Pinheiro, José C., and Douglas M. Bates. 2000. <em>Mixed-Effects Models in <span>S</span> and <span>S-PLUS</span></em>. Springer.
+Pinheiro, J. C., &amp; Bates, D. M. (2000). <em>Mixed-effects models in <span>S</span> and <span>S-PLUS</span></em>. Springer.
 </div>
 <div id="ref-MLwiNUser:2000" class="csl-entry" role="doc-biblioentry">
-Rasbash, J., W. Browne, H. Goldstein, M. Yang, and I. Plewis. 2000. <em>A User’s Guide to <span>MLwiN</span></em>. London: Multilevel Models Project, Institute of Education, University of London.
+Rasbash, J., Browne, W., Goldstein, H., Yang, M., &amp; Plewis, I. (2000). <em>A user’s guide to <span>MLwiN</span></em>. Multilevel Models Project, Institute of Education, University of London.
 </div>
 <div id="ref-Rauden:Bryk:2002" class="csl-entry" role="doc-biblioentry">
-Raudenbush, Stephen W., and Anthony S. Bryk. 2002. <em>Hierarchical Linear Models: Applications and Data Analysis Methods</em>. 2nd ed. Sage.
+Raudenbush, S. W., &amp; Bryk, A. S. (2002). <em>Hierarchical linear models: Applications and data analysis methods</em> (2nd ed.). Sage.
 </div>
 </div>
 </section>

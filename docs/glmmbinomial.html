@@ -320,7 +320,7 @@ div.csl-indent {
 <p>As in previous chapters, we will begin with an example to help illustrate these ideas.</p>
 <section id="sec-contraception" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="sec-contraception"><span class="header-section-number">5.1</span> Artificial contraception use in regions of Bangladesh</h2>
-<p>One of the test data sets from the Center for Multilevel Modelling, University of Bristol is derived from the 1989 Bangladesh Fertility Survey, <span class="citation" data-cites="huq:cleland:1990">(<a href="references.html#ref-huq:cleland:1990" role="doc-biblioref">Huq and Cleland 1990</a>)</span>. The data are a subsample of 1934 women selected from 60 of the 64 political districts or <em>zila</em>, available as the <code>contra</code> data set in the <code>MixedModels</code> package.</p>
+<p>One of the test data sets from the Center for Multilevel Modelling, University of Bristol is derived from the 1989 Bangladesh Fertility Survey, <span class="citation" data-cites="huq:cleland:1990">(<a href="references.html#ref-huq:cleland:1990" role="doc-biblioref">Huq &amp; Cleland, 1990</a>)</span>. The data are a subsample of 1934 women selected from 60 of the 64 political districts or <em>zila</em>, available as the <code>contra</code> data set in the <code>MixedModels</code> package.</p>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>contra <span class="op">=</span> <span class="pp">@chain</span> <span class="op">:</span>contra <span class="cf">begin</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  MixedModels.dataset</span>
@@ -402,7 +402,7 @@ div.csl-indent {
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(com01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 458   Time: 0:00:00 ( 1.44 ms/it)</code></pre>
+<pre><code>Minimizing 458   Time: 0:00:00 ( 1.28 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Mixed Model fit by maximum likelihood (nAGQ = 1)
@@ -475,7 +475,7 @@ age ^ 2 &amp; urban: Y  -0.000375127  0.000731441  -0.51    0.6080
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 461   Time: 0:00:00 ( 0.56 ms/it)</code></pre>
+<pre><code>Minimizing 461   Time: 0:00:00 ( 0.43 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <table class="table table-sm table-striped">
@@ -632,7 +632,7 @@ age ^ 2 &amp; urban: Y  -0.000375127  0.000731441  -0.51    0.6080
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts)</span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 442   Time: 0:00:00 ( 0.55 ms/it)</code></pre>
+<pre><code>Minimizing 442   Time: 0:00:00 ( 0.47 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <table class="table table-sm table-striped">
@@ -986,9 +986,9 @@ y\,\log\left(\frac{\mu}{1-\mu}\right) .
 <p>Consider the cross-tabulation of counts of interviewees by district and urban/rural status presented at the end of . The data contains responses from 54 rural women in district 1 but only 21 rural women from district 11. Thus the bottom line in <a href="#fig-com05qqcaterpillar">Figure&nbsp;<span>5.4</span></a>, from the level of the interaction, and based on 54 responses, is shorter than the line second from the bottom, for and based on 21 women only.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="doc-bibliography" style="display: none">
 <div id="ref-huq:cleland:1990" class="csl-entry" role="doc-biblioentry">
-Huq, N. M., and J. Cleland. 1990. <span>“Bangladesh Fertility Survey 1989 (Main Report).”</span> Dhaka, Bangladesh: National Institute of Population Research; Training.
+Huq, N. M., &amp; Cleland, J. (1990). <em>Bangladesh fertility survey 1989 (main report)</em>. National Institute of Population Research; Training.
 </div>
 </div>
 </section>
