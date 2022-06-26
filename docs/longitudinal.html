@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-99.9.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Embrace Uncertainty - 3&nbsp; Models for Longitudinal Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./largescale.html" rel="next">
+<link href="./multiple.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Embrace Uncertainty</a> 
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./largescale.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale study</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glmmbinomial.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Appendices</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./linalg.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></a>
+  </div>
+</li>
+    </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-elstongrizzle-data" id="toc-the-elstongrizzle-data" class="nav-link active" data-scroll-target="#the-elstongrizzle-data"> <span class="header-section-number">3.1</span> The elstongrizzle data</a></li>
+  <li><a href="#random-effects-for-slope-and-intercept" id="toc-random-effects-for-slope-and-intercept" class="nav-link" data-scroll-target="#random-effects-for-slope-and-intercept"> <span class="header-section-number">3.2</span> Random effects for slope and intercept</a>
+  <ul class="collapse">
+  <li><a href="#centering-the-time-values" id="toc-centering-the-time-values" class="nav-link" data-scroll-target="#centering-the-time-values"> <span class="header-section-number">3.2.1</span> Centering the time values</a></li>
+  </ul></li>
+  <li><a href="#shrinkage-plots" id="toc-shrinkage-plots" class="nav-link" data-scroll-target="#shrinkage-plots"> <span class="header-section-number">3.3</span> Shrinkage plots</a></li>
+  <li><a href="#nonlinear-growth-curves" id="toc-nonlinear-growth-curves" class="nav-link" data-scroll-target="#nonlinear-growth-curves"> <span class="header-section-number">3.4</span> Nonlinear growth curves</a></li>
+  <li><a href="#longitudinal-data-with-treatments" id="toc-longitudinal-data-with-treatments" class="nav-link" data-scroll-target="#longitudinal-data-with-treatments"> <span class="header-section-number">3.5</span> Longitudinal data with treatments</a>
+  <ul class="collapse">
+  <li><a href="#within-group-variation" id="toc-within-group-variation" class="nav-link" data-scroll-target="#within-group-variation"> <span class="header-section-number">3.5.1</span> Within-group variation</a></li>
+  <li><a href="#models-with-interaction-terms" id="toc-models-with-interaction-terms" class="nav-link" data-scroll-target="#models-with-interaction-terms"> <span class="header-section-number">3.5.2</span> Models with interaction terms</a></li>
+  <li><a href="#possible-simplification-of-random-effects" id="toc-possible-simplification-of-random-effects" class="nav-link" data-scroll-target="#possible-simplification-of-random-effects"> <span class="header-section-number">3.5.3</span> Possible simplification of random effects</a></li>
+  <li><a href="#some-consequences-of-changing-the-random-effects-structure" id="toc-some-consequences-of-changing-the-random-effects-structure" class="nav-link" data-scroll-target="#some-consequences-of-changing-the-random-effects-structure"> <span class="header-section-number">3.5.4</span> Some consequences of changing the random-effects structure</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-longitudinal" class="quarto-section-identifier d-none d-lg-block"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="hidden">
+<p><span class="math display">\[
+\newcommand\bbA{{\mathbf{A}}}
+\newcommand\bbb{{\mathbf{b}}}
+\newcommand\bbI{{\mathbf{I}}}
+\newcommand\bbR{{\mathbf{R}}}
+\newcommand\bbX{{\mathbf{X}}}
+\newcommand\bbx{{\mathbf{x}}}
+\newcommand\bby{{\mathbf{y}}}
+\newcommand\bbZ{{\mathbf{Z}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbeta{{\boldsymbol{\eta}}}
+\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
+\newcommand\bbOmega{{\boldsymbol{\Omega}}}
+\newcommand\bbmu{{\boldsymbol{\mu}}}
+\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+\newcommand\mcN{{\mathcal{N}}}
+\newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcY{{\mathcal{Y}}}
+\]</span></p>
+</div>
+<p>Load the packages to be used.</p>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Arrow</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrameMacros</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="fu">contains</span>(<span class="fu">first</span>(<span class="bu">Sys</span>.<span class="fu">cpu_info</span>()).model, <span class="st">"Intel"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="im">using</span> <span class="bu">MKL</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StandardizedPredictors</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span>: scatter! <span class="co"># PA I have no idea why this is failing to resolve later since this exported</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p>Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time. Generally we wish to characterize the time trends within subjects and between subjects. The data will always include the response, the time covariate and the indicator of the subject on which the measurement has been made. If other covariates are recorded, say whether the subject is in the treatment group or the control group, we may wish to relate the within- and between-subject trends to such covariates.</p>
+<p>In this chapter we introduce graphical and statistical techniques for the analysis of longitudinal data by applying them to a simple example.</p>
+<section id="the-elstongrizzle-data" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="the-elstongrizzle-data"><span class="header-section-number">3.1</span> The elstongrizzle data</h2>
+<p>Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in <span class="citation" data-cites="elstongrizzle1962">Elston and Grizzle (<a href="references.html#ref-elstongrizzle1962" role="doc-biblioref">1962</a>)</span> and in <span class="citation" data-cites="davis2002">Davis (<a href="references.html#ref-davis2002" role="doc-biblioref">2002</a>)</span>.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>elstongrizzle <span class="op">=</span> Arrow.<span class="fu">Table</span>(<span class="st">"./data/elstongrizzle.arrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>Arrow.Table with 80 rows, 3 columns, and schema:
+ :Subj  String
+ :time  Float64
+ :resp  Float64
+
+with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
+  "title"      =&gt; "Ramus bone lengths of boys from 8 to 9.5 years of age"
+  "references" =&gt; "@davis2002, Table 3.1, p. 52 and @elstongrizzle1962"
+  "sourcefile" =&gt; "EG.DAT"</code></pre>
+</div>
+</div>
+<p>Converting the table to a data frame provides the description</p>
+<div class="cell" data-execution_count="3">
+<div class="cell-output cell-output-display" data-execution_count="4">
+
+<div class="data-frame"><p>3 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>Subj</td><td></td><td>S01</td><td></td><td>S20</td><td>0</td><td>String</td></tr><tr><th>2</th><td>time</td><td>8.75</td><td>8.0</td><td>8.75</td><td>9.5</td><td>0</td><td>Float64</td></tr><tr><th>3</th><td>resp</td><td>50.0875</td><td>45.0</td><td>49.65</td><td>55.5</td><td>0</td><td>Float64</td></tr></tbody></table></div>
+</div>
+</div>
+<p>A common way of plotting such longitudinal data is response versus time on a single axis with the observations for each individual joined by a line, <a href="#fig-egspaghetti">Figure&nbsp;<span>3.1</span></a> (see also Figure 3.2, p.&nbsp;52 of <span class="citation" data-cites="davis2002">Davis (<a href="references.html#ref-davis2002" role="doc-biblioref">2002</a>)</span>).</p>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>egplt <span class="op">=</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(egdf) <span class="op">*</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="st">"Age (yr)"</span>, <span class="op">:</span>resp <span class="op">=&gt;</span> <span class="st">"Ramus bone length (mm)"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  egplt <span class="op">*</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(; color<span class="op">=:</span>Subj) <span class="op">*</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">visual</span>(Scatter) <span class="op">+</span> <span class="fu">visual</span>(Lines)),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="fig-egspaghetti" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-egspaghetti-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.1: Length of ramus bone versus age for a sample of 20 boys.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Unfortunately, unless there are very few subjects, such figures, sometimes called “spaghetti plots”, are difficult to decipher.</p>
+<p>A preferred alternative is to plot response versus time with each subject’s data in a separate panel (<a href="#fig-eglayout">Figure&nbsp;<span>3.2</span></a>).</p>
+<div class="cell" data-execution_count="5">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"orderedsubj"</span> <span class="op">∉</span> <span class="fu">names</span>(egdf)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  egdf.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    egdf.Subj;</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="pp">@sort</span>(<span class="pp">@subset</span>(egdf, <span class="op">:</span>time <span class="op">==</span> <span class="fl">8.0</span>), <span class="op">:</span>resp).Subj,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>egplt <span class="op">=</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(egdf) <span class="op">*</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="st">"Age (yr)"</span>, <span class="op">:</span>resp <span class="op">=&gt;</span> <span class="st">"Ramus bone length (mm)"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>egplt2 <span class="op">=</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  egplt <span class="op">*</span> <span class="fu">mapping</span>(; layout<span class="op">=:</span>orderedsubj) <span class="op">*</span> <span class="fu">visual</span>(ScatterLines)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(egplt2; axis<span class="op">=</span>(height<span class="op">=</span><span class="fl">300</span>, width<span class="op">=</span><span class="fl">120</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="fig-eglayout" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-eglayout-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.2: Length of ramus bone versus age for a sample of 20 boys. The panels are ordered rowwise, starting at the top left, by increasing initial bone length.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in <a href="#fig-eglayout">Figure&nbsp;<span>3.2</span></a> the order is by increasing bone length at 8 years of age. This ordering makes it easier to examine the patterns in the rate of increase versus the initial bone length.</p>
+<p>And there doesn’t seem to be a strong relationship. Some subjects, e.g.&nbsp;<code>S03</code> and <code>S04</code>, with shorter initial bone lengths have low growth rates. Others, e.g.&nbsp;<code>S10</code> and <code>S20</code>, have low initial bone lengths and a high growth rate. Similarly, <code>S06</code> and <code>S11</code> have longer initial bone lengths and a low growth rate while <code>S07</code> and <code>S11</code> have longer initial bone lengths and a high growth rate.</p>
+</section>
+<section id="random-effects-for-slope-and-intercept" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="random-effects-for-slope-and-intercept"><span class="header-section-number">3.2</span> Random effects for slope and intercept</h2>
+<p>Although it seems that there isn’t a strong correlation between initial bone length and growth rate in these data, a model with an overall linear trend and possibly correlated random effects for intercept and slope by subject estimates a strong negative correlation (-0.97) between these random effects.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>egm01 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Minimizing 217   Time: 0:00:01 ( 8.53 ms/it)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + time + (1 + time | Subj)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   logLik   -2 logLik     AIC       AICc        BIC    
+  -117.2404   234.4809   246.4809   247.6316   260.7730
+
+Variance components:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+            Column    Variance Std.Dev.   Corr.
+Subj     (Intercept)  90.334222 9.504432
+         time          1.162244 1.078074 -0.97
+Residual               0.194450 0.440965
+ Number of obs: 80; levels of grouping factors: 20
+
+  Fixed-effects parameters:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>─────────────────────────────────────────────────
+               Coef.  Std. Error      z  Pr(&gt;|z|)
+─────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)  33.4975    2.26156   14.81    &lt;1e-48
+time          1.896     0.256691   7.39    &lt;1e-12
+─────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>The reason for this seemingly unlikely result is that the <code>(Intercept)</code> term in the fixed effects and the random effects represents the bone length at age 0, which is not of interest here. Notice that the fixed-effects <code>(Intercept)</code> estimate is about 33.5 mm, which is far below the observed range of the data (45.0 to 55.5 mm.)</p>
+<p>Extrapolation from the observed range of ages, 8 years to 9.5 years, back to 0 years, will almost inevitably result is a negative correlation between slope and intercept.</p>
+<p>A caterpillar plot of the random effects for intercept and slope, <a href="#fig-egm01caterpillar">Figure&nbsp;<span>3.3</span></a>, shows both the negative correlation between intercept and slope conditional means and wide prediction intervals on the random effects for the intercept.</p>
+<div class="cell" data-execution_count="7">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">500</span>)), <span class="fu">ranefinfo</span>(egm01, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="fig-egm01caterpillar" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-egm01caterpillar-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.3: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="centering-the-time-values" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="centering-the-time-values"><span class="header-section-number">3.2.1</span> Centering the time values</h3>
+<p>The problem of estimates of intercepts representing extrapolation beyond the observed range of the data is a common one for longitudinal data. If the time covariate represents an age, as it does here, or, say, a year in the range 2000 to 2020, the intercept, which corresponds to an age or year of zero, is rarely of interest.</p>
+<p>The way to avoid extrapolation beyond the range of the data is to center the time covariate at an age or date that is of interest. For example, we may wish to consider “time in study” instead of age as the time covariate.</p>
+<p>In discussing <a href="#fig-eglayout">Figure&nbsp;<span>3.2</span></a> we referred to the bone length at 8 years of age, which was the time of first measurement for each of the subjects, as the “initial” bone length. If the purpose of the experiment is to create a predictive model for the growth rate that can be applied to boys who enter this age range then we could center the time at 8 years.</p>
+<p>Alternatively, we could center at the average observed time, 8.75 years, or at some other value of interest.</p>
+<p>The important thing is to make clear what the <code>(Itercept)</code> parameter estimates represent. The <a href="https://github.com/beacon-biosignals/StandardizedPredictors.jl">StandardizedPredictors.jl</a> package allows for convenient representations of several standardizing transformations in a <code>contrasts</code> specification for the model. An advantage of this method of coding a transformation is that the coefficient names include a concise description of the transformation.</p>
+<p>(In model specifications in R and later in Julia the name <code>contrasts</code> has been come to be applied to ways of specifying the association between covariates in the data and parameters in a model. This is an extension of the original mathematical definition of contrasts amongst the levels of a categorical covariate.)</p>
+<p>A model with <code>time</code> centered at 8 years of age can be fit as</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>egm02 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="fu">Center</span>(<span class="fl">8</span>), <span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + time(centered: 8) + (1 + time(centered: 8) | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -117.2404   234.4809   246.4809   247.6316   260.7730
+
+Variance components:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+               Column      Variance Std.Dev.   Corr.
+Subj     (Intercept)        6.096683 2.469146
+         time(centered: 8)  1.162300 1.078100 -0.23
+Residual                    0.194451 0.440966
+ Number of obs: 80; levels of grouping factors: 20
+
+  Fixed-effects parameters:
+───────────────────────────────────────────────────────
+                     Coef.  Std. Error      z  Pr(&gt;|z|)
+───────────────────────────────────────────────────────
+(Intercept)        48.6655    0.558247  87.18    &lt;1e-99
+time(centered: 8)   1.896     0.256696   7.39    &lt;1e-12
+───────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>Comparing the parameter estimates from models <code>egm01</code> and <code>egm02</code>, we find that the only differences are in the estimates for the <code>(Intercept)</code> terms in the fixed-effects parameters and the variance component parameters and in the correlation of the random effects. In terms of the predictions from the model and the likelihood at the parameter estimates, <code>egm01</code> and <code>egm02</code> are the same model.</p>
+<p>A caterpillar plot, <a href="#fig-egm02caterpillar">Figure&nbsp;<span>3.4</span></a>, for <code>egm02</code> shows much smaller spread and more precision in the distribution of the random effects for <code>(Intercept)</code> but the same spread and precision for the <code>time</code> random effects, although these random effects are displayed in a different order.</p>
+<div class="cell" data-execution_count="9">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">550</span>)), <span class="fu">ranefinfo</span>(egm02, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div id="fig-egm02caterpillar" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-egm02caterpillar-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.4: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A third option is to center the <code>time</code> covariate at the mean of the original <code>time</code> values.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>egm03 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>(), <span class="op">:</span>time <span class="op">=&gt;</span> <span class="fu">Center</span>())</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + time(centered: 8.75) + (1 + time(centered: 8.75) | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -117.2404   234.4809   246.4809   247.6316   260.7730
+
+Variance components:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                Column        Variance Std.Dev.   Corr.
+Subj     (Intercept)           5.826544 2.413824
+         time(centered: 8.75)  1.162300 1.078100 +0.10
+Residual                       0.194450 0.440965
+ Number of obs: 80; levels of grouping factors: 20
+
+  Fixed-effects parameters:
+──────────────────────────────────────────────────────────
+                        Coef.  Std. Error      z  Pr(&gt;|z|)
+──────────────────────────────────────────────────────────
+(Intercept)           50.0875    0.541994  92.41    &lt;1e-99
+time(centered: 8.75)   1.896     0.256696   7.39    &lt;1e-12
+──────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>Because the default for the <code>Center</code> contrast is to center about the mean, this <code>contrasts</code> argument can be written</p>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="fu">Center</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Notice that in this model the estimated correlation of the random effects for <code>Subj</code> is positive.</p>
+</section>
+</section>
+<section id="shrinkage-plots" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="shrinkage-plots"><span class="header-section-number">3.3</span> Shrinkage plots</h2>
+<p>One way of assessing a random-effects term in a linear mixed model is with a caterpillar plot, which shows two important characteristics, location and spread, of the conditional distribution <span class="math inline">\((\mcB|\mcY=\bby)\)</span>.</p>
+<p>Another plot of interest is to show the extent to which the conditional means have been “shrunk” towards the origin by the mixed-model, which represents a compromise between fidelity to the data, measured by the sum of squared residuals, and simplicity of the model.</p>
+<p>The model with the highest fidelity to the data corresponds to a fixed-effects model with the random effects model matrix, <span class="math inline">\(\bbZ\)</span>, incorporated into the fixed-effects model matrix, <span class="math inline">\(\bbX\)</span>. There are technical problems (rank deficiency) with trying to estimate parameters in this model but such “unconstrained” random effects can be approximated as the conditional means for a very large <span class="math inline">\(\bbSigma\)</span> matrix. (In practice we use a large multiple, say 1000, of the identity matrix as the value of <span class="math inline">\(\bbSigma\)</span>.)</p>
+<p>At the other end of the spectrum is the limit as <span class="math inline">\(\bbSigma\rightarrow\mathbf{0}\)</span>, which is the simplest model, involving only the fixed-effects parameters, but usually with a comparatively poor fit.</p>
+<p>A <em>shrinkage plot</em> shows the conditional means of the random effects from the model that was fit and those for a “large” <span class="math inline">\(\bbSigma\)</span>.</p>
+<div class="cell" data-execution_count="12">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">600</span>)), egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div id="fig-egm02shrinkage" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-egm02shrinkage-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.5: Shrinkage plot of the random effects for model egm02. Blue dots are the conditional means of the random effects at the parameter estimates. Red dots are the corresponding unconstrained estimates.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-egm02shrinkage">Figure&nbsp;<span>3.5</span></a> reinforces some of the conclusions from <a href="#fig-egm02caterpillar">Figure&nbsp;<span>3.4</span></a>. In particular, the random effects for the <code>(Intercept)</code> are reasonably precisely determined. We see this in <a href="#fig-egm02caterpillar">Figure&nbsp;<span>3.4</span></a> because the intervals in the left panel are narrow. In <a href="#fig-egm02shrinkage">Figure&nbsp;<span>3.5</span></a> there is little movement in the horizontal direction between the “unconstrained” within-subject estimates and the final random-effect locations.</p>
+</section>
+<section id="nonlinear-growth-curves" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="nonlinear-growth-curves"><span class="header-section-number">3.4</span> Nonlinear growth curves</h2>
+<p>As seen in <a href="#fig-eglayout">Figure&nbsp;<span>3.2</span></a> some of the growth curves are reasonably straight (e.g.&nbsp;<code>S03</code>, <code>S11</code>, and <code>S15</code>) whereas others are concave-up (e.g.&nbsp;<code>S04</code>, <code>S13</code>, and <code>S17</code>) or concave-down (e.g.&nbsp;<code>S05</code>, <code>S07</code>, and <code>S19</code>). One way of allowing for curvature in individual growth curves is to include a quadratic term for <code>time</code> in both the fixed and random effects.</p>
+<p>The usual cautions about polynomial terms in regression models apply even more emphatically to linear mixed models.</p>
+<ol type="1">
+<li>Interpretation of polynomial coefficients depends strongly upon the location of the zero point in the <code>time</code> axis.</li>
+<li>Extrapolation of polynomial models beyond the observed range of the <code>time</code> values is very risky.</li>
+</ol>
+<p>For balanced data like <code>egdf</code> we usually center the <code>time</code> axis about the mean, producing</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>egm04 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> ctime <span class="op">+</span> ctime<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> ctime <span class="op">+</span> ctime<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="pp">@transform</span>(egdf, <span class="op">:</span>ctime <span class="op">=</span> <span class="op">:</span>time <span class="op">-</span> <span class="fl">8.75</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dat; contrasts)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + ctime + :(ctime ^ 2) + (1 + ctime + :(ctime ^ 2) | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -116.6187   233.2374   253.2374   256.4258   277.0577
+
+Variance components:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+            Column   Variance Std.Dev.   Corr.
+Subj     (Intercept)  6.045133 2.458685
+         ctime        1.168422 1.080936 +0.08
+         ctime ^ 2    0.057249 0.239268 -0.61 +0.65
+Residual              0.187128 0.432583
+ Number of obs: 80; levels of grouping factors: 20
+
+  Fixed-effects parameters:
+────────────────────────────────────────────────
+              Coef.  Std. Error      z  Pr(&gt;|z|)
+────────────────────────────────────────────────
+(Intercept)  50.1      0.555203  90.24    &lt;1e-99
+ctime         1.896    0.256722   7.39    &lt;1e-12
+ctime ^ 2    -0.04     0.200719  -0.20    0.8420
+────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>We see that the estimate for the population quadratic coefficient, -0.04, is small, relative to its standard error, 0.20, indicating that it is not significantly different from zero. This is not unexpected because some of the growth curves in <a href="#fig-eglayout">Figure&nbsp;<span>3.2</span></a> are concave-up, while others are concave-down, and others don’t show a noticeable curvature.</p>
+<p>A shrinkage plot, <a href="#fig-egm04shrinkage">Figure&nbsp;<span>3.6</span></a>, shows that the random effects for the quadratic term (vertical axis in the bottom row of panels) are highly attenuated relative to the unconstrained, “per-subject”, values.</p>
+<div class="cell" data-execution_count="14">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">800</span>)), egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div id="fig-egm04shrinkage" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-egm04shrinkage-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.6: Shrinkage plot of the random effects for model egm04. Blue dots are the conditional means of the random effects at the parameter estimates. Red dots are the corresponding unconstrained estimates.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.</p>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(egm03, egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 65%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">resp ~ 1 + time(centered: 8.75) + (1 + time(centered: 8.75) | Subj)</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">234</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">resp ~ 1 + ctime + :(ctime ^ 2) + (1 + ctime + :(ctime ^ 2) | Subj)</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">233</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">0.8709</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="longitudinal-data-with-treatments" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="longitudinal-data-with-treatments"><span class="header-section-number">3.5</span> Longitudinal data with treatments</h2>
+<p>Often the “subjects” on which longitudinal measurements are made are divided into different treatment groups. Many of the examples cited in <span class="citation" data-cites="davis2002">Davis (<a href="references.html#ref-davis2002" role="doc-biblioref">2002</a>)</span> are of this type, including one from <span class="citation" data-cites="box1950">Box (<a href="references.html#ref-box1950" role="doc-biblioref">1950</a>)</span></p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>box1950 <span class="op">=</span> Arrow.<span class="fu">Table</span>(<span class="st">"./data/box.arrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>Arrow.Table with 135 rows, 4 columns, and schema:
+ :Group  String
+ :Subj   String
+ :time   Int8
+ :resp   Int16
+
+with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
+  "title"      =&gt; "Body weight by week of rats in three treatment groups"
+  "references" =&gt; "@davis2002, Table 2.12, p. 32 and Problem 2.4, p. 32, and @b…
+  "sourcefile" =&gt; "BOX.DAT"</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>bxdf <span class="op">=</span> <span class="fu">DataFrame</span>(box1950)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(bxdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+
+<div class="data-frame"><p>4 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>Group</td><td></td><td>Control</td><td></td><td>Thyroxin</td><td>0</td><td>String</td></tr><tr><th>2</th><td>Subj</td><td></td><td>S01</td><td></td><td>S27</td><td>0</td><td>String</td></tr><tr><th>3</th><td>time</td><td>2.0</td><td>0</td><td>2.0</td><td>4</td><td>0</td><td>Int8</td></tr><tr><th>4</th><td>resp</td><td>100.807</td><td>46</td><td>100.0</td><td>189</td><td>0</td><td>Int16</td></tr></tbody></table></div>
+</div>
+</div>
+<p>There are three treatment groups</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">levels</span>(bxdf.Group))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>["Control", "Thioracil", "Thyroxin"]</code></pre>
+</div>
+</div>
+<p>and each “subject” (rat, in this case) is in only one of the treatment groups. This can be checked by comparing the number of unique <code>Subj</code> levels to the number of unique combinations of <code>Subj</code> and <code>Group</code>.</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">unique</span>(<span class="fu">select</span>(bxdf, <span class="op">:</span>Group, <span class="op">:</span>Subj))) <span class="op">==</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(bxdf.Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>true</code></pre>
+</div>
+</div>
+<p>Because the number of combinations of <code>Subj</code> and <code>Group</code> is equal to the number of subjects, each subject occurs in only one group.</p>
+<p>These data are balanced with respect to <code>time</code> (i.e.&nbsp;each rat is weighed at the same set of times) but not with respect to treatment, as can be seen by checking the number of rats in each treatment group.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groupby</span>(<span class="fu">unique</span>(<span class="fu">select</span>(bxdf, <span class="op">:</span>Group, <span class="op">:</span>Subj)), <span class="op">:</span>Group),</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  nrow <span class="op">=&gt;</span> <span class="op">:</span>n,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+
+<div class="data-frame"><p>3 rows × 2 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>Group</th><th>n</th></tr><tr><th></th><th title="String">String</th><th title="Int64">Int64</th></tr></thead><tbody><tr><th>1</th><td>Control</td><td>10</td></tr><tr><th>2</th><td>Thioracil</td><td>10</td></tr><tr><th>3</th><td>Thyroxin</td><td>7</td></tr></tbody></table></div>
+</div>
+</div>
+<section id="within-group-variation" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="within-group-variation"><span class="header-section-number">3.5.1</span> Within-group variation</h3>
+<p>Considering first the control group, whose trajectories can be plotted in a “spaghetti plot”, <a href="#fig-bxctrlspaghetti">Figure&nbsp;<span>3.7</span></a></p>
+<div class="cell" data-execution_count="21">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>bxaxes <span class="op">=</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="st">"Time in trial (wk)"</span>, <span class="op">:</span>resp <span class="op">=&gt;</span> <span class="st">"Body weight (g)"</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Control"</span>)) <span class="op">*</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  bxaxes <span class="op">*</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(; color<span class="op">=:</span>Subj) <span class="op">*</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">visual</span>(Scatter) <span class="op">+</span> <span class="fu">visual</span>(Lines)),</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="fig-bxctrlspaghetti" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxctrlspaghetti-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.7: Weight (g) of rats in the control group of bxdf versus time in trial (wk).</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>or in separate panels ordered by initial weight, <a href="#fig-bxctrllayout">Figure&nbsp;<span>3.8</span></a>.</p>
+<div class="cell" data-execution_count="22">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Control"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    ordered<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    bxaxes <span class="op">*</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(; layout<span class="op">=:</span>orderedsubj) <span class="op">*</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(ScatterLines);</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(height<span class="op">=</span><span class="fl">250</span>, width<span class="op">=</span><span class="fl">150</span>),</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div id="fig-bxctrllayout" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxctrllayout-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.8: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The panels in <a href="#fig-bxctrllayout">Figure&nbsp;<span>3.8</span></a> show a strong linear trend with little evidence of systematic curvature.</p>
+<p>A multi-panel plot for the Thioracil group, <a href="#fig-bxthiolayout">Figure&nbsp;<span>3.9</span></a>,</p>
+<div class="cell" data-execution_count="23">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Thioracil"</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    ordered<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    bxaxes <span class="op">*</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(; layout<span class="op">=:</span>orderedsubj) <span class="op">*</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(ScatterLines);</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(height<span class="op">=</span><span class="fl">250</span>, width<span class="op">=</span><span class="fl">150</span>),</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div id="fig-bxthiolayout" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxthiolayout-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.9: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>shows several animals (<code>S18</code>, <code>S19</code>, <code>S21</code>, and <code>S24</code>) whose rate of weight gain decreases as the trial goes on.</p>
+<p>By contrast, in the Thyroxin group, <a href="#fig-bxthyrlayout">Figure&nbsp;<span>3.10</span></a>,</p>
+<div class="cell" data-execution_count="24">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Thyroxin"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>    ordered<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    bxaxes <span class="op">*</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(; layout<span class="op">=:</span>orderedsubj) <span class="op">*</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(ScatterLines);</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(height<span class="op">=</span><span class="fl">250</span>, width<span class="op">=</span><span class="fl">150</span>),</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div id="fig-bxthyrlayout" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxthyrlayout-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.10: Weight (g) of rats in the Thyroxingroup versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>if there is any suggestion of curvature it would be concave-up.</p>
+</section>
+<section id="models-with-interaction-terms" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="models-with-interaction-terms"><span class="header-section-number">3.5.2</span> Models with interaction terms</h3>
+<p>Longitudinal data in which the observational units, each rat in this case, are in different treatment groups, require careful consideration of the origin on the time axis. If, as here, the origin on the time axis is when the treatments of the different groups began and the subjects have been randomly assigned to the treatment groups, we do not expect differences between groups at time zero.</p>
+<p>Usually, when a model incorporates an effect for <code>time</code> and a <code>time &amp; Group</code> interaction - checking for different underlying slopes of the response with respect to <code>time</code> for each level of <code>Group</code>, we will also include a “main effect” for <code>Group</code>. This is sometimes called the <em>hierarchical principle</em> regarding interactions - a significant higher-order interaction usually forces inclusion of any lower-order interactions or main effects contained in it.</p>
+<p>One occasion where the hierarchical principle does not apply is when the main effect for <code>Group</code> would represent systematic differences in the response <em>before</em> the treatments began. Similarly in dose-response data; when a zero dose is included we could have a main effect for <code>dose</code> and a <code>dose &amp; Group</code> interaction without a main effect for <code>Group</code>, because zero dose of a treatment is the same as zero dose of a placebo.</p>
+<p>We can begin with a main effect for <code>Group</code>, as in</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>bxm01 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span>) <span class="op">*</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(bxm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + time + :(time ^ 2) + Group + time &amp; Group + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -417.6701   835.3403   867.3403   871.9505   913.8247
+
+Variance components:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+            Column    Variance Std.Dev.   Corr.
+Subj     (Intercept)  16.228198 4.028424
+         time         14.092054 3.753938 +0.89
+         time ^ 2      0.994598 0.997296 -0.87 -0.55
+Residual               8.339982 2.887903
+ Number of obs: 135; levels of grouping factors: 27
+
+  Fixed-effects parameters:
+───────────────────────────────────────────────────────────────────
+                                 Coef.  Std. Error      z  Pr(&gt;|z|)
+───────────────────────────────────────────────────────────────────
+(Intercept)                  54.1086      1.53672   35.21    &lt;1e-99
+time                         24.0229      1.56389   15.36    &lt;1e-52
+time ^ 2                      0.614286    0.398787   1.54    0.1235
+Group: Thioracil              0.908571    2.17325    0.42    0.6759
+Group: Thyroxin               0.630204    2.3948     0.26    0.7924
+time &amp; Group: Thioracil      -1.62714     2.21167   -0.74    0.4619
+time &amp; Group: Thyroxin       -2.18612     2.43714   -0.90    0.3697
+time ^ 2 &amp; Group: Thioracil  -1.93571     0.56397   -3.43    0.0006
+time ^ 2 &amp; Group: Thyroxin    0.712245    0.621465   1.15    0.2518
+───────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>but we expect that a model without the main effect for <code>Group</code>,</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>bxm02 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span> (time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span>) <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(bxm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + time &amp; Group + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -417.7606   835.5213   863.5213   867.0213   904.1951
+
+Variance components:
+            Column    Variance Std.Dev.   Corr.
+Subj     (Intercept)  16.374358 4.046524
+         time         14.091246 3.753831 +0.89
+         time ^ 2      0.995339 0.997667 -0.87 -0.55
+Residual               8.344587 2.888700
+ Number of obs: 135; levels of grouping factors: 27
+
+  Fixed-effects parameters:
+───────────────────────────────────────────────────────────────────
+                                 Coef.  Std. Error      z  Pr(&gt;|z|)
+───────────────────────────────────────────────────────────────────
+(Intercept)                  54.6085      0.938187  58.21    &lt;1e-99
+time &amp; Group: Control        24.1725      1.52058   15.90    &lt;1e-56
+time &amp; Group: Thioracil      22.2734      1.52058   14.65    &lt;1e-47
+time &amp; Group: Thyroxin       21.7977      1.80812   12.06    &lt;1e-32
+time ^ 2 &amp; Group: Control     0.565489    0.380632   1.49    0.1374
+time ^ 2 &amp; Group: Thioracil  -1.28154     0.380632  -3.37    0.0008
+time ^ 2 &amp; Group: Thyroxin    1.33925     0.450974   2.97    0.0030
+───────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>will be adequate, as confirmed by</p>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm02, bxm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 74%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 2%">
+<col style="width: 4%">
+<col style="width: 4%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">resp ~ 1 + time &amp; Group + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">836</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">resp ~ 1 + time + :(time ^ 2) + Group + time &amp; Group + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">835</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.9135</td>
+</tr>
+</tbody>
+</table>
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Unfortunately, the interpretations of some of the fixed-effects coefficients change between models <code>bxm01</code> and <code>bxm02</code>. In model <code>bxm01</code> the coefficient labelled <code>time</code> is the estimated slope at time zero for the <code>Control</code> group. In model <code>bxm02</code> this coefficient is labelled <code>time &amp; Group: Control</code>.</p>
+<p>In model <code>bxm01</code> the coefficient labelled <code>time &amp; Group: Thioracil</code> is the change in the estimated slope at time zero between the <code>Thioracil</code> group and the <code>Control</code> group. In model <code>bxm02</code> the coefficient with this label is the estimated slope at time zero in the <code>Thioracil</code> group.</p>
+</div>
+</div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Is there a way to write the formula for <code>bxm02</code> to avoid this?</p>
+</div>
+</div>
+<p>We see the effect of this changing interpretation in the p-values associated with these coefficients. In model <code>bxm01</code> the only coefficients with low p-values are the <code>(Intercept)</code>, the <code>time</code>, representing a typical rate of weight gain in the control group at time zero, and the change in the quadratic term from the <code>Control</code> group to the <code>Thioracil</code> group.</p>
+<p>A model without systematic differences between groups in the initial weight and the initial slope but with differences between groups in the quadratic coefficient is sensible. It would indicate that the groups are initially homogeneous both in weight and growth rate but, as the trial proceeds, the different treatments change the rate of growth.</p>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>bxm03 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ resp ~ 1 + time + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -418.3903   836.7807   860.7807   863.3380   895.6440
+
+Variance components:
+            Column    Variance Std.Dev.   Corr.
+Subj     (Intercept)  16.103785 4.012952
+         time         14.500841 3.807997 +0.88
+         time ^ 2      0.990787 0.995383 -0.88 -0.55
+Residual               8.464538 2.909388
+ Number of obs: 135; levels of grouping factors: 27
+
+  Fixed-effects parameters:
+───────────────────────────────────────────────────────────────────
+                                 Coef.  Std. Error      z  Pr(&gt;|z|)
+───────────────────────────────────────────────────────────────────
+(Intercept)                  54.6085      0.934938  58.41    &lt;1e-99
+time                         22.8534      0.962656  23.74    &lt;1e-99
+time ^ 2 &amp; Group: Control     0.785424    0.324042   2.42    0.0154
+time ^ 2 &amp; Group: Thioracil  -1.3781      0.324042  -4.25    &lt;1e-04
+time ^ 2 &amp; Group: Thyroxin    1.163       0.369128   3.15    0.0016
+───────────────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm03, bxm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 68%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">resp ~ 1 + time + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">837</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">resp ~ 1 + time &amp; Group + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">836</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.5328</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="possible-simplification-of-random-effects" class="level3" data-number="3.5.3">
+<h3 data-number="3.5.3" class="anchored" data-anchor-id="possible-simplification-of-random-effects"><span class="header-section-number">3.5.3</span> Possible simplification of random effects</h3>
+<p>A caterpillar plot created from the conditional means and standard deviations of the random effects by <code>Subj</code> for model <code>bxm03</code>, <a href="#fig-bxm03caterpillar">Figure&nbsp;<span>3.11</span></a>, indicates that all of the random-effects terms generate some prediction intervals that do not contain zero.</p>
+<div class="cell" data-execution_count="30">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<div id="fig-bxm03caterpillar" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxm03caterpillar-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.11: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>A shrinkage plot, <a href="#fig-bxm03shrinkage">Figure&nbsp;<span>3.12</span></a></p>
+<div class="cell" data-execution_count="31">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">800</span>)), bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div id="fig-bxm03shrinkage" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxm03shrinkage-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.12: Shrinkage plot of the random effects for model bxm03. Blue dots are the conditional means of the random effects at the parameter estimates. Red dots are the corresponding unconstrained estimates.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>shows that the random effects are considerably shrunk towards the origin, relative to the “unconstrained” values from within-subject fits, but none of the panels shows them collapsing to a line.</p>
+<p>Nevertheless, the estimated unconditional distribution of the random effects in model <code>bxm03</code> is a degenerate distribution.</p>
+<p>That is, the estimated within-subject covariance of the random effects is singular.</p>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">issingular</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>true</code></pre>
+</div>
+</div>
+<p>One way to see this is because the relative covariance factor, <span class="math inline">\(\boldsymbol{\lambda}\)</span>, of the within-subject random effects is</p>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Matrix</span>(<span class="fu">only</span>(bxm03.λ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<pre><code>3×3 Matrix{Float64}:
+  1.37931   0.0       0.0
+  1.15543   0.614909  0.0
+ -0.301051  0.162541  0.0</code></pre>
+</div>
+</div>
+<p>and we see that the third column is all zeros.</p>
+<p>Thus, in a three-dimensional space the conditional means of the random effects for each rat, lie on a plane, even though each of the two-dimensional projections in <a href="#fig-bxm03shrinkage">Figure&nbsp;<span>3.12</span></a> show a scatter.</p>
+<p>Three-dimensional plots of the conditional means of the random effects, <a href="#fig-bxm03plane">Figure&nbsp;<span>3.13</span></a>, can help to see that these points lie on a plane.</p>
+<div class="cell" data-execution_count="34">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  bpts <span class="op">=</span> <span class="fu">Point3f</span>.(<span class="fu">eachcol</span>(<span class="fu">only</span>(bxm03.b)))</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  Upts <span class="op">=</span> <span class="fu">Point3f</span>.(<span class="fu">eachcol</span>(<span class="fu">svd</span>(<span class="fu">only</span>(bxm03.λ)).U))</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  origin <span class="op">=</span> <span class="fu">Point3</span>(<span class="fu">zeros</span>(<span class="dt">Float32</span>, <span class="fl">3</span>))</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  xlabel, ylabel, zlabel <span class="op">=</span> <span class="fu">only</span>(bxm03.reterms).cnames</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  zlabel <span class="op">=</span> <span class="st">"time²"</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>  perspectiveness <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>  aspect <span class="op">=</span> <span class="op">:</span>data</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">1200</span>, <span class="fl">500</span>))</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  u, v, w <span class="op">=</span> <span class="op">-</span>Upts[<span class="fl">2</span>]    <span class="co"># second principle direction flipped to get positive w</span></span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  elevation <span class="op">=</span> <span class="fu">asin</span>(w)</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>  azimuth <span class="op">=</span> <span class="fu">atan</span>(v, u)</span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>  ax1 <span class="op">=</span></span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis3</span>(f[<span class="fl">1</span>, <span class="fl">1</span>]; aspect, xlabel, ylabel, zlabel, perspectiveness)</span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>  ax2 <span class="op">=</span> <span class="fu">Axis3</span>(</span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">2</span>];</span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a>    aspect,</span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a>    xlabel,</span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a>    ylabel,</span>
+<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>    zlabel,</span>
+<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a>    perspectiveness,</span>
+<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a>    elevation,</span>
+<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a>    azimuth,</span>
+<span id="cb55-24"><a href="#cb55-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb55-25"><a href="#cb55-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scatter!</span>(ax1, bpts; marker<span class="op">=</span><span class="ch">'∘'</span>, markersize<span class="op">=</span><span class="fl">20</span>)</span>
+<span id="cb55-26"><a href="#cb55-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scatter!</span>(ax2, bpts; marker<span class="op">=</span><span class="ch">'∘'</span>, markersize<span class="op">=</span><span class="fl">20</span>)</span>
+<span id="cb55-27"><a href="#cb55-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> p <span class="kw">in</span> Upts</span>
+<span id="cb55-28"><a href="#cb55-28" aria-hidden="true" tabindex="-1"></a>    seg <span class="op">=</span> [origin, p]</span>
+<span id="cb55-29"><a href="#cb55-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines!</span>(ax1, seg)</span>
+<span id="cb55-30"><a href="#cb55-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines!</span>(ax2, seg)</span>
+<span id="cb55-31"><a href="#cb55-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb55-32"><a href="#cb55-32" aria-hidden="true" tabindex="-1"></a>  f</span>
+<span id="cb55-33"><a href="#cb55-33" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<div id="fig-bxm03plane" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxm03plane-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.13: Two views of the conditional means of the random effects from model bxm03. The lines from the origin are the principal axes of the unconditional distribution of the random effects. The panel on the right is looking in along the negative of the second principle axis (red line in left panel).</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In each of the panels the three orthogonal lines from the origin are the three principle axes of the unconditional distribution of the random effects, corresponding to the columns of</p>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svd</span>(<span class="fu">only</span>(bxm03.λ)).U</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>3×3 Matrix{Float64}:
+ -0.723709   0.568507   0.391211
+ -0.675847  -0.698511  -0.235188
+  0.139559  -0.434606   0.889742</code></pre>
+</div>
+</div>
+<p>The panel on the right is oriented so the viewpoint is along the negative of the second principle axis, showing that there is considerable variation in the first principle direction and zero variation in the third principle direction.</p>
+<p>We see that the distribution of the random effects in model <code>bxm03</code> is degenerate but it is not clear how to simplify the model.</p>
+<p>Coverage intervals from a parametric bootstrap sample for this model</p>
+<div class="cell" data-execution_count="36">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>bxm03samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Xoshiro</span>(<span class="fl">8642468</span>),</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">10_000</span>,</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  bxm03;</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  hide_progress<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>bxm03pars <span class="op">=</span> <span class="fu">DataFrame</span>(bxm03samp.allpars)</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(bxm03samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="36">
+
+<div class="data-frame"><p>12 rows × 5 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>type</th><th>group</th><th>names</th><th>lower</th><th>upper</th></tr><tr><th></th><th title="String">String</th><th title="Union{Missing, String}">String?</th><th title="Union{Missing, String}">String?</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>β</td><td><em>missing</em></td><td>(Intercept)</td><td>52.731</td><td>56.421</td></tr><tr><th>2</th><td>β</td><td><em>missing</em></td><td>time</td><td>20.917</td><td>24.7163</td></tr><tr><th>3</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Control</td><td>0.154476</td><td>1.4371</td></tr><tr><th>4</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Thioracil</td><td>-2.02239</td><td>-0.724444</td></tr><tr><th>5</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Thyroxin</td><td>0.42252</td><td>1.90151</td></tr><tr><th>6</th><td>σ</td><td>Subj</td><td>(Intercept)</td><td>2.48372</td><td>5.48879</td></tr><tr><th>7</th><td>σ</td><td>Subj</td><td>time</td><td>2.26442</td><td>5.44328</td></tr><tr><th>8</th><td>ρ</td><td>Subj</td><td>(Intercept), time</td><td>0.380303</td><td>1.0</td></tr><tr><th>9</th><td>σ</td><td>Subj</td><td>time ^ 2</td><td>0.546158</td><td>1.39477</td></tr><tr><th>10</th><td>ρ</td><td>Subj</td><td>(Intercept), time ^ 2</td><td>-1.0</td><td>-0.444565</td></tr><tr><th>11</th><td>ρ</td><td>Subj</td><td>time, time ^ 2</td><td>-0.898147</td><td>-0.185192</td></tr><tr><th>12</th><td>σ</td><td>residual</td><td><em>missing</em></td><td>2.31835</td><td>3.26424</td></tr></tbody></table></div>
+</div>
+</div>
+<p>shows that the coverage intervals for both of the correlation parameters involving the <code>(Intercept)</code> extend out to one of the limits of the allowable range [-1, 1] of correlations.</p>
+<p>A kernel density plot, <a href="#fig-bxm03rhodens">Figure&nbsp;<span>3.14</span></a>, of the parametric bootstrap estimates of the correlation coefficients reinforces this conclusion.</p>
+<div class="cell" data-execution_count="37">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(bxm03pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"ρ"</span>)) <span class="op">*</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap replicates of correlation estimates"</span>;</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Variables"</span>),</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="37">
+<div id="fig-bxm03rhodens" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxm03rhodens-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.14: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Even on the scale of <a href="https://en.wikipedia.org/wiki/Fisher_transformation">Fisher’s z transformation</a>, <a href="#fig-bxm03rhodensatanh">Figure&nbsp;<span>3.15</span></a>, these estimates are highly skewed.</p>
+<div class="cell" data-execution_count="38">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="pp">@transform</span>(</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span>(bxm03pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"ρ"</span>),</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>z <span class="op">=</span> <span class="fu">atanh</span>(<span class="fu">clamp</span>(<span class="op">:</span>value, <span class="op">-</span><span class="fl">0.99999</span>, <span class="fl">0.99999</span>))</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>z <span class="op">=&gt;</span> <span class="st">"Fisher's z transformation of correlation estimates"</span>;</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Variables"</span>),</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(dat) <span class="op">*</span> mp <span class="op">*</span> AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="38">
+<div id="fig-bxm03rhodensatanh" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxm03rhodensatanh-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.15: Kernel density plots of Fisher’s z transformation of parametric bootstrap estimates of correlation estimates from model bxm03</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for <code>time ^ 2</code> reduces the model too much.</p>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>bxm04 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 44%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_Subj</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">54.6085</td>
+<td style="text-align: right;">1.2587</td>
+<td style="text-align: right;">43.38</td>
+<td style="text-align: right;">&lt;1e-99</td>
+<td style="text-align: right;">5.5780</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time</td>
+<td style="text-align: right;">22.8534</td>
+<td style="text-align: right;">1.0454</td>
+<td style="text-align: right;">21.86</td>
+<td style="text-align: right;">&lt;1e-99</td>
+<td style="text-align: right;">3.6245</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time ^ 2 &amp; Group: Control</td>
+<td style="text-align: right;">0.7633</td>
+<td style="text-align: right;">0.2526</td>
+<td style="text-align: right;">3.02</td>
+<td style="text-align: right;">0.0025</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time ^ 2 &amp; Group: Thioracil</td>
+<td style="text-align: right;">-1.3807</td>
+<td style="text-align: right;">0.2526</td>
+<td style="text-align: right;">-5.47</td>
+<td style="text-align: right;">&lt;1e-07</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time ^ 2 &amp; Group: Thyroxin</td>
+<td style="text-align: right;">1.1984</td>
+<td style="text-align: right;">0.2890</td>
+<td style="text-align: right;">4.15</td>
+<td style="text-align: right;">&lt;1e-04</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Residual</td>
+<td style="text-align: right;">3.6290</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm04, bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 66%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">resp ~ 1 + time + :(time ^ 2) &amp; Group + (1 + time | Subj)</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">867</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">resp ~ 1 + time + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">837</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">&lt;1e-05</td>
+</tr>
+</tbody>
+</table>
+<p>as does eliminating within-subject correlations between the random-effects for the <code>time^2</code> random effect and the other random effects.</p>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>bxm05 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span></span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>      time <span class="op">+</span></span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>      time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span></span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj) <span class="op">+</span></span>
+<span id="cb63-8"><a href="#cb63-8" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">0</span> <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb63-9"><a href="#cb63-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb63-10"><a href="#cb63-10" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb63-11"><a href="#cb63-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb63-12"><a href="#cb63-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 44%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 9%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_Subj</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">54.6085</td>
+<td style="text-align: right;">1.0432</td>
+<td style="text-align: right;">52.35</td>
+<td style="text-align: right;">&lt;1e-99</td>
+<td style="text-align: right;">4.6059</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time</td>
+<td style="text-align: right;">22.8534</td>
+<td style="text-align: right;">0.8167</td>
+<td style="text-align: right;">27.98</td>
+<td style="text-align: right;">&lt;1e-99</td>
+<td style="text-align: right;">2.5577</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time ^ 2 &amp; Group: Control</td>
+<td style="text-align: right;">0.8262</td>
+<td style="text-align: right;">0.3471</td>
+<td style="text-align: right;">2.38</td>
+<td style="text-align: right;">0.0173</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time ^ 2 &amp; Group: Thioracil</td>
+<td style="text-align: right;">-1.4171</td>
+<td style="text-align: right;">0.3471</td>
+<td style="text-align: right;">-4.08</td>
+<td style="text-align: right;">&lt;1e-04</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time ^ 2 &amp; Group: Thyroxin</td>
+<td style="text-align: right;">1.1605</td>
+<td style="text-align: right;">0.4054</td>
+<td style="text-align: right;">2.86</td>
+<td style="text-align: right;">0.0042</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">time ^ 2</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">0.9240</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Residual</td>
+<td style="text-align: right;">3.0374</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm05, bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<colgroup>
+<col style="width: 70%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">resp ~ 1 + time + :(time ^ 2) &amp; Group + (1 + time | Subj) + (0 + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">850</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">resp ~ 1 + time + :(time ^ 2) &amp; Group + (1 + time + :(time ^ 2) | Subj)</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">837</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.0017</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="some-consequences-of-changing-the-random-effects-structure" class="level3" data-number="3.5.4">
+<h3 data-number="3.5.4" class="anchored" data-anchor-id="some-consequences-of-changing-the-random-effects-structure"><span class="header-section-number">3.5.4</span> Some consequences of changing the random-effects structure</h3>
+<p>The three models <code>bxm03</code>, <code>bxm04</code>, and <code>bxm05</code> have the same fixed-effects structure. The random effects specification varies from the most complicated (<code>bxm03</code>), which produces a singular estimate of the covariance, to the simplest (<code>bxm04</code>) structure to an intermediate structure (<code>bxm05</code>).</p>
+<p>The likelihood ratio tests give evidence for preferring <code>bxm03</code>, the most complex of these models, but also one with a degenerate distribution of the random effects.</p>
+<p>If we assume that the purpose of the experiment is to compare the effects of the two treatments versus the <code>Control</code> group on the weight gain of the rats, then interest would focus on the fixed-effects parameters and, in particular, on those associated with the groups. The models give essentially the same predictions of weight versus time for a “typical” animal in each group, <a href="#fig-bxmodfitted">Figure&nbsp;<span>3.16</span></a>.</p>
+<div class="cell" data-execution_count="43">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  times <span class="op">=</span> <span class="fu">Float32</span>.((<span class="fl">0</span><span class="op">:</span><span class="fl">256</span>) <span class="op">/</span> <span class="fl">64</span>)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  times² <span class="op">=</span> <span class="fu">abs2</span>.(times)</span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  z257 <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Float32</span>, <span class="fl">257</span>)</span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>  tmat <span class="op">=</span> <span class="fu">hcat</span>(</span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ones</span>(<span class="dt">Float32</span>, <span class="fl">257</span> <span class="op">*</span> <span class="fl">3</span>),</span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">repeat</span>(times, <span class="fl">3</span>),</span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(times², z257, z257),</span>
+<span id="cb65-9"><a href="#cb65-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(z257, times², z257),</span>
+<span id="cb65-10"><a href="#cb65-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(z257, z257, times²),</span>
+<span id="cb65-11"><a href="#cb65-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb65-12"><a href="#cb65-12" aria-hidden="true" tabindex="-1"></a>  grp <span class="op">=</span> <span class="fu">repeat</span>([<span class="st">"Control"</span>, <span class="st">"Thioracil"</span>, <span class="st">"Thyroxin"</span>]; inner<span class="op">=</span><span class="fl">257</span>)</span>
+<span id="cb65-13"><a href="#cb65-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb65-14"><a href="#cb65-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(</span>
+<span id="cb65-15"><a href="#cb65-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">append!</span>(</span>
+<span id="cb65-16"><a href="#cb65-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">append!</span>(</span>
+<span id="cb65-17"><a href="#cb65-17" aria-hidden="true" tabindex="-1"></a>          <span class="fu">DataFrame</span>(;</span>
+<span id="cb65-18"><a href="#cb65-18" aria-hidden="true" tabindex="-1"></a>            times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
+<span id="cb65-19"><a href="#cb65-19" aria-hidden="true" tabindex="-1"></a>            wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm03.beta),</span>
+<span id="cb65-20"><a href="#cb65-20" aria-hidden="true" tabindex="-1"></a>            Group<span class="op">=</span>grp,</span>
+<span id="cb65-21"><a href="#cb65-21" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span><span class="st">"bxm03"</span>,</span>
+<span id="cb65-22"><a href="#cb65-22" aria-hidden="true" tabindex="-1"></a>          ),</span>
+<span id="cb65-23"><a href="#cb65-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">DataFrame</span>(;</span>
+<span id="cb65-24"><a href="#cb65-24" aria-hidden="true" tabindex="-1"></a>            times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
+<span id="cb65-25"><a href="#cb65-25" aria-hidden="true" tabindex="-1"></a>            wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm04.beta),</span>
+<span id="cb65-26"><a href="#cb65-26" aria-hidden="true" tabindex="-1"></a>            Group<span class="op">=</span>grp,</span>
+<span id="cb65-27"><a href="#cb65-27" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span><span class="st">"bxm04"</span>,</span>
+<span id="cb65-28"><a href="#cb65-28" aria-hidden="true" tabindex="-1"></a>          ),</span>
+<span id="cb65-29"><a href="#cb65-29" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb65-30"><a href="#cb65-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(;</span>
+<span id="cb65-31"><a href="#cb65-31" aria-hidden="true" tabindex="-1"></a>          times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
+<span id="cb65-32"><a href="#cb65-32" aria-hidden="true" tabindex="-1"></a>          wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm05.beta),</span>
+<span id="cb65-33"><a href="#cb65-33" aria-hidden="true" tabindex="-1"></a>          Group<span class="op">=</span>grp,</span>
+<span id="cb65-34"><a href="#cb65-34" aria-hidden="true" tabindex="-1"></a>          model<span class="op">=</span><span class="st">"bxm05"</span>,</span>
+<span id="cb65-35"><a href="#cb65-35" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb65-36"><a href="#cb65-36" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb65-37"><a href="#cb65-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
+<span id="cb65-38"><a href="#cb65-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(</span>
+<span id="cb65-39"><a href="#cb65-39" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>times <span class="op">=&gt;</span> <span class="st">"Time in trial (wk)"</span>,</span>
+<span id="cb65-40"><a href="#cb65-40" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>wt <span class="op">=&gt;</span> <span class="st">"Weight (gm)"</span>;</span>
+<span id="cb65-41"><a href="#cb65-41" aria-hidden="true" tabindex="-1"></a>      color<span class="op">=:</span>Group,</span>
+<span id="cb65-42"><a href="#cb65-42" aria-hidden="true" tabindex="-1"></a>      col<span class="op">=:</span>model,</span>
+<span id="cb65-43"><a href="#cb65-43" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
+<span id="cb65-44"><a href="#cb65-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(Lines);</span>
+<span id="cb65-45"><a href="#cb65-45" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(width<span class="op">=</span><span class="fl">350</span>, height<span class="op">=</span><span class="fl">350</span>),</span>
+<span id="cb65-46"><a href="#cb65-46" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb65-47"><a href="#cb65-47" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="43">
+<div id="fig-bxmodfitted" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxmodfitted-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.16: Typical weight curves from models bxm03, bxm04, and bxm05 for each of the three treatment groups.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Other points to make:</p>
+<pre><code>1. Standard errors are different, largest for `bxm05`, smallest for `bxm04`
+2. Real interest should center on the differences in the quadratic coef - trt vs control
+3. Not sure how to code that up
+4. More complex models require more iterations and more work per iteration
+5. Probably go with `bxm03` in this case, even though it gives a degenerate dist'n of random effects.  The idea is that the random effects are absorbing a form of rat-to-rat variability.  The residual standard deviation does reflect this.</code></pre>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="ref-box1950" class="csl-entry" role="doc-biblioentry">
+Box, G. E. P. 1950. <span>“Problems in the Analysis of Growth and Wear Curves.”</span> <em>Biometrics</em> 6 (4): 362. <a href="https://doi.org/10.2307/3001781">https://doi.org/10.2307/3001781</a>.
+</div>
+<div id="ref-davis2002" class="csl-entry" role="doc-biblioentry">
+Davis, Charles S. 2002. <em>Statistical Methods for the Analysis of Repeated Measurements</em>. <em>Springer Texts in Statistics</em>. New York, NY: Springer. <a href="https://doi.org/10.1007/b97287">https://doi.org/10.1007/b97287</a>.
+</div>
+<div id="ref-elstongrizzle1962" class="csl-entry" role="doc-biblioentry">
+Elston, R. C., and J. E. Grizzle. 1962. <span>“Estimation of Time-Response Curves and Their Confidence Bands.”</span> <em>Biometrics</em> 18: 148–59. <a href="https://doi.org/10.2307/2527453">https://doi.org/10.2307/2527453</a>.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./multiple.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./largescale.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale study</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

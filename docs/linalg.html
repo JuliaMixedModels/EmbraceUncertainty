@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-99.9.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Embrace Uncertainty - Appendix A — Linear Algebra for Linear Models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Appendix A — Linear Algebra for Linear Models</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Embrace Uncertainty</a> 
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Preface</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./largescale.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale study</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glmmbinomial.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+    <div class="sidebar-item-container"> 
+        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Appendices</a>
+      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+        <i class="bi bi-chevron-right ms-2"></i>
+      </a>
+    </div>
+    <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./linalg.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></a>
+  </div>
+</li>
+    </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#matrix-vector-representation-of-linear-models" id="toc-matrix-vector-representation-of-linear-models" class="nav-link active" data-scroll-target="#matrix-vector-representation-of-linear-models"> <span class="header-section-number">A.1</span> Matrix-vector representation of linear models</a></li>
+  <li><a href="#the-multivariate-gaussian-distribution" id="toc-the-multivariate-gaussian-distribution" class="nav-link" data-scroll-target="#the-multivariate-gaussian-distribution"> <span class="header-section-number">A.2</span> The multivariate Gaussian distribution</a>
+  <ul class="collapse">
+  <li><a href="#some-properties-of-triangular-matrices" id="toc-some-properties-of-triangular-matrices" class="nav-link" data-scroll-target="#some-properties-of-triangular-matrices"> <span class="header-section-number">A.2.1</span> Some properties of triangular matrices</a></li>
+  <li><a href="#sec-cholesky" id="toc-sec-cholesky" class="nav-link" data-scroll-target="#sec-cholesky"> <span class="header-section-number">A.2.2</span> Positive definiteness and the Cholesky factor</a></li>
+  <li><a href="#sec-mvgaussian" id="toc-sec-mvgaussian" class="nav-link" data-scroll-target="#sec-mvgaussian"> <span class="header-section-number">A.2.3</span> Density of the multivariate Gaussian</a></li>
+  <li><a href="#linear-functions-of-a-multivariate-gaussian" id="toc-linear-functions-of-a-multivariate-gaussian" class="nav-link" data-scroll-target="#linear-functions-of-a-multivariate-gaussian"> <span class="header-section-number">A.2.4</span> Linear functions of a multivariate Gaussian</a></li>
+  </ul></li>
+  <li><a href="#back-at-the-linear-model" id="toc-back-at-the-linear-model" class="nav-link" data-scroll-target="#back-at-the-linear-model"> <span class="header-section-number">A.3</span> Back at the linear model</a></li>
+  <li><a href="#minimizing-the-sum-of-squared-residuals" id="toc-minimizing-the-sum-of-squared-residuals" class="nav-link" data-scroll-target="#minimizing-the-sum-of-squared-residuals"> <span class="header-section-number">A.4</span> Minimizing the sum of squared residuals</a></li>
+  <li><a href="#numerical-example" id="toc-numerical-example" class="nav-link" data-scroll-target="#numerical-example"> <span class="header-section-number">A.5</span> Numerical example</a></li>
+  <li><a href="#alternative-decompositions-of-x" id="toc-alternative-decompositions-of-x" class="nav-link" data-scroll-target="#alternative-decompositions-of-x"> <span class="header-section-number">A.6</span> Alternative decompositions of X</a></li>
+  <li><a href="#sec-lmmtheory" id="toc-sec-lmmtheory" class="nav-link" data-scroll-target="#sec-lmmtheory"> <span class="header-section-number">A.7</span> Linear mixed-effects models</a></li>
+  <li><a href="#sec-REML" id="toc-sec-REML" class="nav-link" data-scroll-target="#sec-REML"> <span class="header-section-number">A.8</span> The REML criterion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec.LinAlg" class="quarto-section-identifier d-none d-lg-block">Appendix A — Linear Algebra for Linear Models</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="hidden">
+<p><span class="math display">\[
+\newcommand\bbA{{\mathbf{A}}}
+\newcommand\bbb{{\mathbf{b}}}
+\newcommand\bbI{{\mathbf{I}}}
+\newcommand\bbR{{\mathbf{R}}}
+\newcommand\bbX{{\mathbf{X}}}
+\newcommand\bbx{{\mathbf{x}}}
+\newcommand\bby{{\mathbf{y}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbeta{{\boldsymbol{\eta}}}
+\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
+\newcommand\bbOmega{{\boldsymbol{\Omega}}}
+\newcommand\bbmu{{\boldsymbol{\mu}}}
+\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+\newcommand\mcN{{\mathcal{N}}}
+\newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcU{{\mathcal{U}}}
+\newcommand\mcX{{\mathcal{X}}}
+\newcommand\mcY{{\mathcal{Y}}}
+\newcommand\mcZ{{\mathcal{Z}}}
+\]</span></p>
+</div>
+<p>Attach the packages to be used in this appendix</p>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MKL</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p>In this appendix we describe properties of the multivariate Gaussian (or “normal”) distribution and how linear models and linear mixed models can be formulated in terms of this distribution.</p>
+<p>We also describe some methods in numerical linear algebra that are particularly useful in working with linear models. One of the strengths of the Julia language is the <a href="https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/">LinearAlgebra</a> package in the standard library. The implementation of a multi-dimensional <em>array</em>, including one-dimensional <em>vectors</em> and two-dimensional <em>matrices</em>, is part of the base language. The added value of the <em>LinearAlgebra</em> package is compact representations of special types of matrices and methods for and with matrix decompositions or factorizations.</p>
+<p>The purpose of these descriptions is to motivate a representation of a linear mixed model that allows for fast and stable estimation of the parameters. The estimation process requires iterative optimization of some of the parameters in the model to minimize an objective function. Often this optimization requires hundreds or thousands of evaluations of the objective at different values of the parameters and the portion of time spent in these evaluations dominates the overall estimation time. Thus, a fast, efficient method for evaluating the objective is crucial to making the whole process fast.</p>
+<section id="matrix-vector-representation-of-linear-models" class="level2" data-number="A.1">
+<h2 data-number="A.1" class="anchored" data-anchor-id="matrix-vector-representation-of-linear-models"><span class="header-section-number">A.1</span> Matrix-vector representation of linear models</h2>
+<p>A linear statistical model is often written in terms of each element of the <span class="math inline">\(n\)</span>-dimensional response vector, <span class="math inline">\(\bby\)</span>, as, e.g.</p>
+<p><span id="eq-elementlinmod"><span class="math display">\[
+y_i = \beta_1 x_{i,1} + \beta_2 x_{i,2} + \dots + \beta_p x_{i,p} + \epsilon_i, \quad i=1,\dots, n
+\tag{A.1}\]</span></span></p>
+<p>and some additional description like “where the <span class="math inline">\(\epsilon_i,i=1,\dots,n\)</span> are independently and identically distributed as <span class="math inline">\(\mcN(0, \sigma^2)\)</span>”.</p>
+<p>An alternative is to write the model in terms of the <span class="math inline">\(n\)</span>-dimensional <em>response vector</em>, <span class="math inline">\(\bby\)</span>, an <span class="math inline">\(n\times p\)</span> <em>model matrix</em>, <span class="math inline">\(\bbX\)</span>, and a <span class="math inline">\(p\)</span>-dimensional <em>coefficient vector</em>, <span class="math inline">\(\bbbeta\)</span>, as</p>
+<p><span id="eq-mvnlinmod"><span class="math display">\[
+\mcY\sim\mcN\left(\bbX\bbbeta,\sigma^2\bbI\right),
+\tag{A.2}\]</span></span></p>
+<p>where <span class="math inline">\(\mcN\)</span> denotes the multivariate Gaussian distribution with mean <span class="math inline">\(\bbmu=\bbX\bbbeta\)</span> and variance-covariance matrix <span class="math inline">\(\bbSigma=\sigma^2\bbI\)</span>. (In what follows we will refer to the <em>variance-covariance matrix</em> as simply the <em>covariance matrix</em>.)</p>
+<p>Before considering properties of and computational methods for the model <a href="#eq-mvnlinmod">Equation&nbsp;<span>A.2</span></a> we will describe some of the properties of the <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">multivariate Gaussian distribution</a>.</p>
+</section>
+<section id="the-multivariate-gaussian-distribution" class="level2" data-number="A.2">
+<h2 data-number="A.2" class="anchored" data-anchor-id="the-multivariate-gaussian-distribution"><span class="header-section-number">A.2</span> The multivariate Gaussian distribution</h2>
+<p>Just as a univariate Gaussian distribution can be written by specifying the (scalar) mean, <span class="math inline">\(\mu\)</span>, and the variance, <span class="math inline">\(\sigma^2\)</span>, as <span class="math inline">\(\mcN(\mu, \sigma^2)\)</span>, a multivariate Gaussian distribution is characterized by its <span class="math inline">\(n\)</span>-dimensional mean vector, <span class="math inline">\(\bbmu\)</span>, and its <span class="math inline">\(n\times n\)</span> variance-covariance matrix, <span class="math inline">\(\bbSigma\)</span>, as <span class="math inline">\(\mcN(\bbmu, \bbSigma)\)</span>.</p>
+<p>The density function for a univariate Gaussian distribution is the familiar “bell curve”</p>
+<p><span id="eq-univariateGaussianpdf"><span class="math display">\[
+f(x; \mu, \sigma^2)=\frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x-\mu\right)^2}{2\sigma^2}\right)
+\tag{A.3}\]</span></span></p>
+<p>and probabilities defined by this density are most easily evaluated by standardizing the deviation, <span class="math inline">\(x-\mu\)</span>, as <span class="math inline">\(z=\frac{x-\mu}{\sigma}\)</span>. (This is why <span class="math inline">\(\sigma\)</span> is called the <em>standard deviation</em>.)</p>
+<p>To be able to evaluate <span class="math inline">\(\sigma\)</span>, the variance, <span class="math inline">\(\sigma^2\)</span>, must be positive, or at least non-negative. If <span class="math inline">\(\sigma^2=0\)</span> then all the probability is concentrated at a single point, <span class="math inline">\(x=\mu\)</span>, and we no longer have a probability density, in the usual way of thinking of one. The density shrinks to a point mass and the distribution is said to be <a href="https://en.wikipedia.org/wiki/Degenerate_distribution">degenerate</a>.</p>
+<p>Similar constraints apply to the covariance matrix, <span class="math inline">\(\bbSigma\)</span>. Because the covariance of the i’th and j’th elements does not depend upon the order in which we write them, <span class="math inline">\(\bbSigma\)</span> must be symmetric. That is,</p>
+<p><span id="eq-Sigmasym"><span class="math display">\[
+\bbSigma' = \bbSigma
+\tag{A.4}\]</span></span></p>
+<p>Furthermore, to define a proper multivariate density, <span class="math inline">\(\bbSigma\)</span> must be <a href="https://en.wikipedia.org/wiki/Definite_matrix">positive definite</a>, which means that for any non-zero vector, <span class="math inline">\(\bbx\)</span>, the <em>quadratic form</em> defined by <span class="math inline">\(\bbSigma\)</span> must be positive. That is</p>
+<p><span id="eq-positiveDef"><span class="math display">\[
+\bbx'\bbSigma\bbx&gt;0,\quad\forall\,\bbx\ne\mathbf{0} .
+\tag{A.5}\]</span></span></p>
+<p>(the symbol <span class="math inline">\(\forall\)</span> means “for all”). Positive definiteness implies that the <em>precision matrix</em>, <span class="math inline">\(\bbSigma^{-1}\)</span>, exists and is also positive definite. It also implies that there are “matrix square roots” of <span class="math inline">\(\bbSigma\)</span> in the sense that there are matrices <span class="math inline">\(\mathbf{A}\)</span> such that <span class="math inline">\(\mathbf{A}'\mathbf{A}=\bbSigma\)</span>. (The reason for writing <span class="math inline">\(\mathbf{A}'\mathbf{A}\)</span> and not simply the square of <span class="math inline">\(\mathbf{A}\)</span> is that <span class="math inline">\(\mathbf{A}\)</span> is not required to be symmetric but <span class="math inline">\(\mathbf{A}'\mathbf{A}\)</span> will be symmetric, even in <span class="math inline">\(\mathbf{A}\)</span> is not.)</p>
+<p>One such “square root” of a positive definite <span class="math inline">\(\bbSigma\)</span> is the <a href="https://en.wikipedia.org/wiki/Cholesky_decomposition">Cholesky factor</a>, which corresponds to <span class="math inline">\(n\times n\)</span> upper-triangular matrix, <span class="math inline">\(\bbR\)</span>, such that</p>
+<p><span id="eq-uppercholesky"><span class="math display">\[
+\bbSigma=\bbR'\bbR .
+\tag{A.6}\]</span></span></p>
+<p>This factor is usually called <span class="math inline">\(\bbR\)</span> because it appears without the transpose as the right-hand multiplicant in <a href="#eq-uppercholesky">Equation&nbsp;<span>A.6</span></a>. An alternative expression is written with the lower-triangular <span class="math inline">\(\mathbf{L}\)</span> on the left as</p>
+<p><span id="eq-lowerCholesky"><span class="math display">\[
+\bbSigma=\mathbf{L}\mathbf{L}',
+\tag{A.7}\]</span></span></p>
+<p>with the obvious relationship that <span class="math inline">\(\mathbf{L}=\bbR'\)</span>. To add to the confusion, the <code>cholesky</code> function in the <em>LinearAlgebra</em> package produces a factorization where the lower-triangular factor on the left is called <code>L</code> and the upper-triangular factor on the right is called <code>U</code>.</p>
+<p>The factor <span class="math inline">\(\bbR\)</span> or <span class="math inline">\(\mathbf{L}\)</span> can be evaluated directly from the elements of <span class="math inline">\(\bbSigma\)</span>. For example, the non-zeros in the first two rows of <span class="math inline">\(\mathbf{L}\)</span> are evaluated as</p>
+<p><span id="eq-lowerCholtworows"><span class="math display">\[
+\begin{aligned}
+\mathbf{L}_{1,1}&amp;=\sqrt{\bbSigma_{1,1}}\\
+\mathbf{L}_{2,1}&amp;=\bbSigma_{2,1}/\mathbf{L}_{1,1}\\
+\mathbf{L}_{2,2}&amp;=\sqrt{\bbSigma_{2,2}-\mathbf{L}_{2,1}^2}
+\end{aligned}
+\tag{A.8}\]</span></span></p>
+<p>Evaluating the diagonal elements involves taking a square root. By convention we choose the positive square root for the Cholesky factor with the result that the diagonal elements of <span class="math inline">\(\mathbf{L}\)</span> are all positive.</p>
+<section id="some-properties-of-triangular-matrices" class="level3" data-number="A.2.1">
+<h3 data-number="A.2.1" class="anchored" data-anchor-id="some-properties-of-triangular-matrices"><span class="header-section-number">A.2.1</span> Some properties of triangular matrices</h3>
+<p>A triangular matrix with non-zero diagonal elements is non-singular. One way to show this is because its <a href="https://en.wikipedia.org/wiki/Determinant">determinant</a>, written <span class="math inline">\(\left|\mathbf{L}\right|\)</span>, which is the product of its diagonal elements, is non-zero. In the case of a Cholesky factor the determinant will be positive because all the diagonal elements are positive.</p>
+<p>A more straightforward way of showing that such a matrix is non-singular is to show how a triangular system of equations, like</p>
+<p><span id="eq-triangularsystem"><span class="math display">\[
+\mathbf{Lx}=\mathbf{b}
+\tag{A.9}\]</span></span></p>
+<p>can be solved. In the case of a lower-triangular system the method is called <em>forward solution</em>, with the sequence of scalar equations</p>
+<p><span id="eq-forwardsolve"><span class="math display">\[
+\begin{aligned}
+x_1&amp;=b_1/\mathbf{L}_{1,1}\\
+x_2&amp;=\left(b_2-x_1\mathbf{L}_{2,1}\right)/\mathbf{L}_{2,2}\\
+x_3&amp;=\left(b_3-x_1\mathbf{L}_{3,1}-x_2\mathbf{L}_{3,2}\right)/\mathbf{L}_{3,3}
+\end{aligned}
+\tag{A.10}\]</span></span></p>
+<p>and so on.</p>
+<p>One point to note here is that <span class="math inline">\(b_1\)</span> is not needed after <span class="math inline">\(x_1\)</span> is evaluated, <span class="math inline">\(b_2\)</span> is not needed after <span class="math inline">\(x_2\)</span> is evaluated, and so on. That is, the forward solution can be carried out <em>in place</em> with each element of <span class="math inline">\(\mathbf{b}\)</span> overwriting the corresponding element of <span class="math inline">\(\bbx\)</span>. This property is useful for avoiding allocation of storage in each evaluation of the objective function.</p>
+<p>The corresponding method of solving an upper-triangular system of equations is called <em>backward solution</em>, where <span class="math inline">\(b_n\)</span> is evaluated first, then <span class="math inline">\(b_{n-1}\)</span>, and so on.</p>
+<p>Repeated forward solution (or backward solution for upper triangular) can be used to evaluate the inverse, <span class="math inline">\(\mathbf{L}^{-1}\)</span>, of a lower triangular matrix, <span class="math inline">\(\mathbf{L}\)</span>. However, a general rule in numerical linear algebra is that you rarely need to evaluate the full inverse of a matrix. Solving a triangular system like <a href="#eq-triangularsystem">Equation&nbsp;<span>A.9</span></a> by evaluating <span class="math inline">\(\mathbf{L}^{-1}\)</span> and forming the product</p>
+<p><span id="eq-inversesolve"><span class="math display">\[
+\bbx = \mathbf{L}^{-1}\mathbf{b}
+\tag{A.11}\]</span></span></p>
+<p>involves doing roughly <span class="math inline">\(n\)</span> times as much work as solving the system directly, as in <a href="#eq-forwardsolve">Equation&nbsp;<span>A.10</span></a>. Requiring that the inverse of a matrix must be evaluated to solve a linear system is like saying that a quotient, <span class="math inline">\(a/b\)</span>, must be evalated by calculating <span class="math inline">\(b^{-1}\)</span>, the reciprocal of <span class="math inline">\(b\)</span>, then evaluating the product <span class="math inline">\(b^{-1}a\)</span>, instead of evaluating the quotient directly.</p>
+<p>In a derivation we may write an expression like <span class="math inline">\(\mathbf{L}^{-1}\mathbf{b}\)</span> but the evaluation is performed by solving a system like <a href="#eq-forwardsolve">Equation&nbsp;<span>A.10</span></a>.</p>
+</section>
+<section id="sec-cholesky" class="level3" data-number="A.2.2">
+<h3 data-number="A.2.2" class="anchored" data-anchor-id="sec-cholesky"><span class="header-section-number">A.2.2</span> Positive definiteness and the Cholesky factor</h3>
+<p>It turns out that the ability to form the Cholesky factor, which means that all the quantities like <span class="math inline">\(\bbSigma_{2,2}-\mathbf{L}_{2,1}^2\)</span>, whose square roots form the diagonal of <span class="math inline">\(\mathbf{L}\)</span>, evaluate to positive numbers, is equivalent to <span class="math inline">\(\bbSigma\)</span> being positive definite. It is straightforward to show that having a Cholesky factor implies that <span class="math inline">\(\bbSigma\)</span> is positive definite, because</p>
+<p><span id="eq-cholimpliesposdef"><span class="math display">\[
+\bbx'\bbSigma\bbx = \bbx'\bbR'\bbR\bbx=\left(\mathbf{Rx}\right)'\mathbf{Rx}=\left\|\mathbf{Rx}\right\|^2
+\tag{A.12}\]</span></span></p>
+<p>where <span class="math inline">\(\left\|\mathbf{v}\right\|^2\)</span> is the squared length of the vector <span class="math inline">\(\mathbf{v}\)</span>. Because <span class="math inline">\(\bbR\)</span> is non-singular, <span class="math inline">\(\bbx\ne\mathbf{0}\implies\mathbf{Rx}\ne\mathbf{0}\)</span> and the squared length in <a href="#eq-cholimpliesposdef">Equation&nbsp;<span>A.12</span></a> is greater than zero.</p>
+<p>The other direction is a bit more complicated to prove but essentially it amounts to showing that if the process of generating the Cholesky factor requires the square root of a non-positive number to obtain a diagonal element then there is a direction in which the quadratic form gives a non-positive result.</p>
+<p>In practice, the easiest way to check a symmetric matrix to see if it is positive definite is to attempt to evaluate the Cholesky factor and check whether that succeeds. This is exactly what the <code>isposdef</code> methods in the <em>LinearAlgebra</em> package do.</p>
+</section>
+<section id="sec-mvgaussian" class="level3" data-number="A.2.3">
+<h3 data-number="A.2.3" class="anchored" data-anchor-id="sec-mvgaussian"><span class="header-section-number">A.2.3</span> Density of the multivariate Gaussian</h3>
+<p>For the general multivariate normal distribution, <span class="math inline">\(\mcN(\bbmu,\bbSigma)\)</span>, where <span class="math inline">\(\bbSigma\)</span> is positive definite with lower Cholesky factor <span class="math inline">\(\mathbf{L}\)</span>, the probability density function is</p>
+<p><span id="eq-mvndensity"><span class="math display">\[
+\begin{aligned}
+f(\bbx;\bbmu,\bbSigma)&amp;=
+\frac{1}{\sqrt{(2\pi)^n\left|\bbSigma\right|}}
+\exp\left(\frac{-[\bbx-\bbmu]'\bbSigma^{-1}[\bbx-\bbmu]}{2}\right)\\
+&amp;=\frac{1}{\sqrt{(2\pi)^n}\left|\mathbf{L}\right|}
+\exp\left(\frac{-[\bbx-\bbmu]'{\mathbf{L}'}^{-1}\mathbf{L}^{-1}[\bbx-\bbmu]}{2}\right)\\
+&amp;=\frac{1}{\sqrt{(2\pi)^n}\left|\mathbf{L}\right|}
+\exp\left(\frac{-\left\|\mathbf{L}^{-1}[\bbx-\bbmu]\right\|^2}{2}\right)\\
+\end{aligned}
+\tag{A.13}\]</span></span></p>
+<p>and the standardizing transformation becomes</p>
+<p><span id="eq-mvnstandardizing"><span class="math display">\[
+\mathbf{z}=\mathbf{L}^{-1}[\bbx-\bbmu] ,
+\tag{A.14}\]</span></span></p>
+<p>which, in practice, means using forward solution on the lower-triangular system of equations</p>
+<p><span id="eq-mvnstandardizingsol"><span class="math display">\[
+\mathbf{Lz}=\bbx-\bbmu .
+\tag{A.15}\]</span></span></p>
+<p>Note that the standardizing transformation gives us a way to simulate values from a general <span class="math inline">\(n\)</span>-dimensional multivariate Gaussian, <span class="math inline">\(\mcX\sim\mcN(\bbmu,\bbSigma)\)</span> as</p>
+<p><span id="eq-simulatemvn"><span class="math display">\[
+\bbx=\bbmu+\mathbf{L}\mathbf{z}
+\tag{A.16}\]</span></span></p>
+<p>where <span class="math inline">\(\mathbf{z}\)</span> is simulated from the <span class="math inline">\(n\)</span>-dimensional <em>standard multivariate Gaussian</em>, <span class="math inline">\(\mcZ\sim\mcN(\mathbf{0},\bbI)\)</span>, which is <span class="math inline">\(n\)</span> independent univariate standard normal distributions.</p>
+</section>
+<section id="linear-functions-of-a-multivariate-gaussian" class="level3" data-number="A.2.4">
+<h3 data-number="A.2.4" class="anchored" data-anchor-id="linear-functions-of-a-multivariate-gaussian"><span class="header-section-number">A.2.4</span> Linear functions of a multivariate Gaussian</h3>
+<p>In general, if <span class="math inline">\(\mcX\)</span> is an <span class="math inline">\(n\)</span>-dimensional random variable with mean <span class="math inline">\(\bbmu\)</span> and covariance matrix <span class="math inline">\(\bbSigma\)</span>, and <span class="math inline">\(\mathbf{A}\)</span> is a matrix with <span class="math inline">\(n\)</span> columns then the mean and variance of <span class="math inline">\(\mcU=\mathbf{A}\mcX\)</span> are given by</p>
+<p><span id="eq-mvexpectedlin"><span class="math display">\[
+\require{unicode}
+𝔼\left[\mcU\right] =
+𝔼\left[\mathbf{A}\mcX\right] =
+\mathbf{A}𝔼\left[\mcX\right] =
+\mathbf{A}\bbmu
+\tag{A.17}\]</span></span></p>
+<p>and</p>
+<p><span id="eq-mvvarlin"><span class="math display">\[
+\begin{aligned}
+\text{Var}\left(\mcU\right)
+&amp;=𝔼\left[\left(\mcU-𝔼\left[\mcU\right]\right)\left(\mcU-𝔼\left[\mcU\right]\right)'\right]\\
+&amp;=𝔼\left[\left(\mathbf{A}\mcX-\mathbf{A}\bbmu\right)\left(\mathbf{A}\mcX-\mathbf{A}\bbmu\right)'\right]\\
+&amp;=𝔼\left[\mathbf{A}\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\mathbf{A}'\right]\\
+&amp;=\mathbf{A}\,𝔼\left[\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\right]\mathbf{A}'\\
+&amp;=\mathbf{A}\text{Var}(\mcX)\mathbf{A}'\\
+&amp;=\mathbf{A}\bbSigma\mathbf{A}'
+\end{aligned}
+\tag{A.18}\]</span></span></p>
+<p>A linear function, <span class="math inline">\(\mcU=\mathbf{A}\mcX\)</span>, of a multivariate Gaussian distribution, <span class="math inline">\(\mcX\sim\mcN(\bbmu,\bbSigma)\)</span>, is also Gaussian and these relationships imply that</p>
+<p><span id="eq-mvnlinfunc"><span class="math display">\[
+\mcU\sim\mcN(\mathbf{A}\bbmu, \mathbf{A}\bbSigma\mathbf{A}')
+\tag{A.19}\]</span></span></p>
+<p>For the special case of <span class="math inline">\(\mathbf{A}\)</span> being of dimension <span class="math inline">\(1\times n\)</span> (i.e.&nbsp;a <em>row vector</em>), the expression for the <span class="math inline">\(1\times 1\)</span> covariance matrix is the quadratic form defined by <span class="math inline">\(\bbSigma\)</span>, which is why <span class="math inline">\(\bbSigma\)</span> must be positive definite for the conditional distributions to be non-degenerate.</p>
+</section>
+</section>
+<section id="back-at-the-linear-model" class="level2" data-number="A.3">
+<h2 data-number="A.3" class="anchored" data-anchor-id="back-at-the-linear-model"><span class="header-section-number">A.3</span> Back at the linear model</h2>
+<p>The probability density function for the linear model, <a href="#eq-mvnlinmod">Equation&nbsp;<span>A.2</span></a>, is</p>
+<p><span id="eq-linmoddensity"><span class="math display">\[
+\begin{aligned}
+f(\bby; \bbbeta, \sigma^2)&amp;=
+\frac{1}{\sqrt{2\pi\left|\sigma^2\bbI\right|}}
+\exp\left(\frac{-[\bby-\bbX\bbbeta]'
+\left(\sigma^2\bbI\right)^{-1}[\bby-\bbX\bbbeta]}{2}\right)\\
+&amp;=\left(2\pi\sigma^2\right)^{-n/2}\exp\left(-\left\|\bby-\bbX\bbbeta\right\|^2/\left(2\sigma^2\right)\right)
+\end{aligned}
+\tag{A.20}\]</span></span></p>
+<p><a href="#eq-linmoddensity">Equation&nbsp;<span>A.20</span></a> describes the density of the random variable, <span class="math inline">\(\mcY\)</span>, representing the observations, given the values of the parameters, <span class="math inline">\(\bbbeta\)</span> and <span class="math inline">\(\sigma^2\)</span>. For parameter estimation we use the <em>likelihood function</em>, which is the same expression as <a href="#eq-linmoddensity">Equation&nbsp;<span>A.20</span></a> but regarded as function of the parameters, <span class="math inline">\(\bbbeta\)</span> and <span class="math inline">\(\sigma^2\)</span>, with the observed response, <span class="math inline">\(\bby\)</span>, fixed.</p>
+<p><span id="eq-linmodlikelihood"><span class="math display">\[
+L(\bbbeta,\sigma^2;\bby)=
+\left(2\pi\sigma^2\right)^{-n/2}\exp\left(-\left\|\bby-\bbX\bbbeta\right\|^2/\left(2\sigma^2\right)\right)
+\tag{A.21}\]</span></span></p>
+<p>The <a href="https://en.wikipedia.org/wiki/Maximum_likelihood_estimation">maximum likelihood</a> estimates of the parameters are, as the name implies, the values of <span class="math inline">\(\bbbeta\)</span> and <span class="math inline">\(\sigma^2\)</span> that maximize the expression on the right of <a href="#eq-linmodlikelihood">Equation&nbsp;<span>A.21</span></a> .</p>
+<p>Because the logarithm is a <a href="https://en.wikipedia.org/wiki/Monotonic_function">monotone increasing</a> function, the maximum likelihood estimates will also maximize the <em>log-likelihood</em></p>
+<p><span id="eq-linmodloglike"><span class="math display">\[
+\begin{aligned}
+\ell(\bbbeta,\sigma^2;\bby)
+&amp;=\log L(\bbbeta,\sigma^2;\bby)\\
+&amp;=-\frac{n}{2}\log(2\pi\sigma^2)-\frac{\left\|\bby-\bbX\bbbeta\right\|^2}{2\sigma^2}
+\end{aligned}
+\tag{A.22}\]</span></span></p>
+<p>Usually the log-likelihood is easier to optimize, either algebraically or numerically, than the likelihood itself.</p>
+<p>To avoid the negative signs and the factors of 2 in the denominator, we often convert the log-likelihood to the <em>deviance scale</em>, which is negative twice the log-likelihood,</p>
+<p><span id="eq-linmoddevscale"><span class="math display">\[
+\begin{aligned}
+d(\bbbeta,\sigma^2;\bby)
+&amp;=-2\ell(\bbbeta,\sigma^2; \bby)\\
+&amp;=n\log(2\pi\sigma^2)+\frac{\left\|\bby-\bbX\bbbeta\right\|^2}{\sigma^2} .
+\end{aligned}
+\tag{A.23}\]</span></span></p>
+<p>Because of the negative sign, the maximum likelihood estimates are those that <em>minimize</em> <span class="math inline">\(d(\bbbeta,\sigma^2;\bby)\)</span>.</p>
+<p>(The term <em>deviance scale</em> is used for <span class="math inline">\(d(\bbbeta,\sigma^2;\bby)\)</span> rather than <a href="https://en.wikipedia.org/wiki/Deviance_(statistics)">deviance</a> because the deviance involves an additive shift, which is a correction for the saturated model - see the link. It is obvious what the saturated model should be for the linear model but not for the linear mixed model so, to avoid confusion, we refer to the log-likelihood on the deviance scale as the <em>objective</em>.)</p>
+<p>The form of <a href="#eq-linmoddevscale">Equation&nbsp;<span>A.23</span></a> makes it easy to determine the maximum likelihood estimates. Because <span class="math inline">\(\bbbeta\)</span> appears only in the sum of squared residuals expression, <span class="math inline">\(\|\bby-\bbX\bbbeta\|^2\)</span>, we minimize that with respect to <span class="math inline">\(\bbbeta\)</span></p>
+<p><span id="eq-leastsquaresest"><span class="math display">\[
+\widehat{\bbbeta}=
+\arg\min_{\bbbeta}\|\bby-\bbX\bbbeta\|^2 ,
+\tag{A.24}\]</span></span></p>
+<p>where <span class="math inline">\(\arg\min_{\bbbeta}\)</span> means the value of <span class="math inline">\(\bbbeta\)</span> that minimizes the expression that follows.</p>
+<p>Let <span class="math inline">\(r^2(\widehat{\bbbeta}) = \left\|\bby-\bbX\widehat{\bbbeta}\right\|^2\)</span> be the minimum sum of squared residuals. Substituting this value into <a href="#eq-linmoddevscale">Equation&nbsp;<span>A.23</span></a>, differentiating with respect to <span class="math inline">\(\sigma^2\)</span>, and setting this derivative to zero gives</p>
+<p><span class="math display">\[
+\widehat{\sigma^2}=\frac{r^2(\widehat{\bbbeta})}{n}
+\]</span></p>
+</section>
+<section id="minimizing-the-sum-of-squared-residuals" class="level2" data-number="A.4">
+<h2 data-number="A.4" class="anchored" data-anchor-id="minimizing-the-sum-of-squared-residuals"><span class="header-section-number">A.4</span> Minimizing the sum of squared residuals</h2>
+<p>A condition for <span class="math inline">\(\widehat{\bbbeta}\)</span> to minimize the sum of squared residuals is that the <em>gradient</em></p>
+<p><span id="eq-sumsqgrad"><span class="math display">\[
+\nabla r^2(\bbbeta)=-2\bbX'(\bby-\bbX\bbbeta)
+\tag{A.25}\]</span></span></p>
+<p>be zero at <span class="math inline">\(\widehat{\bbbeta}\)</span>. This condition can be rewritten as</p>
+<p><span id="eq-normaleq"><span class="math display">\[
+\bbX'\bbX\widehat{\bbbeta}=\bbX'\bby ,
+\tag{A.26}\]</span></span></p>
+<p>which are called the <em>normal equations</em>.</p>
+<p>The term <em>normal</em> in this expression comes from the fact that requiring the gradient, <a href="#eq-sumsqgrad">Equation&nbsp;<span>A.25</span></a>, to be zero is equivalent to requiring that the <em>residual vector</em>, <span class="math inline">\(\bby-\bbX\widehat{\bbbeta}\)</span>, be perpendicular, or <em>normal</em>, to the columns of <span class="math inline">\(\bbX\)</span>.</p>
+<p>When the model matrix, <span class="math inline">\(\bbX\)</span>, is of <em>full column rank</em>, which means</p>
+<p><span id="eq-fullcolumnrank"><span class="math display">\[
+\bbX\mathbf{\beta}\ne\mathbf{0}\quad\forall\bbbeta\ne\mathbf{0} ,
+\tag{A.27}\]</span></span></p>
+<p>then the quadratic form defined by <span class="math inline">\(\bbX'\bbX\)</span> is positive definite and has a Cholesky factor, say <span class="math inline">\(\bbR_{XX}\)</span>, and the normal equations can be solved in two stages. First, solve</p>
+<p><span id="eq-rXydef"><span class="math display">\[
+\bbR_{XX}'\mathbf{r}_{Xy}=\bbX'\bby
+\tag{A.28}\]</span></span></p>
+<p>for <span class="math inline">\(\mathbf{r}_{Xy}\)</span> using forward solution, then solve</p>
+<p><span id="eq-betahatchol"><span class="math display">\[
+\bbR_{XX}\widehat{\bbbeta}=\mathbf{r}_{Xy}
+\tag{A.29}\]</span></span></p>
+<p>for <span class="math inline">\(\widehat{\bbbeta}\)</span> using backward solution.</p>
+<p>An alternative approach is to write the residual sum of squares as a quadratic form</p>
+<p><span id="eq-extendedqf"><span class="math display">\[
+\begin{aligned}
+r^2(\bbbeta)&amp;=\|\bby-\bbX\bbbeta\|^2\\
+&amp;=(\bby-\bbX\bbbeta)'(\bby-\bbX\bbbeta)\\
+&amp;=(\bbX\bbbeta-\bby)'(\bbX\bbbeta-\bby)\\
+&amp;=\begin{bmatrix}\bbbeta&amp;-1\end{bmatrix}
+\begin{bmatrix}
+\bbX'\bbX &amp; \bbX'\bby\\
+\bby'\bbX &amp; \bby'\bby
+\end{bmatrix}
+\begin{bmatrix}
+\bbbeta\\
+-1
+\end{bmatrix}\\
+&amp;=\begin{bmatrix}\bbbeta&amp;-1\end{bmatrix}
+\begin{bmatrix}
+\bbR_{XX}' &amp; \mathbf{0}\\
+\mathbf{r}_{Xy}' &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+\bbR_{XX} &amp; \mathbf{r}_{Xy}\\
+\mathbf{0} &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+\bbbeta\\
+-1
+\end{bmatrix}\\
+&amp;=\left\|
+\begin{bmatrix}
+\bbR_{XX} &amp; \mathbf{r}_{Xy}\\
+\mathbf{0} &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+\bbbeta\\
+-1
+\end{bmatrix}\right\|^2\\
+&amp;=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2- r_{yy}^2
+\end{aligned}
+\tag{A.30}\]</span></span></p>
+<p>The first term, <span class="math inline">\(\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2\)</span>, is non-negative and can be made zero by solving <a href="#eq-betahatchol">Equation&nbsp;<span>A.29</span></a> for <span class="math inline">\(\widehat{\bbbeta}\)</span>. Thus, the minimum sum of squared residuals is <span class="math inline">\(r_{yy}^2\)</span>.</p>
+<p>One consequence of this derivation is that the minimum sum of squared residuals can be evaluated directly from the extended Cholesky factor</p>
+<p><span id="eq-extendedcholfac"><span class="math display">\[
+\begin{bmatrix}
+\bbR_{XX} &amp; \mathbf{r}_{Xy}\\
+\mathbf{0} &amp; r_{yy}
+\end{bmatrix}
+\tag{A.31}\]</span></span></p>
+<p>without needing to solve for <span class="math inline">\(\widehat{\bbbeta}\)</span> first. This is not terribly important for a linear model where the evaluation of <span class="math inline">\(\widehat{\bbbeta}\)</span> and the residual is typically done only once. However, for the linear mixed model, a similar calculation must be done for every evaluation of the objective in the iterative optimization, and being able to evaluate the minimum penalized sum of squared residuals without solving for parameter values and without needing to evaluate the residual saves a non-negligible amount of time and effort.</p>
+</section>
+<section id="numerical-example" class="level2" data-number="A.5">
+<h2 data-number="A.5" class="anchored" data-anchor-id="numerical-example"><span class="header-section-number">A.5</span> Numerical example</h2>
+<p>Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject <code>S372</code> in the <code>sleepstudy</code> dataset.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>S372 <span class="op">=</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">last</span>(<span class="fu">groupby</span>(<span class="fu">DataFrame</span>(MixedModels.<span class="fu">dataset</span>(<span class="op">:</span>sleepstudy)), <span class="op">:</span>subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+
+<div class="data-frame"><p>10 rows × 3 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>subj</th><th>days</th><th>reaction</th></tr><tr><th></th><th title="String">String</th><th title="Int8">Int8</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>S372</td><td>0</td><td>269.412</td></tr><tr><th>2</th><td>S372</td><td>1</td><td>273.474</td></tr><tr><th>3</th><td>S372</td><td>2</td><td>297.597</td></tr><tr><th>4</th><td>S372</td><td>3</td><td>310.632</td></tr><tr><th>5</th><td>S372</td><td>4</td><td>287.173</td></tr><tr><th>6</th><td>S372</td><td>5</td><td>329.608</td></tr><tr><th>7</th><td>S372</td><td>6</td><td>334.482</td></tr><tr><th>8</th><td>S372</td><td>7</td><td>343.22</td></tr><tr><th>9</th><td>S372</td><td>8</td><td>369.142</td></tr><tr><th>10</th><td>S372</td><td>9</td><td>364.124</td></tr></tbody></table></div>
+</div>
+</div>
+<p>The model matrix and the response vector can be constructed as</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> <span class="fu">hcat</span>(<span class="fu">ones</span>(<span class="fu">nrow</span>(S372)), S372.days)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>10×2 Matrix{Float64}:
+ 1.0  0.0
+ 1.0  1.0
+ 1.0  2.0
+ 1.0  3.0
+ 1.0  4.0
+ 1.0  5.0
+ 1.0  6.0
+ 1.0  7.0
+ 1.0  8.0
+ 1.0  9.0</code></pre>
+</div>
+</div>
+<p>and</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> S372.reaction</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[269.4117, 273.474, 297.5968, 310.6316, 287.1726, 329.6076, 334.4818, 343.2199, 369.1417, 364.1236]</code></pre>
+</div>
+</div>
+<p>from which we obtain the Cholesky factor</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>chfac <span class="op">=</span> <span class="fu">cholesky!</span>(X<span class="op">'</span>X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>Cholesky{Float64, Matrix{Float64}}
+U factor:
+2×2 UpperTriangular{Float64, Matrix{Float64}}:
+ 3.16228  14.2302
+  ⋅        9.08295</code></pre>
+</div>
+</div>
+<p>(Recall that the upper triangular Cholesky factor is the <code>U</code> property of the <code>Cholesky</code> type.)</p>
+<p>The <code>\</code> operator with a <code>Cholesky</code> factor on the left performs both the forward and backward solutions to obtain the least squares estimates</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">=</span> chfac <span class="op">\</span> (X<span class="op">'</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>2-element Vector{Float64}:
+ 267.0448
+  11.298073333333342</code></pre>
+</div>
+</div>
+<p>Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for <span class="math inline">\(\mathbf{r}_{Xy}\)</span></p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rXy <span class="op">=</span> <span class="fu">ldiv!</span>(chfac.L, X<span class="op">'</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>2-element Vector{Float64}:
+ 1005.2442073763814
+  102.61984718485837</code></pre>
+</div>
+</div>
+<p>then solving in-place to obtain <span class="math inline">\(\widehat{\bbbeta}\)</span></p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ldiv!</span>(chfac.U, rXy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>2-element Vector{Float64}:
+ 267.0448
+  11.298073333333342</code></pre>
+</div>
+</div>
+<p>The residual vector, <span class="math inline">\(\bby-\bbX\widehat{\bbbeta}\)</span>, is</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> y <span class="op">-</span> X <span class="op">*</span> β̂</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>10-element Vector{Float64}:
+   2.366899999999987
+  -4.86887333333334
+   7.955853333333266
+   9.692579999999964
+ -25.064493333333417
+   6.072433333333265
+  -0.35144000000002507
+  -2.911413333333428
+  11.71231333333327
+  -4.603860000000054</code></pre>
+</div>
+</div>
+<p>with geometric length or “norm”,</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>31.915932906580288</code></pre>
+</div>
+</div>
+<p>For the extended Cholesky factor, create the extended matrix of sums of squares and cross products</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>crprod <span class="op">=</span> <span class="kw">let</span> x <span class="op">=</span> S372.days</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Symmetric</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">length</span>(x) <span class="fu">sum</span>(x) <span class="fu">sum</span>(y)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>      <span class="fl">0.0</span> <span class="fu">sum</span>(abs2, x) <span class="fu">dot</span>(x, y)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      <span class="fl">0.0</span> <span class="fl">0.0</span> <span class="fu">sum</span>(abs2, y)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>U,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>3×3 Symmetric{Float64, Matrix{Float64}}:
+   10.0      45.0   3178.86
+   45.0     285.0  15237.0
+ 3178.86  15237.0      1.02207e6</code></pre>
+</div>
+</div>
+<p>The call to <code>Symmetric</code> with the second argument the symbol <code>:U</code> indicates that the matrix should be treated as symmetric but only the upper triangle is given.</p>
+<p>The Cholesky factor of the <code>crprod</code> reproduces <span class="math inline">\(\bbR_{XX}\)</span>, <span class="math inline">\(\mathbf{r}_{Xy}\)</span>, and the norm of the residual, <span class="math inline">\(r_{yy}\)</span>.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>extchfac <span class="op">=</span> <span class="fu">cholesky</span>(crprod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>Cholesky{Float64, Matrix{Float64}}
+U factor:
+3×3 UpperTriangular{Float64, Matrix{Float64}}:
+ 3.16228  14.2302   1005.24
+  ⋅        9.08295   102.62
+  ⋅         ⋅         31.9159</code></pre>
+</div>
+</div>
+<p>and information from which the parameter estimates can be evaluated.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">≈</span> <span class="fu">ldiv!</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">UpperTriangular</span>(<span class="fu">view</span>(extchfac.U, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>)),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy</span>(<span class="fu">view</span>(extchfac.U, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">3</span>)),</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>true</code></pre>
+</div>
+</div>
+<p>The operator <code>≈</code> is a check of approximate equality of floating point numbers or arrays. Exact equality of floating point results from “equivalent” calculations cannot be relied upon.</p>
+<p>Similarly we check that the value of <span class="math inline">\(r_{y,y}\)</span> is approximately equal to the norm of the residual vector.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r) <span class="op">≈</span> extchfac.U[<span class="fl">3</span>, <span class="fl">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>true</code></pre>
+</div>
+</div>
+</section>
+<section id="alternative-decompositions-of-x" class="level2" data-number="A.6">
+<h2 data-number="A.6" class="anchored" data-anchor-id="alternative-decompositions-of-x"><span class="header-section-number">A.6</span> Alternative decompositions of X</h2>
+<p>There are two other decompositions of the model matrix <span class="math inline">\(\bbX\)</span> or the augmented model matrix <span class="math inline">\([\mathbf{X,y}]\)</span> that can be used to evaluate the least squares estimates; the <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR decomposition</a> and the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition (SVD)</a>.</p>
+<p>The QR decomposition expresses <span class="math inline">\(\bbX\)</span> as the product of an <em>orthogonal</em> matrix, <span class="math inline">\(\mathbf{Q}\)</span>, and an upper triangular matrix <span class="math inline">\(\bbR\)</span>. The upper triangular <span class="math inline">\(\bbR\)</span> is related to the upper triangular Cholesky factor in that the numerical values are the same but the signs can be different. In particular, the usual way of creating <span class="math inline">\(\mathbf{Q}\)</span> and <span class="math inline">\(\bbR\)</span> using <a href="https://en.wikipedia.org/wiki/Householder_transformation">Householder transformations</a> typically results in the first row of <span class="math inline">\(\bbR\)</span> from the <code>qr</code> function being the negative of the first row of the upper Cholesky factor.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>qrfac <span class="op">=</span> <span class="fu">qr</span>(X)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>qrfac.R</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>2×2 Matrix{Float64}:
+ -3.16228  -14.2302
+  0.0        9.08295</code></pre>
+</div>
+</div>
+<p>Just as the Cholesky factor can be used on the left of the <code>\</code> operator, so can the <code>qr</code> factor but with <code>y</code> on the right.</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>b3 <span class="op">=</span> qrfac <span class="op">\</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>2-element Vector{Float64}:
+ 267.0447999999999
+  11.298073333333344</code></pre>
+</div>
+</div>
+<p>The matrix <span class="math inline">\(\bbR\)</span> is returned as a square matrix with the same number of columns as <span class="math inline">\(\bbX\)</span>. That is, if <span class="math inline">\(\bbX\)</span> is of size <span class="math inline">\(n\times p\)</span> where <span class="math inline">\(n&gt;p\)</span>, as in the example, then <span class="math inline">\(\bbR\)</span> is <span class="math inline">\(p\times p\)</span>, as shown above.</p>
+<p>The matrix <span class="math inline">\(\mathbf{Q}\)</span> is usually considered to be an <span class="math inline">\(n\times n\)</span> orthogonal matrix, which means that its transpose is its inverse</p>
+<p><span id="eq-orthogonalQ"><span class="math display">\[
+\mathbf{Q'Q}=\mathbf{QQ'}=\bbI
+\tag{A.32}\]</span></span></p>
+<p>To form the product <span class="math inline">\(\mathbf{QR}\)</span> the matrix <span class="math inline">\(\bbR\)</span> is treated as if it were <span class="math inline">\(n\times p\)</span> with zeros below the main diagonal.</p>
+<p>The <span class="math inline">\(n\times n\)</span> matrix <span class="math inline">\(\mathbf{Q}\)</span> can be very large if <span class="math inline">\(n\)</span>, the number of observations, is large but it does not need to be explicitly evaluated. In practice <span class="math inline">\(\mathbf{Q}\)</span> is a “virtual” matrix represented as a product of Householder reflections that only require storage of the size of <span class="math inline">\(\bbX\)</span>. The effect of multiplying a vector or matrix by <span class="math inline">\(\mathbf{Q}\)</span> or by <span class="math inline">\(\mathbf{Q}'\)</span> is achieved by applying the Householder reflections in a particular order.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>rXy2 <span class="op">=</span> qrfac.Q<span class="op">'</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>10-element Vector{Float64}:
+ -1005.2442073763813
+   102.61984718485829
+     8.057970700644915
+     9.321943315787074
+   -25.907884069070683
+     4.756288546071524
+    -2.1403388387862776
+    -5.173066223644113
+     8.977906391498067
+    -7.81102099335979</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> <span class="fu">ldiv!</span>(<span class="fu">UpperTriangular</span>(qrfac.R), rXy2[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>2-element Vector{Float64}:
+ 267.0448
+  11.298073333333331</code></pre>
+</div>
+</div>
+<p>Forming the QR decomposition is a direct, non-iterative, calculation, like forming the Cholesky factor. Forming the SVD, by contrast, is usually an iterative calculation. (It should be noted that modern methods for evaluating the SVD are very fast for an iterative calculation.) The SVD consists of two orthogonal matrices, the <span class="math inline">\(n\times n\)</span> <span class="math inline">\(\mathbf{U}\)</span> and the <span class="math inline">\(p\times p\)</span> <span class="math inline">\(\mathbf{V}\)</span> and an <span class="math inline">\(n\times p\)</span> matrix <span class="math inline">\(\mathbf{S}\)</span> that is zero off the main diagonal, where</p>
+<p><span class="math display">\[
+\bbX=\mathbf{USV'} .
+\]</span></p>
+<p>Unlike the <span class="math inline">\(\mathbf{Q}\)</span> in the QR decomposition, the orthogonal matrices <span class="math inline">\(\mathbf{U}\)</span> and <span class="math inline">\(\mathbf{V}\)</span> are explicitly evaluated. Because of this, the default for the <code>svd</code> function is to produce a compact form where <span class="math inline">\(\mathbf{U}\)</span> is <span class="math inline">\(n\times p\)</span> and only the diagonal of <span class="math inline">\(\mathbf{S}\)</span> is returned.</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>Xsvd <span class="op">=</span> <span class="fu">svd</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>SVD{Float64, Float64, Matrix{Float64}, Vector{Float64}}
+U factor:
+10×2 Matrix{Float64}:
+ 0.00921331   0.587682
+ 0.0669862    0.493961
+ 0.124759     0.400241
+ 0.182532     0.306521
+ 0.240305     0.2128
+ 0.298078     0.11908
+ 0.355851     0.0253594
+ 0.413623    -0.068361
+ 0.471396    -0.162081
+ 0.529169    -0.255802
+singular values:
+2-element Vector{Float64}:
+ 17.093167142525193
+  1.680368125649001
+Vt factor:
+2×2 Matrix{Float64}:
+ 0.157485   0.987521
+ 0.987521  -0.157485</code></pre>
+</div>
+</div>
+<p>If all the singular values are non-zero, as is the case here, the least squares solution <span class="math inline">\(\widehat{\bbbeta}\)</span> can be obtained as</p>
+<p><span id="eq-pseudoinv"><span class="math display">\[
+\mathbf{V}\mathbf{S}^{-1}\mathbf{U}'\bby
+\tag{A.33}\]</span></span></p>
+<p>for the diagonal <span class="math inline">\(\mathbf{S}\)</span>.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>b5 <span class="op">=</span> Xsvd.V <span class="op">*</span> (Xsvd.U<span class="op">'</span>y <span class="op">./</span> Xsvd.S)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>2-element Vector{Float64}:
+ 267.0447999999999
+  11.298073333333363</code></pre>
+</div>
+</div>
+<p>In the extensions to linear mixed-effects models we will emphasize the Cholesky factorization over the QR decomposition or the SVD.</p>
+</section>
+<section id="sec-lmmtheory" class="level2" data-number="A.7">
+<h2 data-number="A.7" class="anchored" data-anchor-id="sec-lmmtheory"><span class="header-section-number">A.7</span> Linear mixed-effects models</h2>
+<p>As described in <span class="citation" data-cites="bates.maechler.etal:2015">Bates et al. (<a href="references.html#ref-bates.maechler.etal:2015" role="doc-biblioref">2015</a>)</span> , a linear mixed-effects model is based on two vector-valued random variables: the <span class="math inline">\(q\)</span>-dimensional vector of random effects, <span class="math inline">\(\mcB\)</span>, and the <span class="math inline">\(n\)</span>-dimensional response vector, <span class="math inline">\(\mcY\)</span>. <a href="intro.html#eq-lmmdist">Equation&nbsp;<span>1.2</span></a> defines the unconditional distribution of <span class="math inline">\(\mcB\)</span> and the conditional distribution of <span class="math inline">\(\mcY\)</span>, given <span class="math inline">\(\mcB=\mathbf{b}\)</span>, as multivariate Gaussian distributions of the form</p>
+<p><span class="math display">\[
+\begin{aligned}
+(\mcY|\mcB=\mathbf{b})&amp;\sim\mcN(\bbX\bbbeta+\mathbf{Z}\mathbf{b},\sigma^2\bbI)\\
+\mcB&amp;\sim\mcN(\mathbf{0},\bbSigma_\theta) .
+\end{aligned}
+\]</span></p>
+<p>The <span class="math inline">\(q\times q\)</span>, symmetric, variance-covariance matrix, <span class="math inline">\(\mathrm{Var}(\mcB)=\bbSigma_\theta\)</span>, depends on the <em>variance-component parameter vector</em>, <span class="math inline">\(\bbtheta\)</span>, through a lower triangular <em>relative covariance factor</em>, <span class="math inline">\(\Lambda_\theta\)</span> as</p>
+<p><span id="eq-relcovfac"><span class="math display">\[
+\bbSigma_\theta=\sigma^2\bbLambda_\theta\bbLambda_\theta' .
+\tag{A.34}\]</span></span></p>
+<p>(Recall that the lower Cholesky factor is generally written <span class="math inline">\(\mathbf{L}\)</span>. In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, <span class="math inline">\(\Lambda\)</span>.)</p>
+<p>Many computational formulas for linear mixed models are written in terms of the <em>precision matrix</em>, <span class="math inline">\(\bbSigma_\theta^{-1}\)</span>. Such formulas will become unstable as <span class="math inline">\(\bbSigma_\theta\)</span> approaches singularity. And it can do so. It is a fact that singular (i.e.&nbsp;non-invertible) <span class="math inline">\(\bbSigma_\theta\)</span> can and do occur in practice, as we have seen in some of the examples in earlier chapters. Moreover, during the course of the numerical optimization by which the parameter estimates are determined, it is frequently the case that the deviance or the REML criterion will need to be evaluated at values of <span class="math inline">\(\bbtheta\)</span> that produce a singular <span class="math inline">\(\bbSigma_\theta\)</span>. Because of this we will take care to use computational methods that can be applied even when <span class="math inline">\(\bbSigma_\theta\)</span> is singular and are stable as <span class="math inline">\(\bbSigma_\theta\)</span> approaches singularity.</p>
+<p>According to <a href="#eq-relcovfac">Equation&nbsp;<span>A.34</span></a>, <span class="math inline">\(\bbSigma\)</span> depends on both <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\theta\)</span>, and we should write it as <span class="math inline">\(\bbSigma_{\sigma,\theta}\)</span>. However, we will blur that distinction and continue to write <span class="math inline">\(\text{Var}(\mcB)=\bbSigma_\theta\)</span>.</p>
+<p>Another technicality is that the <em>common scale parameter</em>, <span class="math inline">\(\sigma\)</span>, could, in theory, be zero. However, the only way for its estimate, <span class="math inline">\(\widehat{\sigma}\)</span>, to be zero is for the fitted values from the fixed-effects only, <span class="math inline">\(\bbX\widehat{\bbbeta}\)</span>, to be exactly equal to the observed data. This occurs only with data that have been (incorrectly) simulated without error. In practice we can safely assume that <span class="math inline">\(\sigma&gt;0\)</span>. However, <span class="math inline">\(\Lambda_\theta\)</span>, like <span class="math inline">\(\bbSigma_\theta\)</span>, can be singular.</p>
+<p>The computational methods in the <em>MixedModels</em> package are based on <span class="math inline">\(\Lambda_\theta\)</span> and do not require evaluation of <span class="math inline">\(\bbSigma_\theta\)</span>. In fact, <span class="math inline">\(\bbSigma_\theta\)</span> is explicitly evaluated only at the converged parameter estimates.</p>
+<p>The spherical random effects, <span class="math inline">\(\mcU\sim\mcN(\mathbf{0},\sigma^2\bbI_q)\)</span>, determine <span class="math inline">\(\mcB\)</span> as</p>
+<p><span id="eq-sphericalre"><span class="math display">\[
+\mcB=\Lambda_\theta\mcU .
+\tag{A.35}\]</span></span></p>
+<p>Although it may seem more intuitive to write <span class="math inline">\(\mcU\)</span> as a linear transformation of <span class="math inline">\(\mcB\)</span>, we cannot do that when <span class="math inline">\(\Lambda_\theta\)</span> is singular, which is why <a href="#eq-sphericalre">Equation&nbsp;<span>A.35</span></a> is in the form shown.</p>
+<p>We can easily verify that <a href="#eq-sphericalre">Equation&nbsp;<span>A.35</span></a> provides the desired distribution for <span class="math inline">\(\mcB\)</span>. As a linear transformation of a multivariate Gaussian random variable, <span class="math inline">\(\mcB\)</span> will also be multivariate Gaussian with mean</p>
+<p><span class="math display">\[
+𝔼\left[\mcB\right]=
+𝔼\left[\bbLambda_\theta\mcU\right]=
+\bbLambda_\theta\,𝔼\left[\mcU\right]=
+\bbLambda_\theta\mathbf{0}=\mathbf{0}
+\]</span></p>
+<p>and covariance matrix</p>
+<p><span class="math display">\[
+\text{Var}(\mcB)=
+\bbLambda_\theta\text{Var}(\mcU)\bbLambda\theta'=
+\sigma^2\bbLambda_\theta\bbLambda_\theta'=\bbSigma_\theta
+\]</span></p>
+<p>Just as we concentrate on how <span class="math inline">\(\bbtheta\)</span> determines <span class="math inline">\(\Lambda_\theta\)</span>, not <span class="math inline">\(\bbSigma_\theta\)</span>, we will concentrate on properties of <span class="math inline">\(\mcU\)</span> rather than <span class="math inline">\(\mcB\)</span>. In particular, we now define the model according to the distributions</p>
+<p><span id="eq-condygivenu"><span class="math display">\[
+\begin{aligned}
+(\mcY|\mcU=\mathbf{u})&amp;\sim\mcN(\mathbf{Z}\Lambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
+\mcU&amp;\sim\mcN(\mathbf{0},\sigma^2\bbI_q) .
+\end{aligned}
+\tag{A.36}\]</span></span></p>
+<p>The joint density for <span class="math inline">\(\mcY\)</span> and <span class="math inline">\(\mcU\)</span> is the product of densities of the two distributions shown in <a href="#eq-condygivenu">Equation&nbsp;<span>A.36</span></a>. That is</p>
+<p><span id="eq-yujointdensity"><span class="math display">\[
+f_{\mcY,\mcU}(\bby,\mathbf{u})=
+\frac{1}{\left(2\pi\sigma^2\right)^{-(n+q)/2}}\exp
+\left(\frac{\left\|\bby-\bbX\bbbeta
+-\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+
+\left\|\mathbf{u}\right\|^2}{-2\sigma^2}\right) .
+\tag{A.37}\]</span></span></p>
+<p>To evaluate the likelihood for the parameters, <span class="math inline">\(\bbtheta\)</span>, <span class="math inline">\(\bbbeta\)</span>, and <span class="math inline">\(\sigma^2\)</span>, given the observed response, <span class="math inline">\(\bby\)</span>, we must evaluate the marginal distribution of <span class="math inline">\(\mcY\)</span>, which is the integral of <span class="math inline">\(f_{\mcY,\mcU}(\bby,\mathbf{u})\)</span> with respect to <span class="math inline">\(\mathbf{u}\)</span>.</p>
+<p>This is much simpler if we first rewrite the <em>penalized sum of squared residuals</em>, <span class="math inline">\(\left\|\bby-\bbX\bbbeta -\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+ \left\|\mathbf{u}\right\|^2\)</span>, in <a href="#eq-yujointdensity">Equation&nbsp;<span>A.37</span></a>, which is a quadratic form in <span class="math inline">\(\mathbf{u}\)</span>, to isolate the dependence on <span class="math inline">\(\mathbf{u}\)</span></p>
+<p><span id="eq-penalized-rss"><span class="math display">\[
+\begin{aligned}
+r^2_\theta(\mathbf{u},\bbbeta)
+&amp;=
+\|\bby-\bbX\bbbeta-\mathbf{Z}\bbLambda_\theta\mathbf{u}\|^2+\|\mathbf{u}\|^2 \\
+&amp;=
+\left\|
+\begin{bmatrix}
+\mathbf{Z}\bbLambda_\theta &amp; \bbX &amp; \bby \\
+-\bbI_q &amp; \mathbf{0} &amp; \mathbf{0}
+\end{bmatrix}
+\begin{bmatrix}
+-\mathbf{u} \\
+-\bbbeta \\
+1
+\end{bmatrix}
+\right\|^2 \\
+&amp;=
+\begin{bmatrix}
+-\mathbf{u'} &amp;
+-\bbbeta' &amp;
+1
+\end{bmatrix}
+\begin{bmatrix}
+\bbLambda'\mathbf{Z}'\mathbf{Z}\bbLambda+\bbI &amp; \bbLambda'\mathbf{Z}'\bbX &amp; \bbLambda'\mathbf{Z}'\bby \\
+\bbX'\mathbf{Z}\bbLambda &amp; \bbX'\bbX &amp; \bbX'\bby \\
+\bby'\mathbf{Z}\bbLambda &amp; \bby'\bbX &amp; \bby'\bby
+\end{bmatrix}
+\begin{bmatrix}
+-\mathbf{u} \\
+-\bbbeta \\
+1
+\end{bmatrix} \\
+&amp;=
+\begin{bmatrix}
+-\mathbf{u'} &amp;
+-\bbbeta' &amp;
+1
+\end{bmatrix}
+\begin{bmatrix}
+\bbR_{ZZ}' &amp; \mathbf{0} &amp; \mathbf{0} \\
+\bbR_{ZX}' &amp; \bbR_{XX}' &amp; \mathbf{0} \\
+\mathbf{r}_{Zy}' &amp; \mathbf{r}_{Xy}' &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+\bbR_{ZZ} &amp; \bbR_{ZX} &amp; \mathbf{r}_{Zy} \\
+\mathbf{0} &amp; \bbR_{XX} &amp; \mathbf{r}_{Xy} \\
+\mathbf{0} &amp; \mathbf{0} &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+-\mathbf{u} \\
+-\bbbeta \\
+1
+\end{bmatrix}\\
+&amp;= \left\|
+\begin{bmatrix}
+\bbR_{ZZ} &amp; \bbR_{ZX} &amp; \mathbf{r}_{Zy}\\
+\mathbf{0} &amp; \bbR_{XX}' &amp; \mathbf{r}_{Xy}\\
+\mathbf{0} &amp; \mathbf{0} &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+-\mathbf{u} \\
+-\bbbeta \\
+1
+\end{bmatrix}
+\right\|^2\\
+&amp;= \| \mathbf{r}_{Zy}-\bbR_{ZX}\bbbeta-\bbR_{ZZ}\mathbf{u} \|^2 +
+\| \mathbf{r}_{Xy}-\bbR_{XX}\bbbeta\|^2 + r_{yy}^2 ,
+\end{aligned}
+\tag{A.38}\]</span></span></p>
+<p>using the Cholesky factor of the blocked matrix,</p>
+<p><span id="eq-bigCholfac"><span class="math display">\[
+\begin{aligned}
+\bbOmega_\theta&amp;=
+\begin{bmatrix}
+\bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI &amp;
+\bbLambda_\theta'\mathbf{Z'X} &amp; \bbLambda_\theta'\mathbf{Z'y} \\
+\mathbf{X'Z}\bbLambda_\theta &amp; \mathbf{X'X} &amp; \mathbf{X'y} \\
+\mathbf{y'Z}\bbLambda_\theta &amp; \mathbf{y'X} &amp; \mathbf{y'y}
+\end{bmatrix}\\
+&amp; =
+\begin{bmatrix}
+\bbR_{ZZ}' &amp; \mathbf{0} &amp; \mathbf{0} \\
+\bbR_{ZX}' &amp; \bbR'_{XX} &amp; \mathbf{0} \\
+\mathbf{r}_{Zy}' &amp; \mathbf{r}'_{Xy} &amp; r_{yy}
+\end{bmatrix}
+\begin{bmatrix}
+\bbR_{ZZ} &amp; \bbR_{ZX} &amp; \mathbf{r}_{Zy} \\
+\mathbf{0} &amp; \bbR_{XX} &amp; \mathbf{r}_{Xy} \\
+\mathbf{0} &amp; \mathbf{0} &amp; r_{yy}
+\end{bmatrix} .
+\end{aligned}
+\tag{A.39}\]</span></span></p>
+<p>Note that the block in the upper left, <span class="math inline">\(\bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI\)</span>, is positive definite even when <span class="math inline">\(\bbLambda_\theta\)</span> is singular, because</p>
+<p><span id="eq-Cholfacupperleft"><span class="math display">\[
+\mathbf{u}'\left(\bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI\right)\mathbf{u} = \left\|\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2
++\left\|\mathbf{u}\right\|^2
+\tag{A.40}\]</span></span></p>
+<p>and the first term is non-negative while the second is positive if <span class="math inline">\(\mathbf{u}\ne\mathbf{0}\)</span>.</p>
+<p>Thus <span class="math inline">\(\bbR_{ZZ}\)</span>, with positive diagonal elements, can be evaluated and its determinant, <span class="math inline">\(\left|\bbR_{ZZ}\right|\)</span>, is positive. This determinant appears in the marginal density of <span class="math inline">\(\mcY\)</span>, from which the likelihood of the parameters is evaluated.</p>
+<p>To evaluate the likelihood,</p>
+<p><span id="eq-likelihood-abstract"><span class="math display">\[
+L(\bbtheta,\bbbeta,\sigma|\bby) = \int_\mathbf{u} f_{\mcY,\mcU}(\bby,\mathbf{u})\, d\mathbf{u}
+\tag{A.41}\]</span></span></p>
+<p>we isolate the part of the joint density that depends on <span class="math inline">\(\mathbf{u}\)</span> and perform a change of variable</p>
+<p><span id="eq-u-system"><span class="math display">\[
+\mathbf{v}=\bbR_{ZZ}\mathbf{u}+\bbR_{ZX}\bbbeta-\mathbf{r}_{Zy} .
+\tag{A.42}\]</span></span></p>
+<p>From the properties of the multivariate Gaussian distribution</p>
+<p><span id="eq-likelihood-integral"><span class="math display">\[
+\begin{aligned}
+\int_{\mathbf{u}}\frac{1}{(2\pi\sigma^2)^{q/2}}
+\exp\left(-\frac{\|\bbR_{ZZ}\mathbf{u}+\bbR_{ZX}\bbbeta-\mathbf{r}_{Zy}\|^2}{2\sigma^2}\right)
+\,d\mathbf{u}
+&amp;= \int_{\mathbf{v}}\frac{1}{(2\pi\sigma^2)^{q/2}}
+\exp\left(-\frac{\|\mathbf{v}\|^2}{2\sigma^2}\right)|\bbR_{ZZ}|^{-1}\,d\mathbf{v}\\
+&amp;=|\bbR_{ZZ}|^{-1}
+\end{aligned}
+\tag{A.43}\]</span></span></p>
+<p>from which we obtain the likelihood as</p>
+<p><span id="eq-likelihood"><span class="math display">\[
+L(\bbtheta,\bbbeta,\sigma;\bby)=
+\frac{|\bbR_{ZZ}|^{-1}}{(2\pi\sigma^2)^{n/2}}
+\exp\left(-\frac{r_{yy}^2 + \|\bbR_{XX}(\bbbeta-\widehat{\bbbeta})\|^2}{2\sigma^2}\right) ,
+\tag{A.44}\]</span></span></p>
+<p>where the conditional estimate, <span class="math inline">\(\widehat{\bbbeta}\)</span>, given <span class="math inline">\(\bbtheta\)</span>, satisfies</p>
+<p><span class="math display">\[
+\bbR_{XX}\widehat{\bbbeta} = \mathbf{r}_{Xy} .
+\]</span></p>
+<p>Setting <span class="math inline">\(\bbbeta=\widehat{\bbbeta}\)</span> and taking the logarithm provides the estimate of <span class="math inline">\(\sigma^2\)</span>, given <span class="math inline">\(\bbtheta\)</span>, as</p>
+<p><span id="eq-sigma-hat"><span class="math display">\[
+\widehat{\sigma^2}=\frac{r_\mathbf{yy}^2}{n}
+\tag{A.45}\]</span></span></p>
+<p>which gives the <em>profiled log-likelihood</em>, <span class="math inline">\(\ell(\bbtheta|\bby)=\log L(\bbtheta,\widehat{\bbbeta},\widehat{\sigma})\)</span>, on the deviance scale, as</p>
+<p><span id="eq-profiled-log-likelihood"><span class="math display">\[
+-2\ell(\bbtheta|\bby)=2\log(|\bbR_{ZZ}|) +
+n\left(1+\log\left(\frac{2\pi r_{yy}^2(\bbtheta)}{n}\right)\right)
+\tag{A.46}\]</span></span></p>
+<p>One of the interesting aspects of this formulation is that it is not necessary to solve for the conditional estimate of <span class="math inline">\(\bbbeta\)</span> or the conditional modes of the random effects when evaluating the log-likelihood. The two values needed for the log-likelihood evaluation, <span class="math inline">\(2\log(|\bbR_{ZZ}|)\)</span> and <span class="math inline">\(r_\mathbf{yy}^2\)</span>, are obtained directly from the diagonal elements of the Cholesky factor.</p>
+<p>Furthermore, <span class="math inline">\(\bbOmega_{\theta}\)</span> and, from that, the Cholesky factor, <span class="math inline">\(\bbR_{\theta}\)</span>, and the objective to be optimized can be evaluated for a given value of <span class="math inline">\(\bbtheta\)</span> from</p>
+<p><span id="eq-A"><span class="math display">\[
+\mathbf{A} = \begin{bmatrix}
+\mathbf{Z}^\prime\mathbf{Z} &amp; \mathbf{Z}^\prime\bbX &amp; \mathbf{Z}^\prime\bby \\
+\bbX^\prime\mathbf{Z} &amp; \bbX^\prime\bbX &amp; \bbX^\prime\bby \\
+\bby^\prime\mathbf{Z} &amp; \bby^\prime\bbX &amp; \bby^\prime\bby
+\end{bmatrix}
+\tag{A.47}\]</span></span></p>
+<p>and <span class="math inline">\(\bbLambda_{\theta}\)</span>.</p>
+<p>In the <code>MixedModels</code> package the <code>LinearMixedModel</code> struct contains a symmetric blocked array in the <code>A</code> field and a similarly structured lower-triangular blocked array in the <code>L</code> field. Evaluation of the objective simply involves updating the template matrices, <span class="math inline">\(\lambda_i, i=1,\dots,k\)</span> in the <code>ReMat</code> structures then updating <code>L</code> from <code>A</code> and the <span class="math inline">\(\lambda_i\)</span>.</p>
+</section>
+<section id="sec-REML" class="level2" data-number="A.8">
+<h2 data-number="A.8" class="anchored" data-anchor-id="sec-REML"><span class="header-section-number">A.8</span> The REML criterion</h2>
+<p>The so-called REML estimates of variance components are often preferred to the maximum likelihood estimates. (“REML” can be considered to be an acronym for “restricted” or “residual” maximum likelihood, although neither term is completely accurate because these estimates do not maximize a likelihood.) We can motivate the use of the REML criterion by considering a linear regression model,</p>
+<p><span id="eq-20"><span class="math display">\[
+\mcY\sim\mcN(\bbX\bbbeta,\sigma^2\bbI_n),
+\tag{A.48}\]</span></span></p>
+<p>in which we typically estimate <span class="math inline">\(\sigma^2\)</span> as</p>
+<p><span id="eq-21"><span class="math display">\[
+\widehat{\sigma^2_R}=\frac{\|\bby-\bbX\widehat{\bbbeta}\|^2}{n-p}
+\tag{A.49}\]</span></span></p>
+<p>even though the maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is</p>
+<p><span id="eq-22"><span class="math display">\[
+\widehat{\sigma^2_{L}}=\frac{\|\bby-\vec
+X\widehat{\bbbeta}\|^2}{n} .
+\tag{A.50}\]</span></span></p>
+<p>The argument for preferring <span class="math inline">\(\widehat{\sigma^2_R}\)</span> to <span class="math inline">\(\widehat{\sigma^2_{L}}\)</span> as an estimate of <span class="math inline">\(\sigma^2\)</span> is that the numerator in both estimates is the sum of squared residuals at <span class="math inline">\(\widehat{\bbbeta}\)</span> and, although the residual vector, <span class="math inline">\(\bby-\bbX\widehat{\bbbeta}\)</span>, is an <span class="math inline">\(n\)</span>-dimensional vector, it satisfies <span class="math inline">\(p\)</span> linearly independent constraints, <span class="math inline">\(\bbX'(\bby-\bbX\widehat{\bbbeta})=\mathbf{0}\)</span>. That is, the residual at <span class="math inline">\(\widehat{\bbbeta}\)</span> is the projection of the observed response vector, <span class="math inline">\(\bby\)</span>, into an <span class="math inline">\((n-p)\)</span>-dimensional linear subspace of the <span class="math inline">\(n\)</span>-dimensional response space. The estimate <span class="math inline">\(\widehat{\sigma^2_R}\)</span> takes into account the fact that <span class="math inline">\(\sigma^2\)</span> is estimated from residuals that have only <span class="math inline">\(n-p\)</span> <em>degrees of freedom</em>.</p>
+<p>Another argument often put forward for REML estimation is that <span class="math inline">\(\widehat{\sigma^2_R}\)</span> is an <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span>, in the sense that the expected value of the estimator is equal to the value of the parameter. However, determining the expected value of an estimator involves integrating with respect to the density of the estimator and we have seen that densities of estimators of variances will be skewed, often highly skewed. It is not clear why we should be interested in the expected value of a highly skewed estimator. If we were to transform to a more symmetric scale, such as the estimator of the standard deviation or the estimator of the logarithm of the standard deviation, the REML estimator would no longer be unbiased. Furthermore, this property of unbiasedness of variance estimators does not generalize from the linear regression model to linear mixed models. This is all to say that the distinction between REML and ML estimates of variances and variance components is probably less important than many people believe.</p>
+<p>Nevertheless it is worthwhile seeing how the computational techniques described in this chapter apply to the REML criterion because the REML parameter estimates <span class="math inline">\(\widehat{\bbtheta}_R\)</span> and <span class="math inline">\(\widehat{\sigma_R^2}\)</span> for a linear mixed model have the property that they would specialize to <span class="math inline">\(\widehat{\sigma^2_R}\)</span> from <a href="#eq-21">Equation&nbsp;<span>A.49</span></a> for a linear regression model, as seen in <a href="intro.html#sec-dyestuff2lmm"><span>Section&nbsp;1.3.3</span></a>.</p>
+<p>Although not usually derived in this way, the REML criterion (on the deviance scale) can be expressed as</p>
+<p><span id="eq-23"><span class="math display">\[
+d_R(\bbtheta,\sigma|\bby)=-2\log
+\int_{\mathbb{R}^p}L(\bbtheta,\bbbeta,\sigma|\bby)\,d\bbbeta .
+\tag{A.51}\]</span></span></p>
+<p>The REML estimates <span class="math inline">\(\widehat{\bbtheta}_R\)</span> and <span class="math inline">\(\widehat{\sigma_R^2}\)</span> minimize <span class="math inline">\(d_R(\bbtheta,\sigma|\bby)\)</span>.</p>
+<p>To evaluate this integral we form an expansion, similar to <a href="#eq-likelihood">Equation&nbsp;<span>A.44</span></a>, of <span class="math inline">\(r^2_{\theta,\beta}\)</span> about <span class="math inline">\(\widehat{\bbbeta}_\theta\)</span></p>
+<p><span id="eq-rsqbetathetaexp"><span class="math display">\[
+r^2_{\theta,\beta}=r^2_\theta+\|\bbR_{XX}(\bbbeta-\widehat{\bbbeta}_\theta)\|^2 .
+\tag{A.52}\]</span></span></p>
+<p>from which we can derive</p>
+<p><span id="eq-betaintegral"><span class="math display">\[
+\int_{\mathbb{R}^p}\frac{\exp\left(-\frac{r^2_{\theta,\beta}}{2\sigma^2}\right)}
+{(2\pi\sigma^2)^{n/2}|\bbR_{ZZ}|} \,d\bbbeta=
+\frac{\exp\left(-\frac{r^2_\theta}{2\sigma^2}\right)}
+{(2\pi\sigma^2)^{(n-p)/2}|\bbR_{ZZ}||\bbR_X|}
+\tag{A.53}\]</span></span></p>
+<p>corresponding to a REML criterion on the deviance scale of</p>
+<p><span id="eq-remldev"><span class="math display">\[
+d_R(\bbtheta,\sigma|\bby)=(n-p)\log(2\pi\sigma^2)+
+2\log\left(|\bbR_{ZZ}||\bbR_X|\right)+\frac{r^2_\theta}{\sigma^2} .
+\tag{A.54}\]</span></span></p>
+<p>Plugging in the conditional REML estimate, <span class="math inline">\(\widehat{\sigma^2}_R=r^2_\theta/(n-p)\)</span>, provides the profiled REML criterion</p>
+<p><span id="eq-24"><span class="math display">\[
+\tilde{d}_R(\bbtheta|\bby)=
+2\log\left(|\bbR_{ZZ}||\bbR_X|\right)+(n-p)
+\left[1+\log\left(\frac{2\pi r^2_\theta}{n-p}\right)\right].
+\tag{A.55}\]</span></span></p>
+<p>The REML estimate of <span class="math inline">\(\bbtheta\)</span> is</p>
+<p><span id="eq-31"><span class="math display">\[
+\widehat{\bbtheta}_R=\arg\min_{\bbtheta}\tilde{d}_R(\bbtheta|\bby) ,
+\tag{A.56}\]</span></span></p>
+<p>and the REML estimate of <span class="math inline">\(\sigma^2\)</span> is the conditional REML estimate of <span class="math inline">\(\sigma^2\)</span> at <span class="math inline">\(\widehat{\bbtheta}_R\)</span>,</p>
+<p><span id="eq-remlsigmasq"><span class="math display">\[
+\widehat{\sigma^2_R}=r^2_{\widehat\theta_R}/(n-p) .
+\tag{A.57}\]</span></span></p>
+<p>It is not entirely clear how one would define a “REML estimate” of <span class="math inline">\(\bbbeta\)</span> because the REML criterion, <span class="math inline">\(d_R(\bbtheta,\sigma|\bby)\)</span>, defined in <a href="#eq-remldev">Equation&nbsp;<span>A.54</span></a>, does not depend on <span class="math inline">\(\bbbeta\)</span>. However, it is customary (and not unreasonable) to use <span class="math inline">\(\widehat{\bbbeta}_R=\widehat{\bbbeta}_{\widehat{\bbtheta}_R}\)</span> as the REML estimate of <span class="math inline">\(\bbbeta\)</span>.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="ref-bates.maechler.etal:2015" class="csl-entry" role="doc-biblioentry">
+Bates, Douglas, Martin Maechler, Benjamin M. Bolker, and Steven Walker. 2015. <span>“Fitting Linear Mixed-Effects Models Using Lme4.”</span> <em>Journal of Statistical Software</em> 67 (1): 1–48. <a href="https://doi.org/10.18637/jss.v067.i01">https://doi.org/10.18637/jss.v067.i01</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./references.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">References</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
