@@ -21,6 +21,7 @@ book:
 execute-dir: project
 
 bibliography: references.bib
+csl: apa-annotated-bibliography.csl
 
 format:
   html:

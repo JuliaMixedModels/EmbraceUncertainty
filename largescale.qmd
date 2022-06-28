@@ -177,10 +177,11 @@ draw(
 Over 95% of the words are between 4 and 13 characters in length
 
 ```{julia}
-count(x -> 4 ≤ x ≤ 13, byitem.wrdlen)/nrow(byitem)
+count(x -> 4 ≤ x ≤ 13, byitem.wrdlen) / nrow(byitem)
 ```
 
 If we restrict the smoother curves to this range, as in @fig-ldtaccsmoothrestrict,
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Smoothed curves of accuracy versus word length in the range 4 to 13 characters in the lexical decision task."
@@ -196,6 +197,7 @@ draw(
   figure=(; resolution=(800, 450)),
 )
 ```
+
 the differences are less dramatic.
 
 ### Summaries by subject {#sec-elpsumrysubj}
@@ -323,7 +325,8 @@ draw(
 However, only about one half of one percent of the correct responses have latencies in the range of 200 ms. to 333 ms.
 
 ```{julia}
-nrow(@subset(ldttrial, !ismissing(:acc), 200 < :rt < 333)) / sum(!ismissing, ldttrial.acc)
+count(r -> !ismissing(r.acc) && 200 < r.rt < 333, eachrow(ldttrial)) /
+count(!ismissing, ldttrial.acc)
 ```
 
 so the exact position of the lower cut-off point on the response latencies is unlikely to be very important.
@@ -420,19 +423,17 @@ print(elm02)
 ```
 
 To compare the conditional means of the random effects for item in these two models we incorporate them into the `byitem` table.
+
 ```{julia}
-leftjoin!(
+disallowmissing!(leftjoin!(
   leftjoin!(
     byitem,
-    rename!(
-      DataFrame(raneftables(elm01).item),
-      ["item", "elm01"],
-    );
+    rename!(DataFrame(raneftables(elm01).item), ["item", "elm01"]);
     on=:item,
   ),
   rename!(DataFrame(raneftables(elm02).item), ["item", "elm02"]);
   on=:item,
-) |> disallowmissing!
+))
 ```
 
 ```{julia}
@@ -441,11 +442,10 @@ leftjoin!(
 #| label: fig-itemreelm01vselm02
 CairoMakie.activate!(; type="png")
 draw(
-  data(byitem) *
-  mapping(
+  data(byitem) * mapping(
     :elm01 => "Conditional means of item random effects for model elm01",
     :elm02 => "Conditional means of item random effects for model elm02";
-    color=:isword
+    color=:isword,
   );
   axis=(; width=600, height=600),
 )

@@ -289,7 +289,7 @@ div.csl-indent {
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <p>As with many techniques in data science, the place where “the rubber meets the road”, as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.</p>
-<p>One such study is the English Lexicon Project <span class="citation" data-cites="Balota_2007">(<a href="references.html#ref-Balota_2007" role="doc-biblioref">Balota et al. 2007</a>)</span> — a multicenter study incorporating both a lexical decision task and a word recognition task. Different groups of subjects participated in the different tasks.</p>
+<p>One such study is the English Lexicon Project <span class="citation" data-cites="Balota_2007">(<a href="references.html#ref-Balota_2007" role="doc-biblioref">Balota et al., 2007</a>)</span> — a multicenter study incorporating both a lexical decision task and a word recognition task. Different groups of subjects participated in the different tasks.</p>
 <p>Compared to our previous examples, these are large data sets. Data manipulation and model fitting in cases like these requires considerable care.</p>
 <section id="trial-level-data-from-the-ldt" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="trial-level-data-from-the-ldt"><span class="header-section-number">4.1</span> Trial-level data from the LDT</h2>
@@ -457,7 +457,7 @@ Note
 </div>
 <p><a href="#fig-ldtaccsmooth">Figure&nbsp;<span>4.2</span></a> may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few. Over 95% of the words are between 4 and 13 characters in length</p>
 <div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(x <span class="op">-&gt;</span> <span class="fl">4</span> <span class="op">≤</span> x <span class="op">≤</span> <span class="fl">13</span>, byitem.wrdlen)<span class="op">/</span><span class="fu">nrow</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(x <span class="op">-&gt;</span> <span class="fl">4</span> <span class="op">≤</span> x <span class="op">≤</span> <span class="fl">13</span>, byitem.wrdlen) <span class="op">/</span> <span class="fu">nrow</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>0.9654899829549666</code></pre>
 </div>
@@ -627,13 +627,14 @@ Note
 </div>
 <p><a href="#fig-elpldtrtdens">Figure&nbsp;<span>4.5</span></a> and <a href="#fig-elpldtspeeddens">Figure&nbsp;<span>4.6</span></a> indicate that it may be more reasonable to establish a lower bound of 1/3 second (333 ms) on the response latency, corresponding to an upper bound of 3 per second on the response speed. However, only about one half of one percent of the correct responses have latencies in the range of 200 ms. to 333 ms.</p>
 <div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="pp">@subset</span>(ldttrial, !<span class="fu">ismissing</span>(<span class="op">:</span>acc), <span class="fl">200</span> <span class="op">&lt;</span> <span class="op">:</span>rt <span class="op">&lt;</span> <span class="fl">333</span>)) <span class="op">/</span> <span class="fu">sum</span>(!ismissing, ldttrial.acc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(r <span class="op">-&gt;</span> !<span class="fu">ismissing</span>(r.acc) <span class="op">&amp;&amp;</span> <span class="fl">200</span> <span class="op">&lt;</span> r.rt <span class="op">&lt;</span> <span class="fl">333</span>, <span class="fu">eachrow</span>(ldttrial)) <span class="op">/</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(!ismissing, ldttrial.acc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="24">
 <pre><code>0.005867195806137328</code></pre>
 </div>
 </div>
 <p>so the exact position of the lower cut-off point on the response latencies is unlikely to be very important.</p>
-<p>As noted in <span class="citation" data-cites="Box1964">Box and Cox (<a href="references.html#ref-Box1964" role="doc-biblioref">1964</a>)</span>, a transformation of the response that produces a more Gaussian distribution often will also produce a simpler model structure. For example, <a href="#fig-ldtrtvswrdlen">Figure&nbsp;<span>4.7</span></a> shows the smoothed relationship between word length and response time for words and non-words separately,</p>
+<p>As noted in <span class="citation" data-cites="Box1964">Box &amp; Cox (<a href="references.html#ref-Box1964" role="doc-biblioref">1964</a>)</span>, a transformation of the response that produces a more Gaussian distribution often will also produce a simpler model structure. For example, <a href="#fig-ldtrtvswrdlen">Figure&nbsp;<span>4.7</span></a> shows the smoothed relationship between word length and response time for words and non-words separately,</p>
 <div class="cell" data-execution_count="24">
 <details>
 <summary>Code</summary>
@@ -707,7 +708,7 @@ Note
 <span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(elm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 54    Time: 0:00:08 ( 0.16  s/it)</code></pre>
+<pre><code>Minimizing 54    Time: 0:00:06 ( 0.12  s/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
@@ -757,7 +758,7 @@ isword: true &amp; wrdlen(centered: 8)  -0.0111571  0.000387059   -28.83    &lt;
 <span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(elm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 54    Time: 0:00:07 ( 0.14  s/it)</code></pre>
+<pre><code>Minimizing 54    Time: 0:00:03 (71.30 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
@@ -785,18 +786,15 @@ isword: true &amp; wrdlen(centered: 8)  -0.011465   0.000399083   -28.73    &lt;
 </div>
 <p>To compare the conditional means of the random effects for item in these two models we incorporate them into the <code>byitem</code> table.</p>
 <div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">leftjoin!</span>(</span>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">disallowmissing!</span>(<span class="fu">leftjoin!</span>(</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leftjoin!</span>(</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    byitem,</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename!</span>(</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">DataFrame</span>(<span class="fu">raneftables</span>(elm01).item),</span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>      [<span class="st">"item"</span>, <span class="st">"elm01"</span>],</span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    );</span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    on<span class="op">=:</span>item,</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename!</span>(<span class="fu">DataFrame</span>(<span class="fu">raneftables</span>(elm02).item), [<span class="st">"item"</span>, <span class="st">"elm02"</span>]);</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>  on<span class="op">=:</span>item,</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>) <span class="op">|&gt;</span> disallowmissing!</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename!</span>(<span class="fu">DataFrame</span>(<span class="fu">raneftables</span>(elm01).item), [<span class="st">"item"</span>, <span class="st">"elm01"</span>]);</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    on<span class="op">=:</span>item,</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename!</span>(<span class="fu">DataFrame</span>(<span class="fu">raneftables</span>(elm02).item), [<span class="st">"item"</span>, <span class="st">"elm02"</span>]);</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  on<span class="op">=:</span>item,</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="30">
 
 <div class="data-frame"><p>80,962 rows × 10 columns (omitted printing of 1 columns)</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>item</th><th>ni</th><th>imiss</th><th>iacc</th><th>imedianrt</th><th>wrdlen</th><th>ipropacc</th><th>isword</th><th>elm01</th></tr><tr><th></th><th title="String">String</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Bool">Bool</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>a</td><td>35</td><td>0</td><td>26</td><td>743.0</td><td>1</td><td>0.742857</td><td>1</td><td>-0.330457</td></tr><tr><th>2</th><td>e</td><td>35</td><td>0</td><td>19</td><td>824.0</td><td>1</td><td>0.542857</td><td>0</td><td>-0.2621</td></tr><tr><th>3</th><td>aah</td><td>34</td><td>0</td><td>21</td><td>770.5</td><td>3</td><td>0.617647</td><td>1</td><td>-0.247168</td></tr><tr><th>4</th><td>aal</td><td>34</td><td>0</td><td>32</td><td>702.5</td><td>3</td><td>0.941176</td><td>0</td><td>-0.0697739</td></tr><tr><th>5</th><td>Aaron</td><td>33</td><td>0</td><td>31</td><td>625.0</td><td>5</td><td>0.939394</td><td>1</td><td>-0.0752139</td></tr><tr><th>6</th><td>Aarod</td><td>33</td><td>0</td><td>23</td><td>810.0</td><td>5</td><td>0.69697</td><td>0</td><td>-0.125307</td></tr><tr><th>7</th><td>aback</td><td>34</td><td>0</td><td>15</td><td>710.0</td><td>5</td><td>0.441176</td><td>1</td><td>-0.1327</td></tr><tr><th>8</th><td>ahack</td><td>34</td><td>0</td><td>34</td><td>662.0</td><td>5</td><td>1.0</td><td>0</td><td>0.030271</td></tr><tr><th>9</th><td>abacus</td><td>34</td><td>0</td><td>17</td><td>671.5</td><td>6</td><td>0.5</td><td>1</td><td>-0.178605</td></tr><tr><th>10</th><td>alacus</td><td>34</td><td>0</td><td>29</td><td>640.0</td><td>6</td><td>0.852941</td><td>0</td><td>0.0086832</td></tr><tr><th>11</th><td>abandon</td><td>34</td><td>0</td><td>32</td><td>641.0</td><td>7</td><td>0.941176</td><td>1</td><td>0.0532322</td></tr><tr><th>12</th><td>acandon</td><td>34</td><td>0</td><td>33</td><td>725.5</td><td>7</td><td>0.970588</td><td>0</td><td>0.000197911</td></tr><tr><th>13</th><td>abandoned</td><td>34</td><td>0</td><td>31</td><td>667.5</td><td>9</td><td>0.911765</td><td>1</td><td>0.103862</td></tr><tr><th>14</th><td>adandoned</td><td>34</td><td>0</td><td>11</td><td>760.5</td><td>9</td><td>0.323529</td><td>0</td><td>0.0509863</td></tr><tr><th>15</th><td>abandoning</td><td>34</td><td>0</td><td>34</td><td>662.0</td><td>10</td><td>1.0</td><td>1</td><td>0.0999348</td></tr><tr><th>16</th><td>abantoning</td><td>34</td><td>0</td><td>30</td><td>848.5</td><td>10</td><td>0.882353</td><td>0</td><td>-0.00836868</td></tr><tr><th>17</th><td>abandonment</td><td>35</td><td>0</td><td>35</td><td>734.0</td><td>11</td><td>1.0</td><td>1</td><td>0.0706563</td></tr><tr><th>18</th><td>apandonment</td><td>35</td><td>0</td><td>30</td><td>817.0</td><td>11</td><td>0.857143</td><td>0</td><td>-0.016124</td></tr><tr><th>19</th><td>abase</td><td>34</td><td>1</td><td>23</td><td>750.5</td><td>5</td><td>0.676471</td><td>1</td><td>-0.202465</td></tr><tr><th>20</th><td>abose</td><td>34</td><td>0</td><td>23</td><td>805.5</td><td>5</td><td>0.676471</td><td>0</td><td>-0.053109</td></tr><tr><th>21</th><td>abasement</td><td>33</td><td>0</td><td>17</td><td>850.0</td><td>9</td><td>0.515152</td><td>1</td><td>-0.117373</td></tr><tr><th>22</th><td>afasement</td><td>33</td><td>0</td><td>30</td><td>649.0</td><td>9</td><td>0.909091</td><td>0</td><td>0.173626</td></tr><tr><th>23</th><td>abash</td><td>32</td><td>0</td><td>22</td><td>727.5</td><td>5</td><td>0.6875</td><td>1</td><td>-0.194658</td></tr><tr><th>24</th><td>adash</td><td>32</td><td>0</td><td>25</td><td>784.5</td><td>5</td><td>0.78125</td><td>0</td><td>-0.152705</td></tr><tr><th>25</th><td>abate</td><td>34</td><td>0</td><td>24</td><td>687.0</td><td>5</td><td>0.705882</td><td>1</td><td>-0.0895937</td></tr><tr><th>26</th><td>abape</td><td>34</td><td>0</td><td>32</td><td>675.0</td><td>5</td><td>0.941176</td><td>0</td><td>0.0811883</td></tr><tr><th>27</th><td>abated</td><td>34</td><td>0</td><td>23</td><td>775.0</td><td>6</td><td>0.676471</td><td>1</td><td>-0.171966</td></tr><tr><th>28</th><td>agated</td><td>34</td><td>0</td><td>14</td><td>897.5</td><td>6</td><td>0.411765</td><td>0</td><td>-0.157197</td></tr><tr><th>29</th><td>abbess</td><td>34</td><td>0</td><td>7</td><td>837.5</td><td>6</td><td>0.205882</td><td>1</td><td>-0.222551</td></tr><tr><th>30</th><td>abbass</td><td>34</td><td>0</td><td>28</td><td>788.0</td><td>6</td><td>0.823529</td><td>0</td><td>-0.0246175</td></tr><tr><th>⋮</th><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr></tbody></table></div>
@@ -807,14 +805,13 @@ isword: true &amp; wrdlen(centered: 8)  -0.011465   0.000399083   -28.73    &lt;
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"png"</span>)</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(byitem) <span class="op">*</span></span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>elm01 <span class="op">=&gt;</span> <span class="st">"Conditional means of item random effects for model elm01"</span>,</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>elm02 <span class="op">=&gt;</span> <span class="st">"Conditional means of item random effects for model elm02"</span>;</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>isword</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  );</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  axis<span class="op">=</span>(; width<span class="op">=</span><span class="fl">600</span>, height<span class="op">=</span><span class="fl">600</span>),</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(byitem) <span class="op">*</span> <span class="fu">mapping</span>(</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>elm01 <span class="op">=&gt;</span> <span class="st">"Conditional means of item random effects for model elm01"</span>,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>elm02 <span class="op">=&gt;</span> <span class="st">"Conditional means of item random effects for model elm02"</span>;</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>isword,</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  );</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  axis<span class="op">=</span>(; width<span class="op">=</span><span class="fl">600</span>, height<span class="op">=</span><span class="fl">600</span>),</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <div id="fig-itemreelm01vselm02" class="quarto-figure quarto-figure-center anchored">
@@ -966,12 +963,12 @@ Note
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="doc-bibliography" style="display: none">
 <div id="ref-Balota_2007" class="csl-entry" role="doc-biblioentry">
-Balota, David A., Melvin J. Yap, Keith A. Hutchison, Michael J. Cortese, Brett Kessler, Bjorn Loftis, James H. Neely, Douglas L. Nelson, Greg B. Simpson, and Rebecca Treiman. 2007. <span>“The English Lexicon Project.”</span> <em>Behavior Research Methods</em> 39 (3): 445–59. <a href="https://doi.org/10.3758/bf03193014">https://doi.org/10.3758/bf03193014</a>.
+Balota, D. A., Yap, M. J., Hutchison, K. A., Cortese, M. J., Kessler, B., Loftis, B., Neely, J. H., Nelson, D. L., Simpson, G. B., &amp; Treiman, R. (2007). The english lexicon project. <em>Behavior Research Methods</em>, <em>39</em>(3), 445–459. <a href="https://doi.org/10.3758/bf03193014">https://doi.org/10.3758/bf03193014</a>
 </div>
 <div id="ref-Box1964" class="csl-entry" role="doc-biblioentry">
-Box, G. E. P., and D. R. Cox. 1964. <span>“An Analysis of Transformations.”</span> <em>Journal of the Royal Statistical Society: Series B (Methodological)</em> 26 (2): 211–43. <a href="https://doi.org/10.1111/j.2517-6161.1964.tb00553.x">https://doi.org/10.1111/j.2517-6161.1964.tb00553.x</a>.
+Box, G. E. P., &amp; Cox, D. R. (1964). An analysis of transformations. <em>Journal of the Royal Statistical Society: Series B (Methodological)</em>, <em>26</em>(2), 211–243. <a href="https://doi.org/10.1111/j.2517-6161.1964.tb00553.x">https://doi.org/10.1111/j.2517-6161.1964.tb00553.x</a>
 </div>
 </div>
 </section>

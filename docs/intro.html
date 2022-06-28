@@ -314,10 +314,10 @@ div.csl-indent {
 </section>
 <section id="sec-DyestuffData" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="sec-DyestuffData"><span class="header-section-number">1.2</span> The dyestuff and dyestuff2 data</h2>
-<p>Models with random effects have been in use for a long time. The first edition of the classic book, <em>Statistical Methods in Research and Production</em>, edited by O.L. Davies, was published in 1947 and contained examples of the use of random effects to characterize batch-to-batch variability in chemical processes. The data from one of these examples are available as the <code>dyestuff</code> data in the <code>MixedModels</code> package. In this section we describe and plot these data and introduce a second example, the <code>dyestuff2</code> data, described in <span class="citation" data-cites="box73:_bayes_infer_statis_analy">Box and Tiao (<a href="references.html#ref-box73:_bayes_infer_statis_analy" role="doc-biblioref">1973</a>)</span>.</p>
+<p>Models with random effects have been in use for a long time. The first edition of the classic book, <em>Statistical Methods in Research and Production</em>, edited by O.L. Davies, was published in 1947 and contained examples of the use of random effects to characterize batch-to-batch variability in chemical processes. The data from one of these examples are available as the <code>dyestuff</code> data in the <code>MixedModels</code> package. In this section we describe and plot these data and introduce a second example, the <code>dyestuff2</code> data, described in <span class="citation" data-cites="box73:_bayes_infer_statis_analy">Box &amp; Tiao (<a href="references.html#ref-box73:_bayes_infer_statis_analy" role="doc-biblioref">1973</a>)</span>.</p>
 <section id="sec-dyestuff" class="level3" data-number="1.2.1">
 <h3 data-number="1.2.1" class="anchored" data-anchor-id="sec-dyestuff"><span class="header-section-number">1.2.1</span> The dyestuff data</h3>
-<p>The data are described in <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies and Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>, Table&nbsp;6.3, p.&nbsp;131)</span>, the fourth edition of the book mentioned above, as coming from</p>
+<p>The data are described in <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies &amp; Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>, Table&nbsp;6.3, p.&nbsp;131)</span>, the fourth edition of the book mentioned above, as coming from</p>
 <blockquote class="blockquote">
 <p>an investigation to find out how much the variation from batch to batch in the quality of an intermediate product (H-acid) contributes to the variation in the yield of the dyestuff (Naphthalene Black 12B) made from it. In the experiment six samples of the intermediate, representing different batches of works manufacture, were obtained, and five preparations of the dyestuff were made in the laboratory from each sample. The equivalent yield of each preparation as grams of standard colour was determined by dye-trial.</p>
 </blockquote>
@@ -340,7 +340,8 @@ div.csl-indent {
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span>: AlgebraOfGraphics as AoG <span class="co"># for easy access to some non exported methods</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>);</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>A package must be attached before any of the data sets or functions in the package can be used. If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s). If you are using Julia version 1.8.0 or later the error report will include instructions on how to do this.</p>
 <p>In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.</p>
 <p>The <code>MixedModels</code> package includes several datasets that are used in examples and in tests of the package. Individual datasets can be loaded with the <code>dataset</code> function. To allow for other packages to incorporate their own <code>dataset</code> function without causing name clashes, this function is not exported and must be called with the fully-qualified name <code>MixedModels.dataset</code>. (If this explanation sounds like gibberish to you, the bottom line is that you must use <code>MixedModels.dataset(:dyestuff)</code> and not just <code>dataset(:dyestuff)</code>.)</p>
@@ -477,7 +478,7 @@ Note
 </div>
 <p>than we do from numerical summaries.</p>
 <p>In <a href="#fig-dyestuffdata">Figure&nbsp;<span>1.1</span></a> we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability. For example, four of the five preparations from batch F provided lower yields than did any of the preparations from batches B, C, and E.</p>
-<p>This plot, and essentially all the other plots in this book, were created using the <a href="https://makie.juliaplots.io">Makie</a> package (<span class="citation" data-cites="DanischKrumbiegel2021">Danisch and Krumbiegel (<a href="references.html#ref-DanischKrumbiegel2021" role="doc-biblioref">2021</a>)</span>).</p>
+<p>This plot, and essentially all the other plots in this book, were created using the <a href="https://makie.juliaplots.io">Makie</a> package (<span class="citation" data-cites="DanischKrumbiegel2021">Danisch &amp; Krumbiegel (<a href="references.html#ref-DanischKrumbiegel2021" role="doc-biblioref">2021</a>)</span>).</p>
 <p>In <code>yet-to-be-written-appendix</code> we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot. For example, in this plot the levels of <code>batch</code> are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are <em>jittered</em> to avoid overplotting of points. (Note that the two lowest yields of samples from batch <code>A</code> are identical.)</p>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -497,7 +498,7 @@ Note
 </section>
 <section id="sec-dyestuff2" class="level3" data-number="1.2.2">
 <h3 data-number="1.2.2" class="anchored" data-anchor-id="sec-dyestuff2"><span class="header-section-number">1.2.2</span> The dyestuff2 data</h3>
-<p>The data are simulated data presented in <span class="citation" data-cites="box73:_bayes_infer_statis_analy">Box and Tiao (<a href="references.html#ref-box73:_bayes_infer_statis_analy" role="doc-biblioref">1973</a>, Table 5.1.4, p.&nbsp;247)</span> where the authors state</p>
+<p>The data are simulated data presented in <span class="citation" data-cites="box73:_bayes_infer_statis_analy">Box &amp; Tiao (<a href="references.html#ref-box73:_bayes_infer_statis_analy" role="doc-biblioref">1973</a>, Table 5.1.4, p.&nbsp;247)</span> where the authors state</p>
 <blockquote class="blockquote">
 <p>These data had to be constructed for although examples of this sort undoubtedly occur in practice they seem to be rarely published.</p>
 </blockquote>
@@ -560,7 +561,7 @@ Note
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dyestuff)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 19    Time: 0:00:01 (90.46 ms/it)</code></pre>
+<pre><code>Minimizing 19    Time: 0:00:00 (19.33 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <table class="table table-sm table-striped">
@@ -634,7 +635,7 @@ Residual              2451.2501 49.5101
 </ol>
 <p>We consider each of these sections in turn.</p>
 <p>The description section states that this is a linear mixed model in which the parameters have been estimate by maximum likelihood (ML). The model formula is displayed for later reference.</p>
-<p>The display of a model fit by maximum likelihood provides several model-fit statistics such as Akaike’s Information Criterion <span class="citation" data-cites="saka:ishi:kita:1986">(<a href="references.html#ref-saka:ishi:kita:1986" role="doc-biblioref">Sakamoto, Ishiguro, and Kitagawa 1986</a>)</span>, Schwarz’s Bayesian Information Criterion <span class="citation" data-cites="schw:1978">(<a href="references.html#ref-schw:1978" role="doc-biblioref">Schwarz 1978</a>)</span>, the log-likelihood at the parameter estimates, and negative twice the log-likelihood, which is the estimation criterion transformed to the scale of the <em>deviance</em>. For linear mixed models we refer to <code>-2 loglik</code> as the value of the <em>objective</em> because this is the value that is minimized during the optimization phase of fitting the model. To evaluate the <em>deviance</em> we should subtract the value of this criterion at a <em>saturated</em> or baseline model but it is not clear how to define such a baseline model in these cases.</p>
+<p>The display of a model fit by maximum likelihood provides several model-fit statistics such as Akaike’s Information Criterion <span class="citation" data-cites="saka:ishi:kita:1986">(<a href="references.html#ref-saka:ishi:kita:1986" role="doc-biblioref">Sakamoto et al., 1986</a>)</span>, Schwarz’s Bayesian Information Criterion <span class="citation" data-cites="schw:1978">(<a href="references.html#ref-schw:1978" role="doc-biblioref">Schwarz, 1978</a>)</span>, the log-likelihood at the parameter estimates, and negative twice the log-likelihood, which is the estimation criterion transformed to the scale of the <em>deviance</em>. For linear mixed models we refer to <code>-2 loglik</code> as the value of the <em>objective</em> because this is the value that is minimized during the optimization phase of fitting the model. To evaluate the <em>deviance</em> we should subtract the value of this criterion at a <em>saturated</em> or baseline model but it is not clear how to define such a baseline model in these cases.</p>
 <p>However, it is still possible to perform <a href="https://en.wikipedia.org/wiki/Likelihood-ratio_test">likelihood ratio tests</a> of different models fit to the same data using the difference in the minimized objectives, because this difference is the same as the difference in the deviances. (Recall that a ratio of likelihoods corresponds to a difference in log-likelihoods.)</p>
 <p>The third section is the table of estimates of parameters associated with the random effects. There are two sources of variability in the model we have fit, a batch-to-batch variability in the level of the response and the residual or per-observation variability — also called the within-batch variability. The name “residual” is used in statistical modeling to denote the part of the variability that cannot be explained or modeled with the other terms. It is the variation in the observed data that is “left over” after we have determined the estimates of the parameters in the other parts of the model.</p>
 <p>Some of the variability in the response is associated with the fixed-effects terms. In this model there is only one such term, labeled as the <code>(Intercept)</code>. The name “intercept”, which is better suited to models based on straight lines written in a slope/intercept form, should be understood to represent an overall “typical” or mean level of the response in this case. (In case you are wondering about the parentheses around the name <code>(Intercept)</code>, they are included so that you can’t accidentally create a variable with a name that conflicts with this name.) The line labeled <code>batch</code> in the random effects table shows that the random effects added to the term, one for each level of the factor <code>batch</code>, are modeled as random variables whose unconditional variance is estimated as 1388.33 g<span class="math inline">\(^2\)</span> in the ML fit. The corresponding standard deviation is 37.26 g.</p>
@@ -1183,21 +1184,21 @@ Note
 <p>Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.</p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="doc-bibliography" style="display: none">
 <div id="ref-box73:_bayes_infer_statis_analy" class="csl-entry" role="doc-biblioentry">
-Box, G. E. P., and G. C. Tiao. 1973. <em>Bayesian Inference in Statistical Analysis</em>. Reading, MA: Addison-Wesley.
+Box, G. E. P., &amp; Tiao, G. C. (1973). <em>Bayesian inference in statistical analysis</em>. Addison-Wesley.
 </div>
 <div id="ref-DanischKrumbiegel2021" class="csl-entry" role="doc-biblioentry">
-Danisch, Simon, and Julius Krumbiegel. 2021. <span>“Makie.jl: Flexible High-Performance Data Visualization for Julia.”</span> <em>Journal of Open Source Software</em> 6 (65): 3349. <a href="https://doi.org/10.21105/joss.03349">https://doi.org/10.21105/joss.03349</a>.
+Danisch, S., &amp; Krumbiegel, J. (2021). Makie.jl: Flexible high-performance data visualization for julia. <em>Journal of Open Source Software</em>, <em>6</em>(65), 3349. <a href="https://doi.org/10.21105/joss.03349">https://doi.org/10.21105/joss.03349</a>
 </div>
 <div id="ref-davies72:_statis_method_in_resear_and_produc" class="csl-entry" role="doc-biblioentry">
-Davies, Owen L., and Peter L. Goldsmith, eds. 1972. <em>Statistical Methods in Research and Production</em>. 4th ed. Hafner.
+Davies, O. L., &amp; Goldsmith, P. L. (Eds.). (1972). <em>Statistical methods in research and production</em> (4th ed.). Hafner.
 </div>
 <div id="ref-saka:ishi:kita:1986" class="csl-entry" role="doc-biblioentry">
-Sakamoto, Y., M. Ishiguro, and G. Kitagawa. 1986. <em>Akaike Information Criterion Statistics</em>. Dordrecht, Holland: Reidel.
+Sakamoto, Y., Ishiguro, M., &amp; Kitagawa, G. (1986). <em>Akaike information criterion statistics</em> (p. 290). Reidel.
 </div>
 <div id="ref-schw:1978" class="csl-entry" role="doc-biblioentry">
-Schwarz, G. 1978. <span>“Estimating the Dimension of a Model.”</span> <em>Annals of Statistics</em> 6: 461–64.
+Schwarz, G. (1978). Estimating the dimension of a model. <em>Annals of Statistics</em>, <em>6</em>, 461–464.
 </div>
 </div>
 </section>

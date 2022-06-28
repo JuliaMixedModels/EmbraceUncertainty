@@ -122,6 +122,7 @@ using StatsBase         # basic statistical summaries
 
 using AlgebraOfGraphics: AlgebraOfGraphics as AoG # for easy access to some non exported methods
 
+CairoMakie.activate!(; type="svg");
 ProgressMeter.ijulia_behavior(:clear);
 ```
 

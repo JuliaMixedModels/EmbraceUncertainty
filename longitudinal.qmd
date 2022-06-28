@@ -51,6 +51,7 @@ using StandardizedPredictors
 
 using CairoMakie: scatter! # PA I have no idea why this is failing to resolve later since this exported
 
+CairoMakie.activate!(; type="svg")
 ProgressMeter.ijulia_behavior(:clear);
 ```
 
