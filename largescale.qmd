@@ -325,8 +325,8 @@ draw(
 However, only about one half of one percent of the correct responses have latencies in the range of 200 ms. to 333 ms.
 
 ```{julia}
-nrow(@subset(ldttrial, !ismissing(:acc), 200 < :rt < 333)) /
-sum(!ismissing, ldttrial.acc)
+count(r -> !ismissing(r.acc) && 200 < r.rt < 333, eachrow(ldttrial)) /
+count(!ismissing, ldttrial.acc)
 ```
 
 so the exact position of the lower cut-off point on the response latencies is unlikely to be very important.

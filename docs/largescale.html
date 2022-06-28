@@ -627,8 +627,8 @@ Note
 </div>
 <p><a href="#fig-elpldtrtdens">Figure&nbsp;<span>4.5</span></a> and <a href="#fig-elpldtspeeddens">Figure&nbsp;<span>4.6</span></a> indicate that it may be more reasonable to establish a lower bound of 1/3 second (333 ms) on the response latency, corresponding to an upper bound of 3 per second on the response speed. However, only about one half of one percent of the correct responses have latencies in the range of 200 ms. to 333 ms.</p>
 <div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="pp">@subset</span>(ldttrial, !<span class="fu">ismissing</span>(<span class="op">:</span>acc), <span class="fl">200</span> <span class="op">&lt;</span> <span class="op">:</span>rt <span class="op">&lt;</span> <span class="fl">333</span>)) <span class="op">/</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(!ismissing, ldttrial.acc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(r <span class="op">-&gt;</span> !<span class="fu">ismissing</span>(r.acc) <span class="op">&amp;&amp;</span> <span class="fl">200</span> <span class="op">&lt;</span> r.rt <span class="op">&lt;</span> <span class="fl">333</span>, <span class="fu">eachrow</span>(ldttrial)) <span class="op">/</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(!ismissing, ldttrial.acc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="24">
 <pre><code>0.005867195806137328</code></pre>
 </div>
@@ -758,7 +758,7 @@ isword: true &amp; wrdlen(centered: 8)  -0.0111571  0.000387059   -28.83    &lt;
 <span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(elm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 54    Time: 0:00:03 (69.58 ms/it)</code></pre>
+<pre><code>Minimizing 54    Time: 0:00:03 (71.30 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
