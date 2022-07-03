@@ -86,8 +86,8 @@ byitem = @chain ldttrial begin
   groupby(:item)
   @combine(
     :ni = length(:acc),             # no. of obs
-    :imiss = sum(ismissing, :acc),  # no. of missing acc
-    :iacc = sum(skipmissing(:acc)), # no. of accurate
+    :imiss = count(ismissing, :acc),  # no. of missing acc
+    :iacc = count(skipmissing(:acc)), # no. of accurate
     :imedianrt = median(:rt),
   )
   @transform!(:wrdlen = length(:item), :ipropacc = :iacc / :ni)
@@ -209,8 +209,8 @@ bysubj = @chain ldttrial begin
   groupby(:subj)
   @combine(
     :ns = length(:acc),             # no. of obs
-    :smiss = sum(ismissing, :acc),  # no. of missing acc
-    :sacc = sum(skipmissing(:acc)), # no. of accurate
+    :smiss = count(ismissing, :acc),  # no. of missing acc
+    :sacc = count(skipmissing(:acc)), # no. of accurate
     :smedianrt = median(:rt),
   )
   @transform!(:spropacc = :sacc / :ns)
@@ -249,7 +249,7 @@ During the trials immediate feedback was given if the response was incorrect.
 Nevertheless, approximately 15% of the subjects were unable to maintain 80% accuracy on their trials
 
 ```{julia}
-sum(<(0.8), bysubj.spropacc) / nrow(bysubj)
+count(<(0.8), bysubj.spropacc) / nrow(bysubj)
 ```
 
 and there is some association of faster response times with low accuracy.
@@ -393,7 +393,7 @@ Set these contrasts
 ```{julia}
 contrasts[:subj] = Grouping();
 contrasts[:item] = Grouping();
-contrasts[:isword] = DummyCoding(; base=false);
+contrasts[:isword] = EffectsCoding(; base=false);
 contrasts[:wrdlen] = Center(8);
 ```
 
@@ -406,7 +406,6 @@ elm01 = let
   )
   fit(MixedModel, form, pruned; contrasts)
 end
-print(elm01)
 ```
 
 If we restrict to only those subjects with 80% accuracy or greater the model becomes
@@ -419,7 +418,6 @@ elm02 = let
   dat = @subset(pruned, :spropacc > 0.8)
   fit(MixedModel, form, dat; contrasts)
 end
-print(elm02)
 ```
 
 To compare the conditional means of the random effects for item in these two models we incorporate them into the `byitem` table.

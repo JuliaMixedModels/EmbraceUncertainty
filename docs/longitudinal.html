@@ -404,18 +404,15 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 217   Time: 0:00:00 ( 2.06 ms/it)</code></pre>
+<pre><code>Minimizing 217   Time: 0:00:00 ( 1.59 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
- </code></pre>
+ resp ~ 1 + time + (1 + time | Subj)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>resp ~ 1 + time + (1 + time | Subj)
-   logLik   -2 logLik     AIC       AICc        BIC    </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  -117.2404   234.4809   246.4809   247.6316   260.7730
+<pre><code>   logLik   -2 logLik     AIC       AICc        BIC    
+  -117.2404   234.4809   246.4809   247.6316   260.7730
 
 Variance components:</code></pre>
 </div>
@@ -446,7 +443,7 @@ time          1.896     0.256691   7.39    &lt;1e-12
 <div class="cell" data-execution_count="7">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">500</span>)), <span class="fu">ranefinfo</span>(egm01, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">500</span>)), <span class="fu">ranefinfo</span>(egm01, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div id="fig-egm01caterpillar" class="quarto-figure quarto-figure-center anchored">
@@ -467,15 +464,18 @@ time          1.896     0.256691   7.39    &lt;1e-12
 <p>(In model specifications in R and later in Julia the name <code>contrasts</code> has been come to be applied to ways of specifying the association between covariates in the data and parameters in a model. This is an extension of the original mathematical definition of contrasts amongst the levels of a categorical covariate.)</p>
 <p>A model with <code>time</code> centered at 8 years of age can be fit as</p>
 <div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>egm02 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="fu">Center</span>(<span class="fl">8</span>), <span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>egm02 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="fu">Center</span>(<span class="fl">8</span>), <span class="op">:</span>Subj <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
- resp ~ 1 + time(centered: 8) + (1 + time(centered: 8) | Subj)
+ </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>resp ~ 1 + time(centered: 8) + (1 + time(centered: 8) | Subj)
    logLik   -2 logLik     AIC       AICc        BIC    
   -117.2404   234.4809   246.4809   247.6316   260.7730
 
