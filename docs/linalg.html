@@ -558,7 +558,7 @@ r^2(\bbbeta)&amp;=\|\bby-\bbX\bbbeta\|^2\\
 \bbbeta\\
 -1
 \end{bmatrix}\right\|^2\\
-&amp;=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2- r_{yy}^2
+&amp;=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2+r_{yy}^2
 \end{aligned}
 \tag{A.30}\]</span></span></p>
 <p>The first term, <span class="math inline">\(\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2\)</span>, is non-negative and can be made zero by solving <a href="#eq-betahatchol">Equation&nbsp;<span>A.29</span></a> for <span class="math inline">\(\widehat{\bbbeta}\)</span>. Thus, the minimum sum of squared residuals is <span class="math inline">\(r_{yy}^2\)</span>.</p>
@@ -829,20 +829,20 @@ Vt factor:
 \mcB&amp;\sim\mcN(\mathbf{0},\bbSigma_\theta) .
 \end{aligned}
 \]</span></p>
-<p>The <span class="math inline">\(q\times q\)</span>, symmetric, variance-covariance matrix, <span class="math inline">\(\mathrm{Var}(\mcB)=\bbSigma_\theta\)</span>, depends on the <em>variance-component parameter vector</em>, <span class="math inline">\(\bbtheta\)</span>, through a lower triangular <em>relative covariance factor</em>, <span class="math inline">\(\Lambda_\theta\)</span> as</p>
+<p>The <span class="math inline">\(q\times q\)</span>, symmetric, variance-covariance matrix, <span class="math inline">\(\mathrm{Var}(\mcB)=\bbSigma_\theta\)</span>, depends on the <em>variance-component parameter vector</em>, <span class="math inline">\(\bbtheta\)</span>, through a lower triangular <em>relative covariance factor</em>, <span class="math inline">\(\bbLambda_\theta\)</span> as</p>
 <p><span id="eq-relcovfac"><span class="math display">\[
 \bbSigma_\theta=\sigma^2\bbLambda_\theta\bbLambda_\theta' .
 \tag{A.34}\]</span></span></p>
-<p>(Recall that the lower Cholesky factor is generally written <span class="math inline">\(\mathbf{L}\)</span>. In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, <span class="math inline">\(\Lambda\)</span>.)</p>
+<p>(Recall that the lower Cholesky factor is generally written <span class="math inline">\(\mathbf{L}\)</span>. In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, <span class="math inline">\(\bbLambda\)</span>.)</p>
 <p>Many computational formulas for linear mixed models are written in terms of the <em>precision matrix</em>, <span class="math inline">\(\bbSigma_\theta^{-1}\)</span>. Such formulas will become unstable as <span class="math inline">\(\bbSigma_\theta\)</span> approaches singularity. And it can do so. It is a fact that singular (i.e.&nbsp;non-invertible) <span class="math inline">\(\bbSigma_\theta\)</span> can and do occur in practice, as we have seen in some of the examples in earlier chapters. Moreover, during the course of the numerical optimization by which the parameter estimates are determined, it is frequently the case that the deviance or the REML criterion will need to be evaluated at values of <span class="math inline">\(\bbtheta\)</span> that produce a singular <span class="math inline">\(\bbSigma_\theta\)</span>. Because of this we will take care to use computational methods that can be applied even when <span class="math inline">\(\bbSigma_\theta\)</span> is singular and are stable as <span class="math inline">\(\bbSigma_\theta\)</span> approaches singularity.</p>
 <p>According to <a href="#eq-relcovfac">Equation&nbsp;<span>A.34</span></a>, <span class="math inline">\(\bbSigma\)</span> depends on both <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\theta\)</span>, and we should write it as <span class="math inline">\(\bbSigma_{\sigma,\theta}\)</span>. However, we will blur that distinction and continue to write <span class="math inline">\(\text{Var}(\mcB)=\bbSigma_\theta\)</span>.</p>
-<p>Another technicality is that the <em>common scale parameter</em>, <span class="math inline">\(\sigma\)</span>, could, in theory, be zero. However, the only way for its estimate, <span class="math inline">\(\widehat{\sigma}\)</span>, to be zero is for the fitted values from the fixed-effects only, <span class="math inline">\(\bbX\widehat{\bbbeta}\)</span>, to be exactly equal to the observed data. This occurs only with data that have been (incorrectly) simulated without error. In practice we can safely assume that <span class="math inline">\(\sigma&gt;0\)</span>. However, <span class="math inline">\(\Lambda_\theta\)</span>, like <span class="math inline">\(\bbSigma_\theta\)</span>, can be singular.</p>
-<p>The computational methods in the <em>MixedModels</em> package are based on <span class="math inline">\(\Lambda_\theta\)</span> and do not require evaluation of <span class="math inline">\(\bbSigma_\theta\)</span>. In fact, <span class="math inline">\(\bbSigma_\theta\)</span> is explicitly evaluated only at the converged parameter estimates.</p>
+<p>Another technicality is that the <em>common scale parameter</em>, <span class="math inline">\(\sigma\)</span>, could, in theory, be zero. However, the only way for its estimate, <span class="math inline">\(\widehat{\sigma}\)</span>, to be zero is for the fitted values from the fixed-effects only, <span class="math inline">\(\bbX\widehat{\bbbeta}\)</span>, to be exactly equal to the observed data. This occurs only with data that have been (incorrectly) simulated without error. In practice we can safely assume that <span class="math inline">\(\sigma&gt;0\)</span>. However, <span class="math inline">\(\bbLambda_\theta\)</span>, like <span class="math inline">\(\bbSigma_\theta\)</span>, can be singular.</p>
+<p>The computational methods in the <em>MixedModels</em> package are based on <span class="math inline">\(\bbLambda_\theta\)</span> and do not require evaluation of <span class="math inline">\(\bbSigma_\theta\)</span>. In fact, <span class="math inline">\(\bbSigma_\theta\)</span> is explicitly evaluated only at the converged parameter estimates.</p>
 <p>The spherical random effects, <span class="math inline">\(\mcU\sim\mcN(\mathbf{0},\sigma^2\bbI_q)\)</span>, determine <span class="math inline">\(\mcB\)</span> as</p>
 <p><span id="eq-sphericalre"><span class="math display">\[
-\mcB=\Lambda_\theta\mcU .
+\mcB=\bbLambda_\theta\mcU .
 \tag{A.35}\]</span></span></p>
-<p>Although it may seem more intuitive to write <span class="math inline">\(\mcU\)</span> as a linear transformation of <span class="math inline">\(\mcB\)</span>, we cannot do that when <span class="math inline">\(\Lambda_\theta\)</span> is singular, which is why <a href="#eq-sphericalre">Equation&nbsp;<span>A.35</span></a> is in the form shown.</p>
+<p>Although it may seem more intuitive to write <span class="math inline">\(\mcU\)</span> as a linear transformation of <span class="math inline">\(\mcB\)</span>, we cannot do that when <span class="math inline">\(\bbLambda_\theta\)</span> is singular, which is why <a href="#eq-sphericalre">Equation&nbsp;<span>A.35</span></a> is in the form shown.</p>
 <p>We can easily verify that <a href="#eq-sphericalre">Equation&nbsp;<span>A.35</span></a> provides the desired distribution for <span class="math inline">\(\mcB\)</span>. As a linear transformation of a multivariate Gaussian random variable, <span class="math inline">\(\mcB\)</span> will also be multivariate Gaussian with mean</p>
 <p><span class="math display">\[
 𝔼\left[\mcB\right]=
@@ -856,10 +856,10 @@ Vt factor:
 \bbLambda_\theta\text{Var}(\mcU)\bbLambda\theta'=
 \sigma^2\bbLambda_\theta\bbLambda_\theta'=\bbSigma_\theta
 \]</span></p>
-<p>Just as we concentrate on how <span class="math inline">\(\bbtheta\)</span> determines <span class="math inline">\(\Lambda_\theta\)</span>, not <span class="math inline">\(\bbSigma_\theta\)</span>, we will concentrate on properties of <span class="math inline">\(\mcU\)</span> rather than <span class="math inline">\(\mcB\)</span>. In particular, we now define the model according to the distributions</p>
+<p>Just as we concentrate on how <span class="math inline">\(\bbtheta\)</span> determines <span class="math inline">\(\bbLambda_\theta\)</span>, not <span class="math inline">\(\bbSigma_\theta\)</span>, we will concentrate on properties of <span class="math inline">\(\mcU\)</span> rather than <span class="math inline">\(\mcB\)</span>. In particular, we now define the model according to the distributions</p>
 <p><span id="eq-condygivenu"><span class="math display">\[
 \begin{aligned}
-(\mcY|\mcU=\mathbf{u})&amp;\sim\mcN(\mathbf{Z}\Lambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
+(\mcY|\mcU=\mathbf{u})&amp;\sim\mcN(\mathbf{Z}\bbLambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
 \mcU&amp;\sim\mcN(\mathbf{0},\sigma^2\bbI_q) .
 \end{aligned}
 \tag{A.36}\]</span></span></p>
@@ -1021,7 +1021,7 @@ n\left(1+\log\left(\frac{2\pi r_{yy}^2(\bbtheta)}{n}\right)\right)
 \end{bmatrix}
 \tag{A.47}\]</span></span></p>
 <p>and <span class="math inline">\(\bbLambda_{\theta}\)</span>.</p>
-<p>In the <code>MixedModels</code> package the <code>LinearMixedModel</code> struct contains a symmetric blocked array in the <code>A</code> field and a similarly structured lower-triangular blocked array in the <code>L</code> field. Evaluation of the objective simply involves updating the template matrices, <span class="math inline">\(\lambda_i, i=1,\dots,k\)</span> in the <code>ReMat</code> structures then updating <code>L</code> from <code>A</code> and the <span class="math inline">\(\lambda_i\)</span>.</p>
+<p>In the <code>MixedModels</code> package the <code>LinearMixedModel</code> struct contains a symmetric blocked array in the <code>A</code> field and a similarly structured lower-triangular blocked array in the <code>L</code> field. Evaluation of the objective simply involves updating the template matrices, <span class="math inline">\(\bbLambda_i, i=1,\dots,k\)</span> in the <code>ReMat</code> structures then updating <code>L</code> from <code>A</code> and the <span class="math inline">\(\lambda_i\)</span>.</p>
 </section>
 <section id="sec-REML" class="level2" data-number="A.8">
 <h2 data-number="A.8" class="anchored" data-anchor-id="sec-REML"><span class="header-section-number">A.8</span> The REML criterion</h2>

@@ -363,7 +363,7 @@ r^2(\bbbeta)&=\|\bby-\bbX\bbbeta\|^2\\
 \bbbeta\\
 -1
 \end{bmatrix}\right\|^2\\
-&=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2- r_{yy}^2
+&=\left\|\bbR_{XX}\bbbeta-\mathbf{r}_{Xy}\right\|^2+r_{yy}^2
 \end{aligned}
 $$ {#eq-extendedqf}
 
@@ -561,14 +561,14 @@ $$
 \end{aligned}
 $$
 
-The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mcB)=\bbSigma_\theta$, depends on the *variance-component parameter vector*, $\bbtheta$, through a lower triangular *relative covariance factor*, $\Lambda_\theta$ as
+The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mcB)=\bbSigma_\theta$, depends on the *variance-component parameter vector*, $\bbtheta$, through a lower triangular *relative covariance factor*, $\bbLambda_\theta$ as
 
 $$
 \bbSigma_\theta=\sigma^2\bbLambda_\theta\bbLambda_\theta' .
 $$ {#eq-relcovfac}
 
 (Recall that the lower Cholesky factor is generally written $\mathbf{L}$.
-In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, $\Lambda$.)
+In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, $\bbLambda$.)
 
 Many computational formulas for linear mixed models are written in terms of the *precision matrix*, $\bbSigma_\theta^{-1}$.
 Such formulas will become unstable as $\bbSigma_\theta$ approaches singularity.
@@ -584,18 +584,18 @@ Another technicality is that the *common scale parameter*, $\sigma$, could, in t
 However, the only way for its estimate, $\widehat{\sigma}$, to be zero is for the fitted values from the fixed-effects only, $\bbX\widehat{\bbbeta}$, to be exactly equal to the observed data.
 This occurs only with data that have been (incorrectly) simulated without error.
 In practice we can safely assume that $\sigma>0$.
-However, $\Lambda_\theta$, like $\bbSigma_\theta$, can be singular.
+However, $\bbLambda_\theta$, like $\bbSigma_\theta$, can be singular.
 
-The computational methods in the *MixedModels* package are based on $\Lambda_\theta$ and do not require evaluation of $\bbSigma_\theta$.
+The computational methods in the *MixedModels* package are based on $\bbLambda_\theta$ and do not require evaluation of $\bbSigma_\theta$.
 In fact, $\bbSigma_\theta$ is explicitly evaluated only at the converged parameter estimates.
 
 The spherical random effects, $\mcU\sim\mcN(\mathbf{0},\sigma^2\bbI_q)$, determine $\mcB$ as
 
 $$
-\mcB=\Lambda_\theta\mcU .
+\mcB=\bbLambda_\theta\mcU .
 $$ {#eq-sphericalre}
 
-Although it may seem more intuitive to write $\mcU$ as a linear transformation of $\mcB$, we cannot do that when $\Lambda_\theta$ is singular, which is why @eq-sphericalre is in the form shown.
+Although it may seem more intuitive to write $\mcU$ as a linear transformation of $\mcB$, we cannot do that when $\bbLambda_\theta$ is singular, which is why @eq-sphericalre is in the form shown.
 
 We can easily verify that @eq-sphericalre provides the desired distribution for $\mcB$.
 As a linear transformation of a multivariate Gaussian random variable, $\mcB$ will also be multivariate Gaussian with mean
@@ -615,12 +615,12 @@ $$
 \sigma^2\bbLambda_\theta\bbLambda_\theta'=\bbSigma_\theta
 $$
 
-Just as we concentrate on how $\bbtheta$ determines $\Lambda_\theta$, not $\bbSigma_\theta$, we will concentrate on properties of $\mcU$ rather than $\mcB$.
+Just as we concentrate on how $\bbtheta$ determines $\bbLambda_\theta$, not $\bbSigma_\theta$, we will concentrate on properties of $\mcU$ rather than $\mcB$.
 In particular, we now define the model according to the distributions
 
 $$
 \begin{aligned}
-(\mcY|\mcU=\mathbf{u})&\sim\mcN(\mathbf{Z}\Lambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
+(\mcY|\mcU=\mathbf{u})&\sim\mcN(\mathbf{Z}\bbLambda_\theta\mathbf{u}+\bbX\beta,\sigma^2\bbI_n)\\
 \mcU&\sim\mcN(\mathbf{0},\sigma^2\bbI_q) .
 \end{aligned}
 $$ {#eq-condygivenu}
@@ -821,7 +821,7 @@ $$ {#eq-A}
 and $\bbLambda_{\theta}$.
 
 In the `MixedModels` package the `LinearMixedModel` struct contains a symmetric blocked array in the `A` field and a similarly structured lower-triangular blocked array in the `L` field.
-Evaluation of the objective simply involves updating the template matrices, $\lambda_i, i=1,\dots,k$ in the `ReMat` structures then updating `L` from `A` and the $\lambda_i$.
+Evaluation of the objective simply involves updating the template matrices, $\bbLambda_i, i=1,\dots,k$ in the `ReMat` structures then updating `L` from `A` and the $\lambda_i$.
 
 ## The REML criterion {#sec-REML}
 
