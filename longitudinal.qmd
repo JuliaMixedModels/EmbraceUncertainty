@@ -47,11 +47,15 @@ using MixedModels
 using MixedModelsMakie
 using ProgressMeter
 using Random
+using RCall
 using StandardizedPredictors
 
 using CairoMakie: scatter! # PA I have no idea why this is failing to resolve later since this exported
 
-CairoMakie.activate!(; type="svg")
+if !isdefined(Main, :contrasts)
+  const contrasts = Dict{Symbol, Any}()
+end;
+CairoMakie.activate!(; type="svg");
 ProgressMeter.ijulia_behavior(:clear);
 ```
 
@@ -100,20 +104,22 @@ A preferred alternative is to plot response versus time with each subject's data
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the top left, by increasing initial bone length.
+#| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
 #| label: fig-eglayout
-if "orderedsubj" ∉ names(egdf)
-  egdf.orderedsubj = CategoricalArray(
-    egdf.Subj;
-    levels=@sort(@subset(egdf, :time == 8.0), :resp).Subj,
+RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=7)
+R"""
+print(
+  lattice::xyplot(
+    resp ~ time|Subj,
+    $egdf,
+    type=c("g","p","r"),
+    aspect="xy",
+    index.cond=function(x,y) coef(lm(y ~ x)) %*% c(1,8),
+    xlab="Age (yr)",
+    ylab="Ramus bone length (mm)",
+    ),
   )
-end
-egplt =
-  data(egdf) *
-  mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
-egplt2 =
-  egplt * mapping(; layout=:orderedsubj) * visual(ScatterLines)
-draw(egplt2; axis=(height=300, width=120))
+""";
 ```
 
 To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
@@ -129,9 +135,9 @@ Similarly, `S06` and `S11` have longer initial bone lengths and a low growth rat
 Although it seems that there isn't a strong correlation between initial bone length and growth rate in these data, a model with an overall linear trend and possibly correlated random effects for intercept and slope by subject estimates a strong negative correlation (-0.97) between these random effects.
 
 ```{julia}
+contrasts[:Subj] = Grouping()
 egm01 = let
   form = @formula(resp ~ 1 + time + (1 + time | Subj))
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, egdf; contrasts)
 end
 println(egm01)
@@ -174,9 +180,9 @@ This is an extension of the original mathematical definition of contrasts amongs
 A model with `time` centered at 8 years of age can be fit as
 
 ```{julia}
+contrasts[:time] = Center(8)
 egm02 = let
   form = @formula(resp ~ 1 + time + (1 + time | Subj))
-  contrasts = Dict(:time => Center(8), :Subj => Grouping())
   fit(MixedModel, form, egdf; contrasts)
 end
 println(egm02)
@@ -197,20 +203,15 @@ caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
 A third option is to center the `time` covariate at the mean of the original `time` values.
 
 ```{julia}
+contrasts[:time] = Center()
 egm03 = let
   form = @formula(resp ~ 1 + time + (1 + time | Subj))
-  contrasts = Dict(:Subj => Grouping(), :time => Center())
   fit(MixedModel, form, egdf; contrasts)
 end
 println(egm03)
 ```
 
 Because the default for the `Center` contrast is to center about the mean, this `contrasts` argument can be written
-
-```{julia}
-#| eval: false
-contrasts = Dict(:time => Center())
-```
 
 Notice that in this model the estimated correlation of the random effects for `Subj` is positive.
 
@@ -257,7 +258,6 @@ egm04 = let
     resp ~ 1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
   )
   dat = @transform(egdf, :ctime = :time - 8.75)
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, dat; contrasts)
 end
 println(egm04)
@@ -427,15 +427,14 @@ Similarly in dose-response data; when a zero dose is included we could have a ma
 We can begin with a main effect for `Group`, as in
 
 ```{julia}
+delete!(contrasts, :time)
 bxm01 = let
   form = @formula(
     resp ~
       (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
   )
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, bxdf; contrasts)
 end
-println(bxm01)
 ```
 
 but we expect that a model without the main effect for `Group`,
@@ -446,10 +445,8 @@ bxm02 = let
     resp ~
       1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
   )
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, bxdf; contrasts)
 end
-println(bxm02)
 ```
 
 will be adequate, as confirmed by
@@ -482,10 +479,8 @@ bxm03 = let
   form = @formula(
     resp ~ 1 + time + time^2 & Group + (1 + time + time^2 | Subj)
   )
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, bxdf; contrasts)
 end
-println(bxm03)
 ```
 
 ```{julia}
@@ -644,7 +639,6 @@ Because of these high correlations, trying to deal with the degenerate random ef
 bxm04 = let
   form =
     @formula(resp ~ 1 + time + time^2 & Group + (1 + time | Subj))
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, bxdf; contrasts)
 end
 ```
@@ -665,7 +659,6 @@ bxm05 = let
       (1 + time | Subj) +
       (0 + time^2 | Subj)
   )
-  contrasts = Dict(:Subj => Grouping())
   fit(MixedModel, form, bxdf; contrasts)
 end
 ```

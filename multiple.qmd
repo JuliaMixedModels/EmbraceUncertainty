@@ -183,7 +183,6 @@ pnm01 = let
   form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
   fit(MixedModel, form, penicillin; contrasts)
 end
-println(pnm01)
 ```
 
 This model display indicates that the sample-to-sample variability has the greatest contribution, then plate-to-plate variability and finally the "residual" variability that cannot be attributed to either the sample or the plate.
@@ -352,12 +351,14 @@ R"""
 require("lattice", quietly=TRUE)
 pp <- $pastes
 pp <- within(pp, bb <- reorder(batch, strength))
-dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
-        strip.left = TRUE, layout = c(1, 10),
-        scales = list(y = list(relation = "free")),
-        ylab = "Sample within batch", type = c("p", "a"),
-        xlab = "Paste strength", jitter.y = TRUE)
-"""
+print(
+  dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
+    strip.left = TRUE, layout = c(1, 10),
+    scales = list(y = list(relation = "free")),
+    ylab = "Sample within batch", type = c("p", "a"),
+    xlab = "Paste strength", jitter.y = TRUE)
+)
+""";
 ```
 
 In @fig-pastesdot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
@@ -734,7 +735,7 @@ We will avoid terms of the form , preferring instead an explicit specification w
 
 The insteval data, described in @sec-insteval, illustrate some of the characteristics of the real data to which mixed-effects models are now fit.
 There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed.
-Such data are common in sociological and educational studies but until now it has been very difficult to fit models that appropriately reflect such a structure.
+Such data are common in sociological and educational studies but until recently it has been very difficult to fit models that appropriately reflect such a structure.
 Much of the literature on mixed-effects models leaves the impression that multiple random effects terms can only be associated with nested grouping factors.
 The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.
 
