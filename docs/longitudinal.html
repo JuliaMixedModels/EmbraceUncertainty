@@ -221,6 +221,16 @@ div.csl-indent {
   <a href="./linalg.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./contrasts_kwdyz11.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Contrast Coding of Visual Attention Effects</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./contrasts_fggk21.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Contrast Coding of Physical Fitness Effects</span></a>
+  </div>
+</li>
     </ul>
   </li>
     </ul>
@@ -410,15 +420,15 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[32mMinimizing 236      Time: 0:00:00 ( 0.87 ms/it)[39m</code></pre>
+<pre><code>[32mMinimizing 236      Time: 0:00:00 ( 0.86 ms/it)[39m</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
- resp ~ 1 + time + (1 + time | Subj)</code></pre>
+ resp ~ 1 + time + (1 + time | Subj)
+   logLik   -2 logLik     AIC       AICc        BIC    </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   logLik   -2 logLik     AIC       AICc        BIC    
-  -117.2404   234.4809   246.4809   247.6316   260.7730
+<pre><code>  -117.2404   234.4809   246.4809   247.6316   260.7730
 
 Variance components:</code></pre>
 </div>
