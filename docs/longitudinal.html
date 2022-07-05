@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-0.9.247">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -99,14 +99,13 @@ div.csl-indent {
 }
 </style>
 
-
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
+<meta name="quarto:offset" content="./">
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
 <link href="./largescale.html" rel="next">
 <link href="./multiple.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -114,7 +113,7 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link id="quarto-text-highlighting-styles" href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -145,7 +144,7 @@ div.csl-indent {
 
 </head>
 
-<body class="nav-sidebar floating">
+<body class="floating">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -259,9 +258,9 @@ div.csl-indent {
 </div>
 
 
-
 <div class="quarto-title-meta">
 
+    
     
     
   </div>
@@ -292,6 +291,7 @@ div.csl-indent {
 \]</span></p>
 </div>
 <p>Load the packages to be used.</p>
+<div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
@@ -319,6 +319,7 @@ div.csl-indent {
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>);</span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
 <p>Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time. Generally we wish to characterize the time trends within subjects and between subjects. The data will always include the response, the time covariate and the indicator of the subject on which the measurement has been made. If other covariates are recorded, say whether the subject is in the treatment group or the control group, we may wish to relate the within- and between-subject trends to such covariates.</p>
 <p>In this chapter we introduce graphical and statistical techniques for the analysis of longitudinal data by applying them to a simple example.</p>
 <section id="the-elstongrizzle-data" class="level2" data-number="3.1">
@@ -326,7 +327,7 @@ div.csl-indent {
 <p>Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in <span class="citation" data-cites="elstongrizzle1962">Elston &amp; Grizzle (<a href="references.html#ref-elstongrizzle1962" role="doc-biblioref">1962</a>)</span> and in <span class="citation" data-cites="davis2002">Davis (<a href="references.html#ref-davis2002" role="doc-biblioref">2002</a>)</span>.</p>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>elstongrizzle <span class="op">=</span> Arrow.<span class="fu">Table</span>(<span class="st">"./data/elstongrizzle.arrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>Arrow.Table with 80 rows, 3 columns, and schema:
  :Subj  String
  :time  Float64
@@ -340,8 +341,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 <p>Converting the table to a data frame provides the description</p>
 <div class="cell" data-execution_count="3">
-<div class="cell-output cell-output-display" data-execution_count="6">
-
+<div class="cell-output cell-output-display" data-execution_count="4">
 <div class="data-frame"><p>3 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>Subj</td><td></td><td>S01</td><td></td><td>S20</td><td>0</td><td>String</td></tr><tr><th>2</th><td>time</td><td>8.75</td><td>8.0</td><td>8.75</td><td>9.5</td><td>0</td><td>Float64</td></tr><tr><th>3</th><td>resp</td><td>50.0875</td><td>45.0</td><td>49.65</td><td>55.5</td><td>0</td><td>Float64</td></tr></tbody></table></div>
 </div>
 </div>
@@ -358,7 +358,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">visual</span>(Scatter) <span class="op">+</span> <span class="fu">visual</span>(Lines)),</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div id="fig-egspaghetti" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-egspaghetti-output-1.svg" class="img-fluid figure-img"></p>
@@ -410,7 +410,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 217   Time: 0:00:00 ( 1.65 ms/it)</code></pre>
+<pre><code>[32mMinimizing 236      Time: 0:00:00 ( 0.87 ms/it)[39m</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
@@ -425,9 +425,9 @@ Variance components:</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
             Column    Variance Std.Dev.   Corr.
-Subj     (Intercept)  90.334222 9.504432
-         time          1.162244 1.078074 -0.97
-Residual               0.194450 0.440965
+Subj     (Intercept)  90.337725 9.504616
+         time          1.162283 1.078092 -0.97
+Residual               0.194451 0.440966
  Number of obs: 80; levels of grouping factors: 20
 
   Fixed-effects parameters:</code></pre>
@@ -435,11 +435,9 @@ Residual               0.194450 0.440965
 <div class="cell-output cell-output-stdout">
 <pre><code>─────────────────────────────────────────────────
                Coef.  Std. Error      z  Pr(&gt;|z|)
-─────────────────────────────────────────────────</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>(Intercept)  33.4975    2.26156   14.81    &lt;1e-48
-time          1.896     0.256691   7.39    &lt;1e-12
+─────────────────────────────────────────────────
+(Intercept)  33.4975    2.2616    14.81    &lt;1e-48
+time          1.896     0.256695   7.39    &lt;1e-12
 ─────────────────────────────────────────────────</code></pre>
 </div>
 </div>
@@ -449,9 +447,9 @@ time          1.896     0.256691   7.39    &lt;1e-12
 <div class="cell" data-execution_count="7">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">500</span>)), <span class="fu">ranefinfo</span>(egm01, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">500</span>)), <span class="fu">ranefinfo</span>(egm01, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="8">
 <div id="fig-egm01caterpillar" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-egm01caterpillar-output-1.svg" class="img-fluid figure-img"></p>
@@ -470,12 +468,12 @@ time          1.896     0.256691   7.39    &lt;1e-12
 <p>(In model specifications in R and later in Julia the name <code>contrasts</code> has been come to be applied to ways of specifying the association between covariates in the data and parameters in a model. This is an extension of the original mathematical definition of contrasts amongst the levels of a categorical covariate.)</p>
 <p>A model with <code>time</code> centered at 8 years of age can be fit as</p>
 <div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>time] <span class="op">=</span> <span class="fu">Center</span>(<span class="fl">8</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>egm02 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>time] <span class="op">=</span> <span class="fu">Center</span>(<span class="fl">8</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>egm02 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
  resp ~ 1 + time(centered: 8) + (1 + time(centered: 8) | Subj)
@@ -487,16 +485,16 @@ Variance components:</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
                Column      Variance Std.Dev.   Corr.
-Subj     (Intercept)        6.096683 2.469146
-         time(centered: 8)  1.162300 1.078100 -0.23
-Residual                    0.194451 0.440966
+Subj     (Intercept)        6.096574 2.469124
+         time(centered: 8)  1.162295 1.078098 -0.23
+Residual                    0.194452 0.440967
  Number of obs: 80; levels of grouping factors: 20
 
   Fixed-effects parameters:
 ───────────────────────────────────────────────────────
                      Coef.  Std. Error      z  Pr(&gt;|z|)
 ───────────────────────────────────────────────────────
-(Intercept)        48.6655    0.558247  87.18    &lt;1e-99
+(Intercept)        48.6655    0.558242  87.18    &lt;1e-99
 time(centered: 8)   1.896     0.256696   7.39    &lt;1e-12
 ───────────────────────────────────────────────────────</code></pre>
 </div>
@@ -506,9 +504,9 @@ time(centered: 8)   1.896     0.256696   7.39    &lt;1e-12
 <div class="cell" data-execution_count="9">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">550</span>)), <span class="fu">ranefinfo</span>(egm02, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">550</span>)), <span class="fu">ranefinfo</span>(egm02, <span class="op">:</span>Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div id="fig-egm02caterpillar" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-egm02caterpillar-output-1.svg" class="img-fluid figure-img"></p>
@@ -519,12 +517,12 @@ time(centered: 8)   1.896     0.256696   7.39    &lt;1e-12
 </div>
 <p>A third option is to center the <code>time</code> covariate at the mean of the original <code>time</code> values.</p>
 <div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>time] <span class="op">=</span> <span class="fu">Center</span>()</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>egm03 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>time] <span class="op">=</span> <span class="fu">Center</span>()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>egm03 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, egdf; contrasts)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
  resp ~ 1 + time(centered: 8.75) + (1 + time(centered: 8.75) | Subj)
@@ -536,9 +534,9 @@ Variance components:</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
                 Column        Variance Std.Dev.   Corr.
-Subj     (Intercept)           5.826544 2.413824
-         time(centered: 8.75)  1.162300 1.078100 +0.10
-Residual                       0.194450 0.440965
+Subj     (Intercept)           5.826532 2.413821
+         time(centered: 8.75)  1.162282 1.078092 +0.10
+Residual                       0.194452 0.440967
  Number of obs: 80; levels of grouping factors: 20
 
   Fixed-effects parameters:
@@ -546,7 +544,7 @@ Residual                       0.194450 0.440965
                         Coef.  Std. Error      z  Pr(&gt;|z|)
 ──────────────────────────────────────────────────────────
 (Intercept)           50.0875    0.541994  92.41    &lt;1e-99
-time(centered: 8.75)   1.896     0.256696   7.39    &lt;1e-12
+time(centered: 8.75)   1.896     0.256695   7.39    &lt;1e-12
 ──────────────────────────────────────────────────────────</code></pre>
 </div>
 </div>
@@ -564,9 +562,9 @@ time(centered: 8.75)   1.896     0.256696   7.39    &lt;1e-12
 <div class="cell" data-execution_count="11">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">600</span>)), egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">600</span>)), egm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <div id="fig-egm02shrinkage" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-egm02shrinkage-output-1.svg" class="img-fluid figure-img"></p>
@@ -587,14 +585,14 @@ time(centered: 8.75)   1.896     0.256696   7.39    &lt;1e-12
 </ol>
 <p>For balanced data like <code>egdf</code> we usually center the <code>time</code> axis about the mean, producing</p>
 <div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>egm04 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> ctime <span class="op">+</span> ctime<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> ctime <span class="op">+</span> ctime<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="pp">@transform</span>(egdf, <span class="op">:</span>ctime <span class="op">=</span> <span class="op">:</span>time <span class="op">-</span> <span class="fl">8.75</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dat; contrasts)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>egm04 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> ctime <span class="op">+</span> ctime<span class="op">^</span><span class="fl">2</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> ctime <span class="op">+</span> ctime<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="pp">@transform</span>(egdf, <span class="op">:</span>ctime <span class="op">=</span> <span class="op">:</span>time <span class="op">-</span> <span class="fl">8.75</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dat; contrasts)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
  resp ~ 1 + ctime + :(ctime ^ 2) + (1 + ctime + :(ctime ^ 2) | Subj)
@@ -606,19 +604,19 @@ Variance components:</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
             Column   Variance Std.Dev.   Corr.
-Subj     (Intercept)  6.045133 2.458685
-         ctime        1.168422 1.080936 +0.08
-         ctime ^ 2    0.057249 0.239268 -0.61 +0.65
-Residual              0.187128 0.432583
+Subj     (Intercept)  6.048887 2.459449
+         ctime        1.168134 1.080802 +0.08
+         ctime ^ 2    0.056772 0.238268 -0.62 +0.65
+Residual              0.187157 0.432616
  Number of obs: 80; levels of grouping factors: 20
 
   Fixed-effects parameters:
 ────────────────────────────────────────────────
               Coef.  Std. Error      z  Pr(&gt;|z|)
 ────────────────────────────────────────────────
-(Intercept)  50.1      0.555203  90.24    &lt;1e-99
-ctime         1.896    0.256722   7.39    &lt;1e-12
-ctime ^ 2    -0.04     0.200719  -0.20    0.8420
+(Intercept)  50.1      0.555373  90.21    &lt;1e-99
+ctime         1.896    0.256696   7.39    &lt;1e-12
+ctime ^ 2    -0.04     0.200674  -0.20    0.8420
 ────────────────────────────────────────────────</code></pre>
 </div>
 </div>
@@ -627,9 +625,9 @@ ctime ^ 2    -0.04     0.200719  -0.20    0.8420
 <div class="cell" data-execution_count="13">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">800</span>)), egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">800</span>)), egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div id="fig-egm04shrinkage" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-egm04shrinkage-output-1.svg" class="img-fluid figure-img"></p>
@@ -639,8 +637,10 @@ ctime ^ 2    -0.04     0.200719  -0.20    0.8420
 </div>
 </div>
 <p>Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.</p>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(egm03, egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(egm03, egm04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 65%">
 <col style="width: 9%">
@@ -678,13 +678,15 @@ ctime ^ 2    -0.04     0.200719  -0.20    0.8420
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 </section>
 <section id="longitudinal-data-with-treatments" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="longitudinal-data-with-treatments"><span class="header-section-number">3.5</span> Longitudinal data with treatments</h2>
 <p>Often the “subjects” on which longitudinal measurements are made are divided into different treatment groups. Many of the examples cited in <span class="citation" data-cites="davis2002">Davis (<a href="references.html#ref-davis2002" role="doc-biblioref">2002</a>)</span> are of this type, including one from <span class="citation" data-cites="box1950">Box (<a href="references.html#ref-box1950" role="doc-biblioref">1950</a>)</span></p>
 <div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>box1950 <span class="op">=</span> Arrow.<span class="fu">Table</span>(<span class="st">"./data/box.arrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>box1950 <span class="op">=</span> Arrow.<span class="fu">Table</span>(<span class="st">"./data/box.arrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>Arrow.Table with 135 rows, 4 columns, and schema:
  :Group  String
  :Subj   String
@@ -698,37 +700,35 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 <div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>bxdf <span class="op">=</span> <span class="fu">DataFrame</span>(box1950)</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(bxdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
-
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bxdf <span class="op">=</span> <span class="fu">DataFrame</span>(box1950)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(bxdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
 <div class="data-frame"><p>4 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>Group</td><td></td><td>Control</td><td></td><td>Thyroxin</td><td>0</td><td>String</td></tr><tr><th>2</th><td>Subj</td><td></td><td>S01</td><td></td><td>S27</td><td>0</td><td>String</td></tr><tr><th>3</th><td>time</td><td>2.0</td><td>0</td><td>2.0</td><td>4</td><td>0</td><td>Int8</td></tr><tr><th>4</th><td>resp</td><td>100.807</td><td>46</td><td>100.0</td><td>189</td><td>0</td><td>Int16</td></tr></tbody></table></div>
 </div>
 </div>
 <p>There are three treatment groups</p>
 <div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">levels</span>(bxdf.Group))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">levels</span>(bxdf.Group))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>["Control", "Thioracil", "Thyroxin"]</code></pre>
 </div>
 </div>
 <p>and each “subject” (rat, in this case) is in only one of the treatment groups. This can be checked by comparing the number of unique <code>Subj</code> levels to the number of unique combinations of <code>Subj</code> and <code>Group</code>.</p>
 <div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">unique</span>(<span class="fu">select</span>(bxdf, <span class="op">:</span>Group, <span class="op">:</span>Subj))) <span class="op">==</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(bxdf.Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(<span class="fu">unique</span>(<span class="fu">select</span>(bxdf, <span class="op">:</span>Group, <span class="op">:</span>Subj))) <span class="op">==</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(bxdf.Subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
 <pre><code>true</code></pre>
 </div>
 </div>
 <p>Because the number of combinations of <code>Subj</code> and <code>Group</code> is equal to the number of subjects, each subject occurs in only one group.</p>
 <p>These data are balanced with respect to <code>time</code> (i.e.&nbsp;each rat is weighed at the same set of times) but not with respect to treatment, as can be seen by checking the number of rats in each treatment group.</p>
 <div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span>(</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groupby</span>(<span class="fu">unique</span>(<span class="fu">select</span>(bxdf, <span class="op">:</span>Group, <span class="op">:</span>Subj)), <span class="op">:</span>Group),</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  nrow <span class="op">=&gt;</span> <span class="op">:</span>n,</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
-
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groupby</span>(<span class="fu">unique</span>(<span class="fu">select</span>(bxdf, <span class="op">:</span>Group, <span class="op">:</span>Subj)), <span class="op">:</span>Group),</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  nrow <span class="op">=&gt;</span> <span class="op">:</span>n,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
 <div class="data-frame"><p>3 rows × 2 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>Group</th><th>n</th></tr><tr><th></th><th title="String">String</th><th title="Int64">Int64</th></tr></thead><tbody><tr><th>1</th><td>Control</td><td>10</td></tr><tr><th>2</th><td>Thioracil</td><td>10</td></tr><tr><th>3</th><td>Thyroxin</td><td>7</td></tr></tbody></table></div>
 </div>
 </div>
@@ -738,16 +738,16 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <div class="cell" data-execution_count="20">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bxaxes <span class="op">=</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="st">"Time in trial (wk)"</span>, <span class="op">:</span>resp <span class="op">=&gt;</span> <span class="st">"Body weight (g)"</span>)</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Control"</span>)) <span class="op">*</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  bxaxes <span class="op">*</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(; color<span class="op">=:</span>Subj) <span class="op">*</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">visual</span>(Scatter) <span class="op">+</span> <span class="fu">visual</span>(Lines)),</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>bxaxes <span class="op">=</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>time <span class="op">=&gt;</span> <span class="st">"Time in trial (wk)"</span>, <span class="op">:</span>resp <span class="op">=&gt;</span> <span class="st">"Body weight (g)"</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Control"</span>)) <span class="op">*</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  bxaxes <span class="op">*</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(; color<span class="op">=:</span>Subj) <span class="op">*</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">visual</span>(Scatter) <span class="op">+</span> <span class="fu">visual</span>(Lines)),</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="23">
+<div class="cell-output cell-output-display" data-execution_count="21">
 <div id="fig-bxctrlspaghetti" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxctrlspaghetti-output-1.svg" class="img-fluid figure-img"></p>
@@ -760,8 +760,38 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <div class="cell" data-execution_count="21">
 <details>
 <summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Control"</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    ordered<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    bxaxes <span class="op">*</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(; layout<span class="op">=:</span>orderedsubj) <span class="op">*</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(ScatterLines);</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(height<span class="op">=</span><span class="fl">250</span>, width<span class="op">=</span><span class="fl">150</span>),</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div id="fig-bxctrllayout" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="longitudinal_files/figure-html/fig-bxctrllayout-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.8: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The panels in <a href="#fig-bxctrllayout">Figure&nbsp;<span>3.8</span></a> show a strong linear trend with little evidence of systematic curvature.</p>
+<p>A multi-panel plot for the Thioracil group, <a href="#fig-bxthiolayout">Figure&nbsp;<span>3.9</span></a>,</p>
+<div class="cell" data-execution_count="22">
+<details>
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Control"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Thioracil"</span>)</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
@@ -776,22 +806,22 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<div id="fig-bxctrllayout" class="quarto-figure quarto-figure-center anchored">
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div id="fig-bxthiolayout" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="longitudinal_files/figure-html/fig-bxctrllayout-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.8: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
+<p><img src="longitudinal_files/figure-html/fig-bxthiolayout-output-1.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.9: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
 </figure>
 </div>
 </div>
 </div>
-<p>The panels in <a href="#fig-bxctrllayout">Figure&nbsp;<span>3.8</span></a> show a strong linear trend with little evidence of systematic curvature.</p>
-<p>A multi-panel plot for the Thioracil group, <a href="#fig-bxthiolayout">Figure&nbsp;<span>3.9</span></a>,</p>
-<div class="cell" data-execution_count="22">
+<p>shows several animals (<code>S18</code>, <code>S19</code>, <code>S21</code>, and <code>S24</code>) whose rate of weight gain decreases as the trial goes on.</p>
+<p>By contrast, in the Thyroxin group, <a href="#fig-bxthyrlayout">Figure&nbsp;<span>3.10</span></a>,</p>
+<div class="cell" data-execution_count="23">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Thioracil"</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Thyroxin"</span>)</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
@@ -806,37 +836,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="25">
-<div id="fig-bxthiolayout" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="longitudinal_files/figure-html/fig-bxthiolayout-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3.9: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth.</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-<p>shows several animals (<code>S18</code>, <code>S19</code>, <code>S21</code>, and <code>S24</code>) whose rate of weight gain decreases as the trial goes on.</p>
-<p>By contrast, in the Thyroxin group, <a href="#fig-bxthyrlayout">Figure&nbsp;<span>3.10</span></a>,</p>
-<div class="cell" data-execution_count="23">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="pp">@subset</span>(bxdf, <span class="op">:</span>Group <span class="op">==</span> <span class="st">"Thyroxin"</span>)</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  df.orderedsubj <span class="op">=</span> <span class="fu">CategoricalArray</span>(</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    df.Subj;</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    levels<span class="op">=</span><span class="fu">sort</span>(<span class="pp">@subset</span>(df, <span class="fu">iszero</span>(<span class="op">:</span>time)), <span class="op">:</span>resp).Subj,</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    ordered<span class="op">=</span><span class="cn">true</span>,</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span></span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>    bxaxes <span class="op">*</span></span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(; layout<span class="op">=:</span>orderedsubj) <span class="op">*</span></span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(ScatterLines);</span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(height<span class="op">=</span><span class="fl">250</span>, width<span class="op">=</span><span class="fl">150</span>),</span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-display" data-execution_count="26">
+<div class="cell-output cell-output-display" data-execution_count="24">
 <div id="fig-bxthyrlayout" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxthyrlayout-output-1.svg" class="img-fluid figure-img"></p>
@@ -853,15 +853,17 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <p>Usually, when a model incorporates an effect for <code>time</code> and a <code>time &amp; Group</code> interaction - checking for different underlying slopes of the response with respect to <code>time</code> for each level of <code>Group</code>, we will also include a “main effect” for <code>Group</code>. This is sometimes called the <em>hierarchical principle</em> regarding interactions - a significant higher-order interaction usually forces inclusion of any lower-order interactions or main effects contained in it.</p>
 <p>One occasion where the hierarchical principle does not apply is when the main effect for <code>Group</code> would represent systematic differences in the response <em>before</em> the treatments began. Similarly in dose-response data; when a zero dose is included we could have a main effect for <code>dose</code> and a <code>dose &amp; Group</code> interaction without a main effect for <code>Group</code>, because zero dose of a treatment is the same as zero dose of a placebo.</p>
 <p>We can begin with a main effect for <code>Group</code>, as in</p>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delete!</span>(contrasts, <span class="op">:</span>time)</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>bxm01 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span>) <span class="op">*</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delete!</span>(contrasts, <span class="op">:</span>time)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>bxm01 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span>) <span class="op">*</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
 <col style="width: 12%">
@@ -884,10 +886,10 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: right;">54.1086</td>
-<td style="text-align: right;">1.5367</td>
+<td style="text-align: right;">1.5368</td>
 <td style="text-align: right;">35.21</td>
 <td style="text-align: right;">&lt;1e-99</td>
-<td style="text-align: right;">4.0284</td>
+<td style="text-align: right;">4.0286</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">time</td>
@@ -895,7 +897,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <td style="text-align: right;">1.5639</td>
 <td style="text-align: right;">15.36</td>
 <td style="text-align: right;">&lt;1e-52</td>
-<td style="text-align: right;">3.7539</td>
+<td style="text-align: right;">3.7538</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">time ^ 2</td>
@@ -908,7 +910,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="even">
 <td style="text-align: left;">Group: Thioracil</td>
 <td style="text-align: right;">0.9086</td>
-<td style="text-align: right;">2.1732</td>
+<td style="text-align: right;">2.1733</td>
 <td style="text-align: right;">0.42</td>
 <td style="text-align: right;">0.6759</td>
 <td style="text-align: right;"></td>
@@ -916,7 +918,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="odd">
 <td style="text-align: left;">Group: Thyroxin</td>
 <td style="text-align: right;">0.6302</td>
-<td style="text-align: right;">2.3948</td>
+<td style="text-align: right;">2.3949</td>
 <td style="text-align: right;">0.26</td>
 <td style="text-align: right;">0.7924</td>
 <td style="text-align: right;"></td>
@@ -924,7 +926,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="even">
 <td style="text-align: left;">time &amp; Group: Thioracil</td>
 <td style="text-align: right;">-1.6271</td>
-<td style="text-align: right;">2.2117</td>
+<td style="text-align: right;">2.2116</td>
 <td style="text-align: right;">-0.74</td>
 <td style="text-align: right;">0.4619</td>
 <td style="text-align: right;"></td>
@@ -963,15 +965,19 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 <p>but we expect that a model without the main effect for <code>Group</code>,</p>
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>bxm02 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span> (time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span>) <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>bxm02 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span> (time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span>) <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
 <col style="width: 12%">
@@ -997,7 +1003,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <td style="text-align: right;">0.9382</td>
 <td style="text-align: right;">58.21</td>
 <td style="text-align: right;">&lt;1e-99</td>
-<td style="text-align: right;">4.0465</td>
+<td style="text-align: right;">4.0466</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">time &amp; Group: Control</td>
@@ -1073,9 +1079,13 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 <p>will be adequate, as confirmed by</p>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm02, bxm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm02, bxm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 74%">
 <col style="width: 6%">
@@ -1113,6 +1123,8 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 <div class="callout-warning callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1142,13 +1154,15 @@ Note
 </div>
 <p>We see the effect of this changing interpretation in the p-values associated with these coefficients. In model <code>bxm01</code> the only coefficients with low p-values are the <code>(Intercept)</code>, the <code>time</code>, representing a typical rate of weight gain in the control group at time zero, and the change in the quadratic term from the <code>Control</code> group to the <code>Thioracil</code> group.</p>
 <p>A model without systematic differences between groups in the initial weight and the initial slope but with differences between groups in the quadratic coefficient is sensible. It would indicate that the groups are initially homogeneous both in weight and growth rate but, as the trial proceeds, the different treatments change the rate of growth.</p>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>bxm03 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>bxm03 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
 <col style="width: 12%">
@@ -1174,15 +1188,15 @@ Note
 <td style="text-align: right;">0.9349</td>
 <td style="text-align: right;">58.41</td>
 <td style="text-align: right;">&lt;1e-99</td>
-<td style="text-align: right;">4.0130</td>
+<td style="text-align: right;">4.0129</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">time</td>
 <td style="text-align: right;">22.8534</td>
-<td style="text-align: right;">0.9627</td>
+<td style="text-align: right;">0.9626</td>
 <td style="text-align: right;">23.74</td>
 <td style="text-align: right;">&lt;1e-99</td>
-<td style="text-align: right;">3.8080</td>
+<td style="text-align: right;">3.8079</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">time ^ 2 &amp; Group: Control</td>
@@ -1226,8 +1240,12 @@ Note
 </tr>
 </tbody>
 </table>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm03, bxm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+</div>
+</div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm03, bxm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 68%">
 <col style="width: 8%">
@@ -1265,6 +1283,8 @@ Note
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 </section>
 <section id="possible-simplification-of-random-effects" class="level3" data-number="3.5.3">
 <h3 data-number="3.5.3" class="anchored" data-anchor-id="possible-simplification-of-random-effects"><span class="header-section-number">3.5.3</span> Possible simplification of random effects</h3>
@@ -1272,9 +1292,9 @@ Note
 <div class="cell" data-execution_count="29">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="32">
+<div class="cell-output cell-output-display" data-execution_count="30">
 <div id="fig-bxm03caterpillar" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxm03caterpillar-output-1.svg" class="img-fluid figure-img"></p>
@@ -1287,9 +1307,9 @@ Note
 <div class="cell" data-execution_count="30">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">800</span>)), bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shrinkageplot!</span>(<span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">800</span>)), bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="33">
+<div class="cell-output cell-output-display" data-execution_count="31">
 <div id="fig-bxm03shrinkage" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxm03shrinkage-output-1.svg" class="img-fluid figure-img"></p>
@@ -1302,19 +1322,19 @@ Note
 <p>Nevertheless, the estimated unconditional distribution of the random effects in model <code>bxm03</code> is a degenerate distribution.</p>
 <p>That is, the estimated within-subject covariance of the random effects is singular.</p>
 <div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">issingular</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">issingular</span>(bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
 <pre><code>true</code></pre>
 </div>
 </div>
 <p>One way to see this is because the relative covariance factor, <span class="math inline">\(\boldsymbol{\lambda}\)</span>, of the within-subject random effects is</p>
 <div class="cell" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Matrix</span>(<span class="fu">only</span>(bxm03.λ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Matrix</span>(<span class="fu">only</span>(bxm03.λ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="33">
 <pre><code>3×3 Matrix{Float64}:
   1.37931   0.0       0.0
-  1.15543   0.614909  0.0
- -0.301051  0.162541  0.0</code></pre>
+  1.15547   0.614804  0.0
+ -0.301045  0.162566  0.0</code></pre>
 </div>
 </div>
 <p>and we see that the third column is all zeros.</p>
@@ -1323,41 +1343,41 @@ Note
 <div class="cell" data-execution_count="33">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  bpts <span class="op">=</span> <span class="fu">Point3f</span>.(<span class="fu">eachcol</span>(<span class="fu">only</span>(bxm03.b)))</span>
-<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  Upts <span class="op">=</span> <span class="fu">Point3f</span>.(<span class="fu">eachcol</span>(<span class="fu">svd</span>(<span class="fu">only</span>(bxm03.λ)).U))</span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  origin <span class="op">=</span> <span class="fu">Point3</span>(<span class="fu">zeros</span>(<span class="dt">Float32</span>, <span class="fl">3</span>))</span>
-<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  xlabel, ylabel, zlabel <span class="op">=</span> <span class="fu">only</span>(bxm03.reterms).cnames</span>
-<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  zlabel <span class="op">=</span> <span class="st">"time²"</span></span>
-<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  perspectiveness <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>  aspect <span class="op">=</span> <span class="op">:</span>data</span>
-<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">1200</span>, <span class="fl">500</span>))</span>
-<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  u, v, w <span class="op">=</span> <span class="op">-</span>Upts[<span class="fl">2</span>]    <span class="co"># second principle direction flipped to get positive w</span></span>
-<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>  elevation <span class="op">=</span> <span class="fu">asin</span>(w)</span>
-<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>  azimuth <span class="op">=</span> <span class="fu">atan</span>(v, u)</span>
-<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>  ax1 <span class="op">=</span></span>
-<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis3</span>(f[<span class="fl">1</span>, <span class="fl">1</span>]; aspect, xlabel, ylabel, zlabel, perspectiveness)</span>
-<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>  ax2 <span class="op">=</span> <span class="fu">Axis3</span>(</span>
-<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">2</span>];</span>
-<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>    aspect,</span>
-<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>    xlabel,</span>
-<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a>    ylabel,</span>
-<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>    zlabel,</span>
-<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a>    perspectiveness,</span>
-<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>    elevation,</span>
-<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a>    azimuth,</span>
-<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scatter!</span>(ax1, bpts; marker<span class="op">=</span><span class="ch">'∘'</span>, markersize<span class="op">=</span><span class="fl">20</span>)</span>
-<span id="cb50-26"><a href="#cb50-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scatter!</span>(ax2, bpts; marker<span class="op">=</span><span class="ch">'∘'</span>, markersize<span class="op">=</span><span class="fl">20</span>)</span>
-<span id="cb50-27"><a href="#cb50-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> p <span class="kw">in</span> Upts</span>
-<span id="cb50-28"><a href="#cb50-28" aria-hidden="true" tabindex="-1"></a>    seg <span class="op">=</span> [origin, p]</span>
-<span id="cb50-29"><a href="#cb50-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines!</span>(ax1, seg)</span>
-<span id="cb50-30"><a href="#cb50-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines!</span>(ax2, seg)</span>
-<span id="cb50-31"><a href="#cb50-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb50-32"><a href="#cb50-32" aria-hidden="true" tabindex="-1"></a>  f</span>
-<span id="cb50-33"><a href="#cb50-33" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  bpts <span class="op">=</span> <span class="fu">Point3f</span>.(<span class="fu">eachcol</span>(<span class="fu">only</span>(bxm03.b)))</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  Upts <span class="op">=</span> <span class="fu">Point3f</span>.(<span class="fu">eachcol</span>(<span class="fu">svd</span>(<span class="fu">only</span>(bxm03.λ)).U))</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  origin <span class="op">=</span> <span class="fu">Point3</span>(<span class="fu">zeros</span>(<span class="dt">Float32</span>, <span class="fl">3</span>))</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  xlabel, ylabel, zlabel <span class="op">=</span> <span class="fu">only</span>(bxm03.reterms).cnames</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  zlabel <span class="op">=</span> <span class="st">"time²"</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  perspectiveness <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  aspect <span class="op">=</span> <span class="op">:</span>data</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">1200</span>, <span class="fl">500</span>))</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  u, v, w <span class="op">=</span> <span class="op">-</span>Upts[<span class="fl">2</span>]    <span class="co"># second principle direction flipped to get positive w</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>  elevation <span class="op">=</span> <span class="fu">asin</span>(w)</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>  azimuth <span class="op">=</span> <span class="fu">atan</span>(v, u)</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>  ax1 <span class="op">=</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis3</span>(f[<span class="fl">1</span>, <span class="fl">1</span>]; aspect, xlabel, ylabel, zlabel, perspectiveness)</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>  ax2 <span class="op">=</span> <span class="fu">Axis3</span>(</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">2</span>];</span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>    aspect,</span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>    xlabel,</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>    ylabel,</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>    zlabel,</span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>    perspectiveness,</span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a>    elevation,</span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>    azimuth,</span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scatter!</span>(ax1, bpts; marker<span class="op">=</span><span class="ch">'∘'</span>, markersize<span class="op">=</span><span class="fl">20</span>)</span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scatter!</span>(ax2, bpts; marker<span class="op">=</span><span class="ch">'∘'</span>, markersize<span class="op">=</span><span class="fl">20</span>)</span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> p <span class="kw">in</span> Upts</span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a>    seg <span class="op">=</span> [origin, p]</span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines!</span>(ax1, seg)</span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines!</span>(ax2, seg)</span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>  f</span>
+<span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="36">
+<div class="cell-output cell-output-display" data-execution_count="34">
 <div id="fig-bxm03plane" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxm03plane-output-1.svg" class="img-fluid figure-img"></p>
@@ -1368,12 +1388,12 @@ Note
 </div>
 <p>In each of the panels the three orthogonal lines from the origin are the three principle axes of the unconditional distribution of the random effects, corresponding to the columns of</p>
 <div class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svd</span>(<span class="fu">only</span>(bxm03.λ)).U</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">svd</span>(<span class="fu">only</span>(bxm03.λ)).U</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
 <pre><code>3×3 Matrix{Float64}:
- -0.723709   0.568507   0.391211
- -0.675847  -0.698511  -0.235188
-  0.139559  -0.434606   0.889742</code></pre>
+ -0.723711   0.568469   0.39126
+ -0.675845  -0.698491  -0.235254
+  0.139557  -0.434687   0.889703</code></pre>
 </div>
 </div>
 <p>The panel on the right is oriented so the viewpoint is along the negative of the second principle axis, showing that there is considerable variation in the first principle direction and zero variation in the third principle direction.</p>
@@ -1382,18 +1402,17 @@ Note
 <div class="cell" data-execution_count="35">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>bxm03samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Xoshiro</span>(<span class="fl">8642468</span>),</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">10_000</span>,</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  bxm03;</span>
-<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>  hide_progress<span class="op">=</span><span class="cn">true</span>,</span>
-<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>bxm03pars <span class="op">=</span> <span class="fu">DataFrame</span>(bxm03samp.allpars)</span>
-<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(bxm03samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>bxm03samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Xoshiro</span>(<span class="fl">8642468</span>),</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">10_000</span>,</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  bxm03;</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  hide_progress<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>bxm03pars <span class="op">=</span> <span class="fu">DataFrame</span>(bxm03samp.allpars)</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(bxm03samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="38">
-
-<div class="data-frame"><p>12 rows × 5 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>type</th><th>group</th><th>names</th><th>lower</th><th>upper</th></tr><tr><th></th><th title="String">String</th><th title="Union{Missing, String}">String?</th><th title="Union{Missing, String}">String?</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>β</td><td><em>missing</em></td><td>(Intercept)</td><td>52.731</td><td>56.421</td></tr><tr><th>2</th><td>β</td><td><em>missing</em></td><td>time</td><td>20.917</td><td>24.7163</td></tr><tr><th>3</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Control</td><td>0.154476</td><td>1.4371</td></tr><tr><th>4</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Thioracil</td><td>-2.02239</td><td>-0.724444</td></tr><tr><th>5</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Thyroxin</td><td>0.42252</td><td>1.90151</td></tr><tr><th>6</th><td>σ</td><td>Subj</td><td>(Intercept)</td><td>2.48372</td><td>5.48879</td></tr><tr><th>7</th><td>σ</td><td>Subj</td><td>time</td><td>2.26442</td><td>5.44328</td></tr><tr><th>8</th><td>ρ</td><td>Subj</td><td>(Intercept), time</td><td>0.380303</td><td>1.0</td></tr><tr><th>9</th><td>σ</td><td>Subj</td><td>time ^ 2</td><td>0.546158</td><td>1.39477</td></tr><tr><th>10</th><td>ρ</td><td>Subj</td><td>(Intercept), time ^ 2</td><td>-1.0</td><td>-0.444565</td></tr><tr><th>11</th><td>ρ</td><td>Subj</td><td>time, time ^ 2</td><td>-0.898147</td><td>-0.185192</td></tr><tr><th>12</th><td>σ</td><td>residual</td><td><em>missing</em></td><td>2.31835</td><td>3.26424</td></tr></tbody></table></div>
+<div class="cell-output cell-output-display" data-execution_count="36">
+<div class="data-frame"><p>12 rows × 5 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>type</th><th>group</th><th>names</th><th>lower</th><th>upper</th></tr><tr><th></th><th title="String">String</th><th title="Union{Missing, String}">String?</th><th title="Union{Missing, String}">String?</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>β</td><td><em>missing</em></td><td>(Intercept)</td><td>52.731</td><td>56.421</td></tr><tr><th>2</th><td>β</td><td><em>missing</em></td><td>time</td><td>20.917</td><td>24.7162</td></tr><tr><th>3</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Control</td><td>0.154488</td><td>1.43713</td></tr><tr><th>4</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Thioracil</td><td>-2.02241</td><td>-0.724425</td></tr><tr><th>5</th><td>β</td><td><em>missing</em></td><td>time ^ 2 &amp; Group: Thyroxin</td><td>0.422495</td><td>1.90146</td></tr><tr><th>6</th><td>σ</td><td>Subj</td><td>(Intercept)</td><td>2.48512</td><td>5.48903</td></tr><tr><th>7</th><td>σ</td><td>Subj</td><td>time</td><td>2.25504</td><td>5.4336</td></tr><tr><th>8</th><td>ρ</td><td>Subj</td><td>(Intercept), time</td><td>0.380983</td><td>1.0</td></tr><tr><th>9</th><td>σ</td><td>Subj</td><td>time ^ 2</td><td>0.546805</td><td>1.39493</td></tr><tr><th>10</th><td>ρ</td><td>Subj</td><td>(Intercept), time ^ 2</td><td>-1.0</td><td>-0.444889</td></tr><tr><th>11</th><td>ρ</td><td>Subj</td><td>time, time ^ 2</td><td>-0.898154</td><td>-0.184584</td></tr><tr><th>12</th><td>σ</td><td>residual</td><td><em>missing</em></td><td>2.32512</td><td>3.27124</td></tr></tbody></table></div>
 </div>
 </div>
 <p>shows that the coverage intervals for both of the correlation parameters involving the <code>(Intercept)</code> extend out to one of the limits of the allowable range [-1, 1] of correlations.</p>
@@ -1401,16 +1420,16 @@ Note
 <div class="cell" data-execution_count="36">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(bxm03pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"ρ"</span>)) <span class="op">*</span></span>
-<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap replicates of correlation estimates"</span>;</span>
-<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Variables"</span>),</span>
-<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
-<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(bxm03pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"ρ"</span>)) <span class="op">*</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap replicates of correlation estimates"</span>;</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Variables"</span>),</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="39">
+<div class="cell-output cell-output-display" data-execution_count="37">
 <div id="fig-bxm03rhodens" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxm03rhodens-output-1.svg" class="img-fluid figure-img"></p>
@@ -1423,22 +1442,22 @@ Note
 <div class="cell" data-execution_count="37">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="pp">@transform</span>(</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span>(bxm03pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"ρ"</span>),</span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>z <span class="op">=</span> <span class="fu">atanh</span>(<span class="fu">clamp</span>(<span class="op">:</span>value, <span class="op">-</span><span class="fl">0.99999</span>, <span class="fl">0.99999</span>))</span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
-<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>z <span class="op">=&gt;</span> <span class="st">"Fisher's z transformation of correlation estimates"</span>;</span>
-<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Variables"</span>),</span>
-<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(dat) <span class="op">*</span> mp <span class="op">*</span> AlgebraOfGraphics.<span class="fu">density</span>();</span>
-<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
-<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="pp">@transform</span>(</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@subset</span>(bxm03pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"ρ"</span>),</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>z <span class="op">=</span> <span class="fu">atanh</span>(<span class="fu">clamp</span>(<span class="op">:</span>value, <span class="op">-</span><span class="fl">0.99999</span>, <span class="fl">0.99999</span>))</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>z <span class="op">=&gt;</span> <span class="st">"Fisher's z transformation of correlation estimates"</span>;</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Variables"</span>),</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(dat) <span class="op">*</span> mp <span class="op">*</span> AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="40">
+<div class="cell-output cell-output-display" data-execution_count="38">
 <div id="fig-bxm03rhodensatanh" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxm03rhodensatanh-output-1.svg" class="img-fluid figure-img"></p>
@@ -1448,12 +1467,14 @@ Note
 </div>
 </div>
 <p>Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for <code>time ^ 2</code> reduces the model too much.</p>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>bxm04 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>bxm04 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@formula</span>(resp <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> time <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span> (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj))</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
 <col style="width: 12%">
@@ -1523,8 +1544,12 @@ Note
 </tr>
 </tbody>
 </table>
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm04, bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+</div>
+</div>
+<div class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm04, bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="40">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 66%">
 <col style="width: 9%">
@@ -1562,19 +1587,23 @@ Note
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 <p>as does eliminating within-subject correlations between the random-effects for the <code>time^2</code> random effect and the other random effects.</p>
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>bxm05 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
-<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
-<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span></span>
-<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>      time <span class="op">+</span></span>
-<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>      time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span></span>
-<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj) <span class="op">+</span></span>
-<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">0</span> <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
-<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
-<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>bxm05 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">~</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>      time <span class="op">+</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>      time<span class="op">^</span><span class="fl">2</span> <span class="op">&amp;</span> Group <span class="op">+</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">1</span> <span class="op">+</span> time <span class="op">|</span> Subj) <span class="op">+</span></span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>      (<span class="fl">0</span> <span class="op">+</span> time<span class="op">^</span><span class="fl">2</span> <span class="op">|</span> Subj)</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, bxdf; contrasts)</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
 <col style="width: 12%">
@@ -1597,10 +1626,10 @@ Note
 <tr class="odd">
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: right;">54.6085</td>
-<td style="text-align: right;">1.0432</td>
-<td style="text-align: right;">52.35</td>
+<td style="text-align: right;">1.0433</td>
+<td style="text-align: right;">52.34</td>
 <td style="text-align: right;">&lt;1e-99</td>
-<td style="text-align: right;">4.6059</td>
+<td style="text-align: right;">4.6060</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">time</td>
@@ -1652,8 +1681,12 @@ Note
 </tr>
 </tbody>
 </table>
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm05, bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+</div>
+</div>
+<div class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(bxm05, bxm03)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="42">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 70%">
 <col style="width: 8%">
@@ -1691,6 +1724,8 @@ Note
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 </section>
 <section id="some-consequences-of-changing-the-random-effects-structure" class="level3" data-number="3.5.4">
 <h3 data-number="3.5.4" class="anchored" data-anchor-id="some-consequences-of-changing-the-random-effects-structure"><span class="header-section-number">3.5.4</span> Some consequences of changing the random-effects structure</h3>
@@ -1700,55 +1735,55 @@ Note
 <div class="cell" data-execution_count="42">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  times <span class="op">=</span> <span class="fu">Float32</span>.((<span class="fl">0</span><span class="op">:</span><span class="fl">256</span>) <span class="op">/</span> <span class="fl">64</span>)</span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  times² <span class="op">=</span> <span class="fu">abs2</span>.(times)</span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  z257 <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Float32</span>, <span class="fl">257</span>)</span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  tmat <span class="op">=</span> <span class="fu">hcat</span>(</span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ones</span>(<span class="dt">Float32</span>, <span class="fl">257</span> <span class="op">*</span> <span class="fl">3</span>),</span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">repeat</span>(times, <span class="fl">3</span>),</span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(times², z257, z257),</span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(z257, times², z257),</span>
-<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(z257, z257, times²),</span>
-<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>  grp <span class="op">=</span> <span class="fu">repeat</span>([<span class="st">"Control"</span>, <span class="st">"Thioracil"</span>, <span class="st">"Thyroxin"</span>]; inner<span class="op">=</span><span class="fl">257</span>)</span>
-<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(</span>
-<span id="cb60-15"><a href="#cb60-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">append!</span>(</span>
-<span id="cb60-16"><a href="#cb60-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">append!</span>(</span>
-<span id="cb60-17"><a href="#cb60-17" aria-hidden="true" tabindex="-1"></a>          <span class="fu">DataFrame</span>(;</span>
-<span id="cb60-18"><a href="#cb60-18" aria-hidden="true" tabindex="-1"></a>            times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
-<span id="cb60-19"><a href="#cb60-19" aria-hidden="true" tabindex="-1"></a>            wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm03.beta),</span>
-<span id="cb60-20"><a href="#cb60-20" aria-hidden="true" tabindex="-1"></a>            Group<span class="op">=</span>grp,</span>
-<span id="cb60-21"><a href="#cb60-21" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span><span class="st">"bxm03"</span>,</span>
-<span id="cb60-22"><a href="#cb60-22" aria-hidden="true" tabindex="-1"></a>          ),</span>
-<span id="cb60-23"><a href="#cb60-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">DataFrame</span>(;</span>
-<span id="cb60-24"><a href="#cb60-24" aria-hidden="true" tabindex="-1"></a>            times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
-<span id="cb60-25"><a href="#cb60-25" aria-hidden="true" tabindex="-1"></a>            wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm04.beta),</span>
-<span id="cb60-26"><a href="#cb60-26" aria-hidden="true" tabindex="-1"></a>            Group<span class="op">=</span>grp,</span>
-<span id="cb60-27"><a href="#cb60-27" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span><span class="st">"bxm04"</span>,</span>
-<span id="cb60-28"><a href="#cb60-28" aria-hidden="true" tabindex="-1"></a>          ),</span>
-<span id="cb60-29"><a href="#cb60-29" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb60-30"><a href="#cb60-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(;</span>
-<span id="cb60-31"><a href="#cb60-31" aria-hidden="true" tabindex="-1"></a>          times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
-<span id="cb60-32"><a href="#cb60-32" aria-hidden="true" tabindex="-1"></a>          wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm05.beta),</span>
-<span id="cb60-33"><a href="#cb60-33" aria-hidden="true" tabindex="-1"></a>          Group<span class="op">=</span>grp,</span>
-<span id="cb60-34"><a href="#cb60-34" aria-hidden="true" tabindex="-1"></a>          model<span class="op">=</span><span class="st">"bxm05"</span>,</span>
-<span id="cb60-35"><a href="#cb60-35" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb60-36"><a href="#cb60-36" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb60-37"><a href="#cb60-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
-<span id="cb60-38"><a href="#cb60-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(</span>
-<span id="cb60-39"><a href="#cb60-39" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>times <span class="op">=&gt;</span> <span class="st">"Time in trial (wk)"</span>,</span>
-<span id="cb60-40"><a href="#cb60-40" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>wt <span class="op">=&gt;</span> <span class="st">"Weight (gm)"</span>;</span>
-<span id="cb60-41"><a href="#cb60-41" aria-hidden="true" tabindex="-1"></a>      color<span class="op">=:</span>Group,</span>
-<span id="cb60-42"><a href="#cb60-42" aria-hidden="true" tabindex="-1"></a>      col<span class="op">=:</span>model,</span>
-<span id="cb60-43"><a href="#cb60-43" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
-<span id="cb60-44"><a href="#cb60-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(Lines);</span>
-<span id="cb60-45"><a href="#cb60-45" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(width<span class="op">=</span><span class="fl">350</span>, height<span class="op">=</span><span class="fl">350</span>),</span>
-<span id="cb60-46"><a href="#cb60-46" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb60-47"><a href="#cb60-47" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  times <span class="op">=</span> <span class="fu">Float32</span>.((<span class="fl">0</span><span class="op">:</span><span class="fl">256</span>) <span class="op">/</span> <span class="fl">64</span>)</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  times² <span class="op">=</span> <span class="fu">abs2</span>.(times)</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  z257 <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Float32</span>, <span class="fl">257</span>)</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  tmat <span class="op">=</span> <span class="fu">hcat</span>(</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ones</span>(<span class="dt">Float32</span>, <span class="fl">257</span> <span class="op">*</span> <span class="fl">3</span>),</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">repeat</span>(times, <span class="fl">3</span>),</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(times², z257, z257),</span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(z257, times², z257),</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">vcat</span>(z257, z257, times²),</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>  grp <span class="op">=</span> <span class="fu">repeat</span>([<span class="st">"Control"</span>, <span class="st">"Thioracil"</span>, <span class="st">"Thyroxin"</span>]; inner<span class="op">=</span><span class="fl">257</span>)</span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(</span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">append!</span>(</span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">append!</span>(</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>          <span class="fu">DataFrame</span>(;</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>            times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a>            wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm03.beta),</span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>            Group<span class="op">=</span>grp,</span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span><span class="st">"bxm03"</span>,</span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a>          ),</span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a>          <span class="fu">DataFrame</span>(;</span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a>            times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
+<span id="cb59-25"><a href="#cb59-25" aria-hidden="true" tabindex="-1"></a>            wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm04.beta),</span>
+<span id="cb59-26"><a href="#cb59-26" aria-hidden="true" tabindex="-1"></a>            Group<span class="op">=</span>grp,</span>
+<span id="cb59-27"><a href="#cb59-27" aria-hidden="true" tabindex="-1"></a>            model<span class="op">=</span><span class="st">"bxm04"</span>,</span>
+<span id="cb59-28"><a href="#cb59-28" aria-hidden="true" tabindex="-1"></a>          ),</span>
+<span id="cb59-29"><a href="#cb59-29" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb59-30"><a href="#cb59-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(;</span>
+<span id="cb59-31"><a href="#cb59-31" aria-hidden="true" tabindex="-1"></a>          times<span class="op">=</span>tmat[<span class="op">:</span>, <span class="fl">2</span>],</span>
+<span id="cb59-32"><a href="#cb59-32" aria-hidden="true" tabindex="-1"></a>          wt<span class="op">=</span>tmat <span class="op">*</span> <span class="fu">Float32</span>.(bxm05.beta),</span>
+<span id="cb59-33"><a href="#cb59-33" aria-hidden="true" tabindex="-1"></a>          Group<span class="op">=</span>grp,</span>
+<span id="cb59-34"><a href="#cb59-34" aria-hidden="true" tabindex="-1"></a>          model<span class="op">=</span><span class="st">"bxm05"</span>,</span>
+<span id="cb59-35"><a href="#cb59-35" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb59-36"><a href="#cb59-36" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb59-37"><a href="#cb59-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
+<span id="cb59-38"><a href="#cb59-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(</span>
+<span id="cb59-39"><a href="#cb59-39" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>times <span class="op">=&gt;</span> <span class="st">"Time in trial (wk)"</span>,</span>
+<span id="cb59-40"><a href="#cb59-40" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>wt <span class="op">=&gt;</span> <span class="st">"Weight (gm)"</span>;</span>
+<span id="cb59-41"><a href="#cb59-41" aria-hidden="true" tabindex="-1"></a>      color<span class="op">=:</span>Group,</span>
+<span id="cb59-42"><a href="#cb59-42" aria-hidden="true" tabindex="-1"></a>      col<span class="op">=:</span>model,</span>
+<span id="cb59-43"><a href="#cb59-43" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
+<span id="cb59-44"><a href="#cb59-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(Lines);</span>
+<span id="cb59-45"><a href="#cb59-45" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(width<span class="op">=</span><span class="fl">350</span>, height<span class="op">=</span><span class="fl">350</span>),</span>
+<span id="cb59-46"><a href="#cb59-46" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-47"><a href="#cb59-47" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="45">
+<div class="cell-output cell-output-display" data-execution_count="43">
 <div id="fig-bxmodfitted" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="longitudinal_files/figure-html/fig-bxmodfitted-output-1.svg" class="img-fluid figure-img"></p>
@@ -1792,7 +1827,7 @@ Elston, R. C., &amp; Grizzle, J. E. (1962). Estimation of time-response curves a
 </section>
 
 </main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+<script type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const icon = "";
   const anchorJS = new window.AnchorJS();
@@ -1813,10 +1848,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.blur();
     // flash "checked"
     button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
     setTimeout(function() {
-      button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
     // clear code selection

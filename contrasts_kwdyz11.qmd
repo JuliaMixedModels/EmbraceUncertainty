@@ -1,0 +1,311 @@
+---
+jupyter: julia-1.8
+---
+
+# Contrast Coding of Visual Attention Effects {#sec.CntrstCdng1}
+
+Attach the packages to be used in this appendix.
+
+```{julia}
+#| code-fold: true
+using Arrow
+using Chain
+using DataFrames
+using MixedModels
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL             # faster LAPACK on Intel processors
+end
+using ProgressMeter
+using StatsBase
+using StatsModels
+using StatsModels: ContrastsCoding
+
+ProgressMeter.ijulia_behavior(:clear);
+```
+
+## Example data
+
+We take the `KWDYZ` dataset [@Kliegl2010].
+This is an experiment looking at three effects of visual cueing under four different cue-target relations (CTRs).
+Two horizontal rectangles are displayed above and below a central fixation point or they displayed in vertical orientation to the left and right of the fixation point.
+Subjects react to the onset of a small visual target occuring at one of the four ends of the two rectangles.
+The target is cued validly on 70% of trials by a brief flash of the corner of the rectangle at which it appears; it is cued invalidly at the three other locations 10% of the trials each.
+
+We specify three contrasts for the four-level factor CTR that are derived from spatial, object-based, and attractor-like features of attention.
+They map onto sequential differences between appropriately ordered factor levels.
+Interestingly, a different theoretical perspective, derived from feature overlap, leads to a different set of contrasts.
+Can the results refute one of the theoretical perspectives?
+
+We also have a dataset from a replication and extension of this study [@Kliegl2015].
+Both data sets are also available in [R-package RePsychLing](https://github.com/dmbates/RePsychLing/tree/master/data/)
+
+## Preprocessing
+
+```{julia}
+dat1 = @chain "./data/kwdyz11.arrow" begin
+  Arrow.Table
+  DataFrame
+  select!(:subj => :Subj, :tar => :CTR, :rt)
+end
+cellmeans = combine(
+  groupby(dat1, [:CTR]),
+  :rt => mean,
+  :rt => std,
+  :rt => length,
+  :rt => (x -> std(x) / sqrt(length(x))) => :rt_semean,
+)
+```
+
+## SeqDiffCoding
+
+This contrast corresponds to `MASS::contr.sdif()` in R.
+
+```{julia}
+form = @formula rt ~ 1 + CTR + (1 + CTR | Subj)
+levels = ["val", "sod", "dos", "dod"]
+m1 = let
+  contrasts = Dict(
+    :CTR => SeqDiffCoding(; levels), :Subj => Grouping()
+  )
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+## HypothesisCoding
+
+This contrast corresponds to `MASS::contr.sdif()` in R.
+A general solution (not inverse of last contrast)
+
+```{julia}
+m1b = let
+  contrasts = Dict(
+    :CTR => HypothesisCoding(
+      [
+        -1 1 0 0
+        0 -1 1 0
+        0 0 1 -1
+      ];
+      levels,
+      labels=["spt", "obj", "grv"],
+    ),
+  )
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+Controlling the ordering of levels for contrasts:
+
+ 1. kwarg `levels` to order the levels; the first is set as the baseline.
+ 2. kwarg `base=` to fix the baseline level.
+
+The assignment of random factors such as `Subj` to `Grouping()` is only necessary when the sample size is very large and leads to an out-of-memory error; it is included only in the first example for reference.
+
+## DummyCoding
+
+Thi contrast corresponds to `contr.treatment()` in R
+
+```{julia}
+m2 = let
+  contrasts = Dict(:CTR => DummyCoding(; base="val"))
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+This contrast has the disadvantage that the intercept returns the mean of the level specified as `base`, default is the first level, not the GM.
+
+## SpecialCoding
+
+The contrasts returned by `DummyCoding` may be what you want.
+Can't we have them, but also the GM rather than the mean of the base level?
+Yes, we can! 
+
+```{julia}
+m2b = let
+  contrasts = Dict(
+    :CTR => HypothesisCoding(
+      [
+        -1 1 0 0
+        -1 0 1 0
+        -1 0 0 1
+      ];
+      levels,
+    )
+  )
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+Just relevel the factor or move the column with -1s for a different base.
+
+## EffectsCoding
+
+This contrast coding corresponds to `contr.sum()` in R.
+
+```{julia}
+m3 = let
+  contrasts = Dict(:CTR => EffectsCoding(; base="dod"))
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+## HelmertCoding
+
+```{julia}
+m4 = let
+  contrasts = Dict(:CTR => HelmertCoding())
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+## Reverse HelmertCoding
+
+```{julia}
+m4b = let
+  levels = reverse(StatsModels.levels(dat1.CTR))
+  contrasts = Dict(:CTR => HelmertCoding(; levels))
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+Helmert contrasts are othogonal.
+
+## AnovaCoding
+
+Anova contrasts are orthogonal.
+
+### A(2) x B(2)
+
+An A(2) x B(2) design can be recast as an F(4) design with the levels (A1-B1, A1-B2, A2-B1, A2-B2).
+The following contrast specifiction returns estimates for the main effect of A, the main effect of B, and the interaction of A and B.
+In a figure With A on the x-axis and the levels of B shown as two lines, the interaction tests the null hypothesis that the two lines are parallel.
+A positive coefficient implies overadditivity (diverging lines toward the right) and a negative coefficient underadditivity (converging lines).
+
+```{julia}
+m5 = let
+  contrasts = Dict(
+    :CTR => HypothesisCoding(
+      [
+        -1 -1 +1 +1          # A
+        -1 +1 -1 +1          # B
+        +1 -1 -1 +1          # A x B
+      ];
+      levels,
+      labels=["A", "B", "AxB"],
+    ),
+  )
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+It is also helpful to see the corresponding layout of the four means for the interaction of A and B (i.e., the third contrast)
+
+```
+        B1     B2
+   A1   +1     -1
+   A2   -1     +1
+```
+
+Thus, interaction tests whether the difference between main diagonal and minor diagonal is different from zero.
+
+### A(2) x B(2) x C(2)
+
+Going beyond the four level factor; it is also helpful to see the corresponding layout of the eight means for the interaction of A and B and C.
+
+```
+          C1              C2
+      B1     B2        B1     B2
+ A1   +1     -1   A1   -1     +1
+ A2   -1     +1   A2   +1     -1
+```
+
+### A(2) x B(2) x C(3)
+
+TO BE DONE
+
+## NestedCoding
+
+An A(2) x B(2) design can be recast as an F(4) design with the levels (A1-B1, A1-B2, A2-B1, A2-B2).
+The following contrast specifiction returns an estimate for the main effect of A and the effects of B nested in the two levels of A.
+In a figure With A on the x-axis and the levels of B shown as two lines, the second contrast tests whether A1-B1 is different from A1-B2 and the third contrast tests whether A2-B1 is different from A2-B2.
+
+```{julia}
+m8 = let
+  contrasts = Dict(
+    :CTR => HypothesisCoding(
+      [
+        -1 -1 +1 +1
+        -1 +1 0 0
+        0 0 +1 -1
+      ];
+      levels,
+      labels=["do_so", "spt", "grv"],
+    ),
+  )
+  fit(MixedModel, form, dat1; contrasts)
+end
+```
+
+The three contrasts for one main effect and two nested contrasts are orthogonal.
+There is no test of the interaction (parallelism).
+
+## Other orthogonal contrasts
+
+For factors with more than four levels there are many options for specifying orthogonal contrasts as long as one proceeds in a top-down strictly hiearchical fashion.
+
+Suppose you have a factor with seven levels and let's ignore shifting colummns.
+In this case, you have six options for the first contrast, that is 6 vs. 1, 5 vs.2 , 4 vs. 3, 3 vs. 4, 2 vs. 5, and 1 vs. 6 levels.
+Then, you specify orthogonal contrasts for partitions with more than 2 elements and so on.
+That is, you don't specify a contrast that crosses an earlier partition line.
+
+In the following example, after an initial 4 vs 3 partitioning of levels, we specify `AnovaCoding` for the left and `HelmertCoding` for the right partition.
+
+```{julia}
+contrasts = Dict(
+  :CTR => HypothesisCoding(
+    [
+      -1/4 -1/4 -1/4 -1/4 +1/3 +1/3 +1/3
+      -1/2 -1/2 +1/2 +1/2 0 0 0
+      -1/2 +1/2 -1/2 +1/2 0 0 0
+      +1/2 -1/2 -1/2 +1/2 0 0 0
+      0 0 0 0 -1 +1 0
+      0 0 0 0 -1/2 -1/2 1
+    ];
+    levels=["A1", "A2", "A3", "A4", "A5", "A6", "A7"],
+    labels=["c567.1234", "B", "C", "BxC", "c6.5", "c6.56"],
+  ),
+);
+```
+
+There are two rules that hold for all orthogonal contrasts:
+
+ 1. The weights within rows sum to zero.
+ 2. For all pairs of rows, the sum of the products of weights in the same columns sums to zero.
+
+## Summary (Dave Kleinschmidt)
+
+[StatsModels](https://juliastats.org/StatsModels.jl/latest/contrasts/)
+
+StatsModels.jl provides a few commonly used contrast coding schemes, some less-commonly used schemes, and structs that allow you to manually specify your own, custom schemes.
+
+### Standard contrasts
+
+The most commonly used contrasts are `DummyCoding` and `EffectsCoding` (which are similar to `contr.treatment()` and `contr.sum()` in R, respectively).
+
+### "Exotic" contrasts
+
+We also provide `HelmertCoding` and `SeqDiffCoding` (corresponding to base R's `contr.helmert()` and `MASS::contr.sdif()`).
+
+### Manual contrasts
+
+**ContrastsCoding()**
+
+There are two ways to manually specify contrasts.
+First, you can specify them **directly** via `ContrastsCoding`.
+If you do, it's good practice to specify the levels corresponding to the rows of the matrix, although they can be omitted in which case they'll be inferred from the data.
+
+**HypothesisCoding()**
+
+A better way to specify manual contrasts is via `HypothesisCoding`, where each row of the matrix corresponds to the weights given to the cell means of the levels corresponding to each column (see @Schad2020 for more information).
+
+::: {#refs}
+:::

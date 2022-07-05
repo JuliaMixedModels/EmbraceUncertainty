@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-0.9.247">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -99,14 +99,13 @@ div.csl-indent {
 }
 </style>
 
-
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
+<meta name="quarto:offset" content="./">
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
 <link href="./glmmbinomial.html" rel="next">
 <link href="./longitudinal.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
@@ -114,7 +113,7 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link id="quarto-text-highlighting-styles" href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -144,7 +143,7 @@ div.csl-indent {
 
 </head>
 
-<body class="nav-sidebar floating">
+<body class="floating">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -255,9 +254,9 @@ div.csl-indent {
 </div>
 
 
-
 <div class="quarto-title-meta">
 
+    
     
     
   </div>
@@ -290,7 +289,8 @@ div.csl-indent {
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>WARNING: redefinition of constant contrasts. This may fail, cause incorrect answers, or produce other errors.</code></pre>
+<pre><code>┌ Warning: SIMD capacity not detected by ScanByte, using scalar fallback
+└ @ ScanByte /Users/reinholdkliegl/.julia/packages/ScanByte/cr4PT/src/ScanByte.jl:11</code></pre>
 </div>
 </div>
 <p>As with many techniques in data science, the place where “the rubber meets the road”, as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.</p>
@@ -302,7 +302,7 @@ div.csl-indent {
 <p>Several covariates, some relating to the subject and some relating to the target, were recorded. Initially we consider only the trial-level data.</p>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ldttrial <span class="op">=</span> Arrow.<span class="fu">Table</span>(<span class="st">"./data/ELP_ldt_trial.arrow"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="81">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>Arrow.Table with 2745952 rows, 5 columns, and schema:
  :subj  Int16
  :seq   Int16
@@ -333,8 +333,7 @@ Note
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ldttrial <span class="op">=</span> <span class="pp">@transform</span>!(<span class="fu">DataFrame</span>(ldttrial), <span class="op">:</span>S2 <span class="op">=</span> <span class="op">:</span>seq <span class="op">&gt;</span> <span class="fl">2000</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(ldttrial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="82">
-
+<div class="cell-output cell-output-display" data-execution_count="4">
 <div class="data-frame"><p>6 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="Type">Type</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.31</td><td>1</td><td>409.0</td><td>816</td><td>0</td><td>Int16</td></tr><tr><th>2</th><td>seq</td><td>1687.21</td><td>1</td><td>1687.0</td><td>3374</td><td>0</td><td>Int16</td></tr><tr><th>3</th><td>acc</td><td>0.85604</td><td>0</td><td>1.0</td><td>1</td><td>1370</td><td>Union{Missing, Bool}</td></tr><tr><th>4</th><td>rt</td><td>846.325</td><td>-16160</td><td>732.0</td><td>32061</td><td>0</td><td>Int16</td></tr><tr><th>5</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>6</th><td>S2</td><td>0.407128</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Bool</td></tr></tbody></table></div>
 </div>
 </div>
@@ -358,8 +357,7 @@ Note
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@transform</span>!(<span class="op">:</span>wrdlen <span class="op">=</span> <span class="fu">length</span>(<span class="op">:</span>item), <span class="op">:</span>ipropacc <span class="op">=</span> <span class="op">:</span>iacc <span class="op">/</span> <span class="op">:</span>ni)</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="83">
-
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div class="data-frame"><p>80,962 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>item</th><th>ni</th><th>imiss</th><th>iacc</th><th>imedianrt</th><th>wrdlen</th><th>ipropacc</th></tr><tr><th></th><th title="String">String</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Int64">Int64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>a</td><td>35</td><td>0</td><td>26</td><td>743.0</td><td>1</td><td>0.742857</td></tr><tr><th>2</th><td>e</td><td>35</td><td>0</td><td>19</td><td>824.0</td><td>1</td><td>0.542857</td></tr><tr><th>3</th><td>aah</td><td>34</td><td>0</td><td>21</td><td>770.5</td><td>3</td><td>0.617647</td></tr><tr><th>4</th><td>aal</td><td>34</td><td>0</td><td>32</td><td>702.5</td><td>3</td><td>0.941176</td></tr><tr><th>5</th><td>Aaron</td><td>33</td><td>0</td><td>31</td><td>625.0</td><td>5</td><td>0.939394</td></tr><tr><th>6</th><td>Aarod</td><td>33</td><td>0</td><td>23</td><td>810.0</td><td>5</td><td>0.69697</td></tr><tr><th>7</th><td>aback</td><td>34</td><td>0</td><td>15</td><td>710.0</td><td>5</td><td>0.441176</td></tr><tr><th>8</th><td>ahack</td><td>34</td><td>0</td><td>34</td><td>662.0</td><td>5</td><td>1.0</td></tr><tr><th>9</th><td>abacus</td><td>34</td><td>0</td><td>17</td><td>671.5</td><td>6</td><td>0.5</td></tr><tr><th>10</th><td>alacus</td><td>34</td><td>0</td><td>29</td><td>640.0</td><td>6</td><td>0.852941</td></tr><tr><th>11</th><td>abandon</td><td>34</td><td>0</td><td>32</td><td>641.0</td><td>7</td><td>0.941176</td></tr><tr><th>12</th><td>acandon</td><td>34</td><td>0</td><td>33</td><td>725.5</td><td>7</td><td>0.970588</td></tr><tr><th>13</th><td>abandoned</td><td>34</td><td>0</td><td>31</td><td>667.5</td><td>9</td><td>0.911765</td></tr><tr><th>14</th><td>adandoned</td><td>34</td><td>0</td><td>11</td><td>760.5</td><td>9</td><td>0.323529</td></tr><tr><th>15</th><td>abandoning</td><td>34</td><td>0</td><td>34</td><td>662.0</td><td>10</td><td>1.0</td></tr><tr><th>16</th><td>abantoning</td><td>34</td><td>0</td><td>30</td><td>848.5</td><td>10</td><td>0.882353</td></tr><tr><th>17</th><td>abandonment</td><td>35</td><td>0</td><td>35</td><td>734.0</td><td>11</td><td>1.0</td></tr><tr><th>18</th><td>apandonment</td><td>35</td><td>0</td><td>30</td><td>817.0</td><td>11</td><td>0.857143</td></tr><tr><th>19</th><td>abase</td><td>34</td><td>1</td><td>23</td><td>750.5</td><td>5</td><td>0.676471</td></tr><tr><th>20</th><td>abose</td><td>34</td><td>0</td><td>23</td><td>805.5</td><td>5</td><td>0.676471</td></tr><tr><th>21</th><td>abasement</td><td>33</td><td>0</td><td>17</td><td>850.0</td><td>9</td><td>0.515152</td></tr><tr><th>22</th><td>afasement</td><td>33</td><td>0</td><td>30</td><td>649.0</td><td>9</td><td>0.909091</td></tr><tr><th>23</th><td>abash</td><td>32</td><td>0</td><td>22</td><td>727.5</td><td>5</td><td>0.6875</td></tr><tr><th>24</th><td>adash</td><td>32</td><td>0</td><td>25</td><td>784.5</td><td>5</td><td>0.78125</td></tr><tr><th>25</th><td>abate</td><td>34</td><td>0</td><td>24</td><td>687.0</td><td>5</td><td>0.705882</td></tr><tr><th>26</th><td>abape</td><td>34</td><td>0</td><td>32</td><td>675.0</td><td>5</td><td>0.941176</td></tr><tr><th>27</th><td>abated</td><td>34</td><td>0</td><td>23</td><td>775.0</td><td>6</td><td>0.676471</td></tr><tr><th>28</th><td>agated</td><td>34</td><td>0</td><td>14</td><td>897.5</td><td>6</td><td>0.411765</td></tr><tr><th>29</th><td>abbess</td><td>34</td><td>0</td><td>7</td><td>837.5</td><td>6</td><td>0.205882</td></tr><tr><th>30</th><td>abbass</td><td>34</td><td>0</td><td>28</td><td>788.0</td><td>6</td><td>0.823529</td></tr><tr><th>⋮</th><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr></tbody></table></div>
 </div>
 </div>
@@ -367,16 +365,14 @@ Note
 <div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>byitem.isword <span class="op">=</span> <span class="fu">isodd</span>.(<span class="fu">eachindex</span>(byitem.item))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="84">
-
+<div class="cell-output cell-output-display" data-execution_count="6">
 <div class="data-frame"><p>8 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>2</th><td>ni</td><td>33.9166</td><td>30</td><td>34.0</td><td>37</td><td>0</td><td>Int64</td></tr><tr><th>3</th><td>imiss</td><td>0.0169215</td><td>0</td><td>0.0</td><td>2</td><td>0</td><td>Int64</td></tr><tr><th>4</th><td>iacc</td><td>29.0194</td><td>0</td><td>31.0</td><td>37</td><td>0</td><td>Int64</td></tr><tr><th>5</th><td>imedianrt</td><td>753.069</td><td>458.0</td><td>737.5</td><td>1691.0</td><td>0</td><td>Float64</td></tr><tr><th>6</th><td>wrdlen</td><td>7.9988</td><td>1</td><td>8.0</td><td>21</td><td>0</td><td>Int64</td></tr><tr><th>7</th><td>ipropacc</td><td>0.855616</td><td>0.0</td><td>0.911765</td><td>1.0</td><td>0</td><td>Float64</td></tr><tr><th>8</th><td>isword</td><td>0.5</td><td>0</td><td>0.5</td><td>1</td><td>0</td><td>Bool</td></tr></tbody></table></div>
 </div>
 </div>
 <p>This table shows that some of the items were never identified correctly. These are</p>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@subset</span>(byitem, <span class="fu">iszero</span>(<span class="op">:</span>iacc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="85">
-
+<div class="cell-output cell-output-display" data-execution_count="7">
 <div class="data-frame"><p>9 rows × 8 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>item</th><th>ni</th><th>imiss</th><th>iacc</th><th>imedianrt</th><th>wrdlen</th><th>ipropacc</th><th>isword</th></tr><tr><th></th><th title="String">String</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Bool">Bool</th></tr></thead><tbody><tr><th>1</th><td>baobab</td><td>34</td><td>0</td><td>0</td><td>616.5</td><td>6</td><td>0.0</td><td>1</td></tr><tr><th>2</th><td>haulage</td><td>34</td><td>0</td><td>0</td><td>708.5</td><td>7</td><td>0.0</td><td>1</td></tr><tr><th>3</th><td>leitmotif</td><td>35</td><td>0</td><td>0</td><td>688.0</td><td>9</td><td>0.0</td><td>1</td></tr><tr><th>4</th><td>miasmal</td><td>35</td><td>0</td><td>0</td><td>774.0</td><td>7</td><td>0.0</td><td>1</td></tr><tr><th>5</th><td>peahen</td><td>34</td><td>0</td><td>0</td><td>684.0</td><td>6</td><td>0.0</td><td>1</td></tr><tr><th>6</th><td>plosive</td><td>34</td><td>0</td><td>0</td><td>663.0</td><td>7</td><td>0.0</td><td>1</td></tr><tr><th>7</th><td>plugugly</td><td>33</td><td>0</td><td>0</td><td>709.0</td><td>8</td><td>0.0</td><td>1</td></tr><tr><th>8</th><td>poshest</td><td>34</td><td>0</td><td>0</td><td>740.0</td><td>7</td><td>0.0</td><td>1</td></tr><tr><th>9</th><td>servo</td><td>33</td><td>0</td><td>0</td><td>697.0</td><td>5</td><td>0.0</td><td>1</td></tr></tbody></table></div>
 </div>
 </div>
@@ -390,8 +386,7 @@ Note
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    on<span class="op">=:</span>item,</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="86">
-
+<div class="cell-output cell-output-display" data-execution_count="8">
 <div class="data-frame"><p>8 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="Type">Type</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.31</td><td>1</td><td>409.0</td><td>816</td><td>0</td><td>Int16</td></tr><tr><th>2</th><td>seq</td><td>1687.21</td><td>1</td><td>1687.0</td><td>3374</td><td>0</td><td>Int16</td></tr><tr><th>3</th><td>acc</td><td>0.85604</td><td>0</td><td>1.0</td><td>1</td><td>1370</td><td>Union{Missing, Bool}</td></tr><tr><th>4</th><td>rt</td><td>846.325</td><td>-16160</td><td>732.0</td><td>32061</td><td>0</td><td>Int16</td></tr><tr><th>5</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>6</th><td>S2</td><td>0.407128</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>7</th><td>wrdlen</td><td>7.99835</td><td>1</td><td>8.0</td><td>21</td><td>0</td><td>Union{Missing, Int64}</td></tr><tr><th>8</th><td>isword</td><td>0.499995</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Union{Missing, Bool}</td></tr></tbody></table></div>
 </div>
 </div>
@@ -399,8 +394,7 @@ Note
 <p>This could be done separately for each column or for the whole data frame, as in</p>
 <div class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">disallowmissing!</span>(ldttrial; error<span class="op">=</span><span class="cn">false</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="87">
-
+<div class="cell-output cell-output-display" data-execution_count="9">
 <div class="data-frame"><p>8 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="Type">Type</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.31</td><td>1</td><td>409.0</td><td>816</td><td>0</td><td>Int16</td></tr><tr><th>2</th><td>seq</td><td>1687.21</td><td>1</td><td>1687.0</td><td>3374</td><td>0</td><td>Int16</td></tr><tr><th>3</th><td>acc</td><td>0.85604</td><td>0</td><td>1.0</td><td>1</td><td>1370</td><td>Union{Missing, Bool}</td></tr><tr><th>4</th><td>rt</td><td>846.325</td><td>-16160</td><td>732.0</td><td>32061</td><td>0</td><td>Int16</td></tr><tr><th>5</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>6</th><td>S2</td><td>0.407128</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>7</th><td>wrdlen</td><td>7.99835</td><td>1</td><td>8.0</td><td>21</td><td>0</td><td>Int64</td></tr><tr><th>8</th><td>isword</td><td>0.499995</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Bool</td></tr></tbody></table></div>
 </div>
 </div>
@@ -427,7 +421,7 @@ Note
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">0.5</span><span class="op">:</span><span class="fl">21.5</span>),</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="88">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div id="fig-ldtwrdlenhist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-ldtwrdlenhist-output-1.svg" class="img-fluid figure-img"></p>
@@ -436,7 +430,7 @@ Note
 </div>
 </div>
 </div>
-<p>To examine trends in accuracy by word length we use a scatterplot smoother on the binary response, as described in <a href="glmmbinomial.html#sec-plottingbinary"><span>Section&nbsp;5.1.1</span></a>. The resulting plot, <a href="#fig-ldtaccsmooth">Figure&nbsp;<span>4.2</span></a>, shows the accuracy of identifying words is more-or-less constant at around 84%, but accuracy decreases with increasing word length for the nonwords.</p>
+<p>To examine trends in accuracy by word length we use a scatterplot smoother on the binary response, as described in <a href="glmmbinomial.html#sec-plottingbinary">Section&nbsp;<span>5.1.1</span></a>. The resulting plot, <a href="#fig-ldtaccsmooth">Figure&nbsp;<span>4.2</span></a>, shows the accuracy of identifying words is more-or-less constant at around 84%, but accuracy decreases with increasing word length for the nonwords.</p>
 <div class="cell" data-execution_count="10">
 <details>
 <summary>Code</summary>
@@ -451,7 +445,7 @@ Note
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="89">
+<div class="cell-output cell-output-display" data-execution_count="11">
 <div id="fig-ldtaccsmooth" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-ldtaccsmooth-output-1.svg" class="img-fluid figure-img"></p>
@@ -463,7 +457,7 @@ Note
 <p><a href="#fig-ldtaccsmooth">Figure&nbsp;<span>4.2</span></a> may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few. Over 95% of the words are between 4 and 13 characters in length</p>
 <div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(x <span class="op">-&gt;</span> <span class="fl">4</span> <span class="op">≤</span> x <span class="op">≤</span> <span class="fl">13</span>, byitem.wrdlen) <span class="op">/</span> <span class="fu">nrow</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="90">
+<div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>0.9654899829549666</code></pre>
 </div>
 </div>
@@ -482,7 +476,7 @@ Note
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="91">
+<div class="cell-output cell-output-display" data-execution_count="13">
 <div id="fig-ldtaccsmoothrestrict" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-ldtaccsmoothrestrict-output-1.svg" class="img-fluid figure-img"></p>
@@ -507,16 +501,14 @@ Note
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@transform</span>!(<span class="op">:</span>spropacc <span class="op">=</span> <span class="op">:</span>sacc <span class="op">/</span> <span class="op">:</span>ns)</span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="92">
-
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div class="data-frame"><p>814 rows × 6 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>subj</th><th>ns</th><th>smiss</th><th>sacc</th><th>smedianrt</th><th>spropacc</th></tr><tr><th></th><th title="Int16">Int16</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>1</td><td>3374</td><td>0</td><td>3158</td><td>554.0</td><td>0.935981</td></tr><tr><th>2</th><td>2</td><td>3372</td><td>1</td><td>3031</td><td>960.0</td><td>0.898873</td></tr><tr><th>3</th><td>3</td><td>3372</td><td>3</td><td>3006</td><td>813.0</td><td>0.891459</td></tr><tr><th>4</th><td>4</td><td>3374</td><td>1</td><td>3062</td><td>619.0</td><td>0.907528</td></tr><tr><th>5</th><td>5</td><td>3374</td><td>0</td><td>2574</td><td>677.0</td><td>0.762893</td></tr><tr><th>6</th><td>6</td><td>3374</td><td>0</td><td>2927</td><td>855.0</td><td>0.867516</td></tr><tr><th>7</th><td>7</td><td>3374</td><td>4</td><td>2877</td><td>918.5</td><td>0.852697</td></tr><tr><th>8</th><td>8</td><td>3372</td><td>1</td><td>2731</td><td>1310.0</td><td>0.809905</td></tr><tr><th>9</th><td>9</td><td>3374</td><td>13</td><td>2669</td><td>657.0</td><td>0.791049</td></tr><tr><th>10</th><td>10</td><td>3374</td><td>0</td><td>2722</td><td>757.0</td><td>0.806758</td></tr><tr><th>11</th><td>11</td><td>3374</td><td>0</td><td>2894</td><td>632.0</td><td>0.857736</td></tr><tr><th>12</th><td>12</td><td>3374</td><td>4</td><td>2979</td><td>692.0</td><td>0.882928</td></tr><tr><th>13</th><td>13</td><td>3374</td><td>2</td><td>2980</td><td>1114.0</td><td>0.883225</td></tr><tr><th>14</th><td>14</td><td>3374</td><td>1</td><td>2697</td><td>603.0</td><td>0.799348</td></tr><tr><th>15</th><td>15</td><td>3372</td><td>0</td><td>2957</td><td>729.0</td><td>0.876928</td></tr><tr><th>16</th><td>16</td><td>3374</td><td>0</td><td>2924</td><td>710.0</td><td>0.866627</td></tr><tr><th>17</th><td>17</td><td>3374</td><td>1</td><td>2947</td><td>755.0</td><td>0.873444</td></tr><tr><th>18</th><td>18</td><td>3374</td><td>0</td><td>2851</td><td>617.0</td><td>0.844991</td></tr><tr><th>19</th><td>19</td><td>3374</td><td>0</td><td>2890</td><td>724.0</td><td>0.85655</td></tr><tr><th>20</th><td>20</td><td>3372</td><td>0</td><td>2905</td><td>858.0</td><td>0.861507</td></tr><tr><th>21</th><td>21</td><td>3372</td><td>0</td><td>3051</td><td>1041.0</td><td>0.904804</td></tr><tr><th>22</th><td>22</td><td>3372</td><td>2</td><td>2756</td><td>972.5</td><td>0.817319</td></tr><tr><th>23</th><td>23</td><td>3374</td><td>3</td><td>2543</td><td>629.5</td><td>0.753705</td></tr><tr><th>24</th><td>24</td><td>3374</td><td>0</td><td>2995</td><td>644.0</td><td>0.88767</td></tr><tr><th>25</th><td>25</td><td>3372</td><td>0</td><td>2988</td><td>732.5</td><td>0.886121</td></tr><tr><th>26</th><td>26</td><td>3374</td><td>0</td><td>3024</td><td>830.0</td><td>0.896266</td></tr><tr><th>27</th><td>27</td><td>3374</td><td>1</td><td>2774</td><td>1099.5</td><td>0.82217</td></tr><tr><th>28</th><td>28</td><td>3372</td><td>1</td><td>2898</td><td>823.5</td><td>0.859431</td></tr><tr><th>29</th><td>29</td><td>3372</td><td>0</td><td>3022</td><td>1052.5</td><td>0.896204</td></tr><tr><th>30</th><td>30</td><td>3374</td><td>0</td><td>2946</td><td>680.0</td><td>0.873148</td></tr><tr><th>⋮</th><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr></tbody></table></div>
 </div>
 </div>
 <p>shows some anomalies</p>
 <div class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(bysubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="93">
-
+<div class="cell-output cell-output-display" data-execution_count="15">
 <div class="data-frame"><p>6 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Float64">Float64</th><th title="Real">Real</th><th title="Float64">Float64</th><th title="Real">Real</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.311</td><td>1</td><td>409.5</td><td>816</td><td>0</td><td>Int16</td></tr><tr><th>2</th><td>ns</td><td>3373.41</td><td>3370</td><td>3374.0</td><td>3374</td><td>0</td><td>Int64</td></tr><tr><th>3</th><td>smiss</td><td>1.68305</td><td>0</td><td>1.0</td><td>22</td><td>0</td><td>Int64</td></tr><tr><th>4</th><td>sacc</td><td>2886.33</td><td>1727</td><td>2928.0</td><td>3286</td><td>0</td><td>Int64</td></tr><tr><th>5</th><td>smedianrt</td><td>760.992</td><td>205.0</td><td>735.0</td><td>1804.0</td><td>0</td><td>Float64</td></tr><tr><th>6</th><td>spropacc</td><td>0.855613</td><td>0.511855</td><td>0.868031</td><td>0.973918</td><td>0</td><td>Float64</td></tr></tbody></table></div>
 </div>
 </div>
@@ -533,7 +525,7 @@ Note
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  (<span class="fu">smooth</span>() <span class="op">+</span> <span class="fu">visual</span>(Scatter));</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="94">
+<div class="cell-output cell-output-display" data-execution_count="16">
 <div id="fig-ldtmedianrtvspropacc" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-ldtmedianrtvspropacc-output-1.svg" class="img-fluid figure-img"></p>
@@ -546,19 +538,19 @@ Note
 <p>Nevertheless, approximately 15% of the subjects were unable to maintain 80% accuracy on their trials</p>
 <div class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="fu">&lt;</span>(<span class="fl">0.8</span>), bysubj.spropacc) <span class="op">/</span> <span class="fu">nrow</span>(bysubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="95">
+<div class="cell-output cell-output-display" data-execution_count="17">
 <pre><code>0.15233415233415235</code></pre>
 </div>
 </div>
 <p>and there is some association of faster response times with low accuracy. The majority of the subjects whose median response time is less than 500 ms. are accurate on less than 75% of their trials. Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.</p>
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">minimum</span>(<span class="pp">@subset</span>(bysubj, <span class="op">:</span>spropacc <span class="op">&gt;</span> <span class="fl">0.9</span>).smedianrt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="96">
+<div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>505.0</code></pre>
 </div>
 </div>
 <p>It is common in analyses of response latency in a lexical discrimination task to consider only the latencies on correct identifications and to trim outliers. In <span class="citation" data-cites="Balota_2007">Balota et al. (<a href="references.html#ref-Balota_2007" role="doc-biblioref">2007</a>)</span> a two-stage outlier removal strategy was used; first removing responses less than 200 ms or greater than 3000 ms then removing responses more than three standard deviations from the participant’s mean response.</p>
-<p>As described in <a href="#sec-ldtrtscale"><span>Section&nbsp;4.2.3</span></a> we will analyze these data on a speed scale (the inverse of response time) using only the first-stage outlier removal of response latencies less than 200 ms or greater than 3000 ms. On the speed scale the limits are 0.333 per second up to 5 per second.</p>
+<p>As described in <a href="#sec-ldtrtscale">Section&nbsp;<span>4.2.3</span></a> we will analyze these data on a speed scale (the inverse of response time) using only the first-stage outlier removal of response latencies less than 200 ms or greater than 3000 ms. On the speed scale the limits are 0.333 per second up to 5 per second.</p>
 <p>To examine the effects of the fast but inaccurate responders we will fit models to the data from all the participants and to the data from the 85% of participants who maintained an overall accuracy of 80% or greater.</p>
 <div class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>pruned <span class="op">=</span> <span class="pp">@chain</span> ldttrial <span class="cf">begin</span></span>
@@ -567,14 +559,13 @@ Note
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  dropmissing!</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">size</span>(pruned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="97">
+<div class="cell-output cell-output-display" data-execution_count="19">
 <pre><code>(2714311, 9)</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(pruned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="98">
-
+<div class="cell-output cell-output-display" data-execution_count="20">
 <div class="data-frame"><p>9 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.802</td><td>1</td><td>410.0</td><td>816</td><td>0</td><td>Int16</td></tr><tr><th>2</th><td>seq</td><td>1684.56</td><td>1</td><td>1684.0</td><td>3374</td><td>0</td><td>Int16</td></tr><tr><th>3</th><td>acc</td><td>0.859884</td><td>0</td><td>1.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>4</th><td>rt</td><td>838.712</td><td>200</td><td>733.0</td><td>3000</td><td>0</td><td>Int16</td></tr><tr><th>5</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>6</th><td>S2</td><td>0.40663</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>7</th><td>wrdlen</td><td>7.99244</td><td>1</td><td>8.0</td><td>21</td><td>0</td><td>Int64</td></tr><tr><th>8</th><td>isword</td><td>0.500126</td><td>0</td><td>1.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>9</th><td>spropacc</td><td>0.857169</td><td>0.511855</td><td>0.869295</td><td>0.973918</td><td>0</td><td>Float64</td></tr></tbody></table></div>
 </div>
 </div>
@@ -593,7 +584,7 @@ Note
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="99">
+<div class="cell-output cell-output-display" data-execution_count="21">
 <div id="fig-elpldtrtdens" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-elpldtrtdens-output-1.svg" class="img-fluid figure-img"></p>
@@ -605,8 +596,7 @@ Note
 <p>In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.</p>
 <div class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="pp">@transform</span>!(pruned, <span class="op">:</span>speed <span class="op">=</span> <span class="fl">1000</span> <span class="op">/</span> <span class="op">:</span>rt)) <span class="co"># speed in s⁻¹</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="100">
-
+<div class="cell-output cell-output-display" data-execution_count="22">
 <div class="data-frame"><p>10 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="DataType">DataType</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.802</td><td>1</td><td>410.0</td><td>816</td><td>0</td><td>Int16</td></tr><tr><th>2</th><td>seq</td><td>1684.56</td><td>1</td><td>1684.0</td><td>3374</td><td>0</td><td>Int16</td></tr><tr><th>3</th><td>acc</td><td>0.859884</td><td>0</td><td>1.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>4</th><td>rt</td><td>838.712</td><td>200</td><td>733.0</td><td>3000</td><td>0</td><td>Int16</td></tr><tr><th>5</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>6</th><td>S2</td><td>0.40663</td><td>0</td><td>0.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>7</th><td>wrdlen</td><td>7.99244</td><td>1</td><td>8.0</td><td>21</td><td>0</td><td>Int64</td></tr><tr><th>8</th><td>isword</td><td>0.500126</td><td>0</td><td>1.0</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>9</th><td>spropacc</td><td>0.857169</td><td>0.511855</td><td>0.869295</td><td>0.973918</td><td>0</td><td>Float64</td></tr><tr><th>10</th><td>speed</td><td>1.37398</td><td>0.333333</td><td>1.36426</td><td>5.0</td><td>0</td><td>Float64</td></tr></tbody></table></div>
 </div>
 </div>
@@ -621,7 +611,7 @@ Note
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="101">
+<div class="cell-output cell-output-display" data-execution_count="23">
 <div id="fig-elpldtspeeddens" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-elpldtspeeddens-output-1.svg" class="img-fluid figure-img"></p>
@@ -634,7 +624,7 @@ Note
 <div class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(r <span class="op">-&gt;</span> !<span class="fu">ismissing</span>(r.acc) <span class="op">&amp;&amp;</span> <span class="fl">200</span> <span class="op">&lt;</span> r.rt <span class="op">&lt;</span> <span class="fl">333</span>, <span class="fu">eachrow</span>(ldttrial)) <span class="op">/</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(!ismissing, ldttrial.acc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="102">
+<div class="cell-output cell-output-display" data-execution_count="24">
 <pre><code>0.005867195806137328</code></pre>
 </div>
 </div>
@@ -653,7 +643,7 @@ Note
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">smooth</span>();</span>
 <span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="103">
+<div class="cell-output cell-output-display" data-execution_count="25">
 <div id="fig-ldtrtvswrdlen" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-ldtrtvswrdlen-output-1.svg" class="img-fluid figure-img"></p>
@@ -676,7 +666,7 @@ Note
 <span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">smooth</span>();</span>
 <span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="104">
+<div class="cell-output cell-output-display" data-execution_count="26">
 <div id="fig-ldtspeedvswrdlen" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-ldtspeedvswrdlen-output-1.svg" class="img-fluid figure-img"></p>
@@ -699,10 +689,12 @@ Note
 <p>Because there are a large number of items in the data set it is important to assign a <code>Grouping()</code> contrast to <code>item</code> (and, less importantly, to <code>subj</code>). For the <code>isword</code> factor we will use an <code>EffectsCoding</code> contrast with the base level as <code>false</code>. The non-words are assigned -1 in this contrast and the words are assigned +1. The <code>wrdlen</code> covariate is on its original scale but centered at 8 characters.</p>
 <p>Thus the <code>(Intercept)</code> coefficient is the predicted speed of response for a typical subject and typical item (without regard to word/non-word status) of 8 characters.</p>
 <p>Set these contrasts</p>
+<div class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>subj] <span class="op">=</span> <span class="fu">Grouping</span>();</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>item] <span class="op">=</span> <span class="fu">Grouping</span>();</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>isword] <span class="op">=</span> <span class="fu">EffectsCoding</span>(; base<span class="op">=</span><span class="cn">false</span>);</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>wrdlen] <span class="op">=</span> <span class="fu">Center</span>(<span class="fl">8</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>and fit a first model with simple, scalar, random effects for <code>subj</code> and <code>item</code>.</p>
 <div class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>elm01 <span class="op">=</span> <span class="kw">let</span></span>
@@ -712,9 +704,9 @@ Note
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, pruned; contrasts)</span>
 <span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 54    Time: 0:00:05 ( 0.10  s/it)</code></pre>
+<pre><code>[32mMinimizing 54   Time: 0:00:03 (71.37 ms/it)[39m</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="106">
+<div class="cell-output cell-output-display" data-execution_count="28">
 <table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
@@ -796,9 +788,9 @@ Note
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dat; contrasts)</span>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 54    Time: 0:00:03 (71.18 ms/it)</code></pre>
+<pre><code>[32mMinimizing 73   Time: 0:00:03 (49.26 ms/it)[39m</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="107">
+<div class="cell-output cell-output-display" data-execution_count="29">
 <table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
@@ -881,8 +873,7 @@ Note
 <span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename!</span>(<span class="fu">DataFrame</span>(<span class="fu">raneftables</span>(elm02).item), [<span class="st">"item"</span>, <span class="st">"elm02"</span>]);</span>
 <span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  on<span class="op">=:</span>item,</span>
 <span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="108">
-
+<div class="cell-output cell-output-display" data-execution_count="30">
 <div class="data-frame"><p>80,962 rows × 10 columns (omitted printing of 1 columns)</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>item</th><th>ni</th><th>imiss</th><th>iacc</th><th>imedianrt</th><th>wrdlen</th><th>ipropacc</th><th>isword</th><th>elm01</th></tr><tr><th></th><th title="String">String</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Int64">Int64</th><th title="Float64">Float64</th><th title="Bool">Bool</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>a</td><td>35</td><td>0</td><td>26</td><td>743.0</td><td>1</td><td>0.742857</td><td>1</td><td>-0.330457</td></tr><tr><th>2</th><td>e</td><td>35</td><td>0</td><td>19</td><td>824.0</td><td>1</td><td>0.542857</td><td>0</td><td>-0.2621</td></tr><tr><th>3</th><td>aah</td><td>34</td><td>0</td><td>21</td><td>770.5</td><td>3</td><td>0.617647</td><td>1</td><td>-0.247168</td></tr><tr><th>4</th><td>aal</td><td>34</td><td>0</td><td>32</td><td>702.5</td><td>3</td><td>0.941176</td><td>0</td><td>-0.0697739</td></tr><tr><th>5</th><td>Aaron</td><td>33</td><td>0</td><td>31</td><td>625.0</td><td>5</td><td>0.939394</td><td>1</td><td>-0.0752139</td></tr><tr><th>6</th><td>Aarod</td><td>33</td><td>0</td><td>23</td><td>810.0</td><td>5</td><td>0.69697</td><td>0</td><td>-0.125307</td></tr><tr><th>7</th><td>aback</td><td>34</td><td>0</td><td>15</td><td>710.0</td><td>5</td><td>0.441176</td><td>1</td><td>-0.1327</td></tr><tr><th>8</th><td>ahack</td><td>34</td><td>0</td><td>34</td><td>662.0</td><td>5</td><td>1.0</td><td>0</td><td>0.030271</td></tr><tr><th>9</th><td>abacus</td><td>34</td><td>0</td><td>17</td><td>671.5</td><td>6</td><td>0.5</td><td>1</td><td>-0.178605</td></tr><tr><th>10</th><td>alacus</td><td>34</td><td>0</td><td>29</td><td>640.0</td><td>6</td><td>0.852941</td><td>0</td><td>0.0086832</td></tr><tr><th>11</th><td>abandon</td><td>34</td><td>0</td><td>32</td><td>641.0</td><td>7</td><td>0.941176</td><td>1</td><td>0.0532322</td></tr><tr><th>12</th><td>acandon</td><td>34</td><td>0</td><td>33</td><td>725.5</td><td>7</td><td>0.970588</td><td>0</td><td>0.000197911</td></tr><tr><th>13</th><td>abandoned</td><td>34</td><td>0</td><td>31</td><td>667.5</td><td>9</td><td>0.911765</td><td>1</td><td>0.103862</td></tr><tr><th>14</th><td>adandoned</td><td>34</td><td>0</td><td>11</td><td>760.5</td><td>9</td><td>0.323529</td><td>0</td><td>0.0509863</td></tr><tr><th>15</th><td>abandoning</td><td>34</td><td>0</td><td>34</td><td>662.0</td><td>10</td><td>1.0</td><td>1</td><td>0.0999348</td></tr><tr><th>16</th><td>abantoning</td><td>34</td><td>0</td><td>30</td><td>848.5</td><td>10</td><td>0.882353</td><td>0</td><td>-0.00836868</td></tr><tr><th>17</th><td>abandonment</td><td>35</td><td>0</td><td>35</td><td>734.0</td><td>11</td><td>1.0</td><td>1</td><td>0.0706563</td></tr><tr><th>18</th><td>apandonment</td><td>35</td><td>0</td><td>30</td><td>817.0</td><td>11</td><td>0.857143</td><td>0</td><td>-0.016124</td></tr><tr><th>19</th><td>abase</td><td>34</td><td>1</td><td>23</td><td>750.5</td><td>5</td><td>0.676471</td><td>1</td><td>-0.202465</td></tr><tr><th>20</th><td>abose</td><td>34</td><td>0</td><td>23</td><td>805.5</td><td>5</td><td>0.676471</td><td>0</td><td>-0.053109</td></tr><tr><th>21</th><td>abasement</td><td>33</td><td>0</td><td>17</td><td>850.0</td><td>9</td><td>0.515152</td><td>1</td><td>-0.117373</td></tr><tr><th>22</th><td>afasement</td><td>33</td><td>0</td><td>30</td><td>649.0</td><td>9</td><td>0.909091</td><td>0</td><td>0.173626</td></tr><tr><th>23</th><td>abash</td><td>32</td><td>0</td><td>22</td><td>727.5</td><td>5</td><td>0.6875</td><td>1</td><td>-0.194658</td></tr><tr><th>24</th><td>adash</td><td>32</td><td>0</td><td>25</td><td>784.5</td><td>5</td><td>0.78125</td><td>0</td><td>-0.152705</td></tr><tr><th>25</th><td>abate</td><td>34</td><td>0</td><td>24</td><td>687.0</td><td>5</td><td>0.705882</td><td>1</td><td>-0.0895937</td></tr><tr><th>26</th><td>abape</td><td>34</td><td>0</td><td>32</td><td>675.0</td><td>5</td><td>0.941176</td><td>0</td><td>0.0811883</td></tr><tr><th>27</th><td>abated</td><td>34</td><td>0</td><td>23</td><td>775.0</td><td>6</td><td>0.676471</td><td>1</td><td>-0.171966</td></tr><tr><th>28</th><td>agated</td><td>34</td><td>0</td><td>14</td><td>897.5</td><td>6</td><td>0.411765</td><td>0</td><td>-0.157197</td></tr><tr><th>29</th><td>abbess</td><td>34</td><td>0</td><td>7</td><td>837.5</td><td>6</td><td>0.205882</td><td>1</td><td>-0.222551</td></tr><tr><th>30</th><td>abbass</td><td>34</td><td>0</td><td>28</td><td>788.0</td><td>6</td><td>0.823529</td><td>0</td><td>-0.0246175</td></tr><tr><th>⋮</th><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr></tbody></table></div>
 </div>
 </div>
@@ -899,7 +890,7 @@ Note
 <span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  axis<span class="op">=</span>(; width<span class="op">=</span><span class="fl">600</span>, height<span class="op">=</span><span class="fl">600</span>),</span>
 <span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="109">
+<div class="cell-output cell-output-display" data-execution_count="31">
 <div id="fig-itemreelm01vselm02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-itemreelm01vselm02-output-1.png" class="img-fluid figure-img"></p>
@@ -924,7 +915,7 @@ Note
 <p><a href="#fig-itemreelm01vselm02">Figure&nbsp;<span>4.9</span></a> is exactly of the form that would be expected in a sample from a correlated multivariate Gaussian distribution. The correlation of the two sets of conditional means is about 96%.</p>
 <div class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="fu">Matrix</span>(<span class="fu">select</span>(byitem, <span class="op">:</span>elm01, <span class="op">:</span>elm02)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="110">
+<div class="cell-output cell-output-display" data-execution_count="32">
 <pre><code>2×2 Matrix{Float64}:
  1.0       0.958655
  0.958655  1.0</code></pre>
@@ -932,7 +923,10 @@ Note
 </div>
 <p>These models take only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.</p>
 <p>The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers. We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the <code>MixedModel</code> object followed by restoring the <code>optsum</code> object.</p>
+<div class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveoptsum</span>(<span class="st">"./optsums/elm01.json"</span>, elm01);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>elm01a <span class="op">=</span> <span class="fu">restoreoptsum!</span>(</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    form <span class="op">=</span> <span class="pp">@formula</span>(</span>
@@ -942,7 +936,8 @@ Note
 <span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span>,</span>
 <span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"./optsums/elm01.json"</span>,</span>
 <span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<table class="table">
+<div class="cell-output cell-output-display" data-execution_count="35">
+<table class="table table-sm table-striped">
 <colgroup>
 <col style="width: 44%">
 <col style="width: 10%">
@@ -1011,12 +1006,13 @@ Note
 </tr>
 </tbody>
 </table>
+</div>
+</div>
 <p>Other covariates associated with the item are available as</p>
 <div class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>elpldtitem <span class="op">=</span> <span class="fu">DataFrame</span>(Arrow.<span class="fu">Table</span>(<span class="st">"./data/ELP_ldt_item.arrow"</span>))</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="114">
-
+<div class="cell-output cell-output-display" data-execution_count="36">
 <div class="data-frame"><p>9 rows × 7 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th><th>nmissing</th><th>eltype</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, AbstractFloat}">Union…</th><th title="Any">Any</th><th title="Union{Nothing, Float64}">Union…</th><th title="Any">Any</th><th title="Int64">Int64</th><th title="Type">Type</th></tr></thead><tbody><tr><th>1</th><td>item</td><td></td><td>Aarod</td><td></td><td>zuss</td><td>0</td><td>String</td></tr><tr><th>2</th><td>Ortho_N</td><td>1.53309</td><td>0</td><td>1.0</td><td>25</td><td>0</td><td>Int8</td></tr><tr><th>3</th><td>BG_Sum</td><td>13938.4</td><td>11</td><td>13026.0</td><td>59803</td><td>177</td><td>Union{Missing, Int32}</td></tr><tr><th>4</th><td>BG_Mean</td><td>1921.25</td><td>5.5</td><td>1907.0</td><td>6910.0</td><td>177</td><td>Union{Missing, Float32}</td></tr><tr><th>5</th><td>BG_Freq_By_Pos</td><td>2043.08</td><td>0</td><td>1928.0</td><td>6985</td><td>4</td><td>Union{Missing, Int16}</td></tr><tr><th>6</th><td>itemno</td><td>40481.5</td><td>1</td><td>40481.5</td><td>80962</td><td>0</td><td>Int32</td></tr><tr><th>7</th><td>isword</td><td>0.5</td><td>0</td><td>0.5</td><td>1</td><td>0</td><td>Bool</td></tr><tr><th>8</th><td>wrdlen</td><td>7.9988</td><td>1</td><td>8.0</td><td>21</td><td>0</td><td>Int8</td></tr><tr><th>9</th><td>pairno</td><td>20241.0</td><td>1</td><td>20241.0</td><td>40481</td><td>0</td><td>Int32</td></tr></tbody></table></div>
 </div>
 </div>
@@ -1024,8 +1020,7 @@ Note
 <div class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>elpldtsubj <span class="op">=</span> <span class="fu">DataFrame</span>(Arrow.<span class="fu">Table</span>(<span class="st">"./data/ELP_ldt_subj.arrow"</span>))</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtsubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="115">
-
+<div class="cell-output cell-output-display" data-execution_count="37">
 <div class="data-frame"><p>20 rows × 7 columns (omitted printing of 2 columns)</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>variable</th><th>mean</th><th>min</th><th>median</th><th>max</th></tr><tr><th></th><th title="Symbol">Symbol</th><th title="Union{Nothing, AbstractFloat}">Union…</th><th title="Any">Any</th><th title="Any">Any</th><th title="Any">Any</th></tr></thead><tbody><tr><th>1</th><td>subj</td><td>409.311</td><td>1</td><td>409.5</td><td>816</td></tr><tr><th>2</th><td>univ</td><td></td><td>Kansas</td><td></td><td>Wayne State</td></tr><tr><th>3</th><td>sex</td><td></td><td>f</td><td></td><td>m</td></tr><tr><th>4</th><td>DOB</td><td></td><td>1938-06-07</td><td></td><td>1984-11-14</td></tr><tr><th>5</th><td>MEQ</td><td>44.4932</td><td>19.0</td><td>44.0</td><td>75.0</td></tr><tr><th>6</th><td>vision</td><td>5.51169</td><td>0</td><td>6.0</td><td>7</td></tr><tr><th>7</th><td>hearing</td><td>5.86101</td><td>0</td><td>6.0</td><td>7</td></tr><tr><th>8</th><td>educatn</td><td>8.89681</td><td>1</td><td>12.0</td><td>28</td></tr><tr><th>9</th><td>ncorrct</td><td>29.8505</td><td>5</td><td>30.0</td><td>40</td></tr><tr><th>10</th><td>rawscor</td><td>31.9925</td><td>13</td><td>32.0</td><td>40</td></tr><tr><th>11</th><td>vocabAge</td><td>17.8123</td><td>10.3</td><td>17.8</td><td>21.0</td></tr><tr><th>12</th><td>shipTime</td><td>3.0861</td><td>0</td><td>3.0</td><td>9</td></tr><tr><th>13</th><td>readTime</td><td>2.50215</td><td>0.0</td><td>2.0</td><td>15.0</td></tr><tr><th>14</th><td>preshlth</td><td>5.48708</td><td>0</td><td>6.0</td><td>7</td></tr><tr><th>15</th><td>pasthlth</td><td>4.92989</td><td>0</td><td>5.0</td><td>7</td></tr><tr><th>16</th><td>S1start</td><td></td><td>2001-03-16T13:49:27</td><td>2001-10-16T11:38:28.500</td><td>2003-07-29T18:48:44</td></tr><tr><th>17</th><td>S2start</td><td></td><td>2001-03-19T10:00:35</td><td>2001-10-19T14:24:19.500</td><td>2003-07-30T13:07:45</td></tr><tr><th>18</th><td>MEQstrt</td><td></td><td>2001-03-22T18:32:00</td><td>2001-10-23T11:26:13</td><td>2003-07-30T14:30:49</td></tr><tr><th>19</th><td>filename</td><td></td><td>101DATA.LDT</td><td></td><td>Data998.LDT</td></tr><tr><th>20</th><td>frstLang</td><td></td><td>English</td><td></td><td>other</td></tr></tbody></table></div>
 </div>
 </div>
@@ -1038,7 +1033,7 @@ Note
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(elm01, <span class="op">:</span>subj),</span>
 <span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="116">
+<div class="cell-output cell-output-display" data-execution_count="38">
 <div id="fig-elm01caterpillarsubj" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="largescale_files/figure-html/fig-elm01caterpillarsubj-output-1.png" class="img-fluid figure-img"></p>
@@ -1061,7 +1056,7 @@ Box, G. E. P., &amp; Cox, D. R. (1964). An analysis of transformations. <em>Jour
 </section>
 
 </main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+<script type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const icon = "";
   const anchorJS = new window.AnchorJS();
@@ -1082,10 +1077,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.blur();
     // flash "checked"
     button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
     setTimeout(function() {
-      button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
     // clear code selection

@@ -35,7 +35,9 @@ Attach the packages to be used in this appendix
 #| code-fold: true
 using DataFrames
 using LinearAlgebra
-using MKL
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL             # faster LAPACK on Intel processors
+end
 using MixedModels
 using ProgressMeter
 

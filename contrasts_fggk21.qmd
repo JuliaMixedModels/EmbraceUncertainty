@@ -1,0 +1,611 @@
+---
+jupyter: julia-1.8
+---
+
+# Contrast Coding of Physical Fitness Effects {#sec.CntrstCdng2}
+
+Ths script uses a subset of data reported in Fühner, Golle, Granacher, & Kliegl (2021).
+Age and sex effects in physical fitness components of 108,295 third graders including 515 primary schools and 9 cohorts. [@Fuehner2021]
+
+To circumvent delays associated with model fitting we work with models that are less complex than those in the reference publication.
+All the data to reproduce the models in the publication are used here, too; the script requires only a few changes to specify the more complex models in the paper.
+
+All children were between 6.0 and 6.99 years at legal keydate (30 September) of school enrollement, that is in their ninth year of life in the third grade.
+
+The script is structured in three main sections:
+
+ 1. **Setup** with reading and examing the data
+
+ 2. **Contrasts coding**
+
+  - Effect and seqential difference contrasts
+  - Helmert contrast
+  - Hypothesis contrast
+  - PCA-based contrast
+
+ 3. **Other topics**
+
+  - LMM goodness of fit does not depend on contrast (i.e., reparameterization)
+  - VCs and CPs depend on contrast
+  - VCs and CPs depend on random factor
+
+## Setup
+
+### Packages and functions
+
+```{julia}
+#| code-fold: true
+using AlgebraOfGraphics
+using AlgebraOfGraphics: linear
+using Arrow
+using CairoMakie
+using Chain
+using CategoricalArrays
+using DataFrames
+using DataFrameMacros
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL             # faster LAPACK on Intel processors
+end
+using MixedModels
+using ProgressMeter
+using Statistics
+using StatsBase
+
+ProgressMeter.ijulia_behavior(:clear);
+```
+
+### Readme for './data/fggk21.rds'
+
+Number of scores: 525126
+
+ 1. Cohort: 9 levels; 2011-2019
+
+ 2. School: 515 levels
+ 3. Child: 108295 levels; all children are between 8.0 and 8.99 years old
+ 4. Sex: "Girls" (n=55,086), "Boys" (n= 53,209)
+ 5. age: testdate - middle of month of birthdate
+ 6. Test: 5 levels
+    
+      + Endurance (`Run`):  6 minute endurance run [m]; to nearest 9m in 9x18m field
+      + Coordination (`Star_r`): star coordination run [m/s]; 9x9m field, 4 x diagonal = 50.912 m
+      + Speed(`S20_r`): 20-meters sprint [m/s]
+      + Muscle power low (`SLJ`): standing long jump [cm]
+      + Muscle power up (`BPT`): 1-kg medicine ball push test [m]
+ 7. score - see units
+
+### Preprocessing
+
+#### Read data
+
+```{julia}
+tbl = Arrow.Table("./data/fggk21.arrow")
+```
+
+```{julia}
+df = DataFrame(tbl)
+describe(df)
+```
+
+#### Extract a stratified subsample
+
+We extract a random sample of 500 children from the Sex (2)  x Test (5) cells of the design. Cohort and School are random.
+
+```{julia}
+begin
+  dat = @chain df begin
+    @transform(:Sex = :Sex == "female" ? "Girls" : "Boys")
+    @groupby(:Test, :Sex)
+    combine(x -> x[sample(1:nrow(x), 500), :])
+  end
+end
+```
+
+#### Transformations
+
+```{julia}
+begin
+  transform!(dat, :age, :age => (x -> x .- 8.5) => :a1) # centered age (linear)
+  select!(groupby(dat, :Test), :, :score => zscore => :zScore) # z-score
+end
+```
+
+```{julia}
+begin
+  dat2 = combine(
+    groupby(dat, [:Test, :Sex]),
+    :score => mean,
+    :score => std,
+    :zScore => mean,
+    :zScore => std,
+  )
+end
+```
+
+#### Figure of age x Sex x Test interactions
+
+The main results of relevance here are shown in Figure 2 of [Scientific Reports 11:17566](https://rdcu.be/cwSeR).
+
+## Contrast coding
+
+Contrast coding is part of `StatsModels.jl`. Here is the primary author's (i.e., Dave Kleinschmidt's documentation of  [Modeling Categorical Data](https://juliastats.org/StatsModels.jl/stable/contrasts/#Modeling-categorical-data).
+
+The random factors `Child`, `School`, and `Cohort` are assigned a _Grouping_ contrast. This contrast is needed when the number of groups (i.e., units, levels) is very large. This is the case for `Child` (i.e., the 108,925 children in the full and probably also the 11,566 children in the reduced data set). The assignment is not necessary for the typical sample size of experiments. However, we use this coding of random factors irrespective of the number of units associated with them to be transparent about the distinction between random and fixed factors.
+
+A couple of general remarks about the following examples. First, all contrasts defined in this tutorial return an estimate of the _Grand Mean_ (GM) in the intercept, that is they are so-called sum-to-zero contrasts. In both `Julia` and `R` the default contrast is _Dummy_ coding which is not a sum-to-zero contrast, but returns the mean of the reference (control) group - unfortunately for (quasi-)experimentally minded scientists.
+
+Second, The factor `Sex` has only two levels. We use _EffectCoding_ (also known as _Sum_ coding in `R`) to estimate the difference of the levels from the Grand Mean. Unlike in `R`, the default sign of the effect is for the second level (_base_ is the first,  not the last level), but this can be changed with the `base` kwarg in the command. _Effect_ coding is a sum-to-zero contrast, but when applied to factors with more than two levels does not yield orthogonal contrasts.
+
+Finally, contrasts for the five levels of the fixed factor `Test` represent the hypotheses about differences between them. In this tutorial, we use this factor to illustrate various options.
+
+**We (initially) include only `Test` as fixed factor and `Child` as random factor. More complex LMMs can be specified by simply adding other fixed or random factors to the formula.**
+
+### _SeqDiffCoding_: `contr1`
+
+_SeqDiffCoding_ was used in the publication. This specification tests pairwise differences between the five neighboring levels of `Test`, that is:
+
+  - SDC1: 2-1
+  - SDC2: 3-2
+  - SDC3: 4-3
+  - SDC4: 5-4
+
+The levels were sorted such that these contrasts map onto four  _a priori_ hypotheses; in other words, they are _theoretically_ motivated pairwise comparisons. The motivation also encompasses theoretically motivated interactions with `Sex`. The order of levels can also be explicitly specified during contrast construction. This is very useful if levels are in a different order in the dataframe. We recommend the explicit specification to increase transparency of the code.
+
+The statistical disadvantage of _SeqDiffCoding_ is that the contrasts are not orthogonal, that is the contrasts are correlated. This is obvious from the fact that levels 2, 3, and 4 are all used in two contrasts. One consequence of this is that correlation parameters estimated between neighboring contrasts (e.g., 2-1 and 3-2) are difficult to interpret. Usually, they will be negative because assuming some practical limitation on the overall range (e.g., between levels 1 and 3), a small "2-1" effect "correlates" negatively with a larger "3-2" effect for mathematical reasons.
+
+Obviously, the tradeoff between theoretical motivation and statistical purity is something that must be considered carefully when planning the analysis.
+
+```{julia}
+contr1 = merge(
+  Dict(nm => Grouping() for nm in (:School, :Child, :Cohort)),
+  Dict(
+    :Sex => EffectsCoding(; levels=["Girls", "Boys"]),
+    :Test => SeqDiffCoding(;
+      levels=["Run", "Star_r", "S20_r", "SLJ", "BPT"]
+    ),
+  ),
+)
+```
+
+```{julia}
+f_ovi_1 = @formula zScore ~ 1 + Test + (1 | Child);
+```
+
+```{julia}
+m_ovi_SeqDiff_1 = fit(MixedModel, f_ovi_1, dat; contrasts=contr1)
+```
+
+In this case, any differences between tests identified by the contrasts would be  spurious because each test was standardized (i.e., _M_=0, $SD$=1). The differences could also be due to an imbalance in the number of boys and girls or in the number of missing observations for each test.
+
+The primary interest in this study related to interactions of the test contrasts with and `age` and `Sex`. We start with age (linear) and its interaction with the four test contrasts.
+
+```{julia}
+m_ovi_SeqDiff_2 = let
+  form = @formula zScore ~ 1 + Test * a1 + (1 | Child)
+  fit(MixedModel, form, dat; contrasts=contr1)
+end
+```
+
+The difference between older and younger childrend is larger for `Star_r` than for `Run` (0.2473).  `S20_r` did not differ significantly from `Star_r` (-0.0377) and `SLJ` (-0.0113) The largest difference in developmental gain was between `BPT` and `SLJ` (0.3355).
+
+P**lease note that standard errors of this LMM are anti-conservative because the LMM is missing a lot of information in the RES (e..g., contrast-related VCs snd CPs for `Child`, `School`, and `Cohort`.**
+
+Next we add the main effect of `Sex` and its interaction with the four test contrasts.
+
+```{julia}
+m_ovi_SeqDiff_3 = let
+  form = @formula zScore ~ 1 + Test * (a1 + Sex) + (1 | Child)
+  fit(MixedModel, form, dat; contrasts=contr1)
+end
+```
+
+The significant interactions with `Sex` reflect mostly differences related to muscle power, where the physiological constitution gives boys an advantage. The sex difference is smaller when coordination and cognition play a role -- as in the `Star_r` test. (Caveat: SEs are estimated with an underspecified RES.)
+
+The final step in this first series is to add the interactions between the three covariates. A significant interaction between any of the four `Test` contrasts and age (linear) x `Sex` was hypothesized to reflect a prepubertal signal (i.e., hormones start to rise in girls' ninth year of life). However, this hypothesis is linked to a specific shape of the interaction: Girls would need to gain more than boys in tests of muscular power.
+
+```{julia}
+f_ovi = @formula zScore ~ 1 + Test * a1 * Sex + (1 | Child)
+m_ovi_SeqDiff = fit(MixedModel, f_ovi, dat; contrasts=contr1)
+```
+
+The results are very clear: Despite an abundance of statistical power there is no evidence for the differences between boys and girls in how much they gain in the ninth year of life in these five tests. The authors argue that, in this case, absence of evidence looks very much like evidence of absence of a hypothesized interaction.
+
+In the next two sections we use different contrasts. Does this have a bearing on this result?  We still ignore for now that we are looking at anti-conservative test statistics.
+
+### _HelmertCoding_: `contr2`
+
+The second set of contrasts uses _HelmertCoding_. Helmert coding codes each level as the difference from the average of the lower levels. With the default order of `Test` levels we get the following test statistics which we describe in reverse order of appearance in model output
+
+  - HeC4: 5 - mean(1,2,3,4)
+  - HeC3: 4 - mean(1,2,3)
+  - HeC2: 3 - mean(1,2)
+  - HeC1: 2 - 1
+
+In the model output, HeC1 will be reported first and HeC4 last.
+
+There is some justification for the HeC4 specification in a post-hoc manner because the fifth test (`BPT`) turned out to be different from the other four tests in that high performance is most likely not only related to physical fitness, but also to overweight/obesity, that is for a subset of children high scores on this test might be indicative of _physical unfitness_. _A priori_ the SDC4 contrast 5-4 between `BPT` (5) and `SLJ` (4) was motivated because conceptually both are tests of the physical fitness component _Muscular Power_, `BPT` for upper limbs and `SLJ` for lower limbs, respectively.
+
+One could argue that there is justification for HeC3 because `Run` (1), `Star_r` (2), and `S20` (3) involve running but `SLJ` (4) does not. Sports scientists, however, recoil. For them it does not make much sense to average the different running tests, because they draw on completely different physiological resources; it is a variant of the old apples-and-oranges problem.
+
+The justification for HeC3 is that`Run` (1) and `Star_r` (2) draw more strongly on cardiosrespiratory _Endurance_ than `S20` (3) due to the longer duration of the runs compared to sprinting for 20 m which is a pure measure of the physical-fitness component _Speed_. Again, sports scientists are not very happy with this proposal.
+
+Finally, HeC1 contrasts the fitness components Endurance, indicated best by Run (1), and Coordination, indicated by `Star_r` (2). Endurance (i.e., running for 6 minutes) is considered to be the best indicator of health-related status among the five tests because it is a rather pure measure of cardiorespiratory fitness. The `Star_r` test requires execution of a pre-instructed sequence of forward, sideways, and backward runs. This coordination of body movements implies a demand on working memory (i.e., remembering the order of these subruns) and executive control processes, but performats also depends on endurance. HeC1 yields a measure of Coordination "corrected" for the contribution of Endurance.
+
+The statistical advantage of _HelmertCoding_ is that the resulting contrasts are orthogonal (uncorrelated). This allows for optimal partitioning of variance and statistical power. It is also more efficient to estimate "orthogonal" than "non-orthogonal" random-effect structures.
+
+```{julia}
+contr2 = Dict(
+  :School => Grouping(),
+  :Child => Grouping(),
+  :Cohort => Grouping(),
+  :Sex => EffectsCoding(; levels=["Girls", "Boys"]),
+  :Test => HelmertCoding(;
+    levels=["Run", "Star_r", "S20_r", "SLJ", "BPT"],
+  ),
+);
+```
+
+```{julia}
+m_ovi_Helmert = fit(MixedModel, f_ovi, dat; contrasts=contr2)
+```
+
+We forego a detailed discussion of the effects, but note that again none of the interactions between `age x Sex` with the four test contrasts was significant.
+
+The default labeling of Helmert contrasts may lead to confusions with other contrasts. Therefore, we could provide our own labels:
+
+`labels=["c2.1", "c3.12", "c4.123", "c5.1234"]`
+
+Once the order of levels is memorized the proposed labelling is very transparent.
+
+### _HypothesisCoding_: `contr3`
+
+The third set of contrasts uses _HypothesisCoding_. _Hypothesis coding_ allows the user to specify their own _a priori_ contrast matrix, subject to the mathematical constraint that the matrix has full rank. For example, sport scientists agree that the first four tests can be contrasted with `BPT`, because the difference is akin to a correction of overall physical fitness. However, they want to keep the pairwise comparisons for the first four tests.
+
+  - HyC1: `BPT` - mean(1,2,3,4)
+  - HyC2: `Star_r` - `Run_r`
+  - HyC3: `Run_r` - `S20_r`
+  - HyC4: `S20_r` - `SLJ`
+
+```{julia}
+contr3 = Dict(
+  :School => Grouping(),
+  :Child => Grouping(),
+  :Cohort => Grouping(),
+  :Sex => EffectsCoding(; levels=["Girls", "Boys"]),
+  :Test => HypothesisCoding(
+    [
+      -1 -1 -1 -1 +4
+      -1 +1 0 0 0
+       0 -1 +1 0 0
+       0 0 -1 +1 0
+    ];
+    levels=["Run", "Star_r", "S20_r", "SLJ", "BPT"],
+    labels=["BPT-other", "Star-End", "S20-Star", "SLJ-S20"],
+  ),
+);
+```
+
+```{julia}
+m_ovi_Hypo = fit(MixedModel, f_ovi, dat; contrasts=contr3)
+```
+
+With _HypothesisCoding_ we must generate our own labels for the contrasts. The default labeling of contrasts is usually not interpretable. Therefore, we provide our own.
+
+Anyway, none of the interactions between `age` x `Sex` with the four `Test` contrasts was significant for these contrasts.
+
+```{julia}
+contr1b = Dict(
+  :School => Grouping(),
+  :Child => Grouping(),
+  :Cohort => Grouping(),
+  :Sex => EffectsCoding(; levels=["Girls", "Boys"]),
+  :Test => HypothesisCoding(
+    [
+      -1 +1 0 0 0
+      0 -1 +1 0 0
+      0 0 -1 +1 0
+      0 0 0 -1 +1
+    ];
+    levels=["Run", "Star_r", "S20_r", "SLJ", "BPT"],
+    labels=["Star-Run", "S20-Star", "SLJ-S20", "BPT-SLJ"],
+  ),
+);
+```
+
+```{julia}
+m_ovi_SeqDiff_v2 = fit(MixedModel, f_ovi, dat; contrasts=contr1b)
+```
+
+```{julia}
+m_zcp_SeqD = let
+  form = @formula(
+    zScore ~ 1 + Test * a1 * Sex + zerocorr(1 + Test | Child)
+  )
+  fit(MixedModel, form, dat; contrasts=contr1b)
+end
+```
+
+```{julia}
+m_zcp_SeqD_2 = let
+  form = @formula(
+    zScore ~ 1 + Test * a1 * Sex + (0 + Test | Child)
+  )
+  fit(MixedModel, form, dat; contrasts=contr1b)
+end
+```
+
+```{julia}
+m_cpx_0_SeqDiff = let
+  f_cpx_0 = @formula(
+    zScore ~ 1 + Test * a1 * Sex + (0 + Test | Child)
+  )
+  fit(MixedModel, f_cpx_0, dat; contrasts=contr1b)
+end
+```
+
+```{julia}
+VarCorr(m_cpx_0_SeqDiff)
+```
+
+```{julia}
+m_cpx_0_SeqDiff.PCA
+```
+
+```{julia}
+f_cpx_1 = @formula(
+  zScore ~ 1 + Test * a1 * Sex + (1 + Test | Child)
+)
+m_cpx_1_SeqDiff =
+fit(MixedModel, f_cpx_1, dat; contrasts=contr1b)
+```
+
+```{julia}
+m_cpx_1_SeqDiff.PCA
+```
+
+### _PCA-based HypothesisCoding_: `contr4`
+
+The fourth set of contrasts uses _HypothesisCoding_ to specify the set of contrasts implementing the loadings of the four principle components of the published LMM based on test scores, not test effects (contrasts) - coarse-grained, that is roughly according to their signs. This is actually a very interesting and plausible solution nobody had proposed _a priori_.
+
+  - PC1: `BPT` - `Run_r`
+  - PC2: (`Star_r` + `S20_r` + `SLJ`) - (`BPT` + `Run_r`)
+  - PC3:  `Star_r` - (`S20_r` + `SLJ`)
+  - PC4:  `S20_r` - `SLJ`
+
+PC1 contrasts the worst and the best indicator of physical **health**; PC2 contrasts these two against the core indicators of **physical fitness**; PC3 contrasts the cognitive and the physical tests within the narrow set of physical fitness components; and PC4, finally, contrasts two types of lower muscular fitness differing in speed and power.
+
+```{julia}
+contr4 = Dict(
+  :School => Grouping(),
+  :Child => Grouping(),
+  :Cohort => Grouping(),
+  :Sex => EffectsCoding(; levels=["Girls", "Boys"]),
+  :Test => HypothesisCoding(
+    [
+      -1 0 0 0 +1
+      -3 +2 +2 +2 -3
+      0 +2 -1 -1 0
+      0 0 +1 -1 0
+    ];
+    levels=["Run", "Star_r", "S20_r", "SLJ", "BPT"],
+    labels=["c5.1", "c234.15", "c2.34", "c3.4"],
+  ),
+);
+```
+
+```{julia}
+m_cpx_1_PC = fit(MixedModel, f_cpx_1, dat; contrasts=contr4)
+```
+
+```{julia}
+VarCorr(m_cpx_1_PC)
+```
+
+```{julia}
+m_cpx_1_PC.PCA
+```
+
+There is a numerical interaction with a z-value > 2.0 for the first PCA (i.e., `BPT` - `Run_r`).  This interaction would really need to be replicated to be taken seriously. It is probably due to larger "unfitness" gains in boys than girls (i.e., in `BPT`)  relative to the slightly larger health-related "fitness" gains of girls than boys (i.e., in `Run_r`).
+
+```{julia}
+contr4b = merge(
+  Dict(nm => Grouping() for nm in (:School, :Child, :Cohort)),
+  Dict(
+    :Sex => EffectsCoding(; levels=["Girls", "Boys"]),
+    :Test => HypothesisCoding(
+      [
+        0.49 -0.04 0.20 0.03 -0.85
+        0.70 -0.56 -0.21 -0.13 0.37
+        0.31 0.68 -0.56 -0.35 0.00
+        0.04 0.08 0.61 -0.78 0.13
+      ];
+      levels=["Run", "Star_r", "S20_r", "SLJ", "BPT"],
+      labels=["c5.1", "c234.15", "c12.34", "c3.4"],
+    ),
+  ),
+);
+```
+
+```{julia}
+m_cpx_1_PC_2 = fit(MixedModel, f_cpx_1, dat; contrasts=contr4b)
+```
+
+```{julia}
+VarCorr(m_cpx_1_PC_2)
+```
+
+```{julia}
+m_cpx_1_PC_2.PCA
+```
+ 
+## Other topics
+
+### Contrasts are re-parameterizations of the same model
+
+The choice of contrast does not affect the model objective, in other words, they  all yield the same goodness of fit. It does not matter whether a contrast is orthogonal or not.
+
+```{julia}
+[
+  objective(m_ovi_SeqDiff),
+  objective(m_ovi_Helmert),
+  objective(m_ovi_Hypo),
+]
+```
+
+### VCs and CPs depend on contrast coding
+
+Trivially, the meaning of a contrast depends on its definition. Consequently, the contrast specification has a big effect on the random-effect structure. As an illustration, we refit the LMMs with variance components (VCs) and correlation parameters (CPs) for `Child`-related contrasts of `Test`. Unfortunately, it is not easy, actually rather quite difficult, to grasp the meaning of correlations of contrast-based effects; they represent two-way interactions.
+
+```{julia}
+begin
+  f_Child = @formula zScore ~
+    1 + Test * a1 * Sex + (1 + Test | Child)
+  m_Child_SDC = fit(MixedModel, f_Child, dat; contrasts=contr1)
+  m_Child_HeC = fit(MixedModel, f_Child, dat; contrasts=contr2)
+  m_Child_HyC = fit(MixedModel, f_Child, dat; contrasts=contr3)
+  m_Child_PCA = fit(MixedModel, f_Child, dat; contrasts=contr4)
+end
+```
+
+```{julia}
+VarCorr(m_Child_SDC)
+```
+
+```{julia}
+VarCorr(m_Child_HeC)
+```
+
+```{julia}
+VarCorr(m_Child_HyC)
+```
+
+```{julia}
+VarCorr(m_Child_PCA)
+```
+
+The CPs for the various contrasts are in line with expectations. For the SDC we observe substantial negative CPs between neighboring contrasts. For the orthogonal HeC, all CPs are small; they are uncorrelated. HyC contains some of the SDC contrasts and we observe again the negative CPs. The (roughly) PCA-based contrasts are small with one exception; there is a sizeable CP of +.41 between GM and the core of adjusted physical fitness (c234.15).
+
+Do these differences in CPs imply that we can move to zcpLMMs when we have orthogonal contrasts? We pursue this question with by refitting the four LMMs with zerocorr() and compare the goodness of fit.
+
+```{julia}
+begin
+  f_Child0 = @formula zScore ~
+    1 + Test * a1 * Sex + zerocorr(1 + Test | Child)
+  m_Child_SDC0 = fit(MixedModel, f_Child0, dat; contrasts=contr1)
+  m_Child_HeC0 = fit(MixedModel, f_Child0, dat; contrasts=contr2)
+  m_Child_HyC0 = fit(MixedModel, f_Child0, dat; contrasts=contr3)
+  m_Child_PCA0 = fit(MixedModel, f_Child0, dat; contrasts=contr4)
+end
+```
+
+```{julia}
+MixedModels.likelihoodratiotest(m_Child_SDC0, m_Child_SDC)
+```
+
+```{julia}
+MixedModels.likelihoodratiotest(m_Child_HeC0, m_Child_HeC)
+```
+
+```{julia}
+MixedModels.likelihoodratiotest(m_Child_HyC0, m_Child_HyC)
+```
+
+```{julia}
+MixedModels.likelihoodratiotest(m_Child_PCA0, m_Child_PCA)
+```
+
+**RK: The above results are not quite in line with what I obtained with earlier runs of this code, I think. This still needs some follow up.**
+
+Obviously, we can not drop CPs from any of the LMMs. The full LMMs all have the same objective, but we can compare the goodness-of-fit statistics of zcpLMMs more directly.
+
+```{julia}
+begin
+  zcpLMM = ["SDC0", "HeC0", "HyC0", "PCA0"]
+  mods = [m_Child_SDC0, m_Child_HeC0, m_Child_HyC0, m_Child_PCA0]
+  gof_summary = sort!(
+    DataFrame(;
+      zcpLMM=zcpLMM,
+      dof=dof.(mods),
+      deviance=deviance.(mods),
+      AIC=aic.(mods),
+      BIC=bic.(mods),
+    ),
+    :deviance,
+  )
+end
+```
+
+**RK: The following description is from an old version of the script; it does not match the current results.**
+
+The best fit was obtained for the PCA-based zcpLMM. Somewhat surprisingly the second best fit was obtained for the SDC. The relatively poor performance of HeC-based zcpLMM is puzzling to me. I thought it might be related to imbalance in design in the present data, but this does not appear to be the case. The same comparison of _SequentialDifferenceCoding_ and _Helmert Coding_ also showed a worse fit for the zcp-HeC LMM than the zcp-SDC LMM.
+
+### VCs and CPs depend on random factor
+
+VCs and CPs resulting from a set of test contrasts can also be estimated for the random factor `School`.
+Of course, these VCs and CPs may look different from the ones we just estimated for `Child`.
+
+The effect of `age` (i.e., developmental gain) varies within `School`.
+Therefore, we also include its VCs and CPs in this model; the school-related VC for `Sex` was not significant.
+
+```{julia}
+f_School = @formula zScore ~
+  1 + Test * a1 * Sex + (1 + Test + a1 | School);
+m_School_SeqDiff = fit(MixedModel, f_School, dat; contrasts=contr1);
+m_School_Helmert = fit(MixedModel, f_School, dat; contrasts=contr2);
+m_School_Hypo = fit(MixedModel, f_School, dat; contrasts=contr3);
+m_School_PCA = fit(MixedModel, f_School, dat; contrasts=contr4);
+```
+
+```{julia}
+VarCorr(m_School_SeqDiff)
+```
+
+```{julia}
+VarCorr(m_School_Helmert)
+```
+
+```{julia}
+VarCorr(m_School_Hypo)
+```
+
+```{julia}
+VarCorr(m_School_PCA)
+```
+
+We compare again how much of the fit resides in the CPs.
+
+```{julia}
+begin
+  f_School0 = @formula zScore ~
+    1 + Test * a1 * Sex + zerocorr(1 + Test + a1 | School)
+  m_School_SDC0 = fit(MixedModel, f_School0, dat; contrasts=contr1)
+  m_School_HeC0 = fit(MixedModel, f_School0, dat; contrasts=contr2)
+  m_School_HyC0 = fit(MixedModel, f_School0, dat; contrasts=contr3)
+  m_School_PCA0 = fit(MixedModel, f_School0, dat; contrasts=contr4)
+  # 	
+  zcpLMM2 = ["SDC0", "HeC0", "HyC0", "PCA0"]
+  mods2 = [
+    m_School_SDC0, m_School_HeC0, m_School_HyC0, m_School_PCA0
+  ]
+  gof_summary2 = sort!(
+    DataFrame(;
+      zcpLMM=zcpLMM2,
+      dof=dof.(mods2),
+      deviance=deviance.(mods2),
+      AIC=aic.(mods2),
+      BIC=bic.(mods2),
+    ),
+    :deviance,
+  )
+end
+```
+
+For the random factor `School` the Helmert contrast, followed by PCA-based contrasts have least information in the CPs; SDC has the largest contribution from CPs. Interesting.
+
+## That's it
+
+That's it for this tutorial. It is time to try your own contrast coding. You can use these data; there are many alternatives to set up hypotheses for the five tests. Of course and even better, code up some contrasts for data of your own.
+
+Have fun!
+
+::: {#refs}
+:::
