@@ -17,7 +17,10 @@ book:
     - references.qmd
   appendices: 
     - linalg.qmd
-
+    - contrasts_kwdyz11.qmd
+    - contrasts_fggk21.qmd
+    - kwdyz11.qmd
+    - kkl15.qmd
 execute-dir: project
 
 bibliography: references.bib
