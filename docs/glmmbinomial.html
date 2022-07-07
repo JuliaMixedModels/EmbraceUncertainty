@@ -231,6 +231,16 @@ div.csl-indent {
   <a href="./contrasts_fggk21.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">Contrast Coding of Physical Fitness Effects</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./kwdyz11.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">RePsychLing RePsychLing Kliegl et al.&nbsp;(2011)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./kkl15.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">RePsychLing RePsychLing Kliegl, Kuschela, &amp; Laubrock (2015)</span></a>
+  </div>
+</li>
     </ul>
   </li>
     </ul>
@@ -411,7 +421,7 @@ div.csl-indent {
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(com01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[32mMinimizing 527      Time: 0:00:00 ( 0.95 ms/it)[39m</code></pre>
+<pre><code>[32mMinimizing 527      Time: 0:00:00 ( 0.90 ms/it)[39m</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Mixed Model fit by maximum likelihood (nAGQ = 1)
@@ -420,12 +430,12 @@ div.csl-indent {
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Bernoulli{Float64}
-  Link: </code></pre>
+  Link: LogitLink()
+
+   logLik  </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>LogitLink()
-
-   logLik    deviance     AIC       AICc        BIC    
+<pre><code>  deviance     AIC       AICc        BIC    
  -1185.4606  2370.9212  2390.9212  2391.0356  2446.5946
 </code></pre>
 </div>
@@ -474,7 +484,7 @@ age ^ 2 &amp; urban: Y  -0.000368095  0.000731401  -0.50    0.6148
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts)</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[32mMinimizing 430      Time: 0:00:00 ( 0.52 ms/it)[39m</code></pre>
+<pre><code>[32mMinimizing 430      Time: 0:00:00 ( 0.47 ms/it)[39m</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <table class="table table-sm table-striped">

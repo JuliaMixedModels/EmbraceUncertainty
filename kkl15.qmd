@@ -1,0 +1,575 @@
+---
+jupyter: julia-1.8
+---
+
+# RePsychLing RePsychLing Kliegl, Kuschela, & Laubrock (2015)
+
+## Background
+
+@Kliegl2015 is a follow-up to @Kliegl2010 (see also script `contrasts_kwdyz11.qmd`) from an experiment looking at a variety of effects of visual cueing under four different cue-target relations (CTRs).
+In this experiment two rectangles are displayed (1) in horizontal orientation , (2) in vertical orientation, (3) in left diagonal orientation, or in (4) right diagonal orientation relative to a central fixation point.
+Subjects react to the onset of a small or a large visual target occuring at one of the four ends of the two rectangles.
+The target is cued validly on 70% of trials by a brief flash of the corner of the rectangle at which it appears; it is cued invalidly at the three other locations 10% of the trials each.
+This implies a latent imbalance in design that is not visiable in the repeated-measures ANOVA, but we will show its effect in the random-effect structure and conditional modes.
+
+There are a couple of differences between the first and this follow-up experiment, rendering it more a conceptual than a direct replication.
+First, the original experiment was carried out at Peking University and this follow-up at Potsdam University.
+Second, diagonal orientations of rectangles and large target sizes were not part of the design of @Kliegl2010.
+To keep matters somewhat simpler and comparable we ignore them in this script.
+
+We specify three contrasts for the four-level factor CTR that are derived from spatial, object-based, and attractor-like features of attention.
+They map onto sequential differences between appropriately ordered factor levels.
+Replicating @Kliegl2010, the attraction effect was not significant as a fixed effect, but yielded a highly reliable variance component (VC; i.e., reliable individual differences in positive and negative attraction effects cancel the fixed effect).
+Moreover, these individual differences in the attraction effect were negatively correlated with those in the spatial effect.
+
+This comparison is of interest because a few years after the publication of @Kliegl2010, the theoretically critical correlation parameter (CP) between the spatial effect and the attraction effect was determined as the source of a non-singular LMM in that paper.
+The present study served the purpose to estimate this parameter with a larger sample and a wider variety of experimental conditions.
+Therefore, the code in this script is largely the same as the one in `kwdyz.jl`.
+
+There will be another vignette modelling the additional experimental manipulations of target size and orientation of cue rectangle.
+This analysis was reported in the parsimonious mixed-model paper [@bates.kliegl.etal:2015a]; they were also used in a paper of GAMMs [@baayen.vasishth.etal:2017jml].
+Data and R scripts are also available in [R-package RePsychLing](https://github.com/dmbates/RePsychLing/tree/master/data/).
+Here we provide some of the corresponding analyses with _MixedModels.jl_ and a much wider variety of visualizations of LMM results.
+A _MixedModels.jl_-based analysis focusing on the complex experimental design and the analysis of a complex random-effect structure for this design is in script `kkl15_complex.jl`.
+
+## Packages
+
+```{julia}
+#| code-fold: true
+using Arrow
+using AlgebraOfGraphics
+using CairoMakie
+using CategoricalArrays
+using Chain
+using DataFrameMacros
+using DataFrames
+using MixedModels
+using MixedModelsMakie
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL             # faster LAPACK on Intel processors
+end
+using Random
+using ProgressMeter
+using Statistics
+using StatsBase
+
+using AlgebraOfGraphics: density
+using AlgebraOfGraphics: boxplot
+using MixedModelsMakie: qqnorm
+using MixedModelsMakie: ridgeplot
+using MixedModelsMakie: scatter
+const datadir = joinpath(@__DIR__, "data")
+
+ProgressMeter.ijulia_behavior(:clear)
+CairoMakie.activate!(; type="png")
+```
+
+## Read data, compute and plot means
+
+```{julia}
+#| scrolled: true
+dat = @chain "kkl15.arrow" begin
+  joinpath(datadir, _)
+  Arrow.Table
+  DataFrame
+  select(
+    :subj =>
+      (s -> categorical(string.('S', lpad.(s, 3, '0')))) => :Subj,
+    :tar => categorical => :CTR,
+    :rt => (x -> log.(x)) => :lrt,
+    :rt,
+  )
+end
+levels!(dat.CTR, ["val", "sod", "dos", "dod"])
+describe(dat)
+```
+
+We recommend to code the levels/units of random factor / grouping variable not as a number, but as a string starting with a letter and of the same length for all levels/units.
+
+We also recommend to sort levels of factors into a meaningful order, that is overwrite the default alphabetic ordering. This is also a good place to choose alternative names for variables in the context of the present analysis.
+
+The LMM analysis is based on log-transformed reaction times `lrt`, indicated by a _boxcox()_ check of model residuals. With the exception of diagnostic plots of model residuals, the analysis of untransformed reaction times did not lead to different results.
+
+Comparative density plots of all response times by cue-target relation show the times for valid cues to be faster than for the other conditions.
+
+```{julia}
+#| code-fold: true
+#| label: fig-kkl15comparativedens
+#| fig-cap: Compartive density plots of log response time by condition
+draw(
+  data(dat) *
+  mapping(
+    :lrt => "log(Reaction time [ms])";
+    color=:CTR =>
+      renamer("val" => "valid cue", "sod" => "some obj/diff pos", "dos" => "diff obj/same pos", "dod" => "diff obj/diff pos") => "Cue-target relation",
+  ) *
+  density();
+  figure=(; resolution=(800, 350)),
+)
+```
+
+Boxplots of the mean of log response time by subject under the different conditions show an outlier value under three of the four conditions; they are from the same subject.
+
+```{julia}
+dat_subj = combine(
+  groupby(dat, [:Subj, :CTR]),
+  :rt => length => :n,
+  :rt => mean => :rt_m,
+  :lrt => mean => :lrt_m,
+)
+describe(dat_subj)
+```
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Comparative boxplots of mean response by subject under different conditions
+#| label: fig-bxpltsubjcond
+boxplot(
+  dat_subj.CTR.refs,
+  dat_subj.lrt_m;
+  orientation=:horizontal,
+  show_notch=true,
+  axis=(;
+    yticks=(
+      1:4,
+      [
+        "valid cue",
+        "same obj/diff pos",
+        "diff obj/same pos",
+        "diff obj/diff pos",
+      ],
+    ),
+  ),
+  figure=(; resolution=(800, 300)),
+)
+```
+
+Mean of log reaction times for four cue-target relations. Targets appeared at (a) the cued position (valid) in a rectangle, (b) in the same rectangle cue, but at its other end, (c) on the second rectangle, but at a corresponding horizontal/vertical physical distance, or (d) at the other end of the second rectangle, that is $\sqrt{2}$ of horizontal/vertical distance diagonally across from the cue, that is also at larger physical distance compared to (c).
+
+We remove the outlier subject and replot, but we model the data points in `dat` and check whether this subject appears as an outlier in the caterpillar plot of conditional modes.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: 'Comparative boxplots of mean response by subject under different conditions without outlier'
+#| label: fig-bxpltsubjcond2
+let
+  dat_subj2 = @subset(dat_subj, :rt_m < 510)
+  boxplot(
+    dat_subj2.CTR.refs,
+    dat_subj2.lrt_m;
+    orientation=:horizontal,
+    show_notch=true,
+    axis=(;
+      yticks=(
+        1:4,
+        [
+          "valid cue",
+          "same obj/diff pos",
+          "diff obj/same pos",
+          "diff obj/diff pos",
+        ],
+      ),
+    ),
+    figure=(; resolution=(800, 300)),
+  )
+end
+```
+
+A better alternative to the boxplot is often a dotplot, because it also displays subjects' condition means.
+
+**To be done**
+
+For the next set of plots we average subjects' data within the four experimental conditions.
+This table could be used as input for a repeated-measures ANOVA.
+
+```{julia}
+dat_cond = combine(
+  groupby(dat_subj, :CTR),
+  :n => length => :N,
+  :lrt_m => mean => :lrt_M,
+  :lrt_m => std => :lrt_SD,
+  :lrt_m => (x -> std(x) / sqrt(length(x))) => :lrt_SE,
+)
+```
+
+We can also look at correlations plots based on the four condition means.
+There are actually two correlation matrices which have correspondences in alternative parameterizatios of the LMM random-effect structure.
+One matrix is based on the four measures.
+If you think of the four measures as test scores, this matrix is the usual correlation matrix.
+The second matrix contains correlations between the Grand Mean (GM) and the three effects defined with the contrasts for the four levels of the condition factor in the next chunk.
+
+To this end, we
+
+  - use the `unstack()` command to convert data from long to wide format,
+  - compute the GM and the three experimental effects.
+  - plot the correlation matrix for four measures/scores, and
+  - plot the correlation matrix for GM and three effects
+
+```{julia}
+dat_subj_w = @chain dat_subj begin
+  unstack(:Subj, :CTR, :rt_m)
+  disallowmissing!
+  @transform(
+    :GM = (:val + :sod + :dos + :dod) ./ 4,
+    :spatial = :sod - :val,
+    :object = :dos - :sod,
+    :attraction = :dod - :dos,
+  )
+end
+describe(dat_subj_w)
+```
+
+```{julia}
+#| eval: false
+#@df dat_subj_w StatsPlots.corrplot(cols(2:5), grid = false, compact=false)
+```
+
+```{julia}
+#| eval: false
+#@df dat_subj_w StatsPlots.corrplot(cols(6:9), grid = false, compact=false)
+```
+
+:::{.callout-note}
+Two of the theoreticsally irrelevant within-subject effect correlations have a different sign than the corresponding, non-significant CPs in the LMM; they are negative here, numerically positive in the LMM.
+This occurs only very rarely in the case of ecological correlations.
+However, as they are not significant according to shortest coverage interval, it may not be that relevant either.
+It is the case both for effects based on log-transformed and raw reaction times.
+:::
+
+## Linear mixed model
+
+```{julia}
+contrasts = Dict(
+  :Subj => Grouping(),
+  :CTR => SeqDiffCoding(; levels=["val", "sod", "dos", "dod"]),
+)
+m1 = let
+  form = @formula lrt ~ 1 + CTR + (1 + CTR | Subj)
+  fit(MixedModel, form, dat; contrasts)
+end
+```
+
+```{julia}
+VarCorr(m1)
+```
+
+```{julia}
+issingular(m1)
+```
+
+```{julia}
+only(MixedModels.PCA(m1))
+```
+
+We note that the critical correlation parameter between spatial (`sod`) and attraction (`dod`) is now estimated at .66 -- not that close to the 1.0 boundary that caused singularity in @Kliegl2010.
+However, the LMM based on log reaction times is still singular.
+Let's check for untransformed reaction times.
+
+```{julia}
+m1_rt = let
+  form = @formula rt ~ 1 + CTR + (1 + CTR | Subj)
+  fit(MixedModel, form, dat; contrasts)
+end
+```
+
+```{julia}
+VarCorr(m1_rt)
+```
+
+```{julia}
+issingular(m1_rt)
+```
+
+For untransformed reaction times, we see the model is **not** singular.
+
+## Diagnostic plots of LMM residuals
+
+Do model residuals meet LMM assumptions? Classic plots are
+
+  - Residual over fitted
+  - Quantiles of model residuals over theoretical quantiles of normal distribution
+
+### Residual-over-fitted plot
+
+The slant in residuals show a lower and upper boundary of reaction times, that is we have have too few short and too few long residuals. Not ideal, but at least width of the residual band looks similar across the fitted values, that is there is no evidence for heteroskedasticity.
+
+```{julia}
+#| code-fold: true
+#| label: fig-m1fittedresid
+#| fig-cap: Residuals versus fitted values for model m1
+scatter(fitted(m1), residuals(m1))
+```
+
+With many observations the scatterplot is not that informative. Contour plots or heatmaps may be an alternative.
+
+```{julia}
+#| code-fold: true
+#| label: fig-m1fittedresid2
+#| fig-cap: Heatmap of residuals versus fitted values for model m1
+set_aog_theme!()
+draw(
+  data((; f=fitted(m1), r=residuals(m1))) *
+  mapping(
+    :f => "Fitted values from m1", :r => "Residuals from m1"
+  ) *
+  density();
+)
+```
+
+### Q-Q plot
+
+The plot of quantiles of model residuals over corresponding quantiles of the normal distribution should yield a straight line along the main diagonal.
+
+```{julia}
+#| code-fold: true
+#| label: fig-qqnormm1
+#| fig-cap: Quantile-quantile plot of the residuals for model m1 versus a standard normal
+#| eval: false
+qqnorm(m1; qqline=:none)
+```
+
+```{julia}
+#| code-fold: true
+#| label: fig-qqnormm1_rt
+#| fig-cap: 'Quantile-quantile plot of the residuals for model m1_rt versus a standard normal'
+#| eval: false
+qqnorm(m1_rt; qqline=:none)
+```
+
+### Observed and theoretical normal distribution
+
+The violation of expectation is again due to the fact that the distribution of residuals is narrower than expected from a normal distribution.
+We can see this in this plot.
+Overall, it does not look too bad.
+
+```{julia}
+#| code-fold: true
+#| label: fig-stdresidm1dens
+#| fig-cap: '  Kernel density plot of the standardized residuals for model m1 versus a  standard normal'
+let
+  n = nrow(dat)
+  dat_rz = (;
+    value=vcat(residuals(m1) ./ std(residuals(m1)), randn(n)),
+    curve=repeat(["residual", "normal"]; inner=n),
+  )
+  draw(
+    data(dat_rz) *
+    mapping(:value; color=:curve) *
+    density(; bandwidth=0.1);
+  )
+end
+```
+
+## Conditional modes
+
+### Caterpillar plot
+
+```{julia}
+#| code-fold: true
+#| label: fig-caterpillarm1
+#| fig-cap: Prediction intervals of the subject random effects in model m1
+cm1 = only(ranefinfo(m1))
+caterpillar!(Figure(; resolution=(800, 1200)), cm1; orderby=2)
+```
+
+When we order the conditional modes for GM, that is `(Intercept)`, the outlier subject _S113_ becomes visible; the associated experimental effects are not unusual.
+
+```{julia}
+#| code-fold: true
+#| label: fig-caterpillarm1a
+#| fig-cap: '  Prediction intervals of the subject random effects in model m1 ordered by mean  response'
+caterpillar!(Figure(; resolution=(800, 1200)), cm1; orderby=1)
+```
+
+The catepillar plot also reveals that credibilty intervals are much shorter for subjects' Grand Means, shown in `(Intercept)`, than the subjects' experimental effects, because the latter are based on difference scores not means.
+Moreover, credibility intervals are shorter for the first spatial effect `sod` than the other two effects, because the spatial effect involves the valid condition which yielded three times as many trials than the other three conditions.
+Consequently, the spatial effect is more reliable. Unfortunately, due to differences in scaling of the x-axis of the panels this effect must be inferred. One option to reveal this difference is to reparameterize the LMM such model parameters estimate the conditional modes for the levels of condition rather than the contrast-based effects.
+This is accomplished by replacing the `1` in the random effect term with `0`, as shown next.
+
+```{julia}
+m1L = let
+  form = @formula rt ~ 1 + CTR + (0 + CTR | Subj)
+  fit(MixedModel, form, dat; contrasts)
+end
+```
+
+```{julia}
+VarCorr(m1L)
+```
+
+The caterpillar plot for levels shows the effect of the number of trials on credibility intervals; they are obviously much shorter for the valid condition.
+Note that this effect is not visible in a repeated-measure ANOVA with four condition means per subject as input.
+
+```{julia}
+#| code-fold: true
+#| label: fig-caterpillarm1La
+#| fig-cap: Prediction intervals of the subject random effects in model m1L
+@chain m1L begin
+  ranefinfo
+  only
+  caterpillar!(Figure(; resolution=(800, 1000)), _; orderby=1)
+end
+```
+
+### Shrinkage plot
+
+#### Log-transformed reaction times (LMM `m1`)
+
+```{julia}
+#| code-fold: true
+#| label: fig-caterpillarm1L
+#| fig-cap: Shrinkage plots of the subject random effects in model m1L
+shrinkageplot!(Figure(; resolution=(1000, 1200)), m1)
+```
+
+Three of the CPs are imploded, but not the theoretically critical ones.
+These implosions did not occur (or were not as visible) for raw reaction times.
+
+#### Raw reaction times (LMM `m1_rt`)
+
+```{julia}
+#| code-fold: true
+#| label: fig-shrinkagem1_rt
+#| fig-cap: Shrinkage plots of the subject random effects in model m1_rt
+shrinkageplot!(Figure(; resolution=(1000, 1200)), m1_rt)
+```
+
+The implosion is for three CP visualizations is not observed for raw reaction times.
+Interesting.
+
+## Parametric bootstrap
+
+Here we
+
+  - generate a bootstrap sample
+  - compute shortest covergage intervals for the LMM parameters
+  - plot densities of bootstrapped parameter estimates for residual, fixed effects, variance components, and correlation parameters
+
+### Generate a bootstrap sample
+
+We generate 2500 samples for the 15 model parameters (4 fixed effect, 4 VCs, 6 CPs, and 1 residual).
+
+```{julia}
+Random.seed!(1234321)
+samp = parametricbootstrap(2500, m1);
+```
+
+```{julia}
+dat2 = DataFrame(samp.allpars)
+first(dat2, 10)
+```
+
+```{julia}
+nrow(dat2) # 2500 estimates for each of 15 model parameters 
+```
+
+### Shortest coverage interval
+
+```{julia}
+DataFrame(shortestcovint(samp))
+```
+
+We can also visualize the shortest coverage intervals for fixed effects with the `ridgeplot()` command:
+
+```{julia}
+#| code-fold: true
+#| label: fig-bsridgem1
+#| fig-cap: Ridge plot of fixed-effects bootstrap samples from model m1L
+ridgeplot(samp; show_intercept=false)
+```
+
+### Comparative density plots of bootstrapped parameter estimates
+
+#### Residual
+
+```{julia}
+#| code-fold: true
+#| label: fig-sigmadensitym1
+#| fig-cap: '  Kernel density estimate from bootstrap samples of the residual standard  deviation for model m1L'
+draw(
+  data(@subset(dat2, :type == "σ" && :group == "residual")) *
+  mapping(:value => "Residual") *
+  density();
+  figure=(; resolution=(800, 400)),
+)
+```
+
+#### Fixed effects (w/o GM)
+
+The shortest coverage interval for the `GM` ranges from 376 to 404 ms. To keep the plot range small we do not include its density here.
+
+```{julia}
+#| code-fold: true
+#| label: fig-betadensitym1
+#| fig-cap: '  Kernel density estimate from bootstrap samples of the fixed effects for model  m1L'
+rn = renamer([
+  "(Intercept)" => "GM",
+  "CTR: sod" => "spatial effect",
+  "CTR: dos" => "object effect",
+  "CTR: dod" => "attraction effect",
+  "(Intercept), CTR: sod" => "GM, spatial",
+  "(Intercept), CTR: dos" => "GM, object",
+  "CTR: sod, CTR: dos" => "spatial, object",
+  "(Intercept), CTR: dod" => "GM, attraction",
+  "CTR: sod, CTR: dod" => "spatial, attraction",
+  "CTR: dos, CTR: dod" => "object, attraction",
+])
+draw(
+  data(@subset(dat2, :type == "β" && :names ≠ "(Intercept)")) *
+  mapping(
+    :value => "Experimental effect size [ms]";
+    color=:names => rn => "Experimental effects",
+  ) *
+  density();
+  figure=(; resolution=(800, 350)),
+)
+```
+
+The densitiies correspond nicely with the shortest coverage intervals.
+
+```{julia}
+#| code-fold: true
+#| label: fig-sigmasdensitym1
+#| fig-cap: '  Kernel density estimate from bootstrap samples of the standard deviations for  model m1L'
+draw(
+  data(@subset(dat2, :type == "σ" && :group == "Subj")) *
+  mapping(
+    :value => "Standard deviations [ms]";
+    color=:names => rn => "Variance components",
+  ) *
+  density();
+  figure=(; resolution=(800, 350)),
+)
+```
+
+The VC are all very nicely defined.
+
+#### Correlation parameters (CPs)
+
+```{julia}
+#| code-fold: true
+#| label: fig-corrdensitym1
+#| fig-cap: '  Kernel density estimate from bootstrap samples of the standard deviations for  model m1L'
+draw(
+  data(@subset(dat2, :type == "ρ")) *
+  mapping(
+    :value => "Correlation";
+    color=:names => rn => "Correlation parameters",
+  ) *
+  density();
+  figure=(; resolution=(800, 350)),
+)
+```
+
+Three CPs stand out positively, the correlation between GM and the spatial effect, GM and attraction effect, and the correlation between spatial and attraction effects.
+The second CP was positive, but not significant in the first study.
+The third CP replicates a CP that was judged questionable in script `kwdyz11.jl`.
+
+The three remaining CPs are not well defined for log-transformed reaction times; they only fit noise and should be removed.
+It is also possible that fitting the complex experimental design (including target size and rectangle orientation) will lead to more acceptable estimates.
+The corresponding plot based on LMM `m1_rt` for raw reaction times still shows them with very wide distributions, but acceptable.
+
+# References
+
+::: {#refs}
+:::

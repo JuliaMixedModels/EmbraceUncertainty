@@ -1,7 +1,7 @@
 ---
 jupyter: julia-1.8
 ---
-
+ 
 # Contrast Coding of Physical Fitness Effects {#sec.CntrstCdng2}
 
 Ths script uses a subset of data reported in Fühner, Golle, Granacher, & Kliegl (2021).
