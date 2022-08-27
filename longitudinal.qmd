@@ -53,7 +53,7 @@ using StandardizedPredictors
 using CairoMakie: scatter! # PA I have no idea why this is failing to resolve later since this exported
 
 if !isdefined(Main, :contrasts)
-  const contrasts = Dict{Symbol, Any}()
+  const contrasts = Dict{Symbol,Any}()
 end;
 CairoMakie.activate!(; type="svg");
 ProgressMeter.ijulia_behavior(:clear);

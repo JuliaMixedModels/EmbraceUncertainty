@@ -11,10 +11,15 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -53,7 +58,7 @@ code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code span.at { color: #7d9029; } /* Attribute */
 code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
+code span.bu { color: #008000; } /* BuiltIn */
 code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
 code span.ch { color: #4070a0; } /* Char */
 code span.cn { color: #880000; } /* Constant */
@@ -66,7 +71,7 @@ code span.er { color: #ff0000; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
 code span.fl { color: #40a070; } /* Float */
 code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
+code span.im { color: #008000; font-weight: bold; } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 code span.kw { color: #007020; font-weight: bold; } /* Keyword */
 code span.op { color: #666666; } /* Operator */
@@ -117,7 +122,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -196,12 +201,17 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./largescale.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale study</span></a>
+  <a href="./largescaledesigned.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale designed experiment</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./glmmbinomial.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></a>
+  <a href="./largescaleobserved.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A large-scale observational study</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glmmbinomial.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -210,50 +220,50 @@ div.csl-indent {
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
-    <div class="sidebar-item-container"> 
-        <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Appendices</a>
-      <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
-        <i class="bi bi-chevron-right ms-2"></i>
-      </a>
-    </div>
-    <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-        <li class="sidebar-item">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Appendices</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./linalg.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></a>
   </div>
 </li>
-    </ul>
+      </ul>
   </li>
     </ul>
     </div>
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc">
+        <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#sec-memod" id="toc-sec-memod" class="nav-link active" data-scroll-target="#sec-memod"> <span class="header-section-number">1.1</span> Mixed-effects models</a></li>
-  <li><a href="#sec-DyestuffData" id="toc-sec-DyestuffData" class="nav-link" data-scroll-target="#sec-DyestuffData"> <span class="header-section-number">1.2</span> The dyestuff and dyestuff2 data</a>
+  <li><a href="#sec-memod" id="toc-sec-memod" class="nav-link active" data-scroll-target="#sec-memod"><span class="toc-section-number">1.1</span>  Mixed-effects models</a></li>
+  <li><a href="#sec-DyestuffData" id="toc-sec-DyestuffData" class="nav-link" data-scroll-target="#sec-DyestuffData"><span class="toc-section-number">1.2</span>  The dyestuff and dyestuff2 data</a>
   <ul class="collapse">
-  <li><a href="#sec-dyestuff" id="toc-sec-dyestuff" class="nav-link" data-scroll-target="#sec-dyestuff"> <span class="header-section-number">1.2.1</span> The dyestuff data</a></li>
-  <li><a href="#sec-dyestuff2" id="toc-sec-dyestuff2" class="nav-link" data-scroll-target="#sec-dyestuff2"> <span class="header-section-number">1.2.2</span> The dyestuff2 data</a></li>
+  <li><a href="#sec-dyestuff" id="toc-sec-dyestuff" class="nav-link" data-scroll-target="#sec-dyestuff"><span class="toc-section-number">1.2.1</span>  The dyestuff data</a></li>
+  <li><a href="#sec-dyestuff2" id="toc-sec-dyestuff2" class="nav-link" data-scroll-target="#sec-dyestuff2"><span class="toc-section-number">1.2.2</span>  The dyestuff2 data</a></li>
   </ul></li>
-  <li><a href="#sec-fittinglmms" id="toc-sec-fittinglmms" class="nav-link" data-scroll-target="#sec-fittinglmms"> <span class="header-section-number">1.3</span> Fitting linear mixed models</a>
+  <li><a href="#sec-fittinglmms" id="toc-sec-fittinglmms" class="nav-link" data-scroll-target="#sec-fittinglmms"><span class="toc-section-number">1.3</span>  Fitting linear mixed models</a>
   <ul class="collapse">
-  <li><a href="#sec-dyestuffLMM" id="toc-sec-dyestuffLMM" class="nav-link" data-scroll-target="#sec-dyestuffLMM"> <span class="header-section-number">1.3.1</span> A model for the dyestuff data</a></li>
-  <li><a href="#sec-printeddetails" id="toc-sec-printeddetails" class="nav-link" data-scroll-target="#sec-printeddetails"> <span class="header-section-number">1.3.2</span> Details of the printed display</a></li>
-  <li><a href="#sec-dyestuff2lmm" id="toc-sec-dyestuff2lmm" class="nav-link" data-scroll-target="#sec-dyestuff2lmm"> <span class="header-section-number">1.3.3</span> A model for the dyestuff2 data</a></li>
+  <li><a href="#sec-dyestuffLMM" id="toc-sec-dyestuffLMM" class="nav-link" data-scroll-target="#sec-dyestuffLMM"><span class="toc-section-number">1.3.1</span>  A model for the dyestuff data</a></li>
+  <li><a href="#sec-printeddetails" id="toc-sec-printeddetails" class="nav-link" data-scroll-target="#sec-printeddetails"><span class="toc-section-number">1.3.2</span>  Details of the printed display</a></li>
+  <li><a href="#sec-dyestuff2lmm" id="toc-sec-dyestuff2lmm" class="nav-link" data-scroll-target="#sec-dyestuff2lmm"><span class="toc-section-number">1.3.3</span>  A model for the dyestuff2 data</a></li>
   </ul></li>
-  <li><a href="#sec-modelformulation" id="toc-sec-modelformulation" class="nav-link" data-scroll-target="#sec-modelformulation"> <span class="header-section-number">1.4</span> Model formulation</a></li>
-  <li><a href="#sec-furtherassess" id="toc-sec-furtherassess" class="nav-link" data-scroll-target="#sec-furtherassess"> <span class="header-section-number">1.5</span> Variability of parameter estimates</a>
+  <li><a href="#sec-modelformulation" id="toc-sec-modelformulation" class="nav-link" data-scroll-target="#sec-modelformulation"><span class="toc-section-number">1.4</span>  Model formulation</a></li>
+  <li><a href="#sec-furtherassess" id="toc-sec-furtherassess" class="nav-link" data-scroll-target="#sec-furtherassess"><span class="toc-section-number">1.5</span>  Variability of parameter estimates</a>
   <ul class="collapse">
-  <li><a href="#sec-confints" id="toc-sec-confints" class="nav-link" data-scroll-target="#sec-confints"> <span class="header-section-number">1.5.1</span> Confidence intervals on the parameters</a></li>
-  <li><a href="#sec-dsm01trace" id="toc-sec-dsm01trace" class="nav-link" data-scroll-target="#sec-dsm01trace"> <span class="header-section-number">1.5.2</span> Tracking the progress of the iterations</a></li>
+  <li><a href="#sec-confints" id="toc-sec-confints" class="nav-link" data-scroll-target="#sec-confints"><span class="toc-section-number">1.5.1</span>  Confidence intervals on the parameters</a></li>
+  <li><a href="#sec-dsm01trace" id="toc-sec-dsm01trace" class="nav-link" data-scroll-target="#sec-dsm01trace"><span class="toc-section-number">1.5.2</span>  Tracking the progress of the iterations</a></li>
   </ul></li>
-  <li><a href="#sec-assessRE" id="toc-sec-assessRE" class="nav-link" data-scroll-target="#sec-assessRE"> <span class="header-section-number">1.6</span> Assessing the random effects</a></li>
-  <li><a href="#sec-stylistic" id="toc-sec-stylistic" class="nav-link" data-scroll-target="#sec-stylistic"> <span class="header-section-number">1.7</span> Some stylistic conventions</a></li>
-  <li><a href="#sec-ChIntroSummary" id="toc-sec-ChIntroSummary" class="nav-link" data-scroll-target="#sec-ChIntroSummary"> <span class="header-section-number">1.8</span> Chapter summary</a></li>
+  <li><a href="#sec-assessRE" id="toc-sec-assessRE" class="nav-link" data-scroll-target="#sec-assessRE"><span class="toc-section-number">1.6</span>  Assessing the random effects</a></li>
+  <li><a href="#sec-stylistic" id="toc-sec-stylistic" class="nav-link" data-scroll-target="#sec-stylistic"><span class="toc-section-number">1.7</span>  Some stylistic conventions</a></li>
+  <li><a href="#sec-ChIntroSummary" id="toc-sec-ChIntroSummary" class="nav-link" data-scroll-target="#sec-ChIntroSummary"><span class="toc-section-number">1.8</span>  Chapter summary</a></li>
   </ul>
 </nav>
     </div>
@@ -276,7 +286,7 @@ div.csl-indent {
 
 </header>
 
-<div class="hidden">
+<div class="hidden" data-unless-format="html">
 <p><span class="math display">\[
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
@@ -297,6 +307,9 @@ div.csl-indent {
 \newcommand\mcB{{\mathcal{B}}}
 \newcommand\mcY{{\mathcal{Y}}}
 \]</span></p>
+</div>
+<div class="hidden" data-unless-format="pdf">
+
 </div>
 <p>In this book we describe the theory behind a type of statistical model called <em>mixed-effects</em> models and the practice of fitting and analyzing such models using the <a href="https://github.com/JuliaStats/MixedModels.jl">MixedModels</a> package for <a href="https://julialang.org">Julia</a>. These models are used in many different disciplines. Because the descriptions of the models can vary markedly between disciplines, we begin by describing what mixed-effects models are and by exploring a very simple example of one type of mixed model, the <em>linear mixed model</em>.</p>
 <p>This simple example allows us to illustrate the use of the <code>LinearMixedModel</code> type in the <code>MixedModels</code> package for fitting such models and for analyzing the fitted model. We also describe methods of assessing the precision of the parameter estimates and of visualizing the conditional distribution of the random effects, given the observed data.</p>
@@ -322,6 +335,9 @@ div.csl-indent {
 <p>an investigation to find out how much the variation from batch to batch in the quality of an intermediate product (H-acid) contributes to the variation in the yield of the dyestuff (Naphthalene Black 12B) made from it. In the experiment six samples of the intermediate, representing different batches of works manufacture, were obtained, and five preparations of the dyestuff were made in the laboratory from each sample. The equivalent yield of each preparation as grams of standard colour was determined by dye-trial.</p>
 </blockquote>
 <p>To access these data within <code>Julia</code> we must first attach this package, and others that we will use, to our session.</p>
+<div class="cell" data-execution_count="1">
+<details open="">
+<summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics </span><span class="co"># high-level graphics</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie        </span><span class="co"># graphics back-end</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays </span><span class="co"># factors and ordered factors</span></span>
@@ -342,6 +358,8 @@ div.csl-indent {
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>);</span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <p>A package must be attached before any of the data sets or functions in the package can be used. If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s). If you are using Julia version 1.8.0 or later the error report will include instructions on how to do this.</p>
 <p>In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.</p>
 <p>The <code>MixedModels</code> package includes several datasets that are used in examples and in tests of the package. Individual datasets can be loaded with the <code>dataset</code> function. To allow for other packages to incorporate their own <code>dataset</code> function without causing name clashes, this function is not exported and must be called with the fully-qualified name <code>MixedModels.dataset</code>. (If this explanation sounds like gibberish to you, the bottom line is that you must use <code>MixedModels.dataset(:dyestuff)</code> and not just <code>dataset(:dyestuff)</code>.)</p>
@@ -471,13 +489,13 @@ Note
 <div id="fig-dyestuffdata" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-dyestuffdata-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.1: Yield of dyestuff by batch. The line joins the mean yields.</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.1: Yield of dyestuff by batch. The line joins the mean yields.</figcaption><p></p>
 </figure>
 </div>
 </div>
 </div>
 <p>than we do from numerical summaries.</p>
-<p>In <a href="#fig-dyestuffdata">Figure&nbsp;<span>1.1</span></a> we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability. For example, four of the five preparations from batch F provided lower yields than did any of the preparations from batches B, C, and E.</p>
+<p>In <a href="#fig-dyestuffdata">Figure&nbsp;<span>1.1</span></a> we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability. For example, four of the five preparations from batch F produced lower yields than did any of the preparations from batches B, C, and E.</p>
 <p>This plot, and essentially all the other plots in this book, were created using the <a href="https://makie.juliaplots.io">Makie</a> package (<span class="citation" data-cites="DanischKrumbiegel2021">Danisch &amp; Krumbiegel (<a href="references.html#ref-DanischKrumbiegel2021" role="doc-biblioref">2021</a>)</span>).</p>
 <p>In <code>yet-to-be-written-appendix</code> we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot. For example, in this plot the levels of <code>batch</code> are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are <em>jittered</em> to avoid overplotting of points. (Note that the two lowest yields of samples from batch <code>A</code> are identical.)</p>
 <div class="callout-note callout callout-style-default callout-captioned">
@@ -538,7 +556,7 @@ Note
 <div id="fig-dyestuff2data" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-dyestuff2data-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.2: Artificial data of yield by batch. The line joins the mean yields.</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.2: Artificial data of yield by batch. The line joins the mean yields.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -561,7 +579,7 @@ Note
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dyestuff)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 19    Time: 0:00:00 (13.67 ms/it)</code></pre>
+<pre><code>Minimizing 19    Time: 0:00:00 (12.87 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <table class="table table-sm table-striped">
@@ -596,7 +614,7 @@ Note
 </table>
 </div>
 </div>
-<p>By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, are shown compactly like this. To obtain more information we can <code>print</code> the model, as in</p>
+<p>By default, this compact display of mixed-effects model fits is used in <a href="https://jupyter.org">Jupyter</a> notebooks, which are the evaluation engine for <a href="https://quarto.org/docs/books/">quarto books</a> with Julia code chunks. To obtain more information we can <code>print</code> the model, as in</p>
 <div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(dsm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -685,16 +703,12 @@ Residual              13.34610 3.65323
 </section>
 <section id="sec-modelformulation" class="level2" data-number="1.4">
 <h2 data-number="1.4" class="anchored" data-anchor-id="sec-modelformulation"><span class="header-section-number">1.4</span> Model formulation</h2>
-<p>A common way of writing the statistical model being fit in <code>dsm01</code> and <code>dsm02</code> is as an expression for the i’th observation in the j’th batch</p>
-<p><span class="math display">\[
+<p>A common way of writing the statistical model being fit in <code>dsm01</code> and <code>dsm02</code> is as an expression for the i’th observation in the j’th batch <span class="math display">\[
 y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
-\]</span></p>
-<p>with the further specification that the per-observation noise terms, <span class="math inline">\(\epsilon_{i,j}\)</span>, are independently and identically distributed as <span class="math inline">\(\mcN(0, \sigma^2)\)</span> and the random effects, <span class="math inline">\(b_j\)</span>, are independently and identically distributed as <span class="math inline">\(\mcN(0, \sigma_1^2)\)</span>. The three parameters in the model are the overall mean, <span class="math inline">\(\mu\)</span>, the standard deviation of the random effects, <span class="math inline">\(\sigma_1\)</span>, and the standard deviation of the per-observation noise, <span class="math inline">\(\sigma\)</span>.</p>
-<p>Generalizing this formulation to unbalanced data sets and more complex models can become unwieldy. For the range of models shown in this book it is more convenient to use a matrix-vector representation in which the random effects are described as a <span class="math inline">\(q\)</span>-dimensional multivariate Gaussian random variable</p>
-<p><span id="eq-mvbdist"><span class="math display">\[
+\]</span> with the further specification that the per-observation noise terms, <span class="math inline">\(\epsilon_{i,j}\)</span>, are independently and identically distributed as <span class="math inline">\(\mcN(0, \sigma^2)\)</span> and the random effects, <span class="math inline">\(b_j\)</span>, are independently and identically distributed as <span class="math inline">\(\mcN(0, \sigma_1^2)\)</span>. The three parameters in the model are the overall mean, <span class="math inline">\(\mu\)</span>, the standard deviation of the random effects, <span class="math inline">\(\sigma_1\)</span>, and the standard deviation of the per-observation noise, <span class="math inline">\(\sigma\)</span>.</p>
+<p>Generalizing this formulation to unbalanced data sets and more complex models can become unwieldy. For the range of models shown in this book it is more convenient to use a matrix-vector representation in which the random effects are described as a <span class="math inline">\(q\)</span>-dimensional multivariate Gaussian random variable <span id="eq-mvbdist"><span class="math display">\[
 \mcB\sim\mcN(\mathbf{0},\sigma_1^2\bbI) .
-\tag{1.1}\]</span></span></p>
-<p>The multivariate Gaussian distribution is described in more detail in <a href="linalg.html#sec-mvgaussian"><span>Section&nbsp;A.2.3</span></a>. At this point the important thing to know is that <a href="#eq-mvbdist">Equation&nbsp;<span>1.1</span></a> describes a vector of independent Gaussian random variables, each of which has mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma_1^2\)</span>.</p>
+\tag{1.1}\]</span></span> The multivariate Gaussian distribution is described in more detail in <a href="linalg.html#sec-mvgaussian"><span>Section&nbsp;A.2.3</span></a>. At this point the important thing to know is that <a href="#eq-mvbdist">Equation&nbsp;<span>1.1</span></a> describes a vector of independent Gaussian random variables, each of which has mean <span class="math inline">\(0\)</span> and variance <span class="math inline">\(\sigma_1^2\)</span>.</p>
 <p>The random effects are associated with the observations through a <em>model matrix</em>, <span class="math inline">\(\bbZ\)</span>. For a model with <span class="math inline">\(n\)</span> observations and a total of <span class="math inline">\(q\)</span> random effects, <span class="math inline">\(\bbZ\)</span> will be of size <span class="math inline">\(n\times q\)</span>. Furthermore, it is sparse - meaning that most of the elements of the matrix are zeros. In this case, <span class="math inline">\(\bbZ\)</span> is the indicator matrix for the <code>batch</code> covariate.</p>
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>Zdsm01 <span class="op">=</span> <span class="fu">Int</span>.(<span class="fu">Matrix</span>(<span class="fu">only</span>(dsm01.reterms)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -767,12 +781,10 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 </div>
 </div>
 <p>A linear model without random effects can be described as <span class="math inline">\(\mcY\sim\mcN(\bbX\bbbeta, \sigma^2\bbI)\)</span>. That is, the expected value of the response vector is the <em>linear predictor</em>, <span class="math inline">\(\bbX\bbbeta\)</span>, and the covariance matrix of the multivariate Gaussian distribution for the response is <span class="math inline">\(\sigma^2\bbI\)</span>, corresponding to independent, constant variance per-observation noise terms.</p>
-<p>For the linear mixed model, we describe the conditional distribution of the response, given a particular value, <span class="math inline">\(\bbb\)</span>, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, <span class="math inline">\(\bbb\)</span>, and the fixed-effects parameter vector <span class="math inline">\(\bbbeta\)</span>.</p>
-<p><span class="math display">\[
+<p>For the linear mixed model, we describe the conditional distribution of the response, given a particular value, <span class="math inline">\(\bbb\)</span>, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, <span class="math inline">\(\bbb\)</span>, and the fixed-effects parameter vector <span class="math inline">\(\bbbeta\)</span>. <span class="math display">\[
 (\mcY|\mcB=\bbb)\sim\mcN(\bbX\bbbeta+\bbZ\bbb,\sigma^2\bbI)
 \]</span></p>
-<p>The complete model can be written as</p>
-<p><span id="eq-lmmdist"><span class="math display">\[
+<p>The complete model can be written as <span id="eq-lmmdist"><span class="math display">\[
 \begin{aligned}
 (\mcY|\mcB=\bbb)&amp;\sim\mcN(\bbX\bbbeta+\bbZ\bbb,\sigma^2\bbI)\\
 \mcB&amp;\sim\mcN(\mathbf{0},\bbSigma_\theta) .
@@ -780,16 +792,14 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 \tag{1.2}\]</span></span></p>
 <p>From these two distributions, the joint distribution of <span class="math inline">\(\mcY\)</span> and <span class="math inline">\(\mcB\)</span>, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value <span class="math inline">\(\bby\)</span> of <span class="math inline">\(\mcY\)</span>.</p>
 <p>Details on the derivation and evaluation of the log-likelihood are given in <a href="linalg.html#sec-lmmtheory"><span>Section&nbsp;A.7</span></a>. At this point the important results are that the <em>profiled</em> log-likelihood for models <code>dsm01</code> and <code>dsm02</code> can be evaluated directly (i.e.&nbsp;without an iterative optimization) from a single parameter, <span class="math inline">\(\theta=\sigma_1/\sigma\)</span>.</p>
-<p>Furthermore, this profiled log-likelihood can be evaluated from a matrix of <span class="math inline">\(\bbX'\bbX\)</span>-like products,</p>
-<p><span class="math display">\[
+<p>Furthermore, this profiled log-likelihood can be evaluated from a matrix of <span class="math inline">\(\bbX'\bbX\)</span>-like products, <span class="math display">\[
 \bbA=
 \begin{bmatrix}
 \bbZ'\bbZ &amp; \bbZ'\bbX &amp; \bbZ'\bby \\
 \bbX'\bbZ &amp; \bbX'\bbX &amp; \bbX'\bby \\
 \bby'\bbZ &amp; \bby'\bbX &amp; \bby'\bby
 \end{bmatrix}
-\]</span></p>
-<p>which is stored in three pieces</p>
+\]</span> which is stored in three pieces</p>
 <div class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(dsm01.A)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="23">
@@ -820,16 +830,14 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 </div>
 <p>The first, diagonal matrix is <span class="math inline">\(\bbZ'\bbZ\)</span>. A simple, scalar random effects term like <code>(1|batch)</code> in the formula for models <code>dsm01</code> and <code>dsm02</code> results in <span class="math inline">\(\bbZ\)</span> being the indicator matrix for the levels of the grouping factor and, hence, in a diagonal <span class="math inline">\(\bbZ'\bbZ\)</span>, whose diagonal elements are the frequencies of the levels. Thus this block shows that there are exactly 5 observations on each of the 6 batches.</p>
 <p>The second, rectangular matrix is <span class="math inline">\(\begin{bmatrix} \bbZ'\bbX \\ \bbZ'\bby \end{bmatrix}\)</span>. Again, the fact that <span class="math inline">\(\bbZ\)</span> is the indicator matrix for the levels of the grouping factor and that <span class="math inline">\(\bbX\)</span> is a single column of 1’s results in the frequencies of the levels of the factor in the first row of this block. The second row of this block consists of the sums of the yields for each batch.</p>
-<p>The third, square symmetric matrix is</p>
-<p><span class="math display">\[
+<p>The third, square symmetric matrix is <span class="math display">\[
 \begin{bmatrix}
 \bbX'\bbX &amp; \bbX'\bby \\
 \bby'\bbX &amp; \bby'\bby
 \end{bmatrix}
 \]</span></p>
 <p>The parameters enter into the computation via a <em>relative covariance factor</em>, <span class="math inline">\(\bbLambda_{\boldsymbol\theta}\)</span>, which is the <span class="math inline">\(6\times 6\)</span> matrix <span class="math inline">\(\theta\,\bbI\)</span> in this case.</p>
-<p>The method hinges on being able to evaluate efficiently the <em>Cholesky factor</em> (see <a href="linalg.html#sec-cholesky"><span>Section&nbsp;A.2.2</span></a> for details) of</p>
-<p><span class="math display">\[
+<p>The method hinges on being able to evaluate efficiently the <em>Cholesky factor</em> (see <a href="linalg.html#sec-cholesky"><span>Section&nbsp;A.2.2</span></a> for details) of <span class="math display">\[
 \begin{bmatrix}
 \bbLambda_\theta'\mathbf{Z'Z}\bbLambda_\theta+\bbI &amp;
 \bbLambda_\theta'\mathbf{Z'X} &amp; \bbLambda_\theta'\mathbf{Z'y} \\
@@ -911,7 +919,7 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 <div id="fig-dsm01_bs_beta_density" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-dsm01_bs_beta_density-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.3: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.3: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -929,8 +937,12 @@ Note
 <p>Find a way to use <code>:compact=true</code> when interpolating numeric values into the text</p>
 </div>
 </div>
+<div class="cell" data-execution_count="31">
+<div class="cell-output cell-output-display" data-execution_count="32">
 <p>The distribution of the estimates of <code>β₁</code> is more-or-less a Gaussian (or “normal”) shape, with a mean value of 1528.021212 which is close to the estimated <code>β₁</code> of 1527.500000.</p>
 <p>Similarly the standard deviation of the simulated β values, 17.711433258971017 is close to the standard error of the parameter, 17.694552727788437.</p>
+</div>
+</div>
 <p>In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect. The estimates are approximately normally distributed centered about the “true” parameter value with a standard deviation given by the standard error of the parameter.</p>
 <p>The situation is different for the estimates of the standard deviation parameters, <span class="math inline">\(\sigma\)</span> and <span class="math inline">\(\sigma_1\)</span>, as shown in <a href="#fig-dsm01_bs_sigma_density">Figure&nbsp;<span>1.4</span></a>.</p>
 <div class="cell" data-execution_count="32">
@@ -950,13 +962,17 @@ Note
 <div id="fig-dsm01_bs_sigma_density" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-dsm01_bs_sigma_density-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.4: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.4: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01</figcaption><p></p>
 </figure>
 </div>
 </div>
 </div>
 <p>The estimator for the residual standard deviation, <span class="math inline">\(\sigma\)</span>, is approximately normally distributed but the estimator for <span class="math inline">\(\sigma_1\)</span>, the standard deviation of the <code>batch</code> random effects is bimodal (i.e.&nbsp;has two “modes” or local maxima).</p>
+<div class="cell" data-execution_count="33">
+<div class="cell-output cell-output-display" data-execution_count="34">
 <p>There is one peak around the “true” value for the simulation, 37.26034309083298, and another peak at zero.</p>
+</div>
+</div>
 <p>The apparent distribution of the estimates of <span class="math inline">\(\sigma_1\)</span> in <a href="#fig-dsm01_bs_sigma_density">Figure&nbsp;<span>1.4</span></a> is being distorted by the method of approximating the density. A <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">kernel density estimate</a> approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a <em>kernel</em> such as a narrow Gaussian distribution (see the linked article for details). In this case the distribution of the estimates is a combination of a continuous distribution and a spike or point mass at zero as shown in a histogram, <a href="#fig-dsm01_bs_sigma_hist">Figure&nbsp;<span>1.5</span></a>.</p>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -988,7 +1004,7 @@ Note
 <div id="fig-dsm01_bs_sigma_hist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-dsm01_bs_sigma_hist-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.5: Histogram of bootstrap variance-components as standard deviations from model dsm01</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.5: Histogram of bootstrap variance-components as standard deviations from model dsm01</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -1021,7 +1037,7 @@ Note
 <div id="fig-dsm01_bs_sigmasqr_hist" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-dsm01_bs_sigmasqr_hist-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.6: Histogram of bootstrap variance-components from model dsm01</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -1078,7 +1094,11 @@ Note
 <div class="data-frame"><p>19 rows × 2 columns</p><table class="data-frame table table-sm table-striped"><thead><tr><th></th><th>1</th><th>2</th></tr><tr><th></th><th title="Vector{Float64}">Array…</th><th title="Float64">Float64</th></tr></thead><tbody><tr><th>1</th><td>[1.0]</td><td>327.767</td></tr><tr><th>2</th><td>[1.0]</td><td>327.767</td></tr><tr><th>3</th><td>[1.75]</td><td>331.036</td></tr><tr><th>4</th><td>[0.25]</td><td>330.646</td></tr><tr><th>5</th><td>[0.97619]</td><td>327.695</td></tr><tr><th>6</th><td>[0.928569]</td><td>327.566</td></tr><tr><th>7</th><td>[0.833327]</td><td>327.383</td></tr><tr><th>8</th><td>[0.807188]</td><td>327.353</td></tr><tr><th>9</th><td>[0.799688]</td><td>327.347</td></tr><tr><th>10</th><td>[0.792188]</td><td>327.341</td></tr><tr><th>11</th><td>[0.777188]</td><td>327.333</td></tr><tr><th>12</th><td>[0.747188]</td><td>327.327</td></tr><tr><th>13</th><td>[0.739688]</td><td>327.329</td></tr><tr><th>14</th><td>[0.752777]</td><td>327.327</td></tr><tr><th>15</th><td>[0.753527]</td><td>327.327</td></tr><tr><th>16</th><td>[0.752584]</td><td>327.327</td></tr><tr><th>17</th><td>[0.752509]</td><td>327.327</td></tr><tr><th>18</th><td>[0.752591]</td><td>327.327</td></tr><tr><th>19</th><td>[0.752581]</td><td>327.327</td></tr></tbody></table></div>
 </div>
 </div>
+<div class="cell" data-execution_count="40">
+<div class="cell-output cell-output-display" data-execution_count="41">
 <p>Here the algorithm converges after 18 function evaluations to a profiled deviance of 327.327059881143 at θ = 0.7525806394967323.</p>
+</div>
+</div>
 </section>
 </section>
 <section id="sec-assessRE" class="level2" data-number="1.6">
@@ -1111,7 +1131,7 @@ Note
 <div id="fig-caterpillar_dsm01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-caterpillar_dsm01-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.7: Caterpillar plot of prediction intervals for dsm01 random effects</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.7: Caterpillar plot of prediction intervals for dsm01 random effects</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -1129,7 +1149,7 @@ Note
 <div id="fig-qqcaterpillar_dsm01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="intro_files/figure-html/fig-qqcaterpillar_dsm01-output-1.svg" class="img-fluid figure-img"></p>
-<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1.8: Quantile caterpillar plot of prediction intervals for dsm01 random effects</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1.8: Quantile caterpillar plot of prediction intervals for dsm01 random effects</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -1143,41 +1163,47 @@ Note
 <p>The name <code>contrasts</code> is used in a general sense here to specify certain transformations that are to take place during the process of converting a formula and the structure, or <a href="https://en.wikipedia.org/wiki/Database_schema">schema</a>, of the data into model matrices.</p>
 <p>The <a href="https://github.com/JuliaStats/StatsModels.jl">StatsModels.jl package</a> allows for contrasts to be specified as a key-value dictionary where the keys are symbols and the values are of a type that specializes <code>StatsModels.AbstractContrasts</code>. The <a href="https://github.com/JuliaStats/MixedModels.jl">MixedModels.jl package</a> provides for a <code>Grouping()</code> contrast and the <a href="https://github.com/beacon-biosignals/StandardizedPredictors.jl">StandardizedPredictors.jl package</a> allows transformations to be expressed as contrasts.</p>
 <p>For models <code>dsm01</code> and <code>dsm02</code> the only covariate in the model formula is <code>batch</code>, which is a grouping factor for the random effects. Thus the desired contrasts specification is</p>
+<div class="cell" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>batch <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>(Symbols in Julia can be written as a colon followed by the name of the symbol. The colon creates an expression but, if the expression consists of a single name, then the expression is the symbol.)</p>
 <p>It is best to get into the habit of specifying <code>Grouping()</code> contrasts for any grouping factors in the data. Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter. However, when the number of levels is large, as for some of the models in later chapters, failure to specify <code>Grouping()</code> contrasts can cause memory faults when constructing the numeric represention of the model.</p>
 <p>There is an advantage in assigning the contrasts dictionary to the name <code>contrasts</code> because a call to <code>fit</code> with the optional, named argument <code>contrasts</code></p>
+<div class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="fu">fit</span>(</span>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  MixedModel,</span>
 <span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch)),</span>
 <span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  dyestuff;</span>
 <span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  contrasts<span class="op">=</span>contrasts,</span>
 <span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>can be condensed to</p>
+<div class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="fu">fit</span>(</span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  MixedModel,</span>
 <span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch)),</span>
 <span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  dyestuff;</span>
 <span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a>  contrasts,</span>
 <span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>That is, if the name of the object to be passed as a named argument is the same as the name of the argument, like <code>contrasts=contrasts</code>, then the name does not need to be repeated. Note that the comma after the positional arguments must be changed to a semicolon in this convention. This is necessary because it indicates that arguments following the semicolon are named arguments, not positional.</p>
 <p>Another convention we will use is assigning the formula separately from the call to <code>fit</code> as part of a <code>let</code> block. Often the formula can become rather long, sometimes needing multiple lines in the call, and it becomes difficult to keep track of the other arguments. Assigning the formula separately helps in keeping track of the arguments to <code>fit</code>.</p>
 <p>A <code>let</code> block is a way of making temporary assignments that do not affect the global state. An assignment to a variable name inside a <code>let</code> block is local to the block.</p>
 <p>Thus <code>dsm01</code> can be assigned as</p>
+<div class="cell" data-execution_count="47">
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="kw">let</span></span>
 <span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch))</span>
 <span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dyestuff; contrasts)</span>
 <span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="sec-ChIntroSummary" class="level2" data-number="1.8">
 <h2 data-number="1.8" class="anchored" data-anchor-id="sec-ChIntroSummary"><span class="header-section-number">1.8</span> Chapter summary</h2>
 <p>A considerable amount of material has been presented in this chapter, especially considering the word “simple” in its title (it’s the model that is simple, not the material). A summary may be in order.</p>
-<p>A mixed-effects model incorporates fixed-effects parameters and random effects, which are unobserved random variables, <span class="math inline">\(\mcB\)</span>. In a linear mixed model, both the unconditional distribution of <span class="math inline">\(\mcB\)</span> and the conditional distribution, <span class="math inline">\((\mcY|\mcB=\bbb)\)</span>, are multivariate Gaussian distributions. Furthermore, this conditional distribution is a spherical Gaussian with mean, <span class="math inline">\(\bbmu\)</span>, determined by the linear predictor, <span class="math inline">\(\bbZ\bbb+\bbX\bbbeta\)</span>. That is,</p>
-<p><span class="math display">\[
+<p>A mixed-effects model incorporates fixed-effects parameters and random effects, which are unobserved random variables, <span class="math inline">\(\mcB\)</span>. In a linear mixed model, both the unconditional distribution of <span class="math inline">\(\mcB\)</span> and the conditional distribution, <span class="math inline">\((\mcY|\mcB=\bbb)\)</span>, are multivariate Gaussian distributions. Furthermore, this conditional distribution is a spherical Gaussian with mean, <span class="math inline">\(\bbmu\)</span>, determined by the linear predictor, <span class="math inline">\(\bbZ\bbb+\bbX\bbbeta\)</span>. That is, <span class="math display">\[
 (\mcY|\mcB=\bbb)\sim
 \mcN(\bbZ\bbb+\bbX\bbbeta, \sigma^2\bbI_n) .
-\]</span></p>
-<p>The unconditional distribution of <span class="math inline">\(\mcB\)</span> has mean <span class="math inline">\(\mathbf{0}\)</span> and a parameterized <span class="math inline">\(q\times q\)</span> variance-covariance matrix, <span class="math inline">\(\Sigma_\theta\)</span>.</p>
+\]</span> The unconditional distribution of <span class="math inline">\(\mcB\)</span> has mean <span class="math inline">\(\mathbf{0}\)</span> and a parameterized <span class="math inline">\(q\times q\)</span> variance-covariance matrix, <span class="math inline">\(\Sigma_\theta\)</span>.</p>
 <p>In the models we considered in this chapter, <span class="math inline">\(\Sigma_\theta\)</span>, is a scalar multiple of the identity matrix, <span class="math inline">\(\bbI_6\)</span>. This matrix is always a multiple of the identity in models with just one random-effects term that is a simple, scalar term. The reason for introducing all the machinery that we did is to allow for more general model specifications.</p>
 <p>The maximum likelihood estimates of the parameters are obtained by minimizing the deviance. For linear mixed models we can minimize the profiled deviance, which is a function of <span class="math inline">\(\bbtheta\)</span> only, thereby considerably simplifying the optimization problem.</p>
 <p>To assess the precision of the parameter estimates we use a parametric bootstrap sample, when feasible. Re-fitting a simple model, such as those shown in this chapter, to a randomly generated response vector is quite fast and it is reasonable to work with bootstrap samples of tens of thousands of replicates. With larger data sets and more complex models, large bootstrap samples of parameter estimates could take much longer.</p>
@@ -1206,6 +1232,24 @@ Schwarz, G. (1978). Estimating the dimension of a model. <em>Annals of Statistic
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -1255,7 +1299,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      let href = ref.getAttribute('href');
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
