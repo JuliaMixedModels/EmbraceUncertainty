@@ -4,8 +4,6 @@ jupyter: julia-1.8
 
 # Generalized Linear Mixed Models for Binary Responses {#sec-glmmbinomial}
 
-::: {.hidden}
-$$
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
 \newcommand\bbI{{\mathbf{I}}}
@@ -24,8 +22,6 @@ $$
 \newcommand\mcN{{\mathcal{N}}}
 \newcommand\mcB{{\mathcal{B}}}
 \newcommand\mcY{{\mathcal{Y}}}
-$$
-:::
 
 Attach the packages to be used in this chapter
 

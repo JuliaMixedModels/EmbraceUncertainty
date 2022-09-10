@@ -4,8 +4,6 @@ jupyter: julia-1.8
 
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
 
-::: {.hidden unless-format="html"}
-$$
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
 \newcommand\bbI{{\mathbf{I}}}
@@ -24,33 +22,6 @@ $$
 \newcommand\mcN{{\mathcal{N}}}
 \newcommand\mcB{{\mathcal{B}}}
 \newcommand\mcY{{\mathcal{Y}}}
-$$
-:::
-
-::: {.hidden unless-format="pdf"}
-
-```{=latex}
-\newcommand\bbA{{\mathbf{A}}}
-\newcommand\bbb{{\mathbf{b}}}
-\newcommand\bbI{{\mathbf{I}}}
-\newcommand\bbR{{\mathbf{R}}}
-\newcommand\bbX{{\mathbf{X}}}
-\newcommand\bbx{{\mathbf{x}}}
-\newcommand\bby{{\mathbf{y}}}
-\newcommand\bbZ{{\mathbf{Z}}}
-\newcommand\bbbeta{{\boldsymbol{\beta}}}
-\newcommand\bbeta{{\boldsymbol{\eta}}}
-\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
-\newcommand\bbOmega{{\boldsymbol{\Omega}}}
-\newcommand\bbmu{{\boldsymbol{\mu}}}
-\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
-\newcommand\bbtheta{{\boldsymbol{\theta}}}
-\newcommand\mcN{{\mathcal{N}}}
-\newcommand\mcB{{\mathcal{B}}}
-\newcommand\mcY{{\mathcal{Y}}}
-```
-
-:::
 
 In this book we describe the theory behind a type of statistical model called *mixed-effects* models and the practice of fitting and analyzing such models using the [MixedModels](https://github.com/JuliaStats/MixedModels.jl) package for [Julia](https://julialang.org).
 These models are used in many different disciplines.

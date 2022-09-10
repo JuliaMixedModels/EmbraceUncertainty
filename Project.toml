@@ -1,5 +1,7 @@
 name = "EmbraceUncertainty"
+uuid = "81be8970-b14c-4107-8889-06289fef228c"
 authors = ["Phillip Alday <me@phillipalday.com>, Reinhold Kliegl <reinhold.kliegl@gmail.com>, Douglas Bates <dmbates@gmail.com>"]
+version = "0.1.0"
 
 [deps]
 AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
