@@ -47,7 +47,7 @@ const GENRES = ["Action", "Adventure", "Animation",
 function load_quiver()
     @info "Downloading data"
     quiver = String[]
-    open(Downloads.download(ML25M_URL), "r") do io
+    open(Downloads.download(ML_LATEST_URL), "r") do io
         zipfile = ZipFile.Reader(io)
         @info "Extracting and saving ratings"
         ratings = extract_csv(zipfile, "ratings.csv";
