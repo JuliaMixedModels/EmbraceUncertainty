@@ -14,10 +14,8 @@ using CairoMakie
 using Chain
 using DataFrameMacros
 using DataFrames
+using Effects
 using LinearAlgebra
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL
-end
 using MixedModels
 using MixedModelsMakie
 using ProgressMeter
@@ -102,7 +100,7 @@ This table shows that some of the items were never identified correctly.
 These are
 
 ```{julia}
-@subset(byitem, iszero(:iacc))
+filter(:iacc => iszero, byitem)
 ```
 
 Notice that these are all words but somewhat obscure words such that none of the subjects exposed to the word identified it correctly.
@@ -268,7 +266,7 @@ draw(
   data(bysubj) *
   mapping(
     :spropacc => "Proportion accurate",
-    :smedianrt => "Median response time",
+    :smedianrt => "Median response time (ms)",
   ) *
   (smooth() + visual(Scatter));
 )
@@ -337,10 +335,6 @@ draw(
 
 In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.
 
-```{julia}
-describe(@transform!(pruned, :speed = 1000 / :rt)) # speed in s⁻¹
-```
-
 The density of the response speed, in responses per second, is shown in @fig-elpldtspeeddens.
 
 ```{julia}
@@ -349,7 +343,8 @@ The density of the response speed, in responses per second, is shown in @fig-elp
 #| label: fig-elpldtspeeddens
 draw(
   data(pruned) *
-  mapping(:speed => "Response speed (s⁻¹) for correct responses") *
+  mapping(
+    :rt => (x -> 1000 / x) => "Response speed (s⁻¹) for correct responses") *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
@@ -395,7 +390,7 @@ draw(
   data(pruned) *
   mapping(
     :wrdlen => "Word length",
-    :speed => "Speed of response (s⁻¹)";
+    :rt => (x -> 1000/x) => "Speed of response (s⁻¹)";
     :color => :isword,
   ) *
   smooth();
@@ -415,7 +410,7 @@ let
   plt = data(@subset(pruned, :wrdlen > 3, :wrdlen < 14))
   plt *= mapping(
     :wrdlen => "Word length",
-    :speed => "Speed of response (s⁻¹)",
+    :rt => (x -> 1000/x) => "Speed of response (s⁻¹)",
     color=:isword,
     side=:isword,
   )
@@ -457,22 +452,33 @@ and fit a first model with simple, scalar, random effects for `subj` and `item`.
 ```{julia}
 elm01 = let
   form = @formula(
-    speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+    1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
   )
   fit(MixedModel, form, pruned; contrasts)
 end
 ```
+
+The predicted response speed by word length and word/nonword status can be summarized as
+
+```{julia}
+effects(Dict(:isword => [false, true], :wrdlen => 4:2:12), elm01)
+```
+
 
 If we restrict to only those subjects with 80% accuracy or greater the model becomes
 
 ```{julia}
 elm02 = let
   form = @formula(
-    speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+    1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
   )
   dat = @subset(pruned, :spropacc > 0.8)
   fit(MixedModel, form, dat; contrasts)
 end
+```
+
+```{julia}
+effects(Dict(:isword => [false, true], :wrdlen => 4:2:12), elm02)
 ```
 
 To compare the conditional means of the random effects for item in these two models we incorporate them into the `byitem` table.
@@ -504,7 +510,6 @@ draw(
 
 ::: {.callout-note}
 Adjust the alpha on @fig-itemreelm01vselm02.
-It happens that the search function on the Makie documentation is down now so I can't look up how to do it.
 :::
 
 @fig-itemreelm01vselm02 is exactly of the form that would be expected in a sample from a correlated multivariate Gaussian distribution.
@@ -533,7 +538,7 @@ saveoptsum("./optsums/elm01.json", elm01);
 elm01a = restoreoptsum!(
   let
     form = @formula(
-      speed ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
+      1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
     )
     MixedModel(form, pruned; contrasts)
   end,
