@@ -15,7 +15,7 @@ book:
     - largescale.qmd
     - glmmbinomial.qmd
     - references.qmd
-  appendices: 
+  appendices:
     - linalg.qmd
 
 execute-dir: project
@@ -28,3 +28,6 @@ format:
     theme: cosmo
 
 jupyter: julia-1.8
+execute:
+  cache: true
+  freeze: auto
