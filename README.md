@@ -34,5 +34,5 @@ julia> exit()
 
 ```
 
-Note two important parts of the kernel used above: a flat to activate local Julia environment and a flag to allow Julia to automatically set the appropriate number of threads.
+Note two important parts of the kernel used above: a flag to activate local Julia environment and a flag to allow Julia to automatically set the appropriate number of threads.
 The former is necessary to render the book at all; the latter may improve render speed.
