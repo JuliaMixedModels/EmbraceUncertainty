@@ -7,3 +7,5 @@ Manifest.toml
 
 /.quarto/
 /_book/
+/_freeze/
+/.jupyter_cache/

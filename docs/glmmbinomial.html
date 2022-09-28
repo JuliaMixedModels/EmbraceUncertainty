@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-99.9.9">
+<meta name="generator" content="quarto-1.1.251">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -276,28 +276,6 @@ div.csl-indent {
 
 </header>
 
-<div class="hidden">
-<p><span class="math display">\[
-\newcommand\bbA{{\mathbf{A}}}
-\newcommand\bbb{{\mathbf{b}}}
-\newcommand\bbI{{\mathbf{I}}}
-\newcommand\bbR{{\mathbf{R}}}
-\newcommand\bbX{{\mathbf{X}}}
-\newcommand\bbx{{\mathbf{x}}}
-\newcommand\bby{{\mathbf{y}}}
-\newcommand\bbZ{{\mathbf{Z}}}
-\newcommand\bbbeta{{\boldsymbol{\beta}}}
-\newcommand\bbeta{{\boldsymbol{\eta}}}
-\newcommand\bbLambda{{\boldsymbol{\Lambda}}}
-\newcommand\bbOmega{{\boldsymbol{\Omega}}}
-\newcommand\bbmu{{\boldsymbol{\mu}}}
-\newcommand\bbSigma{{\boldsymbol{\Sigma}}}
-\newcommand\bbtheta{{\boldsymbol{\theta}}}
-\newcommand\mcN{{\mathcal{N}}}
-\newcommand\mcB{{\mathcal{B}}}
-\newcommand\mcY{{\mathcal{Y}}}
-\]</span></p>
-</div>
 <p>Attach the packages to be used in this chapter</p>
 <div class="cell" data-execution_count="1">
 <details>
@@ -324,9 +302,9 @@ div.csl-indent {
 </details>
 </div>
 <p>In this chapter we consider mixed-effects models for data sets in which the response is <em>binary</em>, representing yes/no or true/false or correct/incorrect responses.</p>
-<p>Because the response must be one of only two possible values we adapt our models to predict the probability of the positive response. As for linear models and linear mixed-effects models, the mean response, <span class="math inline">\(\bbmu\)</span>, is determined by a <em>linear predictor</em>, <span id="eq-linearpred"><span class="math display">\[
-\bbeta=\bbX\bbbeta+\bbZ\bbb
-\tag{6.1}\]</span></span> depending on the fixed-effects parameters, <span class="math inline">\(\bbbeta\)</span>, the random effects, <span class="math inline">\(\bbb\)</span>, and the model matrices, <span class="math inline">\(\bbX\)</span> and <span class="math inline">\(\bbZ\)</span>. For a linear model the mean response, <span class="math inline">\(\bbmu\)</span>, is the linear predictor, <span class="math inline">\(\bbeta\)</span>. But for a generalized linear model <span class="math inline">\(\bbeta\)</span> determines <span class="math inline">\(\bbmu\)</span> according to a <em>link function</em>, <span class="math inline">\(g\)</span>. For historical reasons it is the function taking an element of <span class="math inline">\(\bbmu\)</span> to the corresponding element of <span class="math inline">\(\bbeta\)</span> that is called the link. The transformation in the opposite direction, from <span class="math inline">\(\bbeta\)</span> to <span class="math inline">\(\bbmu\)</span>, is called the <em>inverse link</em>.</p>
+<p>Because the response must be one of only two possible values we adapt our models to predict the probability of the positive response. As for linear models and linear mixed-effects models, the mean response, <span class="math inline">\({\boldsymbol{\mu}}\)</span>, is determined by a <em>linear predictor</em>, <span id="eq-linearpred"><span class="math display">\[
+{\boldsymbol{\eta}}={\mathbf{X}}{\boldsymbol{\beta}}+{\mathbf{Z}}{\mathbf{b}}
+\tag{6.1}\]</span></span> depending on the fixed-effects parameters, <span class="math inline">\({\boldsymbol{\beta}}\)</span>, the random effects, <span class="math inline">\({\mathbf{b}}\)</span>, and the model matrices, <span class="math inline">\({\mathbf{X}}\)</span> and <span class="math inline">\({\mathbf{Z}}\)</span>. For a linear model the mean response, <span class="math inline">\({\boldsymbol{\mu}}\)</span>, is the linear predictor, <span class="math inline">\({\boldsymbol{\eta}}\)</span>. But for a generalized linear model <span class="math inline">\({\boldsymbol{\eta}}\)</span> determines <span class="math inline">\({\boldsymbol{\mu}}\)</span> according to a <em>link function</em>, <span class="math inline">\(g\)</span>. For historical reasons it is the function taking an element of <span class="math inline">\({\boldsymbol{\mu}}\)</span> to the corresponding element of <span class="math inline">\({\boldsymbol{\eta}}\)</span> that is called the link. The transformation in the opposite direction, from <span class="math inline">\({\boldsymbol{\eta}}\)</span> to <span class="math inline">\({\boldsymbol{\mu}}\)</span>, is called the <em>inverse link</em>.</p>
 <p>As in previous chapters, we will begin with an example to help illustrate these ideas.</p>
 <section id="sec-contraception" class="level2" data-number="6.1">
 <h2 data-number="6.1" class="anchored" data-anchor-id="sec-contraception"><span class="header-section-number">6.1</span> Artificial contraception use in regions of Bangladesh</h2>
@@ -412,7 +390,7 @@ div.csl-indent {
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(com01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 458   Time: 0:00:00 ( 1.10 ms/it)</code></pre>
+<pre><code>Minimizing 458   Time: 0:00:00 ( 1.93 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Mixed Model fit by maximum likelihood (nAGQ = 1)
@@ -485,7 +463,7 @@ age ^ 2 &amp; urban: Y  -0.000375127  0.000731441  -0.51    0.6080
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 461   Time: 0:00:00 ( 0.40 ms/it)</code></pre>
+<pre><code>Minimizing 461   Time: 0:00:00 ( 0.45 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <table class="table table-sm table-striped">
@@ -646,7 +624,7 @@ age ^ 2 &amp; urban: Y  -0.000375127  0.000731441  -0.51    0.6080
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts)</span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 442   Time: 0:00:00 ( 0.42 ms/it)</code></pre>
+<pre><code>Minimizing 442   Time: 0:00:00 ( 0.46 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <table class="table table-sm table-striped">

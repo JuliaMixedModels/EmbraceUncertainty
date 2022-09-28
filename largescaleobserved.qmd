@@ -124,20 +124,22 @@ let
   yminorticksvisible = true
   xminorticks = IntervalsBetween(10)
   ylabel = "Relative cumulative frequency"
+  nrtngs = sort(movies.nrtngs)
   ecdfplot(
     f[1,1],
-    movies.nrtngs;
-    npoints=last(movies.nrtngs),
+    nrtngs;
+    npoints=last(nrtngs),
     axis=(
       xlabel="Number of ratings per movie (logarithmic scale)",
       xminorgridvisible, xminorticks, xminorticksvisible, xscale,
       ylabel, yminorticksvisible, 
     ),
   )
+  urtngs = sort(users.urtngs)
   ecdfplot(
     f[1,2],
-    users.urtngs;
-    npoints=last(users.urtngs),
+    urtngs;
+    npoints=last(urtngs),
     axis=(
       xlabel="Number of ratings per user (logarithmic scale)",
       xminorgridvisible, xminorticks, xminorticksvisible, xscale,
@@ -163,11 +165,10 @@ We can imagine that the "shrinkage" of random effects for movies with just a few
 
 Furthermore, the distribution of ratings for movies with only one rating is systematically lower than the distribution of ratings for movies rated at least five times.
 
+First, add `nrtngs` and `urtngs` as columns of the `ratings` table.
+
 ```{julia}
-#| code-fold: true
-#| fig-cap: "Distribution of ratings for movies with only one rating compared to movies with at least 5 ratings"
-#| label: fig-ratingsbarcharts
-ratings = disallowmissing!(
+disallowmissing!(
   leftjoin!(
     leftjoin!(
       ratings,
@@ -178,10 +179,18 @@ ratings = disallowmissing!(
     on=:userId,
   )
 )
+```
+
+then create a bar chart of the two distributions
+
+```{julia}
+#| code-fold: true
+#| fig-cap: "Distribution of ratings for movies with only one rating compared to movies with at least 5 ratings"
+#| label: fig-ratingsbarcharts
 let
   fiveplus = zeros(Int, 10)
   onlyone = zeros(Int, 10)
-  for (i, n) in zip(refarray(ratings.rating), ratings.nrtngs)
+  for (i, n) in zip(round.(Int, Float32(2) .* ratings.rating), ratings.nrtngs)
     if n > 4
       fiveplus[i] += 1
     elseif isone(n)
@@ -207,12 +216,12 @@ let
 end
 ```
 
-Similarly, users who rate very few movies add little information, even about the movies that they rated, because there isn't sufficient information to contrast a typical rating for the user from a specific rating.
+Similarly, users who rate very few movies add little information, even about the movies that they rated, because there isn't sufficient information to contrast a specific rating with a typical rating for the user.
 
 One way of dealing with the extreme imbalance in the number of observations per user or per movie is to set a threshold on the number of observations for a user or a movie to be included in the data used to fit the model.
 For example, a companion data set on grouplens.org, available in the [ml-25m.zip](https://files.grouplens.org/datasets/movielens/ml-25n.zip) archive, included only users who had rated at least 20 movies.
 
-To be able to select ratings on according to the number of ratings per user and the number of ratings per movie, we left-join the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
+To be able to select ratings on according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
 
 ```{julia}
 describe(ratings)

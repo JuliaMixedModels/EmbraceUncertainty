@@ -607,7 +607,7 @@ and covariance matrix
 
 $$
 \text{Var}(\mcB)=
-\bbLambda_\theta\text{Var}(\mcU)\bbLambda\theta'=
+\bbLambda_\theta\text{Var}(\mcU)\bbLambda_\theta'=
 \sigma^2\bbLambda_\theta\bbLambda_\theta'=\bbSigma_\theta
 $$
 
