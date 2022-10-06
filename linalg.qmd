@@ -2,10 +2,8 @@
 jupyter: julia-1.8
 ---
 
-# Linear Algebra for Linear Models {#sec.LinAlg}
+# Linear Algebra for Linear Models {#sec-linalg}
 
-::: {.hidden}
-$$
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
 \newcommand\bbI{{\mathbf{I}}}
@@ -26,8 +24,6 @@ $$
 \newcommand\mcX{{\mathcal{X}}}
 \newcommand\mcY{{\mathcal{Y}}}
 \newcommand\mcZ{{\mathcal{Z}}}
-$$
-:::
 
 Attach the packages to be used in this appendix
 
@@ -611,7 +607,7 @@ and covariance matrix
 
 $$
 \text{Var}(\mcB)=
-\bbLambda_\theta\text{Var}(\mcU)\bbLambda\theta'=
+\bbLambda_\theta\text{Var}(\mcU)\bbLambda_\theta'=
 \sigma^2\bbLambda_\theta\bbLambda_\theta'=\bbSigma_\theta
 $$
 

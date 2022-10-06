@@ -4,8 +4,6 @@ jupyter: julia-1.8
 
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
 
-::: {.hidden}
-$$
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
 \newcommand\bbI{{\mathbf{I}}}
@@ -24,8 +22,6 @@ $$
 \newcommand\mcN{{\mathcal{N}}}
 \newcommand\mcB{{\mathcal{B}}}
 \newcommand\mcY{{\mathcal{Y}}}
-$$
-:::
 
 In this book we describe the theory behind a type of statistical model called *mixed-effects* models and the practice of fitting and analyzing such models using the [MixedModels](https://github.com/JuliaStats/MixedModels.jl) package for [Julia](https://julialang.org).
 These models are used in many different disciplines.
@@ -104,6 +100,7 @@ The data are described in @davies72:_statis_method_in_resear_and_produc [, Table
 To access these data within `Julia` we must first attach this package, and others that we will use, to our session.
 
 ```{julia}
+#| code-fold: show
 using AlgebraOfGraphics # high-level graphics
 using CairoMakie        # graphics back-end
 using CategoricalArrays # factors and ordered factors
@@ -248,7 +245,7 @@ end
 than we do from numerical summaries.
 
 In @fig-dyestuffdata we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability.
-For example, four of the five preparations from batch F provided lower yields than did any of the preparations from batches B, C, and E.
+For example, four of the five preparations from batch F produced lower yields than did any of the preparations from batches B, C, and E.
 
 This plot, and essentially all the other plots in this book, were created using the [Makie](https://makie.juliaplots.io) package (@DanischKrumbiegel2021).
 
@@ -331,7 +328,7 @@ dsm01 = let
 end
 ```
 
-By default, mixed-effects models in Jupyter notebooks, which is the evaluation engine behind quarto.org books, are shown compactly like this.
+By default, this compact display of mixed-effects model fits is used in [Jupyter](https://jupyter.org) notebooks, which are the evaluation engine for [quarto books](https://quarto.org/docs/books/) with Julia code chunks.
 To obtain more information we can `print` the model, as in
 
 ```{julia}

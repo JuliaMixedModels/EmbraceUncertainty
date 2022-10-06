@@ -12,7 +12,8 @@ book:
     - intro.qmd
     - multiple.qmd
     - longitudinal.qmd
-    - largescale.qmd
+    - largescaledesigned.qmd
+    - largescaleobserved.qmd
     - glmmbinomial.qmd
     - references.qmd
   appendices:
@@ -26,6 +27,10 @@ csl: apa-annotated-bibliography.csl
 format:
   html:
     theme: cosmo
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
 
 jupyter: julia-1.8
 execute:
