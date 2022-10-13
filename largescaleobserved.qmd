@@ -341,7 +341,6 @@ println(mvm20u20)
 
 Creating the model representation and restoring the optimal parameter values can take a few minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
 
-Each evaluation of the objective, which
 
 As described in @sec-lmmtheory, the profiled log-likelihood of a linear mixed-effects model is evaluated in the `MixedModels.jl` package by setting the value of the parameter $\bbtheta$ in the numerical representation of the model, updating the blocked Cholesky factor, $\mathbf{L}$, and evaluating the scalar objective value from this factor.
 For this model these steps take a little over a minute (71 seconds) on a server node and probably longer on a laptop.
