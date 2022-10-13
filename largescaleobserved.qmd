@@ -570,6 +570,6 @@ In the most extreme case of `mc == 1` the square storage of `L[2,2]` requires ov
 This can be the difference between being able to fit the model and not being able to fit it.
 
 The time to evaluate the log-likelihood once goes from about 5 minutes for the square storage to a little over 6 minutes for the rectangular storage on the `mc == 1` models.
-Because the number of evaluations to convergence stays the same on this set of models the time to fit the model goes from roughly 2 hours (square storage) to about 2.5 hours (rectangular storage).
+Because the number of evaluations to convergence stays the same on this set of models, the time to fit the model goes from roughly 2 hours (square storage) to about 2.5 hours (rectangular storage).
 
 As the threshold on the number of ratings for inclusion of a movie increases the relative change in storage sizes decreases as does the relative change in time to fit the model.
