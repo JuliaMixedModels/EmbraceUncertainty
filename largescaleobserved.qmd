@@ -14,19 +14,16 @@ using AlgebraOfGraphics
 using Arrow
 using CairoMakie
 using CategoricalArrays
+using DataFrameMacros
 using DataFrames
 using MixedModels
-#using ProgressMeter
-#using SparseArrays
+using SparseArrays
 using Statistics
 using TypedTables
 
-datadir(paths::AbstractString...) =
-  joinpath(@__DIR__, "data", paths...)
-optsumdir(paths::AbstractString...) =
-  joinpath(@__DIR__, "optsums", paths...)
+datadir(paths::AbstractString...) = joinpath(@__DIR__, "data", paths...)
+optsumdir(paths::AbstractString...) = joinpath(@__DIR__, "optsums", paths...)
 CairoMakie.activate!(; type="svg");
-#ProgressMeter.ijulia_behavior(:clear);
 ```
 
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
@@ -76,22 +73,31 @@ ratings = select!(DataFrame(ratings), Not(:timestamp));
 Information on the movies is available as
 
 ```{julia}
-movies = disallowmissing!(
-  leftjoin!(
-    combine(groupby(ratings, :movieId), :rating => mean => :mnrtng),
-    DataFrame(Arrow.Table(datadir("movies.arrow")));
-    on=:movieId,
-  );
-  error=false,
+movies = sort!(
+  disallowmissing!(
+    leftjoin!(
+      combine(groupby(ratings, :movieId), :rating => mean => :mnrtng),
+      DataFrame(Arrow.Table(datadir("movies.arrow")));
+      on=:movieId,
+    );
+    error=false,
+  ),
+  :nrtngs;
+  rev=true,
 )
 ```
 
-In contrast to data from a designed experiment, like the English Lexicon Project, the data from this observational study are extremely unbalanced with respect to the observational grouping factors, `userId` and `movieId`.
-The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from 1 to nearly 100,000.
+The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from nearly 100,000 down to a single rating.
+We have sorted the movies by decreasing number of ratings to illustrate this highly skewed distribution and also because this ordering provides a slight speed boost when fitting a model.
 
-```{julia}
-extrema(movies.nrtngs)
-```
+:::{.callout-note collapse="true"}
+### Why does this ordering give a speed boost?
+
+The reasons for this ordering giving a speed boost are rather technical.
+The most time-consuming part of evaluating the objective during optimization is "down-dating" a symmetric matrix, the `[2,2]` block of a blocked Cholesky factor `L`, from the `[2,1]` block, which is a sparse matrix.
+The ordering of the movies determines both the row and column positions of each movie in the `[2,2]` block.
+Having movies that are often rated by the same user in close proximity results in localization of memory access, which is an advantage on modern computer architectures.
+:::
 
 The number of ratings per user is also highly skewed
 
@@ -237,7 +243,7 @@ The results are summarized in the following table
 
 ```{julia}
 #| code-fold: true
-sizespeed = Table(Arrow.Table("./data/sizespeed.arrow"))
+sizespeed = Table(Arrow.Table("./data/sizespeedsquare.arrow"))
 ```
 
 In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nev` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.
@@ -343,7 +349,7 @@ Creating the model representation and restoring the optimal parameter values can
 
 
 As described in @sec-lmmtheory, the profiled log-likelihood of a linear mixed-effects model is evaluated in the `MixedModels.jl` package by setting the value of the parameter $\bbtheta$ in the numerical representation of the model, updating the blocked Cholesky factor, $\mathbf{L}$, and evaluating the scalar objective value from this factor.
-For this model these steps take a little over a minute (71 seconds) on a server node and probably longer on a laptop.
+For this model these steps take a little over a minute (66 seconds) on a server node and probably longer on a laptop.
 
 The lower triangular `L` factor is large but sparse.
 It is stored in six blocks of dimensions and types as shown in
@@ -431,7 +437,7 @@ Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` 
 
 In general, for models with scalar random effects for two incompletely crossed grouping factors, the memory footprint depends strongly on the smaller of the number of levels of the grouping factors, less strongly on the larger number, and almost not at all on the number of observations.
 
-### Speed of log-likelihood evalation
+### Speed of log-likelihood evalation {#sec-largeobslleval}
 
 The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates.
 The time for one evaluation is given in the `evtime` column of `sizespeed`.
@@ -475,7 +481,7 @@ end
 However the middle panel shows that the number of iterations to convergence is highly variable.
 Most of these models required between 20 and 25 evaluations but some required nearly 40 evaluations.
 
-## Rectangular storage of L[2,2]
+## Rectangular storage of L[2,2] {#sec-RFPstorage}
 
 @fig-memoryfootprint shows that the amount of storage required for `L[2,2]` is a substantial fraction of the total storage required for the model.
 In a sense this is good news because the amount of storage required for the `L[2,2]` can be cut roughly in half by taking advantage of the fact that it is a triangular matrix.
