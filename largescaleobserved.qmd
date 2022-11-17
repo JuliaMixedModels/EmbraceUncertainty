@@ -16,23 +16,14 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
-using GLM
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL
-end
 using MixedModels
-using MixedModelsMakie
-using ProgressMeter
 using SparseArrays
 using Statistics
 using TypedTables
 
-datadir(paths::AbstractString...) =
-  joinpath(@__DIR__, "data", paths...)
-optsumdir(paths::AbstractString...) =
-  joinpath(@__DIR__, "optsums", paths...)
+datadir(paths::AbstractString...) = joinpath(@__DIR__, "data", paths...)
+optsumdir(paths::AbstractString...) = joinpath(@__DIR__, "optsums", paths...)
 CairoMakie.activate!(; type="svg");
-ProgressMeter.ijulia_behavior(:clear);
 ```
 
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
@@ -82,22 +73,31 @@ ratings = select!(DataFrame(ratings), Not(:timestamp));
 Information on the movies is available as
 
 ```{julia}
-movies = disallowmissing!(
-  leftjoin!(
-    combine(groupby(ratings, :movieId), :rating => mean => :mnrtng),
-    DataFrame(Arrow.Table(datadir("movies.arrow")));
-    on=:movieId,
-  );
-  error=false,
+movies = sort!(
+  disallowmissing!(
+    leftjoin!(
+      combine(groupby(ratings, :movieId), :rating => mean => :mnrtng),
+      DataFrame(Arrow.Table(datadir("movies.arrow")));
+      on=:movieId,
+    );
+    error=false,
+  ),
+  :nrtngs;
+  rev=true,
 )
 ```
 
-In contrast to data from a designed experiment, like the English Lexicon Project, the data from this observational study are extremely unbalanced with respect to the observational grouping factors, `userId` and `movieId`.
-The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from 1 to nearly 100,000.
+The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from nearly 100,000 down to a single rating.
+We have sorted the movies by decreasing number of ratings to illustrate this highly skewed distribution and also because this ordering provides a slight speed boost when fitting a model.
 
-```{julia}
-extrema(movies.nrtngs)
-```
+:::{.callout-note collapse="true"}
+### Why does this ordering give a speed boost?
+
+The reasons for this ordering giving a speed boost are rather technical.
+The most time-consuming part of evaluating the objective during optimization is "down-dating" a symmetric matrix, the `[2,2]` block of a blocked Cholesky factor `L`, from the `[2,1]` block, which is a sparse matrix.
+The ordering of the movies determines both the row and column positions of each movie in the `[2,2]` block.
+Having movies that are often rated by the same user in close proximity results in localization of memory access, which is an advantage on modern computer architectures.
+:::
 
 The number of ratings per user is also highly skewed
 
@@ -221,7 +221,7 @@ Similarly, users who rate very few movies add little information, even about the
 One way of dealing with the extreme imbalance in the number of observations per user or per movie is to set a threshold on the number of observations for a user or a movie to be included in the data used to fit the model.
 For example, a companion data set on grouplens.org, available in the [ml-25m.zip](https://files.grouplens.org/datasets/movielens/ml-25n.zip) archive, included only users who had rated at least 20 movies.
 
-To be able to select ratings on according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
+To be able to select ratings according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
 
 ```{julia}
 describe(ratings)
@@ -243,7 +243,7 @@ The results are summarized in the following table
 
 ```{julia}
 #| code-fold: true
-sizespeed = Table(Arrow.Table("./data/sizespeed.arrow"))
+sizespeed = Table(Arrow.Table("./data/sizespeedsquare.arrow"))
 ```
 
 In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nev` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.
@@ -345,9 +345,11 @@ mvm20u20 = ratingsoptsum(20, 20)
 println(mvm20u20)
 ```
 
-Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
+Creating the model representation and restoring the optimal parameter values can take a few minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
 
-Each evaluation of the objective, which requires setting the value of the parameter $\bbtheta$ in the numerical representation of the model, updating the blocked Cholesky factor, $\mathbf{L}$, and evaluating the scalar objective value from this factor, takes a little over a minute (71 seconds) on a server node and probably longer on a laptop.
+
+As described in @sec-lmmtheory, the profiled log-likelihood of a linear mixed-effects model is evaluated in the `MixedModels.jl` package by setting the value of the parameter $\bbtheta$ in the numerical representation of the model, updating the blocked Cholesky factor, $\mathbf{L}$, and evaluating the scalar objective value from this factor.
+For this model these steps take a little over a minute (66 seconds) on a server node and probably longer on a laptop.
 
 The lower triangular `L` factor is large but sparse.
 It is stored in six blocks of dimensions and types as shown in
@@ -433,12 +435,9 @@ end
 @fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
 Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` is over 30% of the memory footprint.
 
-In a sense this is good news because the amount of storage required for the `[2,2]` block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix.
-The [rectangular full packed format](https://netlib.org/lapack/lawnspdf/lawn199.pdf) looks especially promising for this purpose.
-
 In general, for models with scalar random effects for two incompletely crossed grouping factors, the memory footprint depends strongly on the smaller of the number of levels of the grouping factors, less strongly on the larger number, and almost not at all on the number of observations.
 
-### Speed of log-likelihood evalation
+### Speed of log-likelihood evalation {#sec-largeobslleval}
 
 The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates.
 The time for one evaluation is given in the `evtime` column of `sizespeed`.
@@ -480,38 +479,103 @@ end
 @fig-timetoconverge shows that the average evaluation time for the log-likelihood function depends strongly on the number of movies and less strongly on the number of users.
 
 However the middle panel shows that the number of iterations to convergence is highly variable.
-Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.
+Most of these models required between 20 and 25 evaluations but some required nearly 40 evaluations.
 
-The derivation of the log-likelihood for linear mixed-effects models is given in @sec-lmmtheory, which provides a rather remarkable result:
-the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.
+## Rectangular storage of L[2,2] {#sec-RFPstorage}
 
-There are two blocked matrices, `A` and `L`, stored in the model representation and, for large models such as we are considering these are the largest fields in 
-## Model size and speed for different thresholds
+@fig-memoryfootprint shows that the amount of storage required for `L[2,2]` is a substantial fraction of the total storage required for the model.
+In a sense this is good news because the amount of storage required for the `L[2,2]` can be cut roughly in half by taking advantage of the fact that it is a triangular matrix.
+When the matrix is stored as a square two-dimensional array, storage for a total of $n^2$ floating point numbers is allocated, even though the matrix is determined by only $(n*(n+1))/2$ values.
+
+Switching to the [rectangular full packed format](https://netlib.org/lapack/lawnspdf/lawn199.pdf) for `L[2,2]` saves nearly 50% of the storage size at the cost of a modest increase in the evaluation time for the objective.
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Amount of storage for L[2,2] versus amount of storage for the entire model.  Colors are determined by the minimum number of ratings per user in the data to which the model was fit."
-#| label: fig-L22vsmodelsz
-draw(
-  data(sizespeed) *
-  mapping(
-    :L22sz => "Size (GiB) of 2,2 block of L",
-    :modelsz => "Size (GiB) of model representation";
-    color = :uc,
-  ) * 
-  visual(Scatter)
-)
+sizespeedrfp = Table(Arrow.Table("./data/sizespeedrfp.arrow"))
 ```
-
-Linear regression of the `modelsz` versus the number of users and `L22sz`.
 
 ```{julia}
-sizemod = lm(@formula(Float64(modelsz) ~ 1 + nusers + L22sz), sizespeed)
-coeftable(sizemod)
+#| label: augment-sizespeed-df
+#| echo: false
+#| output: false
+sizespeedrfp = let
+  ord(x) = categorical(x; ordered=true)
+  transform!(
+    DataFrame(sizespeedrfp),
+    :mc => ord => :mc,
+    :uc => ord => :uc,
+    [:L22sz, :modelsz] => ((x, y) -> x ./ y) => :L22prop,
+  )
+end
 ```
 
-provides an $r^2$ value very close to one, indicating an almost perfect fit.
+Reproducing @fig-memoryfootprint and @fig-timetoconverge for the RFP storage scheme as @fig-memoryfootprintrfp and @fig-timetoconvergerfp
 
 ```{julia}
-r²(sizemod)
+#| fig-cap: "Bar plot of memory footprint of the model representation using RFP, by minimum number of ratings per user and per movie."
+#| code-fold: true
+#| label: fig-memoryfootprintrfp
+let
+  f = Figure(resolution=(800, 1000))
+  xlabel = "Minimum number of ratings per movie"
+  mc = refarray(sizespeedrfp.mc)
+  xticks = (1:7, string.(refpool(sizespeedrfp.mc)))
+  uc = refarray(sizespeedrfp.uc)
+  Legend(
+    f[1,1], lelements, llabels, ltitle;
+    orientation=:horizontal, tellwidth=false, tellheight=true,
+  )
+  barplot!(
+    Axis(f[2,1]; xticks, ylabel="Memory requirement (GiB)",),
+    mc, sizespeedrfp.modelsz; xticks, dodge=uc, color=uc,
+  )
+  barplot!(
+    Axis(f[3,1]; xticks, ylabel="Size of L[2,2] (GiB)",),
+    mc, sizespeedrfp.L22sz; xticks, dodge=uc, color=uc,
+  )
+  barplot!(
+    Axis(f[4,1]; xlabel, xticks, ylabel="L[2,2] memory fraction",),
+    mc, sizespeedrfp.L22prop; xticks, dodge=uc, color=uc,
+  )
+  f
+end
 ```
+
+```{julia}
+#| fig-cap: "Bar plot of function log-likelihood evaluation time using RFP, by minimum number of ratings per user and per movie using RFP storage"
+#| code-fold: true
+#| label: fig-timetoconvergerfp
+let
+  f = Figure(resolution=(800, 1000))
+  xlabel = "Minimum number of ratings per movie"
+  mc = refarray(sizespeedrfp.mc)
+  xticks = (1:7, string.(refpool(sizespeedrfp.mc)))
+  uc = refarray(sizespeedrfp.uc)
+  Legend(
+    f[1,1], lelements, llabels, ltitle;
+    orientation=:horizontal, tellwidth=false, tellheight=true,
+  )
+  barplot!(
+    Axis(f[2,1]; xticks, ylabel="Log-likelihood evaluation time (m)",),
+    mc, sizespeedrfp.evtime ./ 60; xticks, dodge=uc, color=uc,
+  )
+  barplot!(
+    Axis(f[3,1]; xticks, ylabel="Number of evaluations to convergence",),
+    mc, sizespeedrfp.nv; xticks, dodge=uc, color=uc,
+  )
+  barplot!(
+    Axis(f[4,1]; xlabel, xticks, ylabel="Time (hr) to fit the model",),
+    mc, sizespeedrfp.fittime ./ 3600; xticks, dodge=uc, color=uc,
+  )
+  f
+end
+```
+
+The patterns in @fig-memoryfootprintrfp are similar to those in @fig-memoryfootprint but the vertical axes are quite different.
+In the most extreme case of `mc == 1` the square storage of `L[2,2]` requires over 20 GiB but the rectangular storage requires just over 10 GiB.
+This can be the difference between being able to fit the model and not being able to fit it.
+
+The time to evaluate the log-likelihood once goes from about 5 minutes for the square storage to a little over 6 minutes for the rectangular storage on the `mc == 1` models.
+Because the number of evaluations to convergence stays the same on this set of models, the time to fit the model goes from roughly 2 hours (square storage) to about 2.5 hours (rectangular storage).
+
+As the threshold on the number of ratings for inclusion of a movie increases the relative change in storage sizes decreases as does the relative change in time to fit the model.
