@@ -18,6 +18,7 @@ book:
     - references.qmd
   appendices:
     - linalg.qmd
+    - profiling.qmd
 
 execute-dir: project
 

@@ -1,0 +1,39 @@
+julia> BLAS.get_config()
+LinearAlgebra.BLAS.LBTConfig
+Libraries: 
+└ [ILP64] libmkl_rt.so
+
+julia> 
+
+julia> versioninfo()
+Julia Version 1.8.1
+Commit afb6c60d69a (2022-09-06 15:09 UTC)
+Platform Info:
+  OS: Linux (x86_64-linux-gnu)
+  CPU: 48 × Intel(R) Xeon(R) CPU E5-2680 v3 @ 2.50GHz
+  WORD_SIZE: 64
+  LIBM: libopenlibm
+  LLVM: libLLVM-13.0.1 (ORCJIT, haswell)
+  Threads: 12 on 48 virtual cores
+Environment:
+  JULIA_PKGDIR = /workspace/bates/.julia
+
+julia> L22 ≈ cholesky(A).L
+true
+
+julia> @time cholesky(A)
+ 11.364124 seconds (214.61 k allocations: 2.524 GiB, 1.34% compilation time)
+Cholesky{Float64, Matrix{Float64}}
+L factor:
+18366×18366 LowerTriangular{Float64, Matrix{Float64}}:
+ 142.899          ⋅             ⋅             ⋅            ⋅             ⋅             ⋅             ⋅            ⋅             ⋅             ⋅           …    ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  -0.196643     93.3377         ⋅             ⋅            ⋅             ⋅             ⋅             ⋅            ⋅             ⋅             ⋅                ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  -0.22576      -0.0751888    65.6802         ⋅            ⋅             ⋅             ⋅             ⋅            ⋅             ⋅             ⋅                ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  -0.0163699    -0.0301473    -0.0315764    30.5307        ⋅             ⋅             ⋅             ⋅            ⋅             ⋅             ⋅                ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  -0.22555      -0.095088     -0.40096      -0.0769525   65.5402         ⋅             ⋅             ⋅            ⋅             ⋅             ⋅                ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  -0.283249     -0.128435     -0.313398     -0.0622343   -0.295714     94.0405         ⋅             ⋅            ⋅             ⋅             ⋅           …    ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  -0.218425     -0.0755674    -0.34867      -0.0677439   -0.348584     -0.218313     66.7052         ⋅            ⋅             ⋅             ⋅                ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅             ⋅           ⋅ 
+  
+julia> @time cholesky(AHRFP)
+ 10.598045 seconds (3 allocations: 1.257 GiB, 4.17% gc time)
+CholeskyRFP{Float64}([3.4030371143089218 -2.6033570769993846e-5 … -2.158084199515956e-5 -4.398256913437502e-6; 142.89944450614055 5.630928473032044 … -2.6337093431126156e-5 -5.6920907776638e-6; … ; -0.00026856827278010087 -0.00030943476152171166 … -5.4308307924551196e-5 -0.0005888510424116055; -3.2369494419933605e-5 -1.8005842761186777e-6 … -7.128610831696069e-6 -0.00025929494882248274], 'N', 'L')

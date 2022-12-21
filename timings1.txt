@@ -1,0 +1,53 @@
+# Using RectangularFullPacked
+
+julia> @time restoreoptsum!(m, "./optsums/mvm20u20.json")
+357.968256 seconds (676 allocations: 42.781 KiB)
+Linear mixed model fit by maximum likelihood
+ rating ~ 1 + (1 | userId) + (1 | movieId)
+     logLik       -2 logLik         AIC           AICc            BIC      
+ -33644689.0320  67289378.0639  67289386.0639  67289386.0639  67289446.4165
+
+Variance components:
+            Column   Variance Std.Dev. 
+userId   (Intercept)  0.184529 0.429568
+movieId  (Intercept)  0.242959 0.492909
+Residual              0.732964 0.856133
+ Number of obs: 26380766; levels of grouping factors: 174605, 18366
+
+  Fixed-effects parameters:
+──────────────────────────────────────────────────
+               Coef.  Std. Error       z  Pr(>|z|)
+──────────────────────────────────────────────────
+(Intercept)  3.43345   0.0038669  887.91    <1e-99
+──────────────────────────────────────────────────
+
+julia> Base.summarysize(m.L[3]) / 2^30
+1.2566459774971008
+
+# Without packing
+
+julia> Base.summarysize(m.L[3]) / 2^30
+2.513155050575733
+
+julia> restoreoptsum!(m, "./optsums/mvm20u20.json")
+Linear mixed model fit by maximum likelihood
+ rating ~ 1 + (1 | userId) + (1 | movieId)
+     logLik       -2 logLik         AIC           AICc            BIC      
+ -33644689.0320  67289378.0639  67289386.0639  67289386.0639  67289446.4165
+
+Variance components:
+            Column   Variance Std.Dev. 
+userId   (Intercept)  0.184529 0.429568
+movieId  (Intercept)  0.242959 0.492909
+Residual              0.732964 0.856133
+ Number of obs: 26380766; levels of grouping factors: 174605, 18366
+
+  Fixed-effects parameters:
+──────────────────────────────────────────────────
+               Coef.  Std. Error       z  Pr(>|z|)
+──────────────────────────────────────────────────
+(Intercept)  3.43345   0.0038669  887.91    <1e-99
+──────────────────────────────────────────────────
+
+julia> @time restoreoptsum!(m, "./optsums/mvm20u20.json");
+123.037280 seconds (676 allocations: 42.875 KiB)

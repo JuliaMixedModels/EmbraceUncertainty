@@ -106,9 +106,6 @@ using CairoMakie        # graphics back-end
 using CategoricalArrays # factors and ordered factors
 using DataFrameMacros   # elegant DataFrame manipulation
 using DataFrames        # DataFrame implementation
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL             # faster LAPACK on Intel processors
-end
 using Markdown          # utilities for generating markdown text
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
@@ -324,7 +321,7 @@ We fit a model to the data allowing for an overall level of the `yield` and for 
 ```{julia}
 dsm01 = let
   form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff)
+  fit(MixedModel, form, dyestuff; thin=1)
 end
 ```
 
@@ -377,7 +374,7 @@ Do not confuse them with standard errors of the variance estimators, which are n
 In `add-section-reference-here` we explain why we do not provide standard errors of variance estimates.
 
 The line labeled `Residual` in this table gives the estimate of the variance of the residuals (also in g$^2$) and its corresponding standard deviation.
-The estimated standard deviation of the residuals is 49.5 g.
+The estimated residual standard deviation is 49.5 g.
 
 The last line in the random effects table states the number of observations to which the model was fit and the number of levels of any "grouping factors" for the random effects.
 In this case we have a single random effects term, `(1|batch)`, in the model formula and the grouping factor for that term is `batch`.
@@ -560,6 +557,34 @@ producing a lower Cholesky factor of
 
 ```{julia}
 sparseL(dsm01; full=true)
+```
+
+## Determining the parameter estimates
+
+As described in @sec-lmmtheory, the *profiled* objective can be evaluated directly from this lower Cholesky factor.
+As the objective is defined as *negative* twice the log-likelihood, the *maximum likelihood estimate*, $\hat\theta$, is the value of $\theta$ that minimizes the profiled objective.
+
+Because $\theta$ represents a ratio of non-negative quantities, it must itself be non-negative.
+Furthermore a reasonable starting estimate for this parameter is one.
+
+The profiled objective as a function of $\theta$ is shown in @fig-profiledobjectivedsm01 along with the progress of the iterative optimization steps.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Negative twice the log-likelihood in model dsm01 as a function of $\theta$, the ratio of standard deviations of the random effects to the per-observation noise. The green lines and points show the progress of the iterations to the optimum, starting at $\theta=1$, then $\theta=1.75$, then $\theta=0.25$ and so on.
+#| label: fig-profiledobjectivedsm01
+let
+  fig, ax, sc = lines(
+    0.0 .. 2.0,
+    x -> objective!(dsm01, x);
+    figure=(; resolution=(700,600)),
+    axis=(; xlabel="θ", ylabel="Profiled objective")
+  )
+  updateL!(setθ!(dsm01, dsm01.optsum.final))  # restore optimal θ
+  flog = dsm01.optsum.fitlog
+  scatterlines!(ax, only.(first.(flog)), last.(flog); color=:green)
+  fig
+end
 ```
 
 ## Variability of parameter estimates {#sec-furtherassess}
