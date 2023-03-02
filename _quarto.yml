@@ -17,7 +17,9 @@ book:
     - glmmbinomial.qmd
     - references.qmd
   appendices:
+    - datatables.qmd
     - linalg.qmd
+    - aGHQ.qmd
 
 execute-dir: project
 
@@ -27,10 +29,6 @@ csl: apa-annotated-bibliography.csl
 format:
   html:
     theme: cosmo
-  pdf:
-    toc: true
-    number-sections: true
-    colorlinks: true
 
 jupyter: julia-1.8
 execute:

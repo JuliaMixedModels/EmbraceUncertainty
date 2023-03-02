@@ -1,0 +1,255 @@
+---
+jupyter: julia-1.8
+---
+
+# Working with data tables {#sec-datatables}
+
+Load the packages to be used
+
+```{julia}
+#| code-fold: true
+using DataFrames
+using MixedModels
+using Tables
+using TypedTables
+```
+
+A call to fit a mixed-effects model using the `MixedModels` package follows the *formula/data* specification that is common to many statistical model-fitting packages, especially those in [R](https://r-project.org).
+In Julia, model formulas and contrasts, which are used to produce model matrices from a formula/data specification, are implemented in the [StatsModels.jl](https://github.com/JuliaStats/StatsModels.jl) package.
+
+The `data` argument must be able to be expressed as a column-oriented *data table*, which, for these purposes, is a named, ordered collection of columns, each of which is a homogeneous (i.e. all the elements have the same type) vector and all of which have the same length.
+
+Implementations of column-oriented data tables are ubiquitous in data science, where they are often called *data frames*.
+These include the *data.frame* type in [R](https://R-Project.org) and the [data.table](https://cloud.cran.org/package=data.table) package for [R](https://R-Project.org), and the `DataFrame` class in the [pandas](https://pandas.pydata.org) package for [Python](https://python.org) and, as a separate implementation, in the [polars](https://pola.rs) package for [Python](https://python.org) and [Rust](https://rustlang.org).
+
+## The Arrow format for data tables
+
+An increasing popular representation of data frames is as [Arrow](https://arrow.apache.org) tables.
+[Polars](https://pola.rs) uses the Arrow format internally as does the [DuckDB](https://duckdb.org) database.
+Recently it was announced that the 2.0 release of [pandas](https://pandas.pydata.org) will allow for Arrow tables.
+
+Arrow specifies a language-independent tabular memory format that provides many desirable properties, such as provision for missing data and compact representation of categorical data vectors, for data science.
+The memory format also defines a file format for storing and exchanging data tables.
+Because the memory format is essentially the same as the file format, Arrow files can be [memory-mapped](https://en.wikipedia.org/wiki/Memory-mapped_file) providing very fast read speeds.
+
+Furthermore, the Arrow Project provides a reference implementation of the Arrow format and tools for manipulating data in that format as a C++ library, which is used by implementations in several other languages, including C, C#, Go, Java, JavaScript, MATLAB, Python, R, and Ruby.
+The Julia implementation in [Arrow.jl](https://github.com/apache/julia-arrow) does not call functions in the C++ library.
+Instead it implements the format in Julia code in such a way that Arrow vectors behave like native Julia vectors.
+That is, Arrow vectors are a subtype of `AbstractVector`.
+A similar approach is taken in the implementations of the Arrow format for the [Rust](https://rustlang.org) language.
+
+The data sets in the `MixedModels` package and the auxillary data sets used in this book are stored in the Arrow file format and retrieved as `Arrow.Table`s.
+There are many examples throughout this book of loading such data sets.
+
+```{julia}
+contra = MixedModels.dataset(:contra)
+```
+
+Often, for ease of access and for display, we convert the Arrow table to a `Table`, which, contrary to convention, is a type defined in [TypedTables.jl](https://github.com/JuliaData/TypedTables.jl) and not in [Tables.jl](https://github.com/JuliaData/Tables.jl).
+
+Before going into detail about the properties and use of the `Table` type, let us first discuss the role of [Tables.jl](https://github.com/JuliaData/Tables.jl).
+
+## Tables.jl provides an "interface for tables"
+
+An important characteristic of any system for working with data tables is whether the table is stored in memory column-wise or row-wise.
+
+As described above, most implementations of data frames for data science store the data column-wise.
+
+In *relational database management systems* (RDBMS), such as [PostgreSQL](https://postgresql.org), [SQLite](https://sqlite.org), and a multitude of commerical systems, a data table, called a *relation*, is typically stored row-wise.
+Such systems typically use [SQL](https://en.wikipedia.org/wiki/SQL), the *structured query language*, to define and access the data in tables, which is why that acronym appears in many of the names.
+There are exceptions to the row-wise rule, such as [DuckDB](https://duckdb.org), an SQL-based RDBMS, that, as mentioned above, represents relations as Arrow tables.
+
+Many external representations of data tables, such as in comma-separated-value (CSV) files, are row-oriented.
+Furthermore, it is often convenient to generate a data table a row at a time.
+
+Thus it becomes convenient to have a "clearing house" that can accept either row tables or column tables and provided the desired form to a downstream package, such as [StatsModels.jl](https://github.com/JuliaStats/StatsModels.jl).
+[Tables.jl](https://github.com/JuliaData/Tables.jl) does exactly this.
+It is not an implementation of data tables itself, but rather it defines "an interface for tables in Julia", allowing a row-oriented table to be accessed column-wise and vice-versa.
+
+It defines a prototype column-oriented table, `Tables.ColumnTable`, as a [NamedTuple](https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple) of vectors.
+
+```{julia}
+Tables.ColumnTable
+```
+
+and a prototype row-oriented table as a vector of `NamedTuple`s.
+
+```{julia}
+Tables.RowTable
+```
+
+The actual implementation of a row-table or column-table type may be different from these prototypes but it must provide access methods as if it were one of these types.
+`Tables.jl` provides the "glue" to treat a particular data table type as if it were row-oriented, by calling `Tables.rows` or `Tables.rowtable` on it, or column-oriented, by calling `Tables.columntable` on it.
+
+## The Table type from TypedTables
+
+[TypedTables.jl](https://github.com/JuliaData/TypedTables.jl) is a lightweight package (about 1500 lines of source code) that provides a concrete implementation of column-tables, called simply `Table`, as a `NamedTuple` of vectors.
+
+A `Table` that is constructed from another type of column-table, such as an `Arrow.Table` or a `DataFrame` or an explicit `NamedTuple` of vectors, is simply a wrapper around the original table's contents.
+On the other hand, constructing a `Table` from a row table first creates a `ColumnTable`, then wraps it.
+
+```{julia}
+contratbl = Table(contra)
+```
+
+```{julia}
+typeof(contratbl)
+```
+
+(The output from that expression is a very long string.  You need to scroll to the right over the output to see all the output.)
+
+This type of table is said to be "strongly typed", meaning that the data type itself contains a wealth of detail about the exact form of the table, allowing the Julia compiler to generate efficient code for operations on the table.
+That is the positive aspect of being so specific about the names of the columns and the details of the type of data in each column.
+However, it also means that this mechanism is not suitable for tables with a large number, say hundreds or thousands, of columns, which can overburden the compiler.
+
+### Accessing columns or rows in a Table
+
+The methods for accessing columns or rows in a `Table` are simple.
+
+A column is accessed by its name as a "property", either using the `getproperty` extractor function or, more commonly, with the dot (`.`) operator, returning a vector.
+
+```{julia}
+contratbl.urban
+```
+
+The column names are [Symbols](https://docs.julialang.org/en/v1/base/base/#Core.Symbol), not strings, usually typed as a `:` followed by the name, as shown in
+
+```{julia}
+columnnames(contratbl)
+```
+
+The `:` form for creating the Symbol requires that the column name be a valid variable name in Julia.
+If, for example, a column name contains a blank, the `:` form must be replaced by an expression like `var"<name>"`, which invokes what is called a "string macro".
+
+```{julia}
+contratbl.var"urban"
+```
+
+A row is accessed by its index, either using the `getindex` function or, more commonly, with the index in square brackets, returning a `NamedTuple` for a singleton index or another `Table` for a vector-valued index.
+
+```{julia}
+contratbl[1]
+```
+
+```{julia}
+contratbl[2:5]
+```
+
+(Notice that the row numbers are not part of the table.  Extracting a subset of the rows produces a table with row numbers starting at one, regardless of what the original row numbers were.)
+
+But there is much more to the indexing than simply extracting a subset of rows - it provides an iterator interface to `Table`.
+
+### A trivial example done several ways
+
+Suppose we wish to select the rows from district `D49` as a table.
+We could create a Boolean vector and use it to index into `contratbl`
+
+```{julia}
+contratbl[contratbl.dist .== "D49"]
+```
+
+::: {.callout-note collapse="true"}
+
+### .== is the vectorized form of the equality comparison ==
+
+When comparing a vector, like `contratbl.dist` to a single string or number, like `"D47"` we must "vectorize" the operation, which is done here using [dot vectorization](https://docs.julialang.org/en/v1/manual/functions/#man-vectorized)
+:::
+
+Or we could `filter` the rows of the table by applying a function to each row to determine if the `dist` field has the value `"D49"`.
+
+```{julia}
+isD49dist(row) = row.dist == "D49"    # a simple 'one-liner' function definition
+filter(isD49dist, contratbl)
+```
+
+Or we could write the filter function as an anonymous function
+
+```{julia}
+filter(r -> r.dist == "D49", contratbl)
+```
+
+Or we could write the filter function as the composition of a function that extracts the first value from the row, which is the `dist` value, and a function that compares that value to `"D49"`.
+
+```{julia}
+filter(==("D49") ∘ first, contratbl)
+```
+
+::: {.callout-note collapse="true"}
+
+### The function composition operator
+
+The function composition operator, `∘`, typed as `\circ<tab>`, is described in [this manual section](https://docs.julialang.org/en/v1/manual/functions/#Function-composition-and-piping),
+:::
+
+Or we could write a [generator expression](https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions)
+
+```{julia}
+Table(r for r in contratbl if r.dist == "D49")
+```
+
+The point is that all of these variations are from the base Julia language and simply rely on the fact that `contratbl` can be treated as an *iterator* over the rows of the table.
+
+As shown in the last code block, the process of iterating over the rows of a `Table` can be applied in reverse, constructing a `Table` from an iterator or a generator expression that returns `NamedTuple`s.
+In @sec-glmmbinomial a `newdata` table is constructed from the Cartesian product of vectors of covariates as the `newdata` table.
+
+```{julia}
+newdata = Table(
+  (; age=a, ch=c, urban=u)  # NamedTuple from iterator product
+  for a in -10:3:20, c in [false, true], u in ["N", "Y"]
+)
+```
+
+::: {.callout-note collapse="true"}
+
+### Expression for creating a NamedTuple
+
+In general a `Tuple` is written as a comma-separated set of values within parentheses.
+
+```{julia}
+typeof((1, true, 'R'))
+```
+
+This looks like the arguments to a function call without the function name, which is not accidental - internally the structure is exactly that of the arguments to a function call.
+Just as we can optionally separate the positional arguments from the named arguments with `;` in a function call, we can indicate that we are generating a `NamedTuple` by prefacing the named values with `;` as shown in this example.
+
+In this expression the `;` is not necessary but there is another form where we just give the name of the variable, like simply specifying ` contrasts` in the function call like `fit(MixedModel, form, data; contrasts)`, where the `;` indicates that the following arguments are named arguments so that `contrasts` by itself is equivalent to `contrasts=contrasts` specifying both the name and the value.
+
+Thus the `newdata` table could be constructed as
+
+```{julia}
+newdata = Table(
+  (; age, ch, urban) for age in -10:3:20, ch in [false, true],
+  urban in ["N", "Y"]
+)
+```
+
+:::
+
+[TypedTables.jl](https://github.com/JuliaData/TypedTables.jl) leverages the power of the base Julia language and its implementation of concepts such as iterators to provide data manipulation without needing to re-implement each concept from scratch.
+
+### Adding or removing columns from a Table
+
+Because `TypeTables.Table` wraps a `NamedTuple` of vectors, which is an immutable type, a `Table`'s column names and types cannot be changed.
+However, it is easy and fast to create a new `Table` from an existing `Table`.
+(The reason this operation is fast is because it does not copy the contents of the vectors in the table, it just creates a new `NamedTuple` and wrapper referencing the existing contents.)
+
+During the creation of a new `Table` columns can be added or removed.
+
+For example, in @sec-glmmbinomial we added a Boolean column, `ch`, indicating if `livch` is not `"0"`, to the `contra` table using an expression like
+
+```{julia}
+contratbl = Table(contratbl; ch=contratbl.livch .== "0")
+```
+
+If later we decide that we can do without this column we can drop it using `getproperties` whose second argument should be a `Tuple` of `Symbol`s of the names of the columns to retain.
+
+```{julia}
+contratbl = Table(
+  getproperties(contratbl, (:dist, :urban, :livch, :age, :use)),
+)
+```
+
+## The DataFrames package
+
+The [JuliaData](https://github.com/JuliaData) organization manages the development of several packages related to data science and data management, including [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl), a comprehensive system for working with column-oriented data tables in Julia.
+@Kaminski2023, written by the primary author of that package, provides an in-depth introduction to data science facilities, in particular the `DataFrames` package, in Julia.
