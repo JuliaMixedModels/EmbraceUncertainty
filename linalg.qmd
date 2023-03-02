@@ -29,13 +29,8 @@ Attach the packages to be used in this appendix
 
 ```{julia}
 #| code-fold: true
-using DataFrames
 using LinearAlgebra
-using MKL
 using MixedModels
-using ProgressMeter
-
-ProgressMeter.ijulia_behavior(:clear);
 ```
 
 In this appendix we describe properties of the multivariate Gaussian (or "normal") distribution and how linear models and linear mixed models can be formulated in terms of this distribution.
@@ -382,14 +377,14 @@ However, for the linear mixed model, a similar calculation must be done for ever
 Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject `S372` in the `sleepstudy` dataset.
 
 ```{julia}
-S372 =
-  last(groupby(DataFrame(MixedModels.dataset(:sleepstudy)), :subj))
+sleepstudy = Table(MixedModels.dataset(:sleepstudy))
+S372 = sleepstudy[sleepstudy.subj .== "S372"]
 ```
 
 The model matrix and the response vector can be constructed as
 
 ```{julia}
-X = hcat(ones(nrow(S372)), S372.days)
+X = hcat(ones(length(S372)), S372.days)
 ```
 
 and
