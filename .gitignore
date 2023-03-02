@@ -5,7 +5,10 @@ Manifest.toml
 .vscode/
 .DS_Store
 
-/.quarto/
-/_book/
+.quarto/
+_book/
 _freeze/
 .jupyter_cache/
+docs/
+
+/.quarto/
