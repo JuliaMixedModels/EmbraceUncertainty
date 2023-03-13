@@ -37,12 +37,12 @@ In this appendix we describe properties of the multivariate Gaussian (or "normal
 
 We also describe some methods in numerical linear algebra that are particularly useful in working with linear models.
 One of the strengths of the Julia language is the [LinearAlgebra](https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/) package in the standard library.
-The implementation of a multi-dimensional *array*, including one-dimensional *vectors* and two-dimensional *matrices*, is part of the base language.
-The added value of the *LinearAlgebra* package is compact representations of special types of matrices and methods for and with matrix decompositions or factorizations.
+The implementation of multi-dimensional *arrays*, including one-dimensional *vectors* and two-dimensional *matrices*, is part of the base Julia language.
+The added value of the *LinearAlgebra* package is compact representations of special types of matrices and methods for and with matrix decompositions or [factorizations](https://nhigham.com/2022/05/18/the-big-six-matrix-factorizations/).
 
 The purpose of these descriptions is to motivate a representation of a linear mixed model that allows for fast and stable estimation of the parameters.
 The estimation process requires iterative optimization of some of the parameters in the model to minimize an objective function.
-Often this optimization requires hundreds or thousands of evaluations of the objective at different values of the parameters and the portion of time spent in these evaluations dominates the overall estimation time.
+Often this optimization requires hundreds or thousands of evaluations of the objective at different values of the parameters and the these evaluations dominate the overall estimation time.
 Thus, a fast, efficient method for evaluating the objective is crucial to making the whole process fast.
 
 ## Matrix-vector representation of linear models
@@ -70,14 +70,13 @@ The density function for a univariate Gaussian distribution is the familiar "bel
 $$
 f(x; \mu, \sigma^2)=\frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{-\left(x-\mu\right)^2}{2\sigma^2}\right)
 $$ {#eq-univariateGaussianpdf}
-and probabilities defined by this density are most easily evaluated by standardizing the deviation, $x-\mu$, as $z=\frac{x-\mu}{\sigma}$.
-(This is why $\sigma$ is called the *standard deviation*.)
+and probabilities defined by this density are most easily evaluated by *standardizing* the deviation, $x-\mu$, as $z=\frac{x-\mu}{\sigma}$, which is why $\sigma$ is called the *standard deviation*.
 
 To be able to evaluate $\sigma$, the variance, $\sigma^2$, must be positive, or at least non-negative.
 If $\sigma^2=0$ then all the probability is concentrated at a single point, $x=\mu$, and we no longer have a probability density, in the usual way of thinking of one.
 The density shrinks to a point mass and the distribution is said to be [degenerate](https://en.wikipedia.org/wiki/Degenerate_distribution).
 
-Similar constraints apply to the covariance matrix, $\bbSigma$.
+Similar constraints apply to a covariance matrix, $\bbSigma$.
 Because the covariance of the i'th and j'th elements does not depend upon the order in which we write them, $\bbSigma$ must be symmetric.
 That is,
 $$
@@ -140,12 +139,12 @@ and so on.
 
 One point to note here is that $b_1$ is not needed after $x_1$ is evaluated, $b_2$ is not needed after $x_2$ is evaluated, and so on.
 That is, the forward solution can be carried out *in place* with each element of $\mathbf{b}$ overwriting the corresponding element of $\bbx$.
-This property is useful for avoiding allocation of storage in each evaluation of the objective function.
+This property is useful for avoiding allocation of storage in, for example, evaluation of objective function during optimization.
 
 The corresponding method of solving an upper-triangular system of equations is called *backward solution*, where $b_n$ is evaluated first, then $b_{n-1}$, and so on.
 
 Repeated forward solution (or backward solution for upper triangular) can be used to evaluate the inverse, $\mathbf{L}^{-1}$, of a lower triangular matrix, $\mathbf{L}$.
-However, a general rule in numerical linear algebra is that you rarely need to evaluate the full inverse of a matrix.
+However, a general rule in numerical linear algebra is that [you rarely need to evaluate the full inverse of a matrix](https://nhigham.com/2022/10/11/seven-sins-of-numerical-linear-algebra/).
 Solving a triangular system like @eq-triangularsystem by evaluating $\mathbf{L}^{-1}$ and forming the product
 $$
 \bbx = \mathbf{L}^{-1}\mathbf{b}
@@ -168,7 +167,7 @@ Because $\bbR$ is non-singular, $\bbx\ne\mathbf{0}\implies\mathbf{Rx}\ne\mathbf{
 The other direction is a bit more complicated to prove but essentially it amounts to showing that if the process of generating the Cholesky factor requires the square root of a non-positive number to obtain a diagonal element then there is a direction in which the quadratic form gives a non-positive result.
 
 In practice, the easiest way to check a symmetric matrix to see if it is positive definite is to attempt to evaluate the Cholesky factor and check whether that succeeds.
-This is exactly what the `isposdef` methods in the *LinearAlgebra* package do.
+This is exactly what the `isposdef` methods in the `LinearAlgebra` package do.
 
 ### Density of the multivariate Gaussian {#sec-mvgaussian}
 
@@ -284,7 +283,7 @@ where $\arg\min_{\bbbeta}$ means the value of $\bbbeta$ that minimizes the expre
 Let $r^2(\widehat{\bbbeta}) = \left\|\bby-\bbX\widehat{\bbbeta}\right\|^2$ be the minimum sum of squared residuals.
 Substituting this value into @eq-linmoddevscale, differentiating with respect to $\sigma^2$, and setting this derivative to zero gives
 $$
-\widehat{\sigma^2}=\frac{r^2(\widehat{\bbbeta})}{n}
+\widehat{\sigma^2}=\frac{r^2(\widehat{\bbbeta})}{n} .
 $$
 
 ## Minimizing the sum of squared residuals
@@ -473,7 +472,7 @@ Similarly we check that the value of $r_{y,y}$ is approximately equal to the nor
 norm(r) ≈ extchfac.U[3, 3]
 ```
 
-## Alternative decompositions of X
+## Alternative decompositions of X {#sec-matrixdecomp}
 
 There are two other decompositions of the model matrix $\bbX$ or the augmented model matrix $[\mathbf{X,y}]$ that can be used to evaluate the least squares estimates; the [QR decomposition](https://en.wikipedia.org/wiki/QR_decomposition) and the [singular value decomposition (SVD)](https://en.wikipedia.org/wiki/Singular_value_decomposition).
 
@@ -528,6 +527,10 @@ Because of this, the default for the `svd` function is to produce a compact form
 Xsvd = svd(X)
 ```
 
+(In general, the `Vt factor` from this decomposition is $\mathbf{V}'$, the transpose of $\mathbf{V}$.
+The distinction is not important in this case because $\mathbf{V}$ is symmetric.
+)
+
 If all the singular values are non-zero, as is the case here, the least squares solution $\widehat{\bbbeta}$ can be obtained as
 
 $$
@@ -552,7 +555,7 @@ $$
 \end{aligned}
 $$
 
-The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mcB)=\bbSigma_\theta$, depends on the *variance-component parameter vector*, $\bbtheta$, through a lower triangular *relative covariance factor*, $\bbLambda_\theta$ as
+The $q\times q$, symmetric, variance-covariance matrix, $\mathrm{Var}(\mcB)=\bbSigma_\theta$, depends on the *variance-component parameter vector*, $\bbtheta$, through a lower triangular *relative covariance factor*, $\bbLambda_\theta$, as
 
 $$
 \bbSigma_\theta=\sigma^2\bbLambda_\theta\bbLambda_\theta' .
@@ -561,7 +564,7 @@ $$ {#eq-relcovfac}
 (Recall that the lower Cholesky factor is generally written $\mathbf{L}$.
 In this case the lower Cholesky factor contains parameters and is named with the corresponding Greek letter, $\bbLambda$.)
 
-Many computational formulas for linear mixed models are written in terms of the *precision matrix*, $\bbSigma_\theta^{-1}$.
+In many descriptions of linear mixed models, computational formulas are written in terms of the *precision matrix*, $\bbSigma_\theta^{-1}$.
 Such formulas will become unstable as $\bbSigma_\theta$ approaches singularity.
 And it can do so.
 It is a fact that singular (i.e. non-invertible) $\bbSigma_\theta$ can and do occur in practice, as we have seen in some of the examples in earlier chapters.
@@ -616,7 +619,7 @@ $$
 \end{aligned}
 $$ {#eq-condygivenu}
 
-The joint density for $\mcY$ and $\mcU$ is the product of densities of the two distributions shown in @eq-condygivenu.
+The joint density for $\mcY$ and $\mcU$ is the product of densities of the two distributions in @eq-condygivenu.
 That is
 
 $$
@@ -629,9 +632,9 @@ $$ {#eq-yujointdensity}
 
 To evaluate the likelihood for the parameters, $\bbtheta$, $\bbbeta$, and $\sigma^2$, given the observed response, $\bby$, we must evaluate the marginal distribution of $\mcY$, which is the integral of $f_{\mcY,\mcU}(\bby,\mathbf{u})$ with respect to $\mathbf{u}$.
 
-This is much simpler if we first rewrite the *penalized sum of squared residuals*, $\left\|\bby-\bbX\bbbeta
+This is much simpler if we rewrite the *penalized sum of squared residuals*, $\left\|\bby-\bbX\bbbeta
 -\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+
-\left\|\mathbf{u}\right\|^2$, in @eq-yujointdensity, which is a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
+\left\|\mathbf{u}\right\|^2$, from @eq-yujointdensity,  a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
 
 $$
 \begin{aligned}
@@ -666,27 +669,6 @@ r^2_\theta(\mathbf{u},\bbbeta)
 -\bbbeta \\
 1
 \end{bmatrix} \\
-&=
-\begin{bmatrix}
--\mathbf{u'} &
--\bbbeta' &
-1
-\end{bmatrix}
-\begin{bmatrix}
-\bbR_{ZZ}' & \mathbf{0} & \mathbf{0} \\
-\bbR_{ZX}' & \bbR_{XX}' & \mathbf{0} \\
-\mathbf{r}_{Zy}' & \mathbf{r}_{Xy}' & r_{yy}
-\end{bmatrix}
-\begin{bmatrix}
-\bbR_{ZZ} & \bbR_{ZX} & \mathbf{r}_{Zy} \\
-\mathbf{0} & \bbR_{XX} & \mathbf{r}_{Xy} \\
-\mathbf{0} & \mathbf{0} & r_{yy}
-\end{bmatrix}
-\begin{bmatrix}
--\mathbf{u} \\
--\bbbeta \\
-1
-\end{bmatrix}\\
 &= \left\|
 \begin{bmatrix}
 \bbR_{ZZ} & \bbR_{ZX} & \mathbf{r}_{Zy}\\

@@ -49,7 +49,7 @@ Often, for ease of access and for display, we convert the Arrow table to a `Tabl
 
 Before going into detail about the properties and use of the `Table` type, let us first discuss the role of [Tables.jl](https://github.com/JuliaData/Tables.jl).
 
-## Tables.jl provides an "interface for tables"
+## Tables.jl provides an "interface for tables" {#sec-Tablesjl}
 
 An important characteristic of any system for working with data tables is whether the table is stored in memory column-wise or row-wise.
 
