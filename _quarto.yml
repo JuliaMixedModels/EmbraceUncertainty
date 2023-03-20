@@ -14,7 +14,7 @@ book:
     - longitudinal.qmd
     - largescaledesigned.qmd
     - largescaleobserved.qmd
-    - glmmbinomial.qmd
+    - glmmbernoulli.qmd
     - references.qmd
   appendices:
     - datatables.qmd
