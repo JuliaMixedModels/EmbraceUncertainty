@@ -62,7 +62,7 @@ where $\mcN$ denotes the multivariate Gaussian distribution with mean $\bbmu=\bb
 
 Before considering properties of and computational methods for the model @eq-mvnlinmod we will describe some of the properties of the [multivariate Gaussian distribution](https://en.wikipedia.org/wiki/Multivariate_normal_distribution).
 
-## The multivariate Gaussian distribution
+## The multivariate Gaussian distribution {#sec-multivariateGaussian}
 
 Just as a univariate Gaussian distribution can be written by specifying the (scalar) mean, $\mu$, and the variance, $\sigma^2$, as $\mcN(\mu, \sigma^2)$, a multivariate Gaussian distribution is characterized by its $n$-dimensional mean vector, $\bbmu$, and its $n\times n$ variance-covariance matrix, $\bbSigma$, as $\mcN(\bbmu, \bbSigma)$.
 
