@@ -149,7 +149,7 @@ A fifth positional argument can be used to specify the link function, described 
 In the case of the Bernoulli distribution the canonical link is the *logit* link.
 
 As for LMMs, the named argument `contrasts` specifies the contrasts to apply to some of the covariates in a key-value dictionary.
-Another named argument, `nAGQ`, specifies the number of quadrature points to use in an *adaptive Gauss-Hermite quadrature* rule for evaluating the deviance (see @sec-AGQ for details).
+Another named argument, `nAGQ`, specifies the number of quadrature points to use in an *adaptive Gauss-Hermite quadrature* rule for evaluating the deviance (see @sec-aGHQ for details).
 A small, odd number, such as `nAGQ=9` defined in the first code block of this chapter, is the preferred choice.
 
 The interpretation of the coefficients in this model is somewhat different from the linear mixed models coefficients that we examined previously, but many of the model-building steps are similar.
