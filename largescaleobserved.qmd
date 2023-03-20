@@ -16,10 +16,8 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
+using EmbraceUncertainty
 using GLM
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL
-end
 using MixedModels
 using MixedModelsMakie
 using ProgressMeter
@@ -69,7 +67,7 @@ The `subject` and `item` factors are "incompletely crossed" in that each item oc
 Similarly in the movie ratings, each instance of a rating is associated with a user and a movie and these factors are incompletely crossed.
 
 ```{julia}
-ratings = Arrow.Table(datadir("ratings.arrow"))
+ratings = EmbraceUncertainty.dataset("ratings")
 ```
 
 Convert this table to a `DataFrame` and drop the `timestamp` column, which we won't be using.
