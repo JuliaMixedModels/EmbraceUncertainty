@@ -738,14 +738,16 @@ $$ {#eq-u-system}
 From the properties of the multivariate Gaussian distribution
 
 $$
-\begin{aligned}
+\begin{multline*}
 \int_{\mathbf{u}}\frac{1}{(2\pi\sigma^2)^{q/2}}
 \exp\left(-\frac{\|\bbR_{ZZ}\mathbf{u}+\bbR_{ZX}\bbbeta-\mathbf{r}_{Zy}\|^2}{2\sigma^2}\right)
-\,d\mathbf{u}
+\,d\mathbf{u}\\
+\begin{aligned}
 &= \int_{\mathbf{v}}\frac{1}{(2\pi\sigma^2)^{q/2}}
 \exp\left(-\frac{\|\mathbf{v}\|^2}{2\sigma^2}\right)|\bbR_{ZZ}|^{-1}\,d\mathbf{v}\\
 &=|\bbR_{ZZ}|^{-1}
 \end{aligned}
+\end{multline*}
 $$ {#eq-likelihood-integral}
 
 from which we obtain the likelihood as
