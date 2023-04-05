@@ -21,37 +21,44 @@ jupyter: julia-1.8
 \newcommand\bbLambda{{\boldsymbol{\Lambda}}}
 \newcommand\bbmu{{\boldsymbol{\mu}}}
 \newcommand\bbtheta{{\boldsymbol{\theta}}}
-\newcommand\mcN{{\mathcal{N}}}
 \newcommand\mcB{{\mathcal{B}}}
+\newcommand\mcD{{\mathcal{D}}}
+\newcommand\mcI{{\mathcal{I}}}
+\newcommand\mcL{{\mathcal{L}}}
+\newcommand\mcN{{\mathcal{N}}}
 \newcommand\mcU{{\mathcal{U}}}
 \newcommand\mcX{{\mathcal{X}}}
 \newcommand\mcY{{\mathcal{Y}}}
 
-The log-likelihood for a linear mixed model (LMM) was derived in @sec-lmmtheory, where some computational methods for fitting such models with [MixedModels.jl](https://github.com/JuliaStats/MixedModels.jl) by optimizing a *profiled log-likelihood* were illustrated.
+The log-likelihood for a linear mixed model (LMM) was derived in @sec-lmmtheory, where some computational methods for fitting such models with [MixedModels.jl](https://github.com/JuliaStats/MixedModels.jl), by optimizing a *profiled log-likelihood*, were illustrated.
 
 In this appendix we outline the evaluation of the log-likelihood for a generalized linear mixed model (GLMM) with a binary response, which is modelled using the [Bernoulli distribution](https://en.wikipedia.org/wiki/Bernoulli_distribution).
 
-## The Bernoulli GLMM 
+## The Bernoulli GLMM
 
 The Bernoulli GLMM model defines the conditional distribution $({\mcY}|{\mcB}={\bbb})$ as independent Bernoulli random variables with expected values ${\bbmu}={\bbg}^{-1}({\bbeta})$, where ${\bbeta}={\bbX}{\bbbeta}+{\bbZ}{\bbb}$ is the *linear predictor* and $\bbg^{-1}$ is an *inverse link function*.
 
-We will use the *logit link function*, $\bbeta=\bbg(\bbmu)$, defined component-wise from the scalar logit link, $g$, as 
+We will use the *logit link function*, $\bbeta=\bbg(\bbmu)$, defined component-wise from the scalar logit link, $g$, as
 $$
-\eta_i=g(\mu_i)=\mathrm{logit}(\mu_i)=\log\left(\frac{\mu_i}{1-\mu_i}\right)\quad i=1,\dots,n ,
+\eta_i=g(\mu_i)=\mathrm{logit}(\mu_i)=\log\left(\frac{\mu_i}{1-\mu_i}\right)\quad i=1,\dots,n .
 $$
-which is the *canonical link function* (@sec-logitlink) for the Bernoulli distribution.
-Similarly, the inverse link, $\bbmu=\bbg^{-1}(\bbeta)$, is defined component-wise from the scalar *logistic* function,
+The inverse link, $\bbmu=\bbg^{-1}(\bbeta)$, is similarly defined component-wise from the inverse of the scalar logit, which is the scalar *logistic* function,
 $$
-\mu_i=g^{-1}(\eta_i)=\mathrm{logistic}(\eta_i)=\frac{1}{1+\exp(-\eta_i)}\quad i=1,\dots,n .
-$$
+\mu_i=g^{-1}(\eta_i)=\mathrm{logistic}(\eta_i)=\frac{1}{1+e^{-\eta_i}}\quad i=1,\dots,n .
+$$ {#eq-scalarlogistic}
+The logit is the *canonical link function* (@sec-logitlink) for the Bernoulli distribution.
 
-As in the linear mixed model discussed in @sec-lmmtheory, the random effects, $\mcB$, are expressed as $\mcB=\bbLambda_{\bbtheta}\mcU$ where $\mcU$ has a standard, multivariate Gaussian distribution (@sec-multivariateGaussian)
+As in the linear mixed model discussed in @sec-lmmtheory, the $q$-dimensional random effects, $\mcB$, are expressed as $\mcB=\bbLambda_{\bbtheta}\,\mcU$ where $\mcU$ has a standard, multivariate Gaussian distribution (@sec-multivariateGaussian)
 $$
-\mcU\sim\mcN(\bbzero,\bbI_q) .
+\mcU\sim\mcN(\bbzero,\bbI_q) ,
 $$ {#eq-MVNUdistGLMM}
+with probability density function
+$$
+f_{\mcU}(\bbu)=\frac{1}{\sqrt{2\pi}^q}e^{-\|\bbu\|^2/2} .
+$$ {#eq-uunconddense}
 
 For a linear mixed model the distribution of these *spherical random effects* was given as $\mcU\sim(\bbzero,\sigma^2\bbI_q)$ (@eq-sphericalre).
-However, in @eq-MVNUdistGLMM no dispersion parameter like $\sigma^2$ appears because there is no separate dispersion parameter in the Bernoulli distribution, which is determined solely but its mean.
+A dispersion parameter like $\sigma^2$ is not present in @eq-MVNUdistGLMM because the Bernoulli distribution does not have a separate dispersion parameter --- it is entirely determined by its mean.
 
 As is the case for the linear mixed model, the *covariance factor*, $\bbLambda_{\bbtheta}$, is sparse and patterned.
 It is not uncommon in practical examples, such as the one in @sec-PIRLS, for
@@ -60,49 +67,59 @@ $\bbtheta$ to be one-dimensional and $\bbLambda_{\bbtheta}=\theta\,\bbI_q$, to b
 ### Log-likelihood for a Bernoulli GLMM
 
 The likelihood for the parameters, $\bbtheta$ and $\bbbeta$, given the observed data, $\bby$, is the value of the marginal probability mass function for the response, $\mcY$, evaluated at $\bby$, the observed vector of {0,1} responses.
-We obtain this value by integrating the product of the probability mass function for the conditional distribution, $(\mcY|\mcU=\bbu)$, and unconditional density of $\mcU$, with respect to $\bbu$ (@eq-GLMMlikelihood).
+We obtain this value by integrating the product of the probability mass function for the conditional distribution, $(\mcY|\mcU=\bbu)$, and unconditional density of $\mcU$  (@eq-uunconddense), with respect to $\bbu$.
 
-Recall that the probability mass for a single Bernoulli response can be written in the somewhat unintuitive form $(1-\mu)^{1-y}\mu^y$ because one of $y$ or $1-y$ must be zero for $y\in\{0,1\}$.
-Because the components of the vector-valued conditional distribution, $(\mcY|\mcU=\bbu)$, are assumed to be independent, the probability mass function that can be written as the product of the probability masses for each component
+Recall that the probability mass for a single Bernoulli response can be written as $(1-\mu)^{1-y}\mu^y$, which is the specialization to $n=1$ of the probability mass function for the [binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution)
 $$
-  f_{\mcY|\mcU=\bbu}=\prod_{i=1}^n \left[(1-\mu_i)^{1-y_i}\mu_i^{y_i}\right]
-  \quad\mathrm{where}\quad
-  \bbmu=\bbg^{-1}(\bbX\bbbeta+\bbZ\bbLambda_{\bbtheta}\bbu) ,
+\binom{n}{y}(1-\mu)^{n-y}\mu^y ,\quad 0\le\mu\le 1, \quad y\in\{0,\dots,n\} .
+$$
+Because the components of the vector-valued conditional distribution, $(\mcY|\mcU=\bbu)$, are assumed to be independent, its probability mass function can be written as the product of the probability masses for each component
+$$
+f_{\mcY|\mcU=\bbu}(\bby|\bbu)=\prod_{i=1}^n \left[(1-\mu_i)^{1-y_i}\mu_i^{y_i}\right]
+\quad\mathrm{where}\quad
+\bbmu=\bbg^{-1}(\bbX\bbbeta+\bbZ\bbLambda_{\bbtheta}\bbu) ,
 $$
 providing the likelihood as
 $$
 \begin{aligned}
-  L(\bbeta,\bbtheta|\bby)&=
-  \int_{\bbu}f_{\mcY,\mcU=\bbu}(\bby,\bbu)f_{\mcU}(\bbu)\,d\bbu\\
-  &={(2\pi)}^{-q/2}
-  \int_{\bbu}e^{\sum_{i=1}^n(1-y_i)\log(1-\mu_i)+y_i*\log(\mu_i)}
-  e^{-\left\|\bbu\right\|^2/2}\,d\bbu\\
-  &=(2\pi)^{q/2}
-  \int_{\bbu}\exp\left(\frac{\left\|\bbu\right\|^2+\sum_{i=1}^n d(y_i,\mu_i)}{-2}\right)\,d\bbu
+L(\bbeta,\bbtheta|\bby)&=
+\int_{\bbu}f_{\mcY,\mcU=\bbu}(\bby,\bbu)f_{\mcU}(\bbu)\,d\bbu\\
+&=\int_{\bbu}\frac{1}{\sqrt{2\pi}^q}e^{\sum_{i=1}^n(1-y_i)\log(1-\mu_i)+y_i\,\log(\mu_i)}
+e^{-\left\|\bbu\right\|^2/2}\,d\bbu\\
+&=\int_{\bbu}\frac{1}{\sqrt{2\pi}^q}\exp\left(\frac{\left\|\bbu\right\|^2+\sum_{i=1}^n d(y_i,\mu_i)}{-2}\right)\,d\bbu
 \end{aligned}
 $$ {#eq-GLMMlikelihood}
 where the *unit deviances*, $d(y_i,\mu_i)$, are
 $$
 d(y_i,\mu_i)=-2\left[(1-y_i)\log(1-\mu_i)+y_i\log(\mu_i)\right]\quad i=1,\dots,n .
+$$ {#eq-unitdeviances}
+
+By converting from the logarithm of the probability mass function to the [deviance](https://en.wikipedia.org/wiki/Deviance_(statistics)) scale, which is negative twice the log-probability, we get a quantity, $\sum_{i=1}^n d(y_i,\mu_i)$, which is on the same scale as the squared length, $\|\bbu\|^2$, of a standard multivariate Gaussian.
+The sum of the unit deviances is analogous to the sum of squared residuals, $\|\bby-\bbX\bbbeta\|^2$, in a linear model.
+
+In @sec-lmmtheory we showed that the integral defining the likelihood for a linear mixed model, @eq-likelihood-integral, has an analytic solution.
+In general, the integral in @eq-GLMMlikelihood does not.
+We will approximate the value of this integral using a quadratic approximation to the argument of the exponential function in @eq-GLMMlikelihood at the value of $\bbu$ that maximizes the integrand, which is the density of the conditional distribution, $(\mcU|\mcY=\bby)$, up to a scale factor.
+Because the scale factor does not affect the location of the maximum, the value of $\bbu$ that maximizes the integrand,
 $$
+\begin{aligned}
+\tilde{\bbu}(\bby|\bbtheta,\bbbeta)
+&=\arg\max_{\bbu}\exp\left(\frac{\left\|\bbu\right\|^2 + \sum_{i=1}^n d(y_i,\mu_i)}{-2}\right)\\
+&=\arg\min_{\bbu}\left(\left\|\bbu\right\|^2 + \sum_{i=1}^n d(y_i,\mu_i)\right)
+\end{aligned} ,
+$$ {#eq-condmode}
+is also the *conditional mode* --- the value of $\bbu$ that maximizes the conditional density.
+The expression being minimized in @eq-condmode, $\left\|\bbu\right\|^2 + \sum_{i=1}^n d(y_i,\mu_i)$, is called the *penalized deviance*.
 
-By converting from the logarithm of the probability mass function to the deviance scale, which is negative twice the log-probability, we get a quantity, $\sum_{i=1}^n d(y_i,\mu_i)$, which is on the same scale as the squared length, $\|\bbu\|^2$, of a standard multivariate Gaussian, or the sum of squared residuals, $\|\bby-\bbX\bbbeta\|^2$, in a linear model.
+Using a quadratic approximation to the penalized deviance at this conditional mode (i.e. the mode of the conditional distribution of $\mcU$ given $\mcY=\bby$) is equivalent to using a multivariate Gaussian approximation to this conditional distribution.
+Approximating an integral like @eq-GLMMlikelihood by approximating the integrand as a scaled multivariate Gaussian distribution at its mode is called [Laplace's approximation](https://en.wikipedia.org/wiki/Laplace%27s_approximation) (@TierneyKadane1986).
 
-For a generalized linear model (GLM) without random effects the *deviance* is defined as the sum of the unit deviances and maximum likelihood estimate of the coefficient vector, $\widehat{\bbbeta}$, is the value that minimizes the deviance.
+The *penalized iteratively re-weighted least squares* (PIRLS) algorithm (@sec-PIRLS) provides a fast and stable method of determining the conditional mode, $\tilde{\bbu}(\bby|\bbtheta,\bbbeta)$ (@eq-condmode), thereby making it feasible to use Laplace's approximation at scale.
+
+Before discussing PIRLS, however, we will describe generalized linear models (GLMs) without random effects (@sec-BernoulliGLM), for which the *deviance* is defined as the sum of the unit deviances and the maximum likelihood estimate of the coefficient vector, $\widehat{\bbbeta}$, is the value that minimizes the deviance.
 In @sec-IRLS we describe the *iteratively re-weighted least squares* (IRLS) algorithm, which is a stable, fast algorithm to minimize the deviance.
 
-For a generalized linear mixed model (GLMM) we refer to the numerator of the exponential expression in the integrand in @eq-GLMMlikelihood,
-$$
-\left\|\bbu\right\|^2+\sum_{i=1}^n d(y_i,\mu_i) ,
-$$
-as the *penalized deviance*.
-In section @sec-PIRLS we describe a *penalized iteratively re-weighted least squares* (PIRLS) algorithm to minimize the penalized deviance with respect to $\bbu$.
-The value of $\bbu$ that minimizes the penalized deviance is the *mode* of $(\mcU|\mcY=\bby)$, in that it maximizes the density of this conditional distribution.
-
-The log-likelihood of a linear mixed model (LMM) can be evaluated analytically (@eq-likelihood) from the Cholesky factor of a large, sparse positive-definite matrix created as part of the solution of a penalized least squares (PLS) problem.
-
-In the case of a GLMM we generally cannot evaluate the integral in @eq-GLMMlikelihood analytically.
-Instead we determine the mode of the integrand via PIRLS and approximate the integrand by a scaled multivariate Gaussian density, a version of [Laplace's approximation](https://en.wikipedia.org/wiki/Laplace's_approximation), or by *adaptive Gauss-Hermite quadrature* (@sec-aGHQ).
+We will illustrate the IRLS algorithm with the `contra` data discussed in @sec-glmmbinomial and a model like `com05`, which was fit in that chapter, but without the random effects. Later we will use the full `com05` model to illustrate some of the computations for GLMMs.
 
 Although 0/1 responses and the Bernoulli distribution are easy to describe, the theory of the generalized linear mixed model (GLMM) and the details of the implementation are not. Readers who wish to focus on practical applications more than on the theory should feel free to skim this appendix.
 
@@ -111,23 +128,24 @@ Load the packages to be used
 ```{julia}
 #| code-fold: true
 #| output: false
-# using AlgebraOfGraphics
+using AlgebraOfGraphics
 using BenchmarkTools
-# using CairoMakie
+using CairoMakie
+using FreqTables
 using LinearAlgebra
 using MixedModels
+using MixedModelsMakie
 using NLopt
+using PooledArrays
 using ProgressMeter
 using StatsAPI
 
-# define showcompact to print a value compactly 
+# showcompact prints a vector compactly 
 showcompact(x) = show(IOContext(stdout, :compact => true), x)
 
 ProgressMeter.ijulia_behavior(:clear)
-#CairoMakie.activate!(; type="svg")
+CairoMakie.activate!(; type="svg")
 ```
-
-Before delving into the complexities of GLMMs - generalized linear *mixed* models - we consider the simpler case of generalized linear models (GLMs), which do not incorporate random effects. We will illustrate the computations on the `contra` data discussed in @sec-glmmbinomial with a model like `com05`, which was fit in that chapter, but without the random effects. Later we will use the full `com05` model to illustrate some of the computations for GLMMs.
 
 ## Generalized linear models for binary data {#sec-BernoulliGLM}
 
@@ -135,59 +153,39 @@ To introduce some terms and workflows we first consider the generalized linear m
 $$
 {\bbeta}= {\bbX}{\bbbeta} ,
 $$
-and the mean response vector, ${\bbmu}$, is evaluated by *mapping* the scalar *inverse link function*, $g^{-1}$, component-wise over the vector ${\bbeta}$. We will write this relationship as a vector-valued function of a vector
-$$
-{\bbmu}={\bbg}^{-1}({\bbeta})
-$$
-but with the understanding that ${\bbg}^{-1}$ corresponds to mapping the scalar function, $g^{-1}$, over the vector.
+and the mean response vector, ${\bbmu}=\bbg^{-1}(\bbeta)$, is obtained by component-wise application of the scalar logistic function (@eq-scalarlogistic).
 
-Recall that the logit link function is
-
+The probability mass function for the Bernoulli distribution is
 $$
-g(\mu) = \log\left(\frac{\mu}{1-\mu}\right)
+f_{\mcY}(y|\mu) = \mu^y\,(1-\mu)^{(1-y)}\quad\mathrm{for}\quad y\in\{0,1\} .
 $$
 
-and the inverse link is the *logistic* function
-
+Because the elements of ${\mcY}|{\bbmu}$ are assumed to be independent, the log-likelihood is simply the sum of contributions from each element, which, on the deviance scale, can be written in terms of the *unit deviances*
 $$
-g^{-1}(\eta)=\frac{1}{1+\exp(-\eta)} .
-$$
-
-As Julia functions these can be written
-
-```{julia}
-#| eval: false
-#| output: false
-logit(μ) = log(μ / (1 - μ))
-logistic(η) = 1 / (1 + exp(-η))
-```
-
-The probability mass function for the Bernoulli distribution can be written as
-$$
-p(y|\mu) = \mu^y+(1-\mu)^{(1-y)}\quad\mathrm{for}\quad y\in\{0,1\} .
-$$
-
-Because the elements of ${\mcY}|{\bbmu}$ are assumed to be independent, the log-likelihood is simply the sum of contributions from each element
-$$
-\ell({\bbmu}|{\mathbf{y}}) = \log(L({\bbmu}|{\mathbf{y}}))=\sum_{i=1}^n y_i\log(\mu_i)+(1-y_i)\log(1-\mu_i) .
+\begin{aligned}
+-2\,\ell({\bbmu}|{\mathbf{y}})&= -2\,\log(L({\bbmu}|{\mathbf{y}}))\\
+&=-2\,\sum_{i=1}^n y_i\log(\mu_i)+(1-y_i)\log(1-\mu_i) .
+\end{aligned}
 $$ {#eq-Bernoulliloglik}
 
-It is customary when working with GLMs to convert the log-likelihood to a [deviance](https://en.wikipedia.org/wiki/Deviance_(statistics)), which, for the Bernoulli distribution, is negative twice the log-likelihood. (For other distributions, the deviance may incorporate an additional term that depends only on ${\mathbf{y}}$.)
+As described above, it is customary when working with GLMs to convert the log-likelihood to a [deviance](https://en.wikipedia.org/wiki/Deviance_(statistics)), which, for the Bernoulli distribution, is negative twice the log-likelihood. (For other distributions, the deviance may incorporate an additional term that depends only on ${\mathbf{y}}$.)
 
 One reason for preferring the deviance scale is that the change in deviance for nested models has approximately a $\chi^2$ distribution with degrees of freedom determined by the number of independent constraints on the parameters in the simpler model.
 Especially for GLMs, the deviance plays a role similar to the sum of squared residuals in linear models.
 
-In particular, the *conditional modes* of the random effects minimize the penalized deviance, as described in @sec-PIRLS.
-
-Numerically there is an advantage in evaluating the deviance directly from the linear predictor value, $\eta$, because
+For greater numerical precision we avoid calculating $1-\mu$ directly when evaluating expressions like @eq-Bernoulliloglik and instead use
 $$
-1 - \mu = 1 - \frac{1}{1+e^{-\eta}}=\frac{e^{-\eta}}{1+e^{-\eta}}
+1 - \mu = 1 - \frac{1}{1+e^{-\eta}}=\frac{e^{-\eta}}{1+e^{-\eta}} .
 $$
-and evaluation of the last expression provides greater precision for large negative values of $\eta$ (corresponding to small values of $\mu$) than does first evaluating $\mu$, then $1 - \mu$, then negative twice @eq-Bernoulliloglik.
+Evaluation of the last expression provides greater precision for large negative values of $\eta$ (corresponding to small values of $\mu$) than does first evaluating $\mu$ followed by $1 - \mu$.
 
 After some algebra, we write the *unit deviance*, $d(y_i,\eta_i)$, which is the contribution to the deviance from the $i$th observation, as
 $$
-d(y_i, \eta_i) = 2\left[(1-y_i)\eta_i-\log(1+\exp(-\eta_i))\right]\quad i=1,\dots,n .
+\begin{aligned}
+d(y_i, \eta_i)&=-2\left[y_i\log(\mu_i)+(1-y_i)\log(1-\mu_i)\right]\\
+&=2\left[(1-y_i)\eta_i-\log(1+e^{-\eta_i})\right]
+\end{aligned}
+\quad i=1,\dots,n
 $$
 
 A Julia function to evaluate both the mean and the unit deviance can be written as
@@ -204,7 +202,7 @@ end
 
 ### log1p
 
-Mathematically `log1p` is defined as $\mathrm{log1p}(x)=\log(1+x)$ but it is implemented in such a way as to provide greater accuracy when $x$ is small. For example,
+Mathematically `log1p`, read *log of 1 plus*, is defined as $\mathrm{log1p}(x)=\log(1+x)$ but it is implemented in such a way as to provide greater accuracy when $x$ is small. For example,
 
 ```{julia}
 let small = eps() / 10
@@ -225,7 +223,7 @@ For example,
 meanunitdev(0.0, 0.21)
 ```
 
-A `Vector` of such `NamedTuple`s is a *row-table* (@sec-Tablesjl), which can be updated in place by "dot-vectorization" of the scalar `meanunitdev` function, as shown below.
+A `Vector` of such `NamedTuple`s is a *row-table* (@sec-Tablesjl), which can be updated in place by [dot-vectorization](https://docs.julialang.org/en/v1/manual/functions/#man-vectorized) of the scalar `meanunitdev` function, as shown below.
 
 ### An example: fixed-effects only from com05
 
@@ -235,7 +233,7 @@ We illustrate some of these computations using only the fixed-effects specificat
 #| code-fold: show
 #| output: false
 contra = let tbl = MixedModels.dataset(:contra)
-  Table(tbl; ch=tbl.livch .!= "0")
+  Table(tbl; ch=tbl.livch .≠ "0")
 end
 contrasts = Dict{Symbol,Any}(
   :urban => HelmertCoding(),
@@ -263,13 +261,13 @@ rowtbl = meanunitdev.(com05.y, com05.X * βm05)
 typeof(rowtbl)
 ```
 
-For display we convert the row-table to a column-table and prepend another column-table of $\bby$ and $\bbeta$.
+For display we convert the row-table to a column-table and prepend another column-table consisting of $\bby$ and $\bbeta$.
 
 ```{julia}
 Table((; y=com05.y, η=com05.X * βm05), rowtbl)  # display as a Table
 ```
 
-The deviance for this value of ${\bbbeta}$ in this model is the sum of the unit deviances, which we write as `sum` applied to a generator expression.  (In general we extract columns of a row-table with generator expressions.)
+The deviance for this value of ${\bbbeta}$ in this model is the sum of the unit deviances, which we write as `sum` applied to a [generator expression](https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions).  (In general we extract columns of a row-table with generator expressions that produce [iterators](https://docs.julialang.org/en/v1/base/collections/#lib-collections-iteration).)
 
 ```{julia}
 sum(r.dev for r in rowtbl)
@@ -288,7 +286,7 @@ struct BernoulliGLM{T<:AbstractFloat}
 end
 ```
 
-We also create an *external constructor*, which is a function defined outside the struct and of the same name as the struct that constructs and returns an object of that type.
+We also create an *external constructor*, which is a function defined outside the struct and of the same name as the struct, that constructs and returns an object of that type.
 In this case the external constructor creates a `BernoulliGLM` from the model matrix and the response vector, after some consistency checks on the arguments passed to it.
 
 ```{julia}
@@ -297,13 +295,17 @@ function BernoulliGLM(
   X::Matrix{T},
   y::Vector{T},
 ) where {T<:AbstractFloat}
-  n = size(X, 1)          # number of rows of X
+
+  # check consistency of arguments
+  n = size(X, 1)                  # number of rows in X
   if length(y) ≠ n || !all(v -> (iszero(v) || isone(v)), y)
     throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
   end
+
   # initial β from linear regression of y in {-1,1} coding
   β = X \ replace(y, 0 => -1)
   η = X * β
+
   return BernoulliGLM(X, β, (; y, η), meanunitdev.(y, η))
 end
 ```
@@ -314,7 +316,14 @@ To optimize the deviance we define an *extractor* method that returns the devian
 StatsAPI.deviance(m::BernoulliGLM) = sum(r.dev for r in m.rtbl)
 ```
 
-and a mutating function, `setβ!`, that installs a new value of `β` then updates `η` and `rtbl` in place.
+::: {.callout-note collapse="true"}
+### Why StatsAPI.deviance and not just deviance?
+
+This extractor is written as a method for the generic `deviance` function defined in the `StatsAPI` package.
+Doing so allows us to use the `deviance` name for the extractor without interfering with `deviance` methods defined for other model types.
+:::
+
+We also define a mutating function, `setβ!`, that installs a new value of `β` then updates `η` and `rtbl` in place.
 
 ```{julia}
 #| output: false
@@ -334,16 +343,16 @@ com05fe = BernoulliGLM(com05.X, com05.y)
 showcompact(β₀)
 ```
 
-These initial values of $\bbbeta$ are from a least squares fit of $\bby$, converted from `{0,1}` coding to `{-1, 1}` coding, on the model matrix, $\bbX$.
+These initial values of $\bbbeta$ are from a least squares fit of $\bby$, converted from `{0,1}` coding to `{-1,1}` coding, on the model matrix, $\bbX$.
 
-As a simple test of the `setβ!` method we can check that `com05fe` produces the same deviance value for `com05.β` as was evaluated above.
+As a simple test of the `setβ!` and `deviance` methods we can check that `com05fe` produces the same deviance value for `βm05` as was evaluated above.
 
 ```{julia}
-deviance(setβ!(com05fe, com05.β))
+deviance(setβ!(com05fe, βm05))
 ```
 
 For fairness in later comparisons we restore the initial values `β₀` to the model.
-These are rough starting estimates with a deviance that is greater than that at `com05.β`.
+These are rough starting estimates with a deviance that is considerably greater than that at `βm05`.
 
 ```{julia}
 deviance(setβ!(com05fe, β₀))
@@ -351,8 +360,8 @@ deviance(setβ!(com05fe, β₀))
 
 ### Fit the GLM using a general optimizer
 
-We will use a general optimizer from [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl) to minimize the deviance.
-Following the instructions given at that package's repository, we create an `Opt` object specifying the algorithm to be used, BOBYQA, and the dimension of the problem, then define and assign the objective function in the required form, and call `optimize`
+We can use a general optimizer like those available in [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl) to minimize the deviance.
+Following the instructions given at that package's repository, we create an `Opt` object specifying the algorithm to be used, BOBYQA (@powell2009bobyqa), and the dimension of the problem, then define and assign the objective function in the required form, and call `optimize`
 
 ```{julia}
 function StatsAPI.fit!(m::BernoulliGLM{T}) where {T}
@@ -385,7 +394,7 @@ Each evaluation of the deviance is fast, requiring only a fraction of a millisec
   (m = com05fe; β = βopt)
 ```
 
-but the already large number of evaluations for six coefficients would not scale well as this dimension increases.
+but the already large number of evaluations for these six coefficients would not scale well as this dimension increases.
 
 Fortunately there is an algorithm, called *iteratively reweighted least squares* (IRLS), that uses the special structure of the GLM to provide fast and stable convergence to estimates of the coefficients, even for models with a large number of coefficients.
 This will be important to us in fitting GLMMs where we must optimize with respect to the random effects, whose dimension can be large.
@@ -397,7 +406,7 @@ The scalar link function, $\eta=g(\mu)$, and the inverse link, $\mu=g^{-1}(\eta)
 
 For operations like determining a new candidate value of $\bbbeta$, the linear predictor scale is preferred, because, on that scale, $\bbeta=\bbX\bbbeta$ is a linear function of $\bbbeta$.
 Thus it would be convenient if we could transform the response, ${\mathbf{y}}$, to the linear predictor scale where we could define a residual and use some form of minimizing a sum of squared residuals to evaluate a new coefficient vector (or, alternatively, evaluate an increment that will be added to the current coefficient vector).
-Unfortunately, a naive approach of transforming $\bby$ to the linear predictor scale won't work because the elements of ${\mathbf{y}}$ are all 0 or 1 and the logit link function maps these values to $-\infty$ and $\infty$, respectively.
+Unfortunately, a naive approach of transforming $\bby$ to the linear predictor scale won't work because the elements of ${\mathbf{y}}$ are all $0$ or $1$ and the logit link function maps these values to $-\infty$ and $\infty$, respectively.
 
 For an iterative algorithm, however, we can use a local linear approximation to the link function to define a *working residual*, from which to evaluate an increment to the coefficient vector, or a *working response*, from which we evaluate the new coefficient vector directly.
 Because the link and inverse link functions are defined component-wise we will define the approximation for scalars $y_i$, $\mu_i$, and $\eta_i$ and for the scalar link function, $g$, with the understanding that these definitions apply component-wise to the vectors.
@@ -425,7 +434,15 @@ $$
 \quad i=1,\dots,n .
 $$
 
-Thus the working weights are $w_i=\mu_i(1-\mu_i), i=1,\dots,n$.
+Thus the working weights are
+$$
+\begin{aligned}
+w_i&=\mu_i(1-\mu_i)\\
+&=\frac{1}{1+e^{-\eta_i}}\frac{e^{-\eta_i}}{1+e^{-\eta_i}}
+\end{aligned}
+,\quad i=1,\dots,n.
+$$
+
 In practice we will use the square roots of the working weights, evaluated as
 $$
 \sqrt{w_i}=\frac{\sqrt{e^{-\eta_i}}}{1+e^{-\eta_i}}=\frac{e^{-\eta_i/2}}{1+e^{-\eta_i}}\quad i=1,\dots,n .
@@ -443,15 +460,16 @@ where $\bbW$ is an $n\times n$ diagonal matrix of the working weights and $\tild
 In practice we use the square roots of the working weights, which we write as a diagonal matrix, $\bbW^{1/2}$, and a QR decomposition (@sec-matrixdecomp) of a weighted model matrix, $\bbW^{1/2}\bbX$, to solve for the updated coefficient vector from the weighted working response, $\bbW^{1/2}\tilde{\bby}$, with elements
 $$
 \begin{aligned}
-\sqrt{w_i}(\eta_i+\tilde{r}_i)&=\sqrt{w_i}\eta_i+(y_i-\mu_i)\sqrt{\mu_i(1-\mu_i)}\\
-&=\sqrt{w_i}\eta_i +\frac{y_i-\mu_i}{\sqrt{w_i}} .
-\end{aligned}
+\sqrt{w_i}(\eta_i+\tilde{r}_i)&=\sqrt{\mu_i(1-\mu_i)}(\eta_i+\tilde{r}_i)\\
+&=\sqrt{w_i}\eta_i +\frac{(y_i-\mu_i)\sqrt{\mu_i(1-\mu_i)}}{\mu_i(1-\mu_i)}\\
+&=\sqrt{w_i}\eta_i +\frac{y_i-\mu_i}{\sqrt{w_i}}
+\end{aligned},\quad i=1,\dots,n
 $$
 
 It is possible to write the IRLS algorithm using a weighted least squares fit of the working residuals on the model matrix to determine a parameter increment.
 However, in the PIRLS algorithm it is necessary to use the working response, not the working residual, so we define the IRLS algorithm in those terms too.
 
-Also, in the PIRLS algorithm we will need to allow for an *offset* when calculating the working response.
+Furthermore, in the PIRLS algorithm we will need to allow for an *offset* when calculating the working response.
 In the presence of an offset, $\bbo$, a constant vector of length $n$, the linear predictor is defined as
 $$
 \bbeta = \bbo + \bbX\bbbeta .
@@ -461,7 +479,7 @@ $$
 \tilde{\bby}=\tilde{\bbr} + \bbeta - \bbo .
 $$
 
-In a linear model there is rarely a reason for using an offset.
+For a linear model there is rarely a reason for using an offset.
 Instead we can simply subtract the constant vector, $\bbo$, from the response, $\bby$, because the response and the linear predictor are on the same scale.
 However, this is not the case for a GLM where we must deal with the effects of the constant offset on the linear predictor scale, not on the response scale.
 
@@ -476,7 +494,7 @@ We also add fields `Xqr`, in which the weighted model matrix, $\bbW^{1/2}\bbX$, 
 #| output: false
 struct BernoulliIRLS{T<:AbstractFloat}
   X::Matrix{T}
-  Xqr::Matrix{T}                # copy of X used for QR decomp
+  Xqr::Matrix{T}                # copy of X used in the QR decomp
   β::Vector{T}
   βcp::Vector{T}                # copy of previous β
   Whalf::Diagonal{T,Vector{T}}  # rtwwt as a Diagonal matrix
@@ -537,7 +555,7 @@ end
 StatsAPI.deviance(m::BernoulliIRLS) = sum(r.dev for r in m.rtbl)
 ```
 
-Next we define a mutating function, `updateβ!`, that evaluates `β` in place by weighted least squares then updates the response table.
+Next we define a mutating function, `updateβ!`, that evaluates $\bbbeta^{(k)}$, the updated coefficient vector at iteration $k$, in place by weighted least squares then updates the response table.
 
 ```{julia}
 #| output: false
@@ -561,7 +579,7 @@ com05fe = BernoulliIRLS(com05.X, com05.y)
 deviance(com05fe)
 ```
 
-The first increment
+The first IRLS iteration
 
 ```{julia}
 deviance(updateβ!(com05fe))
@@ -573,22 +591,22 @@ We create a `fit!` method to iterate to convergence.
 
 ```{julia}
 #| output: false
-function StatsAPI.fit!(m::BernoulliIRLS, β₀=m.β)
+function StatsAPI.fit!(m::BernoulliIRLS, β₀=m.β; verbose::Bool=true)
   (; X, β, βcp, ytbl, rtbl) = m
   (; y, η) = ytbl
   rtbl .= tblrow.(y, mul!(η, X, copyto!(β, β₀)))
   olddev = deviance(m)
-  @info 0, olddev         # record the deviance at initial β
-  for i in 1:1000         # perform a maximum of 1000 iterations
+  verbose && @info 0, olddev   # record the deviance at initial β
+  for i in 1:100               # perform at most 100 iterations
     newdev = deviance(updateβ!(m))
-    @info i, newdev       # record iteration number and deviance
+    verbose && @info i, newdev # iteration number and deviance
     if newdev > olddev
       @warn "failure to decrease deviance"
-      copyto!(β, βcp)     # roll back changes to β, η, and rtbl
+      copyto!(β, βcp)          # roll back changes to β, η, and rtbl
       rtbl = tblrow.(y, mul!(η, X, β))
       break
     elseif (olddev - newdev) < (1.0e-10 * olddev)
-      break               # exit loop when deviance has stabilized
+      break                    # exit loop if deviance is stable
     else
       olddev = newdev
     end
@@ -634,10 +652,10 @@ $$ {#eq-condmodeu}
 where $d(y_i,\eta_i),\,i=1,\dots,n$ are the unit deviances defined in @sec-BernoulliGLM.
 We modify the IRLS algorithm as *penalized iteratively re-weighted least squares* (PIRLS) to determine these values.
 
-As with IRLS, each iteration of the PIRLS algorithm involves using the current linear predictor, $\bbeta(\bbu)=\bbX\bbbeta+\bbZ\bbLambda_{\bbtheta}\bbu$, ($\bbbeta$ and $\bbtheta$ are assumed known and fixed, and $\bbX\bbbeta$ is an offset) to evaluate the mean, $\bbmu=\bbg^{-1}(\bbeta)$, of the conditional distribution, $(\mcY|\mcU=\bbu)$, as well as the unit deviances, $d(y_i,\eta_i)$, the square roots of the working weights on the diagonal of $\bbW^{1/2}$, and the weighted, working response, $\bbW^{1/2}\tilde{\bby}$.
+As with IRLS, each iteration of the PIRLS algorithm involves using the current linear predictor, $\bbeta(\bbu)=\bbX\bbbeta+\bbZ\bbLambda_{\bbtheta}\bbu$, ($\bbbeta$ and $\bbtheta$ are assumed known and fixed, and $\bbX\bbbeta$ is an offset) to evaluate the mean, $\bbmu=\bbg^{-1}(\bbeta)$, of the conditional distribution, $(\mcY|\mcU=\bbu)$, as well as the unit deviances, $d(y_i,\eta_i)$, the square roots of the working weights, which are on the diagonal of $\bbW^{1/2}$, and the weighted, working response, $\bbW^{1/2}\tilde{\bby}$.
 The updated spherical random effects vector, $\bbu$, is the solution to
 $$
-(\bbLambda'\bbZ'\bbW\bbZ\bbLambda+\bbI)\bbu=\bbLambda'\bbZ'\bbW\tilde{\bby} .
+(\bbLambda'\bbZ'\bbW\bbZ\bbLambda+\bbI)\bbu=\bbLambda'\bbZ'\bbW\tilde{\bby}
 $$
 and is evaluated using the Cholesky factor, $\bbL$, of $\bbLambda'\bbZ'\bbW\bbZ\bbLambda+\bbI$.
 
@@ -650,11 +668,12 @@ The matrix $\bbZ$ is displayed as
 
 ```{julia}
 com05re = only(com05.reterms)
+Int.(collect(com05re))  # Int values for compact printing
 ```
 
 but internally it is stored much more compactly because it is an
-*indicator matrix* (also called *one-hot* encoding), which means that all $Z_{i,j}\in\{0,1\}$ and in each row there is exactly non-zero element.
-The column in which this non-zero element appears is given in the `refs` property of `com05re`.
+*indicator matrix* (also called *one-hot* encoding), which means that all $Z_{i,j}\in\{0,1\}$ and in each row there is exactly one value that is one (and all the others are zero).
+The column in which the non-zero element of each row occurs is given as an integer vector in the `refs` property of `com05re`.
 
 ```{julia}
 com05re.refs'      # transpose for compact printing
@@ -667,12 +686,15 @@ We define a struct
 struct BernoulliPIRLS{T<:AbstractFloat,S<:Integer}
   X::Matrix{T}
   θβ::Vector{T}
-  ytbl::NamedTuple{
+  ytbl::NamedTuple{                     # column-table
     (:refs, :y, :η, :offset),
     Tuple{Vector{S},Vector{T},Vector{T},Vector{T}},
   }
-  utbl::NamedTuple{(:u, :ucp, :Lsqdiag),NTuple{3,Vector{T}}}
-  rtbl::Vector{
+  utbl::NamedTuple{                     # column-table
+    (:u, :u0, :Ldiag, :pdev, :pdev0, :aGHQ),
+    NTuple{6,Vector{T}},
+  }
+  rtbl::Vector{                         # row-table
     NamedTuple{(:μ, :dev, :rtwwt, :wwres, :wwresp),NTuple{5,T}},
   }
 end
@@ -687,29 +709,44 @@ function BernoulliPIRLS(
   y::Vector{T},
   refs::Vector{S},
 ) where {T<:AbstractFloat,S<:Integer}
-  n = size(X, 1)                    # number of rows of X
-  if length(y) ≠ n || !all(v -> (iszero(v) || isone(v)), y)
-    throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
-  end
-  refvals = sort!(unique(refs))     # check that refs cover 1:q
+  # use IRLS to check X and y, obtain initial β, and establish rtbl
+  irls = fit!(BernoulliIRLS(X, y); verbose=false)
+  β = irls.β
+  θβ = append!(ones(T, 1), β)       # initial θ = 1
+  η = X * β
+
+  # refs should contain all values from 1 to maximum(refs) 
+  refvals = sort!(unique(refs))
   q = length(refvals)
   if refvals ≠ 1:q
     throw(ArgumentError("sort!(unique(refs)) must be 1:$q"))
   end
-  utbl = (; u=zeros(T, q), ucp=zeros(T, q), Lsqdiag=ones(T, q))
-  irls = fit!(BernoulliIRLS(X, y))  # IRLS fit for initial β and rtbl
-  β = irls.β
-  θβ = append!(ones(T, 1), β)       # initial θ = 1
-  η = X * β
+  length(refs) == length(y) ||
+    throw(ArgumentError("lengths of y and refs aren't equal"))
+
   ytbl = (; refs, y, η, offset=copy(η))
+
+  utbl = NamedTuple(
+    nm => zeros(T, q) for
+    nm in (:u, :u0, :Ldiag, :pdev, :pdev0, :aGHQ)
+  )
   return updatetbl!(BernoulliPIRLS(X, θβ, ytbl, utbl, irls.rtbl))
 end
 ```
 
-(The reason for storing both $\bbtheta$ and $\bbbeta$ in a single vector is to provide for their simultaneous optimization with an optimizer such as those in [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl).)
+::: {.callout-note collapse="true"}
 
-The `updatetbl!` method for this type first evaluates $\bbeta$ from a "virtual" multiplication that forms $\bbZ\bbLambda_{\bbtheta}\bbu$ plus the stored `offset`, which is $\bbX\bbbeta$, then updates the rowtable from $\bby$ and $\bbeta$.
-For this model $\bbtheta$ is a one-dimensional and $\bbLambda_{\bbtheta}$ is a scalar multiple of $\bbI_q$, the identity matrix of size $q$, and the matrix multiplication by $\bbLambda_{\bbtheta}$ can be accumulated from scalar products.
+### Why are θ and β stored in a single vector?
+
+The reason for storing both $\bbtheta$ and $\bbbeta$ in a single vector is to provide for their simultaneous optimization with an optimizer such as those in [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl).
+:::
+
+The `utbl` field in a `BernoulliPIRLS` struct contains vectors named `u0`, `pdev`, `pdev0`, and `aGHQ`, in addition to `u` and `Ldiag`.
+These are not used in the PIRLS algorithm (other than for keeping a copy of the previous $\bbu$) or for optimizing Laplace's approximation to the objective.
+However, they will be used in adaptive Gauss-Hermite quadrature evaluation of the objective (@sec-aGHQ), so we keep them in the struct throughout.
+
+The `updatetbl!` method for this type first evaluates $\bbeta$ via a "virtual" multiplication that forms $\bbZ\bbLambda_{\bbtheta}\bbu$ plus the stored `offset`, which is $\bbX\bbbeta$, then updates the rowtable from $\bby$, $\bbeta$, and the offset.
+For this model $\bbtheta$ is one-dimensional and $\bbLambda_{\bbtheta}$ is a scalar multiple of $\bbI_q$, the identity matrix of size $q$, and thus the matrix multiplication by $\bbLambda_{\bbtheta}$ can be expressed as scalar products.
 
 ```{julia}
 #| output: false
@@ -717,9 +754,9 @@ function updatetbl!(m::BernoulliPIRLS)
   (; refs, y, η, offset) = m.ytbl
   u = m.utbl.u
   θ = first(m.θβ)
-  # evaluate η = offset + ZΛu where Λ is θ * I
+  # evaluate η = offset + ZΛu where Λ is θ * I and Z is one-hot
   fill!(η, 0)
-  for i in eachindex(η, refs, offset)
+  @inbounds for i in eachindex(η, refs, offset)
     η[i] += offset[i] + u[refs[i]] * θ
   end
   m.rtbl .= tblrow.(y, η, offset)
@@ -737,383 +774,628 @@ end
 ```
 
 The `updateu!` method is similar to `updateβ!` for the `BernoulliIRLS` type except that it is based on the diagonal matrix $\bbLambda'\bbZ'\bbW\bbZ\bbLambda + \bbI$.
-Only the diagonal elements of this matrix are constructed and stored in the vector `Lsqdiag`.
+Only the diagonal elements of this matrix are constructed and used to solve for the updated $\bbu$ vector.
+At convergence of the PIRLS algorithm the elements of `Ldiag` are replaced by their square roots.
 
 ```{julia}
 #| output: false
 function updateu!(m::BernoulliPIRLS)
-  (; u, ucp, Lsqdiag) = m.utbl
-  copyto!(ucp, u)              # keep a copy of u
-  θ = first(m.θβ)              # extract the scalar θ
-  fill!(Lsqdiag, 0)
+  (; u, u0, Ldiag) = m.utbl
+  copyto!(u0, u)              # keep a copy of u
+  θ = first(m.θβ)             # extract the scalar θ
   fill!(u, 0)
-  for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
-    rtWΛ = θ * ti.rtwwt        # non-zero in i'th row of √WZΛ 
-    Lsqdiag[ri] += abs2(rtWΛ)  # accumulate Λ'Z'WZΛ
-    u[ri] += rtWΛ * ti.wwresp  # accumulate Λ'Z'√W η̃
+  if iszero(θ)                # skip the update if θ == 0
+    fill!(Ldiag, 1)           # L is the identity if θ == 0
+    return updatetbl!(m)
   end
-  Lsqdiag .+= 1                # diagonal of Λ'Z'WZΛ + I
-  u ./= Lsqdiag                # solve for u with L'L
-  return updatetbl!(m)         # and update η and rtbl
+  fill!(Ldiag, 0)
+  @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
+    rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ 
+    Ldiag[ri] += abs2(rtWΛ)   # accumulate Λ'Z'WZΛ
+    u[ri] += rtWΛ * ti.wwresp # accumulate Λ'Z'Wỹ
+  end
+  Ldiag .+= 1                 # form diagonal of Λ'Z'WZΛ + I = LL'
+  u ./= Ldiag                 # solve for u with diagonal LL'
+  return updatetbl!(m)        # and update η and rtbl
 end
 ```
 
-Create and optimize an `BernoulliPIRLS` struct for the `com05` model.
+Create a `BernoulliPIRLS` struct for the `com05` model and check the penalized deviance at the initial values
 
 ```{julia}
 m = BernoulliPIRLS(com05.X, com05.y, only(com05.reterms).refs)
 pdeviance(m)
 ```
 
+As with IRLS, the first iteration of PIRLS reduces the objective, which is the penalized deviance in this case, substantially.
+
 ```{julia}
-for i in 1:6
-  @info i, pdeviance(updateu!(m))
+pdeviance(updateu!(m))
+```
+
+Create a `pirls!` method for this struct.
+
+```{julia}
+#| output: false
+function pirls!(m::BernoulliPIRLS; verbose::Bool=false)
+  (; u, u0, Ldiag) = m.utbl
+  fill!(u, 0)                  # start from u == 0
+  copyto!(u0, u)               # keep a copy of u
+  oldpdev = pdeviance(updatetbl!(m))
+  verbose && @info 0, oldpdev
+  for i in 1:10                # maximum of 10 PIRLS iterations
+    newpdev = pdeviance(updateu!(m))
+    verbose && @info i, newpdev
+    if newpdev > oldpdev       # PIRLS iteration failed
+      @warn "PIRLS iteration did not reduce penalized deviance"
+      copyto!(u, u0)           # restore previous u
+      updatetbl!(m)            # restore η and rtbl
+      break
+    elseif (oldpdev - newpdev) < (1.0e-8 * oldpdev)
+      copyto!(u0, u)           # keep a copy of u
+      break
+    else
+      copyto!(u0, u)           # keep a copy of u
+      oldpdev = newpdev
+    end
+  end
+  map!(sqrt, Ldiag, Ldiag)     # replace diag(LL') by diag(L)
+  return m
 end
 ```
 
-As with IRLS, PIRLS is a fast and stable algorithm for determining the modes of the conditional distribution $(\mcU|\mcY=\bby)$ with $\bbtheta$ and $\bbbeta$ held fixed.
-
-Calls to `updateu!` are even faster than calls to `updateβ!` in this example
+The PIRLS iterations always start from $\bbu=\mathbf{0}$ so that the converged value of the penalized deviance is reproducible for given values of $\theta$ and $\bbbeta$.
+If we allowed the algorithm to start at whatever values are currently stored in $\bbu$ then there could be slight differences in the value of the penalized deviance at convergence of PIRLS, which can cause problems when trying to optimize with respect to $\theta$ and $\bbbeta$.
 
 ```{julia}
-@benchmark pdeviance(updateu!(mm)) seconds = 1 setup = (mm = m)
+pirls!(m; verbose=true);
 ```
 
-because most of the time in `updateβ!` is spent in the QR factorization to solve the weighted least squares problem, and for `updateu!` we can take advantage of the fact that the penalized, weighted least squares problem is determined by a diagonal matrix.
+As with IRLS, PIRLS is a fast and stable algorithm for determining the mode of the conditional distribution $(\mcU|\mcY=\bby)$ with $\bbtheta$ and $\bbbeta$ held fixed.
 
-### Approximating the objective at the conditional modes
+```{julia}
+@benchmark pirls!(mm) seconds = 1 setup = (mm = m)
+```
 
-The purpose of determining the modes of the conditional distribution, $(\mcU|\mcY=\bby)$ is to be able to evaluate the likelihood, which can be written as in @eq-likelihood-abstract
+The time taken for the four iterations to determine the conditional mode of $\bbu$ is comparable to the time taken for a single call to `updateβ!`.
+Most of the time in `updateβ!` is spent in the QR factorization to solve the weighted least squares problem, whereas in `updateu!`and thus in `pirls!`, we take advantage of the fact that the solution of the penalized, weighted least squares problem is based on a diagonal matrix.
+
+## Laplace's approximation to the log-likelihood {#sec-GLMMLaplace}
+
+The PIRLS algorithm determines the value of $\bbu$ that minimizes the penalized deviance
 $$
-L(\bbtheta,\bbbeta|\bby) = \int_\mathbf{u} f_{\mcY,\mcU}(\bby,\mathbf{u})\, d\mathbf{u} ,
-$$ {#eq-likelihood-as-scaling-factor}
-although the interpretation of this expression is somewhat different.
+\tilde{\bbu}=\arg\min_{\bbu}\left(\left\|\bbu\right\|^2+\sum_{i=1}^n d(y_i,\eta_i)\right) ,
+$$
+where $\eta_i, i=1,\dots,n$ is the $i$th component of $\bbeta=\bbX\bbbeta+\bbZ\bbLambda\bbu$.
+A quadratic approximation to the penalized deviance at $\tilde{\bbu}$ is
+$$
+\begin{aligned}
+\tilde{d}(\bby,\bbu)&=\|\bbu\|^2+\sum_{i=1}^n d(y_i,\eta_i)\\
+&\approx\|\tilde{\bbu}\|^2+\sum_{i=1}^n d(y_i,\tilde{\eta}_i)+
+(\bbu-\tilde{\bbu})'(\bbLambda'\bbZ'\bbW\bbZ\bbLambda+\bbI)(\bbu-\tilde{\bbu})\\
+&=\|\tilde{\bbu}\|^2+\sum_{i=1}^n d(y_i,\tilde{\eta}_i)+
+(\bbu-\tilde{\bbu})'\bbL\bbL'(\bbu-\tilde{\bbu})\\
+&=\tilde{d}(\bby,\tilde{\bbu})+
+(\bbu-\tilde{\bbu})'\bbL\bbL'(\bbu-\tilde{\bbu})
+\end{aligned}
+$$ {#eq-pdevquad}
+where $\bbL$ is the lower Cholesky factor of $\bbLambda'\bbZ'\bbW\bbZ\bbLambda+\bbI$.
+(In @eq-pdevquad the linear term in $(\bbu-\tilde{\bbu})$ that would normally occur in such an expression is omitted because the gradient of $\tilde{d}(\bby,\bbu)$ is zero at $\tilde{\bbu}$.)
 
-For a LMM both $\mcY$ and $\mcU$ are continuous random variables and @eq-likelihood-abstract is the integral of their joint density, $f_{\mcY,\mcU}(\bby,\mathbf{u})$, with respect to $\bbu$ for $\bby$ fixed at the observed response vector.
-In the case of a GLMM $\mcU$ is a continuous random variable but $\mcY$ can be discrete, and the concept of a "joint density" is a bit more complicated.
-However, for our purposes $\bby$ is fixed at the observed response vector so the integrand in @eq-likelihood-as-scaling-factor is a continuous function of $\bbu$.
+[Laplace's approximation](https://en.wikipedia.org/wiki/Laplace%27s_approximation) to the log-likelihood uses this quadratic approximation to the penalized deviance, which is negative one-half the logarithm of the integrand, to approximate the value of the integral.
 
-In fact, the integrand in @eq-likelihood-as-scaling-factor is the density of the conditional distribution, $(\mcU|\mcY=\bby)$, up to a constant scale factor, and the scale factor is the inverse of that integral.
-We will refer to the integrand as the *unscaled conditional density*.
+On the deviance scale, which is negative twice the log-likelihood, the approximation is
+$$
+\begin{aligned}
+-2\,\ell(\bbu|\bby,\bbtheta,\bbbeta)&=-2\,\log\left(L(\bbu|\bby,\bbtheta,\bbbeta)\right)\\
+&=-2\,\log\left(\int_{\bbu}\frac{1}{\sqrt{2\pi}^q}\exp\left(\frac{\left\|\bbu\right\|^2+\sum_{i=1}^n d(y_i,\mu_i)}{-2}\right)\,d\bbu\right)\\
+&\approx\tilde{d}(\bby,\tilde{\bbu})-2\,\log\left(
+\int_\bbu\frac{1}{\sqrt{2\pi}^q}\exp\left(\frac{[\bbu-\tilde{\bbu}]'\bbL\bbL'[\bbu-\tilde{\bbu}]}{-2}\right)\,d\bbu
+\right)\\
+&=\tilde{d}(\bby,\tilde{\bbu})-2\,\log\left(
+\int_\bbu\frac{1}{\sqrt{2\pi}^q}\exp\left(\frac{\left\|\bbL'[\bbu-\tilde{\bbu}\right\|^2}{-2}\right)\,d\bbu
+\right)\\
+&=\tilde{d}(\bby,\tilde{\bbu})-2\,\log\left(|\bbL|^{-1}\right)\\
+&=\tilde{d}(\bby,\tilde{\bbu})+\log\left(|\bbL|^2\right)
+\end{aligned}
+$$
 
-In the case of a GLMM it can be awkward to describe what the "joint density", $f_{\mcY,\mcU}$, is, because $\mcY$ can be a discrete random variable whereas $\mcU$ is continuous.
-(There are ways of doing this but they are beyond the scope of this appendix.)
-However, we don't need to be concerned about the exact interpretation of the dependence of this integral on $\bby$ because it is fixed at the observed values of the response.
+```{julia}
+#| output: false
+function laplaceapprox(m::BernoulliPIRLS)
+  return pdeviance(m) + 2 * sum(log, m.utbl.Ldiag)
+end
+```
 
-For our purposes we regard the integrand as an *unscaled density* of the conditional distribution $(\mcU|\mcY=\bby)$.
-In fact
+```{julia}
+laplaceapprox(pirls!(m))
+```
 
-## Normalized Gauss-Hermite Quadrature {#sec-aGHQ}
+The remaining step is to optimize Laplace's approximation to the GLMM deviance with respect to $\theta$ and $\bbbeta$, which we do using the BOBYQA optimizer from [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl)
+
+```{julia}
+#| output: false
+function StatsAPI.fit!(m::BernoulliPIRLS)
+  θβ = m.θβ
+  pp1 = length(θβ)                # length(β) = p and length(θ) = 1
+  opt = Opt(:LN_BOBYQA, pp1)
+  mβ = view(θβ, 2:pp1)
+  function obj(x, g)
+    if !isempty(g)
+      throw(ArgumentError("gradient not provided, g must be empty"))
+    end
+    copyto!(θβ, x)
+    mul!(m.ytbl.offset, m.X, mβ)
+    return laplaceapprox(pirls!(m))
+  end
+  opt.min_objective = obj
+  lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
+  lb[1] = 0                       # scalar θ must be non-negative
+  NLopt.lower_bounds!(opt, lb)
+  minf, minx, ret = optimize(opt, copy(θβ))
+  @info (; ret, fevals=opt.numevals, minf)
+  return m
+end
+```
+
+```{julia}
+fit!(m);
+```
+
+```{julia}
+#| code-fold: true
+println("Converged to θ = ", first(m.θβ), " and β =")
+showcompact(view(m.θβ, 2:lastindex(m.θβ)))
+```
+
+These estimates differ somewhat from those for model `com05`.
+
+```{julia}
+#| code-fold: true
+println(
+  "Estimates for com05: θ = ",
+  only(com05.θ),
+  ", fmin = ",
+  deviance(com05),
+  ", and β =",
+)
+showcompact(com05.β)
+```
+
+The discrepancy in the results is because the `com05` results are based on a more accurate approximation to the integral called *adaptive Gauss-Hermite Quadrature*, which is discussed in @sec-aGHQ.
+
+### Generalizations to more complex structure
+
+There is an implicit assumption in the `BernoulliPIRLS` structure that random effects in the model are simple, scalar random effects associated with a single grouping factor, which is represented by `m.ytbl.refs`.
+For such models the random effects model matrix, $\bbZ$, is an $n\times q$ indicator matrix, the covariance parameter, $\bbtheta$, is one-dimensional and the covariance factor, $\bbLambda_{\bbtheta}=\theta\,\bbI_q$ is a scalar multiple of the $q\times q$ identity matrix, $\bbI_q$.
+Furthermore, $\bbLambda_{\bbtheta}'\bbZ'\bbW\bbZ\bbLambda_{\bbtheta}+\bbI_q$ is also diagonal, as is its Cholesky factor, $\bbL$.
+
+We have taken advantage of the special structure of these matrices both in representations --- storing $\bbL$ by storing only the diagonal values in the vector `m.utbl.Ldiag` --- and in some algorithms for the PIRLS iterative step.
+
+The PIRLS algorithm to determine the conditional mode, $\tilde{\bbu}$, of the random effects, $\mcU$, and Laplace's approximation to the log-likelihood for GLMMs can be generalized to models with vector-valued random effects, or with random effects associated with more than one grouping factor, or with both.
+The more general representation of $\bbZ$ and $\bbL$ used with linear mixed models can be adapted for GLMMs as well.
+
+We chose to specialize the representation of GLMMs in this appendix to this specific type of random effects to be able to demonstrate adaptive Gauss-Hermite quadrature in @sec-aGHQ, which, at present, is restricted to models with a single, simple, scalar, random effects term.
+
+## Adaptive Gauss-Hermite quadrature {#sec-aGHQ}
+
+Recall from @eq-pdevquad that Laplace's approximation to the likelihood is based on a quadratic approximation to the penalized (GLM) deviance, $\tilde{d}(\bby,\bbu)$, at the conditional mode $\tilde{\bbu}$.
+In the case of a model with a single, scalar, random effects term, like the model `com05`, each linear predictor value, $\eta_i,\,i=1,\dots,n$ depends on only one element of $\bbu$.
+Writing the set of indices $i$ for which `refs[i] == j` as $\mcI(j)$, we can express the penalized deviance, and its quadratic approximation, as sums of scalar contributions,
+$$
+\begin{aligned}
+\tilde{d}(\bby,\bbu)&=\|\bbu\|^2+\sum_{i=1}^n d(y_i,\mu_i)\\
+&=\sum_{j=1}^q\left(u_j^2+\sum_{i\in\mcI(j)}d(y_i,\mu_i)\right)\\
+&\approx\sum_{j=1}^q \left(\tilde{u}_j^2+\sum_{i\in\mcI(j)}\left(d(y_i,\tilde{\mu}_i)+\ell_j^2(u_j-\tilde{u}_j)^2\right)\right)
+\end{aligned}
+$$
+where $\ell_j$ is the $j$th diagonal element of $\bbL$ and $\tilde{\mu}_i$ is the value of $\mu_i$ when $u_j=\tilde{u}_j$.
+
+Extending the notation of @eq-pdevquad we write the contribution from $u_j$ to the penalized (GLM) deviance, and to its quadratic approximation, as
+$$
+\begin{aligned}
+\tilde{d}_j(u_j)&= u_j+\sum_{i\in\mcI(j)}d(y_i,\mu_i)\\
+&\approx \tilde{u_j} + \sum_{i\in\mcI(j)}\left(d(y_i,\tilde{\mu}_i)+\ell_j^2(u_j-\tilde{u}_j)\right)\\
+&=\tilde{d}_j(\tilde{u}_j)+\ell_j^2(u_j-\tilde{u}_j)\quad j=1,\dots,q ,
+\end{aligned}
+$$
+giving Laplace's approximation to the scalar integral defining the contribution of $u_j$ to negative twice the log-likelihood as
+$$
+\begin{aligned}
+-2\log\int_{u_j}\frac{e^{-\tilde{d}_j(u_j)/2}}{\sqrt{2\pi}}\,du_j&\approx
+-2\log\int_{u_j}\frac{e^{\left((-\tilde{d}_j(\tilde{u_j})-\ell_j^2(u_j-\tilde{u}_j)^2)/2\right)}}{\sqrt{2\pi}}\,du_j\\
+&=\tilde{d}_j(\tilde{u}_j)-2\log\int_{u_j}\frac{e^{-\ell_j^2(u_j-\tilde{u}_j)/2}}{\sqrt{2\pi}}\,du_j\\
+&=\tilde{d}_j(\tilde{u}_j)-2\log\int_{z_j}\frac{e^{-z_j^2/2}}{\sqrt{2\pi}}\,\frac{dz_j}{\ell_j}\\
+&=\tilde{d}_j(\tilde{u}_j)+2\log(\ell_j)-2\log\int_{z_j}\frac{e^{-z_j^2/2}}{\sqrt{2\pi}}\,dz_j\\
+&=\tilde{d}_j(\tilde{u}_j)+2\log(\ell_j)-2\log(1)\\
+&=\tilde{d}_j(\tilde{u}_j)+2\log(\ell_j)
+\end{aligned}
+$$ {#eq-scalarlaplace}
+using the change of variable
+$$
+z_j=\ell_j(u_j-\tilde{u}_j)\quad j=1,\dots,q
+$$ {#eq-ujtozj}
+with inverse
+$$
+u_j=\frac{z_j}{\ell_j}+\tilde{u}_j\quad j=1,\dots,q
+$$ {#eq-zjtouj}
+and derivative
+$$
+\frac{du_j}{dz_j}=\frac{1}{\ell_j} .
+$$
+
+The change of variable @eq-ujtozj allows us to express the contribution from $u_j$ to Laplace's approximation as a constant, $\tilde{d}_j(\tilde{u}_j)$, plus the integral of a multiple, $1/\ell_j$, of the density of a standard normal distribution
+$$
+\phi(z)=\frac{e^{-z^2/2}}{\sqrt{2\pi}} .
+$$
+
+The $K$th-order normalized Gauss-Hermite quadrature rule allows us to extend this approach to evaluate integrals of the form
+$$
+\int_z f(z)\frac{e^{-z^2/2}}{\sqrt{2\pi}}\, dz \approx \sum_{k=1}^K w_k f(z_k)
+$$ {#eq-normalizedGaussHermite}
+where the weights, $w_k,\,k=1,\dots,K$, and the absiccae, $z_k,\,k=1,\dots,K$ are evaluated as described in @sec-NGHQ.
+The approximation @eq-normalizedGaussHermite is exact when $f(z)$ is a polynomial of order $2K-1$ or less.
+
+We will apply a rule like @eq-normalizedGaussHermite where $f$ is the exponential of negative half the difference between the penalized deviance, $\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)$, and its quadratic approximation at the conditional mode, $\tilde{u}_j$.
+That is, we will center the standard normal density at the conditional mode, $\tilde{u}_j,\,j=1,\dots,q$, and scale it by the inverse of the quadratic term, $\ell_j,\,j=1,\dots,q$, in the quadratic approximation at that value of $u$.
+This is said to be an *adaptive* quadrature rule because we are shifting and scaling the evaluation points according to the current conditions in the iterative algorithm.
+
+In other words we will first apply PIRLS to determine the conditional modes and the quadratic terms, then use a normalized Gauss-Hermite quadrature rule.
+
+### Normalized Gauss-Hermite quadrature rules {#sec-NGHQ}
 
 [*Gaussian Quadrature rules*](https://en.wikipedia.org/wiki/Gaussian_quadrature) provide sets of `x` values, called *abscissae*, and corresponding weights, `w`, to approximate an integral with respect to a *weight function*, $g(x)$.
-For a `k`th order rule the approximation is
+For a $K$th order rule the approximation is
 $$
-\int f(x)g(x)\,dx \approx \sum_{i=1}^k w_i f(x_i)
+\int f(x)g(x)\,dx \approx \sum_{k=1}^K w_k f(x_k)
 $$
 
-For the *Gauss-Hermite* rule the weight function is
+For the [Gauss-Hermite](https://en.wikipedia.org/wiki/Gauss%E2%80%93Hermite_quadrature) rule the weight function is
 $$
 g(x) = e^{-x^2}
 $$
 and the domain of integration is $(-\infty, \infty)$. A slight variation of this is the *normalized Gauss-Hermite* rule for which the weight function is the standard normal density
 $$
-g(z) = \phi(z) = \frac{e^{-z^2/2}}{\sqrt{2\pi}}
+g(z) = \phi(z) = \frac{e^{-z^2/2}}{\sqrt{2\pi}} .
 $$
 
 Thus, the expected value of $f(z)$, where $\mathcal{Z}\sim\mathscr{N}(0,1)$, is approximated as
 $$
-\mathbb{E}[f]=\int_{-\infty}^{\infty} f(z) \phi(z)\,dz\approx\sum_{i=1}^k w_i\,f(z_i) .
+\mathbb{E}[f]=\int_{-\infty}^{\infty} f(z) \phi(z)\,dz\approx\sum_{k=1}^K w_k\,f(z_k) .
 $$
 
 Naturally, there is a caveat.
 For the approximation to be accurate the function $f(z)$ must behave like a low-order polynomial over the range of interest.
-More formally, a `k`th order rule is exact when `f` is a polynomial of order `2k-1` or less. \[\^1\]
+More formally, a $K$th order rule is exact when $f$ is a polynomial of order $2K-1$ or less.
 
-## Evaluating the weights and abscissae
+#### Evaluating the weights and abscissae
 
 In the [*Golub-Welsch algorithm*](https://en.wikipedia.org/wiki/Gaussian_quadrature#The_Golub-Welsch_algorithm) the abscissae for a particular Gaussian quadrature rule are determined as the eigenvalues of a symmetric tri-diagonal matrix and the weights are derived from the squares of the first row of the matrix of eigenvectors.
-For a `k`th order normalized Gauss-Hermite rule the tridiagonal matrix has zeros on the diagonal and the square roots of `1:k-1` on the super- and sub-diagonal, e.g.
+For a $K$th order normalized Gauss-Hermite rule the tridiagonal matrix has zeros on the diagonal and the square roots of `1:k-1` on the super- and sub-diagonal, e.g.
 
 ```{julia}
-using FreqTables, MixedModels, LinearAlgebra
-sym3 = SymTridiagonal(zeros(3), sqrt.(1:2))
-ev = eigen(sym3);
-ev.values
+sym5 = SymTridiagonal(zeros(5), sqrt.(1:4))
 ```
 
 ```{julia}
-abs2.(ev.vectors[1, :])
+ev = eigen(sym5);
+showcompact(ev.values)
 ```
 
-As a function of `k` this can be written as
+```{julia}
+showcompact(abs2.(ev.vectors[1, :]))
+```
+
+A function of `k` to evaluate the abscissae and weights is
 
 ```{julia}
 #| output: false
 function gausshermitenorm(k)
   ev = eigen(SymTridiagonal(zeros(k), sqrt.(1:(k - 1))))
-  return ev.values, abs2.(ev.vectors[1, :])
+  return Table((;
+    abscissae=ev.values,
+    weights=abs2.(ev.vectors[1, :]),
+  ))
 end
 ```
 
 providing
 
 ```{julia}
-gausshermitenorm(3)
+gausshermitenorm(5)
 ```
 
-The weights and positions are often shown as a *lollipop plot*. For the 9th order rule these are
+The weights and positions for the 9th order rule are shown in @fig-ghnine.
 
 ```{julia}
-#| eval: false
-gh9 = gausshermitenorm(9)
-plot(
-  x=gh9[1],
-  y=gh9[2],
-  Geom.hair,
-  Geom.point,
-  Guide.ylabel("Weight"),
-  Guide.xlabel(""),
+#| code-fold: true
+#| fig-cap: Weights and positions for the 9th order normalized Gauss-Hermite quadrature rule
+#| label: fig-ghnine
+draw(
+  data(gausshermitenorm(9)) *
+  mapping(:abscissae => "Positions", :weights),
 )
 ```
 
-Notice that the magnitudes of the weights drop quite dramatically away from zero, even on a logarithmic scale
+Notice that the magnitudes of the weights drop quite dramatically away from zero, even on a logarithmic scale (@fig-ghninelog)
 
 ```{julia}
-#| eval: false
-plot(
-  x=gh9[1],
-  y=gh9[2],
-  Geom.hair,
-  Geom.point,
-  Scale.y_log2,
-  Guide.ylabel("Weight (log scale)"),
-  Guide.xlabel(""),
+#| code-fold: true
+#| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
+#| label: fig-ghninelog
+draw(
+  data(gausshermitenorm(9)) * mapping(
+    :abscissae => "Positions",
+    :weights => log2 => "log₂(weight)",
+  ),
 )
 ```
 
-The definition of `MixedModels.GHnorm` is similar to the `gausshermitenorm` function with some extra provisions for ensuring symmetry of the abscissae and the weights and for caching values once they have been calculated.
+The definition of `MixedModels.GHnorm` is similar to the `gausshermitenorm` function with some extra provisions for ensuring symmetry of the abscissae and of the weights and for caching values once they have been calculated.
 
 ```{julia}
-GHnorm(3)
+let tbl = GHnorm(9)
+  Table(abscissae=tbl.z, weights=tbl.w)
+end
 ```
 
-By the properties of the normal distribution, when $\mathcal{X}\sim\mathscr{N}(\mu, \sigma^2)$ $$
+In particular, when $K$ is odd the middle abscissa, at index $(K+1)/2$, is exactly zero.
+
+As an example of evaluation using these weights and abscissae, we consider
+$$
 \mathbb{E}[g(x)] \approx \sum_{i=1}^k g(\mu + \sigma z_i)\,w_i
 $$
+where $\mathcal{X}\sim\mathscr{N}(\mu, \sigma^2)$.
 
 For example, $\mathbb{E}[\mathcal{X}^2]$ where $\mathcal{X}\sim\mathcal{N}(2, 3^2)$ is
 
 ```{julia}
-μ = 2;
-σ = 3;
-ghn3 = GHnorm(3);
-sum(@. ghn3.w * abs2(μ + σ * ghn3.z))  # should be μ² + σ² = 13
-```
-
-(In general a dot, '`.`', after the function name in a function call, as in `abs2.(...)`, or before an operator creates a [*fused vectorized*](https://docs.julialang.org/en/stable/manual/performance-tips/#More-dots:-Fuse-vectorized-operations-1) evaluation in Julia. The macro `@.` has the effect of vectorizing all operations in the subsequent expression.)
-
-## Application to a model for contraception use
-
-A *binary response* is a "Yes"/"No" type of answer. For example, in a 1989 fertility survey of women in Bangladesh (reported in [Huq, N. M. and Cleland, J., 1990](https://www.popline.org/node/371841)) one response of interest was whether the woman used artificial contraception. Several covariates were recorded including the woman's age (centered at the mean), the number of live children the woman has had (in 4 categories: 0, 1, 2, and 3 or more), whether she lived in an urban setting, and the district in which she lived. The version of the data used here is that used in review of multilevel modeling software conducted by the Center for Multilevel Modelling, currently at University of Bristol (http://www.bristol.ac.uk/cmm/learning/mmsoftware/data-rev.html). These data are available as the `:contra` dataset.
-
-A smoothed scatterplot of contraception use versus age
-
-```{julia}
-#| eval: false
-plot(
-  contra,
-  x=:age,
-  y=:use,
-  Geom.smooth,
-  Guide.xlabel("Centered age (yr)"),
-  Guide.ylabel("Contraception use"),
-)
-```
-
-shows that the proportion of women using artificial contraception is approximately quadratic in age.
-
-For a model such as `com05`, which has a single, scalar random-effects term, the unscaled conditional density of the spherical random effects variable, $\mathcal{U}$, given the observed data, $\mcY=\mathbf{y}_0$, can be expressed as a product of scalar density functions, $f_i(u_i),\; i=1,\dots,q$. In the PIRLS algorithm, which determines the conditional mode vector, $\tilde{\mathbf{u}}$, the optimization is performed on the *deviance scale*, $$
-D(\mathbf{u})=-2\sum_{i=1}^q \log(f_i(u_i))
-$$ The objective, $D$, consists of two parts: the sum of the (squared) *deviance residuals*, measuring fidelity to the data, and the squared length of $\mathbf{u}$, which is the penalty. In the PIRLS algorithm, only the sum of these components is needed. To use Gauss-Hermite quadrature the contributions of each of the $u_i,\;i=1,\dots,q$ should be separately evaluated.
-
-```{julia}
-const devc0 = map!(abs2, com05.devc0, com05.u[1]);  # start with uᵢ²
-const devresidv = com05.resp.devresid;   # n-dimensional vector of deviance residuals
-const refs = only(com05.LMM.reterms).refs;  # n-dimensional vector of indices in 1:q
-for (dr, i) in zip(devresidv, refs)
-  devc0[i] += dr
+let μ = 2, σ = 3, ghn3 = GHnorm(3)
+  sum(@. ghn3.w * abs2(μ + σ * ghn3.z))  # should be μ² + σ² = 13
 end
 ```
 
-One thing to notice is that, even on the deviance scale, the contributions of different districts can be of different magnitudes. This is primarily due to different sample sizes in the different districts.
+(In general a dot, '`.`', after the function name in a function call, as in `abs2.(...)`, or before an operator creates a [*fused vectorized*](https://docs.julialang.org/en/v1/manual/performance-tips/#More-dots:-Fuse-vectorized-operations)
+evaluation in Julia. The macro `@.` has the effect of vectorizing all operations in the subsequent expression.)
+
+### Illustration of contributions to the objective
+
+We have provided a `pdev` vector in the `utbl` field of a `BernoulliPIRLS` object to allow for accumulation of the penalized deviance contributions for each component of $\bbu$ in the model.
 
 ```{julia}
-freqtable(contra, :dist)'
-```
-
-Because the first district has one of the largest sample sizes and the third district has the smallest sample size, these two will be used for illustration. For a range of $u$ values, evaluate the individual components of the deviance and store them in a matrix.
-
-```{julia}
-const devc = com05.devc;
-const xvals = -5.0:(2.0^(-4)):5.0;
-const uv = vec(com05.u[1]);
-const u₀ = vec(com05.u₀[1]);
-results = zeros(length(devc0), length(xvals))
-for (j, u) in enumerate(xvals)
-  fill!(devc, abs2(u))
-  fill!(uv, u)
-  MixedModels.updateη!(com05)
-  for (dr, i) in zip(devresidv, refs)
-    devc[i] += dr
+#| output: false
+function pdevcomps!(m::BernoulliPIRLS)
+  (; u, pdev) = m.utbl
+  pdev .= abs2.(u)        # initialize pdevj to square of uj
+  @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
+    pdev[ri] += ti.dev
   end
-  copyto!(view(results, :, j), devc)
+  return m
 end
 ```
 
-A plot of the deviance contribution versus $u_1$
+After PIRLS has converged, we evaluate `pdevcomps!` and copy the `pdev` column of the `utbl` field to its `pdev0` column, which will be the baseline evaluation of the penalized deviance at the conditional modes.
+Other evaluations of the penalized deviance components are plotted as differences from `pdev0`.
 
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 1, :),
-  Geom.line,
-  Guide.xlabel("u₁"),
-  Guide.ylabel("Deviance contribution"),
-)
+pdevcomps!(pirls!(m))
+copyto!(m.utbl.pdev0, m.utbl.pdev)
+Table(m.utbl)
 ```
 
-shows that the deviance contribution is very close to a quadratic. This is also true for $u_3$
+Consider the change in the penalized deviance from that at the conditional mode for a selection of groups, which, by default, we choose to be the first 5 groups.
 
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 3, :),
-  Geom.line,
-  Guide.xlabel("u₃"),
-  Guide.ylabel("Deviance contribution"),
-)
-```
-
-The PIRLS algorithm provides the locations of the minima of these scalar functions, stored as
-
-```{julia}
-com05.u₀[1]
-```
-
-the minima themselves, evaluated as `devc0` above, and a horizontal scale, which is the inverse of diagonal of the Cholesky factor. As shown below, this is an estimate of the conditional standard deviations of the components of $\mathcal{U}$.
-
-```{julia}
-using MixedModels: block
-const s = inv.(com05.LMM.L[block(1, 1)].diag);
-s'
-```
-
-The curves can be put on a common scale, corresponding to the standard normal, as
-
-```{julia}
-for (j, z) in enumerate(xvals)
-  @. uv = u₀ + z * s
-  MixedModels.updateη!(com05)
-  @. devc = abs2(uv) - devc0
-  for (dr, i) in zip(devresidv, refs)
-    devc[i] += dr
+#| output: false
+#| code-fold: show
+function pdevdiff(
+  m::BernoulliPIRLS{T};
+  zvals=collect(-3.5:inv(32):3.5),
+  inds=1:5,
+) where {T}
+  (; u, u0, Ldiag, pdev, pdev0) = m.utbl
+  pdevcomps!(pirls!(m))             # assign u0
+  copyto!(pdev0, pdev)              # and pdev0
+  ni = length(inds)
+  nz = length(zvals)
+  uvals = Array{T}(undef, ni, nz)
+  exact = Array{T}(undef, ni, nz)
+  for (j, z) in enumerate(zvals)
+    u .= u0 .+ z ./ Ldiag           # evaluate u from z
+    pdevcomps!(updatetbl!(m))       # evaluate pdev
+    for (i, ind) in enumerate(inds) # store selected u and pdev
+      uvals[i, j] = u[ind]
+      exact[i, j] = pdev[ind] - pdev0[ind]
+    end
   end
-  copyto!(view(results, :, j), devc)
+  uvals = collect(uvals')           # transpose uvals
+  exact = collect(exact')           # and exact
+  return (; zvals, inds, uvals, exact)
+end
+m05pdevdiff = pdevdiff(m);
+```
+
+We begin with plots of the difference in the penalized deviance from its value at the conditional mode, $\tilde{d}_j(u_j)-\tilde{d_j}(\tilde{u}_j)$, for $j=1,\dots,5$ in @fig-uscalepdev
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of u.
+#| label: fig-uscalepdev
+let (; zvals, inds, uvals, exact) = m05pdevdiff,
+  fig = Figure(; resolution=(800, 450)),
+  ax = Axis(
+    fig[1, 1];
+    xlabel="u",
+    ylabel="Change in penalized deviance",
+  )
+
+  lins = [
+    lines!(ax, view(uvals, :, j), view(exact, :, j)) for
+    j in axes(uvals, 2)
+  ]
+  Legend(fig[1, 2], lins, string.(inds))
+  fig
 end
 ```
 
+then shift and scale the horizontal axis to the $z$ scale for this difference in the penalized deviance (from that at the conditional mode) in @fig-zscalepdev.
+
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 1, :),
-  Geom.line,
-  Guide.xlabel("Scaled and shifted u₁"),
-  Guide.ylabel("Shifted deviance contribution"),
-)
+#| code-fold: true
+#| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of z.
+#| label: fig-zscalepdev
+let (; zvals, inds, uvals, exact) = m05pdevdiff,
+  fig = Figure(; resolution=(800, 450)),
+  ax = Axis(
+    fig[1, 1];
+    xlabel="z",
+    ylabel="Change in penalized deviance",
+  )
+
+  lins =
+    [lines!(ax, zvals, view(exact, :, j)) for j in axes(uvals, 2)]
+  Legend(fig[1, 2], lins, string.(inds))
+  fig
+end
 ```
 
+The next stage is to plot, on the $z$ scale, the difference between the penalized deviance and its quadratic approximation at $z=0$ in @fig-zpdevdiff
+
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 3, :),
-  Geom.line,
-  Guide.xlabel("Scaled and shifted u₃"),
-  Guide.ylabel("Shifted deviance contribution"),
-)
+#| code-fold: true
+#| fig-cap: The difference between the contribution to the penalized deviance and its quadratic approximation for each of first 5 groups in model com05 as a function of z.
+#| label: fig-zpdevdiff
+let (; zvals, inds, uvals, exact) = m05pdevdiff,
+  fig = Figure(; resolution=(800, 450)),
+  ax = Axis(
+    fig[1, 1];
+    xlabel="z",
+    ylabel="Penalized deviance minus quadratic approx",
+  )
+
+  lins = [
+    lines!(ax, zvals, view(exact, :, j) .- abs2.(zvals)) for
+    j in axes(uvals, 2)
+  ]
+  Legend(fig[1, 2], lins, string.(inds))
+  fig
+end
 ```
 
-On the original density scale these become
+and, finally, the exponential of negative half of this difference in @fig-zexpneghalfdiff
 
 ```{julia}
-for (j, z) in enumerate(xvals)
-  @. uv = u₀ + z * s
-  MixedModels.updateη!(com05)
-  @. devc = abs2(uv) - devc0
-  for (dr, i) in zip(devresidv, refs)
-    devc[i] += dr
+#| code-fold: true
+#| fig-cap: Exponential of half the difference between the quadratic approximation and the contribution to the penalized deviance, for each of first 5 groups in model com05 as a function of z.
+#| label: fig-zexpneghalfdiff
+let (; zvals, inds, uvals, exact) = m05pdevdiff,
+  fig = Figure(; resolution=(800, 450)),
+  ax = Axis(
+    fig[1, 1];
+    xlabel="z",
+    ylabel="Exp of half the quadratic minus penalized deviance",
+  )
+
+  lins = [
+    lines!(
+      ax,
+      zvals,
+      exp.(0.5 .* (abs2.(zvals) .- view(exact, :, j))),
+    ) for j in axes(uvals, 2)
+  ]
+  Legend(fig[1, 2], lins, string.(inds))
+  fig
+end
+```
+
+Writing the function shown in @fig-zexpneghalfdiff --- the exponential of negative half the difference between the penalized deviance and its quadratic approximation --- as
+$$
+f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde{u}_j)-z_j^2}{-2}\right)}
+\quad j=1,\dots,q
+$$
+we can modify the scalar version of Laplace's approximation, @eq-scalarlaplace, as
+$$
+\begin{multline*}
+-2\log\int_{u_j}\frac{e^{-\tilde{d}_j(u_j)/2}}{\sqrt{2\pi}}\,du_j\\
+=-2\log\int_{z_j}\frac{f_j(z_j)\,e^{-(\tilde{d}_j(\tilde{u}_j)+z_j^2)/2}}{\sqrt{2\pi}}\,\frac{dz_j}{\ell_j}\\
+=\tilde{d}_j(\tilde{u}_j)+2\log(\ell_j)-2\log\int_{z_j}f_j(z_j)\frac{e^{-z_j^2/2}}{\sqrt{2\pi}}\,dz_j
+\end{multline*}
+$$ {#eq-scalaraGHQ}
+
+A $K$th-order adaptive Gauss-Hermite quadrature approximation to the objective, negative twice the log-likelihood, for the GLMM model is Laplace's approximation minus twice the logarithm of the $K$th order normalized Gauss-Hermite quadrature rule applied to $f_j(z_j)$.
+We use the `aGHQ` column of `m.utbl` to accumulate these contributions and to take the logarithm then multiply the result by -2.
+
+```{julia}
+#| output: false
+#| code-fold: show
+function evalGHQ!(m::BernoulliPIRLS; nGHQ::Integer=9)
+  (; ytbl, utbl, rtbl) = m
+  (; u, u0, Ldiag, pdev, pdev0, aGHQ) = utbl
+  ghqtbl = GHnorm(nGHQ)
+  pdevcomps!(pirls!(m))  # ensure that u0 and pdev0 are current
+  copyto!(pdev0, pdev)
+  fill!(aGHQ, 0)
+  for (z, w) in zip(ghqtbl.z, ghqtbl.w)
+    if iszero(z)         # exp term is one when z == 0
+      aGHQ .+= w
+    else
+      u .= u0 .+ z ./ Ldiag
+      pdevcomps!(updatetbl!(m))
+      aGHQ .+= w .* exp.((abs2(z) .+ pdev0 .- pdev) ./ 2)
+    end
   end
-  copyto!(view(results, :, j), @. exp(-devc / 2))
+  map!(log, aGHQ, aGHQ)  # log.(aGHQ) in place
+  aGHQ .*= -2
+  return m
 end
 ```
 
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 1, :),
-  Geom.line,
-  Guide.xlabel("Scaled and shifted u₁"),
-  Guide.ylabel("Conditional density"),
-)
+evalGHQ!(m)
+Table(m.utbl)
 ```
 
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 3, :),
-  Geom.line,
-  Guide.xlabel("Scaled and shifted u₃"),
-  Guide.ylabel("Conditional density"),
-)
+extrema(m.utbl.aGHQ)
 ```
 
-and the function to be integrated with the normalized Gauss-Hermite rule is
+As we see, these "correction terms" relative to Laplace's approximation are relatively small, compared to the contributions to the objective from each component of $\bbu$.
+Also, the corrections are all negative, in this case.
+Close examination of the individual curves in @fig-zpdevdiff shows that these curves, which are $-2\log(f_j(z))$, are more-or-less [odd functions](https://en.wikipedia.org/wiki/Even_and_odd_functions), in the sense that the value at $-z$ is approximately the negative of the value at $z$.
+If we were integrating $\log(f_j(z_j))\phi(z_j)$ with a normalized Gauss-Hermite rule the negative and positive values would cancel out, for the most part, and some of the integrals would be positive while others would be negative.
+
+When we consider $f_j(z_j)$, shown in @fig-zexpneghalfdiff, the exponential function converts from differences to ratios and stretches positive differences more than negative differences, resulting in values slightly greater than 1 for $\int_z f_j(z)\phi(z) dz$ and, after taking negative twice the logarithm, correction terms that are slightly less than zero.
+
+## Optimization of the aGHQ objective
 
 ```{julia}
-for (j, z) in enumerate(xvals)
-  @. uv = u₀ + z * s
-  MixedModels.updateη!(com05)
-  @. devc = abs2(uv) - devc0
-  for (dr, i) in zip(devresidv, refs)
-    devc[i] += dr
+#| output: false
+function fitGHQ!(m::BernoulliPIRLS; nGHQ::Integer=9)
+  (; Ldiag, pdev0, aGHQ) = m.utbl
+  θβ = m.θβ
+  pp1 = length(θβ)                # length(β) = p and length(θ) = 1
+  opt = Opt(:LN_BOBYQA, pp1)
+  mβ = view(θβ, 2:pp1)
+  function obj(x, g)
+    if !isempty(g)
+      throw(ArgumentError("gradient not provided, g must be empty"))
+    end
+    copyto!(θβ, x)
+    mul!(m.ytbl.offset, m.X, mβ)
+    evalGHQ!(m; nGHQ)
+    return sum(pdev0) + sum(aGHQ) + 2 * sum(log, Ldiag)
   end
-  copyto!(view(results, :, j), @. exp((abs2(z) - devc) / 2))
+  opt.min_objective = obj
+  lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
+  lb[1] = 0                       # scalar θ must be non-negative
+  NLopt.lower_bounds!(opt, lb)
+  minf, minx, ret = optimize(opt, copy(θβ))
+  @info (; ret, fevals=opt.numevals, minf)
+  return m
 end
 ```
 
 ```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 1, :),
-  Geom.line,
-  Guide.xlabel("Scaled and shifted u₁"),
-  Guide.ylabel("Kernel ratio"),
-)
-```
-
-```{julia}
-#| eval: false
-plot(
-  x=xvals,
-  y=view(results, 3, :),
-  Geom.line,
-  Guide.xlabel("Scaled and shifted u₃"),
-  Guide.ylabel("Kernel ratio"),
-)
+fitGHQ!(m)
+showcompact(m.θβ)
 ```
