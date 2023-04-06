@@ -30,6 +30,8 @@ using MixedModelsMakie
 using ProgressMeter
 using StatsBase
 using StatsModels
+# XXX can remove when associated PR is merged for raneftables
+using TypedTables
 
 const contrasts = Dict{Symbol,Any}()
 const nAGQ = 9
@@ -481,7 +483,8 @@ shows that the smallest random effects are approximately -1 and the largest are 
 The numerical values and the identifier of the combination of `dist` and `urban` for these extreme values can be obtained from the first few rows and the last few rows of the sorted random-effects table.
 
 ```{julia}
-srtdre = let retbl = only(raneftables(com05))
+# XXX can remove Table() when associated PR is merged for raneftables
+srtdre = let retbl = Table(only(raneftables(com05)))
   retbl[sortperm(last.(retbl))]
 end
 first(srtdre, 6)

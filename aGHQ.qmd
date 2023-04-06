@@ -139,8 +139,10 @@ using NLopt
 using PooledArrays
 using ProgressMeter
 using StatsAPI
+# XXX can remove when associated PR is merged for raneftables
+using TypedTables
 
-# showcompact prints a vector compactly 
+# showcompact prints a vector compactly
 showcompact(x) = show(IOContext(stdout, :compact => true), x)
 
 ProgressMeter.ijulia_behavior(:clear)
@@ -715,7 +717,7 @@ function BernoulliPIRLS(
   θβ = append!(ones(T, 1), β)       # initial θ = 1
   η = X * β
 
-  # refs should contain all values from 1 to maximum(refs) 
+  # refs should contain all values from 1 to maximum(refs)
   refvals = sort!(unique(refs))
   q = length(refvals)
   if refvals ≠ 1:q
@@ -790,7 +792,7 @@ function updateu!(m::BernoulliPIRLS)
   end
   fill!(Ldiag, 0)
   @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
-    rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ 
+    rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ
     Ldiag[ri] += abs2(rtWΛ)   # accumulate Λ'Z'WZΛ
     u[ri] += rtWΛ * ti.wwresp # accumulate Λ'Z'Wỹ
   end

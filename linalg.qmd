@@ -31,6 +31,8 @@ Attach the packages to be used in this appendix
 #| code-fold: true
 using LinearAlgebra
 using MixedModels
+# XXX can remove when associated PR is merged for raneftables
+using TypedTables
 ```
 
 In this appendix we describe properties of the multivariate Gaussian (or "normal") distribution and how linear models and linear mixed models can be formulated in terms of this distribution.
