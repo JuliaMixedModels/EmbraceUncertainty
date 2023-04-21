@@ -44,12 +44,12 @@ The added value of the *LinearAlgebra* package is compact representations of spe
 
 The purpose of these descriptions is to motivate a representation of a linear mixed model that allows for fast and stable estimation of the parameters.
 The estimation process requires iterative optimization of some of the parameters in the model to minimize an objective function.
-Often this optimization requires hundreds or thousands of evaluations of the objective at different values of the parameters and the these evaluations dominate the overall estimation time.
+Often this optimization requires hundreds or thousands of evaluations of the objective at different values of the parameters and these evaluations dominate the overall estimation time.
 Thus, a fast, efficient method for evaluating the objective is crucial to making the whole process fast.
 
 ## Matrix-vector representation of linear models
 
-A linear statistical model is often written in terms of each element of the $n$-dimensional response vector, $\bby$, as, e.g.
+A linear statistical model is often written as an expression for each element of the $n$-dimensional response vector, $\bby$, as, e.g.
 $$
 y_i = \beta_1 x_{i,1} + \beta_2 x_{i,2} + \dots + \beta_p x_{i,p} + \epsilon_i, \quad i=1,\dots, n
 $$ {#eq-elementlinmod}
@@ -141,7 +141,7 @@ and so on.
 
 One point to note here is that $b_1$ is not needed after $x_1$ is evaluated, $b_2$ is not needed after $x_2$ is evaluated, and so on.
 That is, the forward solution can be carried out *in place* with each element of $\mathbf{b}$ overwriting the corresponding element of $\bbx$.
-This property is useful for avoiding allocation of storage in, for example, evaluation of objective function during optimization.
+This property is useful for avoiding allocation of storage in, for example, evaluation of an objective function during optimization.
 
 The corresponding method of solving an upper-triangular system of equations is called *backward solution*, where $b_n$ is evaluated first, then $b_{n-1}$, and so on.
 
@@ -305,7 +305,7 @@ The term *normal* in this expression comes from the fact that requiring the grad
 
 When the model matrix, $\bbX$, is of *full column rank*, which means
 $$
-\bbX\mathbf{\beta}\ne\mathbf{0}\quad\forall\bbbeta\ne\mathbf{0} ,
+\bbX\mathbf{\bbbeta}\ne\mathbf{0}\quad\forall\bbbeta\ne\mathbf{0} ,
 $$ {#eq-fullcolumnrank}
 then the quadratic form defined by $\bbX'\bbX$ is positive definite and has a Cholesky factor, say $\bbR_{XX}$, and the normal equations can be solved in two stages.
 First, solve

@@ -307,8 +307,8 @@ First we construct a table of covariate values, `newdata`, containing the *Carte
 
 ```{julia}
 newdata = Table(
-  (; age, ch, urban) for age in -10:3:20,
-  ch in [false, true], urban in ["N", "Y"]
+  (; age, ch, urban) for age in -10:3:20, ch in [false, true],
+  urban in ["N", "Y"]
 )
 ```
 

@@ -319,6 +319,7 @@ StatsAPI.deviance(m::BernoulliGLM) = sum(r.dev for r in m.rtbl)
 ```
 
 ::: {.callout-note collapse="true"}
+
 ### Why StatsAPI.deviance and not just deviance?
 
 This extractor is written as a method for the generic `deviance` function defined in the `StatsAPI` package.
