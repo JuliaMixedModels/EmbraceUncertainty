@@ -21,6 +21,7 @@ Attach the packages to be used in this chapter
 
 ```{julia}
 #| code-fold: true
+#| output: false
 using AlgebraOfGraphics
 using CairoMakie
 using DataFrames         # only used for `describe`
@@ -30,13 +31,11 @@ using MixedModelsMakie
 using ProgressMeter
 using StatsBase
 using StatsModels
-# XXX can remove when associated PR is merged for raneftables
-using TypedTables
 
 const contrasts = Dict{Symbol,Any}()
 const nAGQ = 9
 CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear);
+ProgressMeter.ijulia_behavior(:clear)
 ```
 
 In this chapter we consider mixed-effects models for data sets in which the response is *binary*, representing  yes/no or true/false or correct/incorrect responses.
@@ -483,8 +482,7 @@ shows that the smallest random effects are approximately -1 and the largest are 
 The numerical values and the identifier of the combination of `dist` and `urban` for these extreme values can be obtained from the first few rows and the last few rows of the sorted random-effects table.
 
 ```{julia}
-# XXX can remove Table() when associated PR is merged for raneftables
-srtdre = let retbl = Table(only(raneftables(com05)))
+srtdre = let retbl = only(raneftables(com05))
   retbl[sortperm(last.(retbl))]
 end
 first(srtdre, 6)

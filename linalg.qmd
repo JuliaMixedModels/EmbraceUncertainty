@@ -31,8 +31,6 @@ Attach the packages to be used in this appendix
 #| code-fold: true
 using LinearAlgebra
 using MixedModels
-# XXX can remove when associated PR is merged for raneftables
-using TypedTables
 ```
 
 In this appendix we describe properties of the multivariate Gaussian (or "normal") distribution and how linear models and linear mixed models can be formulated in terms of this distribution.
@@ -82,7 +80,7 @@ Similar constraints apply to a covariance matrix, $\bbSigma$.
 Because the covariance of the i'th and j'th elements does not depend upon the order in which we write them, $\bbSigma$ must be symmetric.
 That is,
 $$
-\bbSigma' = \bbSigma
+\bbSigma' = \bbSigma .
 $$ {#eq-Sigmasym}
 Furthermore, to define a proper multivariate density, $\bbSigma$ must be [positive definite](https://en.wikipedia.org/wiki/Definite_matrix), which means that for any non-zero vector, $\bbx$, the *quadratic form* defined by $\bbSigma$ must be positive.
 That is
@@ -244,7 +242,7 @@ f(\bby; \bbbeta, \sigma^2)&=
 $$ {#eq-linmoddensity}
 
 @eq-linmoddensity describes the density of the random variable, $\mcY$, representing the observations, given the values of the parameters, $\bbbeta$ and $\sigma^2$.
-For parameter estimation we use the *likelihood function*, which is the same expression as @eq-linmoddensity but regarded as function of the parameters, $\bbbeta$ and $\sigma^2$, with the observed response, $\bby$, fixed.
+For parameter estimation we use the *likelihood function*, which is the same expression as @eq-linmoddensity but regarded as a function of the parameters, $\bbbeta$ and $\sigma^2$, with the observed response, $\bby$, fixed.
 $$
 L(\bbbeta,\sigma^2;\bby)=
 \left(2\pi\sigma^2\right)^{-n/2}\exp\left(-\left\|\bby-\bbX\bbbeta\right\|^2/\left(2\sigma^2\right)\right)
@@ -636,7 +634,7 @@ To evaluate the likelihood for the parameters, $\bbtheta$, $\bbbeta$, and $\sigm
 
 This is much simpler if we rewrite the *penalized sum of squared residuals*, $\left\|\bby-\bbX\bbbeta
 -\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+
-\left\|\mathbf{u}\right\|^2$, from @eq-yujointdensity,  a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
+\left\|\mathbf{u}\right\|^2$, from @eq-yujointdensity, as a quadratic form in $\mathbf{u}$, to isolate the dependence on $\mathbf{u}$
 
 $$
 \begin{aligned}
@@ -657,10 +655,10 @@ r^2_\theta(\mathbf{u},\bbbeta)
 \right\|^2 \\
 &=
 \begin{bmatrix}
--\mathbf{u'} &
--\bbbeta' &
+-\mathbf{u} \\
+-\bbbeta \\
 1
-\end{bmatrix}
+\end{bmatrix} '
 \begin{bmatrix}
 \bbLambda'\mathbf{Z}'\mathbf{Z}\bbLambda+\bbI & \bbLambda'\mathbf{Z}'\bbX & \bbLambda'\mathbf{Z}'\bby \\
 \bbX'\mathbf{Z}\bbLambda & \bbX'\bbX & \bbX'\bby \\

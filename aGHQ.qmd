@@ -139,8 +139,6 @@ using NLopt
 using PooledArrays
 using ProgressMeter
 using StatsAPI
-# XXX can remove when associated PR is merged for raneftables
-using TypedTables
 
 # showcompact prints a vector compactly
 showcompact(x) = show(IOContext(stdout, :compact => true), x)
