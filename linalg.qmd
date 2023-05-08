@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.8
+jupyter: julia-1.9
 ---
 
 # Linear Algebra for Linear Models {#sec-linalg}

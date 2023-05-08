@@ -30,7 +30,7 @@ format:
   html:
     theme: cosmo
 
-jupyter: julia-1.8
+jupyter: julia-1.9
 execute:
   cache: true
   freeze: auto
