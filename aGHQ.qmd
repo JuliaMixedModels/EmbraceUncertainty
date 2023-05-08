@@ -298,7 +298,7 @@ function BernoulliGLM(
 
   # check consistency of arguments
   n = size(X, 1)                  # number of rows in X
-  if length(y) ≠ n || !all(v -> (iszero(v) || isone(v)), y)
+  if length(y) ≠ n || any(!in([0, 1]), y)
     throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
   end
 
