@@ -415,7 +415,7 @@ y\,\log\left(\frac{\mu}{1-\mu}\right) .
 $$ {#eq-BernoulliProb}
 Notice that the logit link function is the multiple of $y$ in the last term.
 
-The characteristic of distributions in the exponential family is that the logarithm of the probability mass function or probability density function, whichever is appropriate, can be expressed as a sum of up to three terms: one that involves $y$ only, one that involves the parameters only and the product of $y$ and a function of the parameters.
+The characteristic of distributions in the exponential family is that the logarithm of the probability mass function or probability density function, whichever is appropriate, can be expressed as a sum of up to three terms: one that involves $y$ only, one that involves the parameters only, and the product of $y$ and a function of the parameters.
 This function is the canonical link for the distribution.
 
 In the case of the Poisson distribution the probability function is $\frac{e^{-\mu}\mu^y}{y!}$ for $y\in\{0,1,2,\dots\}$ so the log probability function is
