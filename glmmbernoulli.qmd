@@ -364,7 +364,7 @@ This brings us to the topic of link functions.
 
 ### The logit link function for binary responses {#sec-logitlink}
 
-The probability model for a binary response is the Bernoulli distribution, which is a very simple probability distribution in that its "support" - the set of possible values of the random variable - is just `0` or `1`.
+The probability model for a binary response is the Bernoulli distribution, which is a very simple probability distribution in that its "support" --- the set of possible values of the random variable --- is just `0` or `1`.
 If the probability of the response `1` is $p$ then the probability of `0` must be $1-p$.
 It is easy to establish that the expected value is also $p$.
 For consistency across distribution families we write this expected response as $\mu$ instead of $p$.
