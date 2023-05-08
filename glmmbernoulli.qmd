@@ -135,7 +135,7 @@ contrasts[:urban] = HelmertCoding()
 contrasts[:dist] = Grouping()
 
 com01 = let
-  form = @formula(use ~ 1 + livch + age * age * urban + (1 | dist))
+  form = @formula(use ~ 1 + livch + (age + abs2(age)) * urban + (1 | dist))
   fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ)
 end
 ```
