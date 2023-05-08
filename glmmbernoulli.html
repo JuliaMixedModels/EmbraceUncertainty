@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Embrace Uncertainty - 6&nbsp; Generalized Linear Mixed Models for Binary Responses</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./largescaleobserved.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./glmmbernoulli.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Embrace Uncertainty</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multiple.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./largescaledesigned.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale designed experiment</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./largescaleobserved.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A large-scale observational study</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./glmmbernoulli.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./datatables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Working with data tables</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./linalg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./aGHQ.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">GLMM log-likelihood</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-contraception" id="toc-sec-contraception" class="nav-link active" data-scroll-target="#sec-contraception"><span class="header-section-number">6.1</span> Artificial contraception use in regions of Bangladesh</a>
+  <ul class="collapse">
+  <li><a href="#sec-plottingbinary" id="toc-sec-plottingbinary" class="nav-link" data-scroll-target="#sec-plottingbinary"><span class="header-section-number">6.1.1</span> Plotting the binary response</a></li>
+  <li><a href="#sec-contraglmm" id="toc-sec-contraglmm" class="nav-link" data-scroll-target="#sec-contraglmm"><span class="header-section-number">6.1.2</span> Initial GLMM fit to the contraception data</a></li>
+  <li><a href="#sec-contramodelbuilding" id="toc-sec-contramodelbuilding" class="nav-link" data-scroll-target="#sec-contramodelbuilding"><span class="header-section-number">6.1.3</span> Model building for the contra data</a></li>
+  </ul></li>
+  <li><a href="#sec-glmmlink" id="toc-sec-glmmlink" class="nav-link" data-scroll-target="#sec-glmmlink"><span class="header-section-number">6.2</span> Link functions and interpreting coefficients</a>
+  <ul class="collapse">
+  <li><a href="#sec-covariategrid" id="toc-sec-covariategrid" class="nav-link" data-scroll-target="#sec-covariategrid"><span class="header-section-number">6.2.1</span> Creating grids of covariate values</a></li>
+  <li><a href="#sec-logitlink" id="toc-sec-logitlink" class="nav-link" data-scroll-target="#sec-logitlink"><span class="header-section-number">6.2.2</span> The logit link function for binary responses</a></li>
+  <li><a href="#sec-canonicallink" id="toc-sec-canonicallink" class="nav-link" data-scroll-target="#sec-canonicallink"><span class="header-section-number">6.2.3</span> Canonical link functions</a></li>
+  <li><a href="#sec-GLMMcoefficients" id="toc-sec-GLMMcoefficients" class="nav-link" data-scroll-target="#sec-GLMMcoefficients"><span class="header-section-number">6.2.4</span> Interpreting coefficient estimates</a></li>
+  </ul></li>
+  <li><a href="#sec-glmmrandomeff" id="toc-sec-glmmrandomeff" class="nav-link" data-scroll-target="#sec-glmmrandomeff"><span class="header-section-number">6.3</span> Interpretation of random effects</a>
+  <ul class="collapse">
+  <li><a href="#conversion-of-random-effects-to-relative-odds" id="toc-conversion-of-random-effects-to-relative-odds" class="nav-link" data-scroll-target="#conversion-of-random-effects-to-relative-odds"><span class="header-section-number">6.3.1</span> Conversion of random effects to relative odds</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="sec-glmmbinomial" class="quarto-section-identifier"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Attach the packages to be used in this chapter</p>
+<div class="cell" data-execution_count="1">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames         </span><span class="co"># only used for `describe`</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">FreqTables</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsModels</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> contrasts <span class="op">=</span> <span class="fu">Dict</span><span class="dt">{Symbol,Any}</span>()</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> nAGQ <span class="op">=</span> <span class="fl">9</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>In this chapter we consider mixed-effects models for data sets in which the response is <em>binary</em>, representing yes/no or true/false or correct/incorrect responses.</p>
+<p>Because the response must be one of only two possible values we adapt our models to predict the probability of the positive response. As for linear models and linear mixed-effects models, the mean response, <span class="math inline">\({\boldsymbol{\mu}}\)</span>, is determined by a <em>linear predictor</em>, <span id="eq-linearpred"><span class="math display">\[
+{\boldsymbol{\eta}}={\mathbf{X}}{\boldsymbol{\beta}}+{\mathbf{Z}}{\mathbf{b}}
+\tag{6.1}\]</span></span> depending on the fixed-effects parameters, <span class="math inline">\({\boldsymbol{\beta}}\)</span>, the random effects, <span class="math inline">\({\mathbf{b}}\)</span>, and the model matrices, <span class="math inline">\({\mathbf{X}}\)</span> and <span class="math inline">\({\mathbf{Z}}\)</span>. For a linear model the mean response, <span class="math inline">\({\boldsymbol{\mu}}\)</span>, is equal to the linear predictor, <span class="math inline">\({\boldsymbol{\eta}}\)</span>. But for a generalized linear model <span class="math inline">\({\boldsymbol{\eta}}\)</span> determines <span class="math inline">\({\boldsymbol{\mu}}\)</span> according to a <em>link function</em>, <span class="math inline">\(g\)</span>. For historical reasons it is the function taking an element of <span class="math inline">\({\boldsymbol{\mu}}\)</span> to the corresponding element of <span class="math inline">\({\boldsymbol{\eta}}\)</span> that is called the link. The transformation in the opposite direction, from <span class="math inline">\({\boldsymbol{\eta}}\)</span> to <span class="math inline">\({\boldsymbol{\mu}}\)</span>, is called the <em>inverse link</em>.</p>
+<p>As in previous chapters, we will begin with an example to help illustrate these ideas.</p>
+<section id="sec-contraception" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="sec-contraception"><span class="header-section-number">6.1</span> Artificial contraception use in regions of Bangladesh</h2>
+<p>One of the test data sets from the Center for Multilevel Modelling, University of Bristol is derived from the 1989 Bangladesh Fertility Survey, <span class="citation" data-cites="huq:cleland:1990">(<a href="references.html#ref-huq:cleland:1990" role="doc-biblioref">Huq &amp; Cleland, 1990</a>)</span>. The data are a subsample of 1934 women selected from 60 of the 64 political districts or <em>zila</em>, available as the <code>contra</code> data set in the <code>MixedModels</code> package.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>contra <span class="op">=</span> <span class="fu">Table</span>(MixedModels.<span class="fu">dataset</span>(<span class="op">:</span>contra))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>Table with 5 columns and 1934 rows:
+      dist  urban  livch  age     use
+    ┌────────────────────────────────
+ 1  │ D01   Y      3+     18.44   N
+ 2  │ D01   Y      0      -5.56   N
+ 3  │ D01   Y      2      1.44    N
+ 4  │ D01   Y      3+     8.44    N
+ 5  │ D01   Y      0      -13.56  N
+ 6  │ D01   Y      0      -11.56  N
+ 7  │ D01   Y      3+     18.44   N
+ 8  │ D01   Y      3+     -3.56   N
+ 9  │ D01   Y      1      -5.56   N
+ 10 │ D01   Y      3+     1.44    N
+ 11 │ D01   Y      0      -11.56  Y
+ 12 │ D01   Y      0      -2.56   N
+ 13 │ D01   Y      1      -4.56   N
+ 14 │ D01   Y      3+     5.44    N
+ 15 │ D01   Y      3+     -0.56   N
+ 16 │ D01   Y      3+     4.44    Y
+ 17 │ D01   Y      0      -5.56   N
+ 18 │ D01   Y      3+     -0.56   Y
+ 19 │ D01   Y      1      -6.56   Y
+ 20 │ D01   Y      2      -3.56   N
+ 21 │ D01   Y      0      -4.56   N
+ 22 │ D01   Y      0      -9.56   N
+ 23 │ D01   Y      3+     2.44    N
+ ⋮  │  ⋮      ⋮      ⋮      ⋮      ⋮</code></pre>
+</div>
+</div>
+<p>with summary</p>
+<div class="cell" data-execution_count="3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="fu">DataFrame</span>(contra)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(df, <span class="op">:</span>mean, <span class="op">:</span>min, <span class="op">:</span>median, <span class="op">:</span>max, <span class="op">:</span>nunique, <span class="op">:</span>eltype)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div><div style="float: left;"><span>5×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">min</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">median</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">max</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">nunique</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">eltype</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Symbol">Symbol</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Float64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Any">Any</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Float64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Any">Any</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Int64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataType">DataType</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">dist</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">D01</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">D61</td>
+<td style="text-align: left;">60</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">urban</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">livch</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">3+</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">age</td>
+<td style="text-align: left;">0.00204757</td>
+<td style="text-align: left;">-13.56</td>
+<td style="text-align: left;">-1.56</td>
+<td style="text-align: left;">19.44</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Float64</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">use</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">String</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The response of interest is <code>use</code>, whether the woman chooses to use artificial contraception, which is a <em>binary</em> response with only two possible values, <code>N</code> and <code>Y</code>. The covariates include the district (<code>dist</code>) in which the woman resides, the number of live children she currently has (<code>livch</code>, coded as <code>0</code>, <code>1</code>, <code>2</code>, and <code>3+</code>), her <code>age</code>, and <code>urban</code>, also coded as <code>N</code> and <code>Y</code>, indicating rural or urban.</p>
+<p>Note that the mean of these <code>age</code> values is close to zero but not exactly zero. This occurs when the values have been centered about the sample mean then rounded. In this case it appears that the ages were recorded as a whole number of years and the mean was rounded to two decimal places ending in <code>.56</code>. Thus, all the negative values end in <code>.56</code> and the positive values end in <code>.44</code>. The mean of these rounded, centered values is not exactly zero because of the rounding after centering.</p>
+<p>Centering the ages allows for meaningful interpretation of intercepts and fixed effects for other covariates, because they refer to an age within the range of the observed ages. Regretably, the information on what the centering age (i.e.&nbsp;the original mean age) was does not seem to be available.</p>
+<section id="sec-plottingbinary" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="sec-plottingbinary"><span class="header-section-number">6.1.1</span> Plotting the binary response</h3>
+<p>Producing informative graphical displays of a binary response as it relates to covariates is somewhat more challenging that the corresponding plots for responses on a continuous scale. If we were to plot the 1934 responses as 0/1 values versus, for example, the woman’s centered age, we would end up with a rather uninformative plot, because all the points would fall on one of two horizontal lines, at <span class="math inline">\(y=0\)</span> and <span class="math inline">\(y=1\)</span>.</p>
+<p>One approach to illustrating the structure of the data more effectively is to add <em>scatterplot smoother</em> lines to the plot, as in <a href="#fig-contradata">Figure&nbsp;<span>6.1</span></a>,</p>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(contra) <span class="op">*</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>age <span class="op">=&gt;</span> <span class="st">"Centered age (yr)"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>use <span class="op">=&gt;</span> <span class="op">==</span>(<span class="st">"Y"</span>) <span class="op">=&gt;</span> <span class="st">"Frequency of contraceptive use"</span>;</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=:</span>urban <span class="op">=&gt;</span> <span class="fu">renamer</span>([<span class="st">"N"</span> <span class="op">=&gt;</span> <span class="st">"Rural"</span>, <span class="st">"Y"</span> <span class="op">=&gt;</span> <span class="st">"Urban"</span>]),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>livch,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">smooth</span>();</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="fig-contradata" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="glmmbernoulli_files/figure-html/fig-contradata-output-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.1: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>to show the trend in the response with respect to the covariate. Once we have the smoother lines in such a plot we can omit the data points themselves, as we did here, because they add very little information.</p>
+<p>The first thing to notice about the plot is that the proportion of women using contraception is not linear in age, which, on reflection, makes sense. A woman in the middle of this age range (probably corresponding to an age around 25) is more likely to use artificial contraception than is a girl in her early teens or a woman in her mid-forties. We also see that women in an urban setting are more likely to use contraception than those in a rural setting and that women with no live children are less likely to use contraception than are women who already have children. There do not seem to be strong differences between women who have 1, 2 or 3 or more children compared to the differences between women with children and those without children.</p>
+<p>Interestingly, the quadratic pattern with respect to age does not seem to have been noticed in other analyses of these data. Comparisons of model fits through different software systems, as provided by the Center for Multilevel Modelling, incorporate only a linear term in age, even though the pattern is clearly nonlinear. The lesson here is similar to what we have seen in other examples; careful plotting of the data should, whenever possible, precede attempts to fit models to the data.</p>
+</section>
+<section id="sec-contraglmm" class="level3" data-number="6.1.2">
+<h3 data-number="6.1.2" class="anchored" data-anchor-id="sec-contraglmm"><span class="header-section-number">6.1.2</span> Initial GLMM fit to the contraception data</h3>
+<p>Fitting a generalized linear mixed model (GLMM) is very similar to fitting a linear mixed model (LMM). We call the <code>fit</code> function with the first three arguments being the model type, <code>MixedModel</code>, then a formula specifying the response, fixed-effects terms and random-effects terms, then a data table. For GLMMs we also specify a fourth positional argument which is a distribution - in this case <code>Bernoulli()</code>.</p>
+<p>Establishing the contrasts and fitting a preliminary model with random effects for <code>dist</code>, main effects for <code>livch</code>, <code>age</code>, <code>age^2</code>, and <code>urban</code>, plus interaction terms for <code>age &amp; urban</code> and <code>age^2 &amp; urban</code> can be done as</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>livch] <span class="op">=</span> <span class="fu">EffectsCoding</span>(; base<span class="op">=</span><span class="st">"0"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>urban] <span class="op">=</span> <span class="fu">HelmertCoding</span>()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>dist] <span class="op">=</span> <span class="fu">Grouping</span>()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>com01 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(use <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> livch <span class="op">+</span> (age <span class="op">+</span> <span class="fu">abs2</span>(age)) <span class="op">*</span> urban <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dist))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts, nAGQ)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Minimizing 822   Time: 0:00:01 ( 1.42 ms/it)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_dist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">-0.0127</td>
+<td style="text-align: right;">0.1058</td>
+<td style="text-align: right;">-0.12</td>
+<td style="text-align: right;">0.9041</td>
+<td style="text-align: right;">0.4787</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">livch: 1</td>
+<td style="text-align: right;">0.1532</td>
+<td style="text-align: right;">0.0982</td>
+<td style="text-align: right;">1.56</td>
+<td style="text-align: right;">0.1187</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">livch: 2</td>
+<td style="text-align: right;">0.2562</td>
+<td style="text-align: right;">0.1045</td>
+<td style="text-align: right;">2.45</td>
+<td style="text-align: right;">0.0142</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">livch: 3+</td>
+<td style="text-align: right;">0.2591</td>
+<td style="text-align: right;">0.1022</td>
+<td style="text-align: right;">2.53</td>
+<td style="text-align: right;">0.0113</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.0006</td>
+<td style="text-align: right;">0.0095</td>
+<td style="text-align: right;">0.06</td>
+<td style="text-align: right;">0.9482</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">abs2(age)</td>
+<td style="text-align: right;">-0.0047</td>
+<td style="text-align: right;">0.0008</td>
+<td style="text-align: right;">-6.12</td>
+<td style="text-align: right;">&lt;1e-09</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">urban: Y</td>
+<td style="text-align: right;">0.3770</td>
+<td style="text-align: right;">0.0804</td>
+<td style="text-align: right;">4.69</td>
+<td style="text-align: right;">&lt;1e-05</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age &amp; urban: Y</td>
+<td style="text-align: right;">-0.0067</td>
+<td style="text-align: right;">0.0069</td>
+<td style="text-align: right;">-0.98</td>
+<td style="text-align: right;">0.3258</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">abs2(age) &amp; urban: Y</td>
+<td style="text-align: right;">-0.0004</td>
+<td style="text-align: right;">0.0007</td>
+<td style="text-align: right;">-0.51</td>
+<td style="text-align: right;">0.6078</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Notice that in the formula language defined by the <a href="https://github.com/JuliaStats/StatsModels.jl">StatsModels</a> package, an interaction term is written with the <code>&amp;</code> operator. <em>Crossing</em> of terms, which generates main effects and interactions, is written with the <code>*</code> operator (as in the formula language in <a href="https://r-project.org">R</a>). An interaction of a numeric variable with itself is performed by multiplication so the coefficient labelled <code>age &amp; age</code> in the table is the quadratic term in <code>age</code>. (Notice that, in this formula language, <code>age * age</code>, which may easily be interpreted as <code>age^2</code>, expands to <code>age + age^2</code>.) Thus, what is written in the formula as a three-way interaction <code>age * age * urban</code> becomes an <code>urban</code> contrast plus linear and quadratic terms for <code>age</code> and each of their interactions with the <code>urban</code> contrast, which will be coded as <code>-1</code> for <code>N</code> and <code>+1</code> for <code>Y</code>.</p>
+<p>A fifth positional argument can be used to specify the link function, described in <a href="#sec-glmmlink"><span>Section&nbsp;6.2</span></a>, but in most cases the canonical link function for the distribution is used. In the case of the Bernoulli distribution the canonical link is the <em>logit</em> link.</p>
+<p>As for LMMs, the named argument <code>contrasts</code> specifies the contrasts to apply to some of the covariates in a key-value dictionary. Another named argument, <code>nAGQ</code>, specifies the number of quadrature points to use in an <em>adaptive Gauss-Hermite quadrature</em> rule for evaluating the deviance (see <a href="aGHQ.html#sec-aGHQ"><span>Section&nbsp;C.6</span></a> for details). A small, odd number, such as <code>nAGQ=9</code> defined in the first code block of this chapter, is the preferred choice.</p>
+<p>The interpretation of the coefficients in this model is somewhat different from the linear mixed models coefficients that we examined previously, but many of the model-building steps are similar. A rough assessment of the utility of a particular term in the fixed-effects part of the model can be obtained from examining the estimates of the coefficients associated with it and their standard errors, which are the basis for the <code>z</code> (z-statistic) and <code>p</code> (p-value) columns in the table. However, these p-values are even more approximate than those provided for LMMs. To perform a more accurate test of whether a particular term is useful we omit it from the model, refit and compare the reduced model fit to the original according to the change in deviance.</p>
+<p>We will examine the terms in the model first and discuss the interpretation of the coefficients in <a href="#sec-glmmlink"><span>Section&nbsp;6.2</span></a>.</p>
+</section>
+<section id="sec-contramodelbuilding" class="level3" data-number="6.1.3">
+<h3 data-number="6.1.3" class="anchored" data-anchor-id="sec-contramodelbuilding"><span class="header-section-number">6.1.3</span> Model building for the contra data</h3>
+<p>We noted that <a href="#fig-contradata">Figure&nbsp;<span>6.1</span></a> shows similar patterns for women with children, whether they have one, two, or three or more children. We have set the contrasts for the <code>livch</code> factor to be offsets relative to the reference level, in this case women who do not have any live children. Although the coefficients labeled <code>livch: 1</code>, <code>livch: 2</code>, and <code>livch: 3+</code> are all large relative to their standard errors, they are reasonably close to each other. This confirms our earlier impression that the main distinction is between women with children and those without and, for those who do have children, the number of children is not an important distinction.</p>
+<p>After incorporating a new variable <code>ch</code> — an indicator of whether the woman has any children — in the data,</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>ch] <span class="op">=</span> <span class="fu">HelmertCoding</span>();</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>contra <span class="op">=</span> <span class="fu">Table</span>(contra; ch<span class="op">=</span>contra.livch <span class="op">.!=</span> <span class="st">"0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>Table with 6 columns and 1934 rows:
+      dist  urban  livch  age     use  ch
+    ┌───────────────────────────────────────
+ 1  │ D01   Y      3+     18.44   N    true
+ 2  │ D01   Y      0      -5.56   N    false
+ 3  │ D01   Y      2      1.44    N    true
+ 4  │ D01   Y      3+     8.44    N    true
+ 5  │ D01   Y      0      -13.56  N    false
+ 6  │ D01   Y      0      -11.56  N    false
+ 7  │ D01   Y      3+     18.44   N    true
+ 8  │ D01   Y      3+     -3.56   N    true
+ 9  │ D01   Y      1      -5.56   N    true
+ 10 │ D01   Y      3+     1.44    N    true
+ 11 │ D01   Y      0      -11.56  Y    false
+ 12 │ D01   Y      0      -2.56   N    false
+ 13 │ D01   Y      1      -4.56   N    true
+ 14 │ D01   Y      3+     5.44    N    true
+ 15 │ D01   Y      3+     -0.56   N    true
+ 16 │ D01   Y      3+     4.44    Y    true
+ 17 │ D01   Y      0      -5.56   N    false
+ 18 │ D01   Y      3+     -0.56   Y    true
+ 19 │ D01   Y      1      -6.56   Y    true
+ 20 │ D01   Y      2      -3.56   N    true
+ 21 │ D01   Y      0      -4.56   N    false
+ 22 │ D01   Y      0      -9.56   N    false
+ 23 │ D01   Y      3+     2.44    N    true
+ ⋮  │  ⋮      ⋮      ⋮      ⋮      ⋮     ⋮</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="fu">DataFrame</span>(contra)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">describe</span>(df, <span class="op">:</span>mean, <span class="op">:</span>min, <span class="op">:</span>median, <span class="op">:</span>max, <span class="op">:</span>nunique, <span class="op">:</span>eltype)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div><div style="float: left;"><span>6×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header header">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">min</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">median</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">max</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">nunique</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">eltype</th>
+</tr>
+<tr class="odd subheader headerLastRow">
+<th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Symbol">Symbol</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Float64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Any">Any</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Float64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Any">Any</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Int64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="DataType">DataType</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
+<td style="text-align: left;">dist</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">D01</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">D61</td>
+<td style="text-align: left;">60</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: left;">urban</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
+<td style="text-align: left;">livch</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">3+</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: left;">age</td>
+<td style="text-align: left;">0.00204757</td>
+<td style="text-align: left;">-13.56</td>
+<td style="text-align: left;">-1.56</td>
+<td style="text-align: left;">19.44</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Float64</td>
+</tr>
+<tr class="odd">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
+<td style="text-align: left;">use</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">N</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Y</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">String</td>
+</tr>
+<tr class="even">
+<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
+<td style="text-align: left;">ch</td>
+<td style="text-align: left;">0.725957</td>
+<td style="text-align: left;">false</td>
+<td style="text-align: left;">1.0</td>
+<td style="text-align: left;">true</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">Bool</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>we fit a reduced model.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>com02 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(use <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> ch <span class="op">+</span> age <span class="op">*</span> age <span class="op">*</span> urban <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dist))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts, nAGQ)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Minimizing 435   Time: 0:00:00 ( 0.96 ms/it)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_dist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">-0.2194</td>
+<td style="text-align: right;">0.1155</td>
+<td style="text-align: right;">-1.90</td>
+<td style="text-align: right;">0.0575</td>
+<td style="text-align: right;">0.4773</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ch: true</td>
+<td style="text-align: right;">0.4342</td>
+<td style="text-align: right;">0.0741</td>
+<td style="text-align: right;">5.86</td>
+<td style="text-align: right;">&lt;1e-08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.0035</td>
+<td style="text-align: right;">0.0082</td>
+<td style="text-align: right;">0.43</td>
+<td style="text-align: right;">0.6674</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">urban: Y</td>
+<td style="text-align: right;">0.3733</td>
+<td style="text-align: right;">0.0801</td>
+<td style="text-align: right;">4.66</td>
+<td style="text-align: right;">&lt;1e-05</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age &amp; age</td>
+<td style="text-align: right;">-0.0048</td>
+<td style="text-align: right;">0.0008</td>
+<td style="text-align: right;">-6.27</td>
+<td style="text-align: right;">&lt;1e-09</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age &amp; urban: Y</td>
+<td style="text-align: right;">-0.0068</td>
+<td style="text-align: right;">0.0069</td>
+<td style="text-align: right;">-0.99</td>
+<td style="text-align: right;">0.3228</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age &amp; age &amp; urban: Y</td>
+<td style="text-align: right;">-0.0004</td>
+<td style="text-align: right;">0.0007</td>
+<td style="text-align: right;">-0.49</td>
+<td style="text-align: right;">0.6273</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Comparing this model to the previous model</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(com02, com01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 72%">
+<col style="width: 7%">
+<col style="width: 6%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">use ~ 1 + ch + age + urban + age &amp; age + age &amp; urban + age &amp; age &amp; urban + (1 | dist)</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">2371</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">use ~ 1 + livch + age + :(abs2(age)) + urban + age &amp; urban + :(abs2(age)) &amp; urban + (1 | dist)</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">2371</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.7823</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>indicates that the reduced model is adequate.</p>
+<p>Apparently neither the second-order interaction <code>age &amp; urban</code> nor the third-order interaction <code>age &amp; age &amp; urban</code> is significant and we fit a model without these terms.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>com03 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(use <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> urban <span class="op">+</span> ch <span class="op">+</span> age <span class="op">*</span> age <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dist))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts, nAGQ)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Minimizing 137   Time: 0:00:00 ( 0.92 ms/it)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_dist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">-0.2303</td>
+<td style="text-align: right;">0.1140</td>
+<td style="text-align: right;">-2.02</td>
+<td style="text-align: right;">0.0434</td>
+<td style="text-align: right;">0.4774</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">urban: Y</td>
+<td style="text-align: right;">0.3462</td>
+<td style="text-align: right;">0.0599</td>
+<td style="text-align: right;">5.78</td>
+<td style="text-align: right;">&lt;1e-08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ch: true</td>
+<td style="text-align: right;">0.4303</td>
+<td style="text-align: right;">0.0737</td>
+<td style="text-align: right;">5.84</td>
+<td style="text-align: right;">&lt;1e-08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">0.0063</td>
+<td style="text-align: right;">0.0078</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.4246</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">age &amp; age</td>
+<td style="text-align: right;">-0.0046</td>
+<td style="text-align: right;">0.0007</td>
+<td style="text-align: right;">-6.47</td>
+<td style="text-align: right;">&lt;1e-10</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>A likelihood ratio test</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(com03, com02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 70%">
+<col style="width: 8%">
+<col style="width: 7%">
+<col style="width: 3%">
+<col style="width: 5%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">use ~ 1 + urban + ch + age + age &amp; age + (1 | dist)</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2373</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">use ~ 1 + ch + age + urban + age &amp; age + age &amp; urban + age &amp; age &amp; urban + (1 | dist)</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">2371</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">0.4119</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>indicates that these terms can safely be eliminated.</p>
+<p>A plot of the smoothed observed proportions versus centered age by <code>urban</code> and <code>ch</code>, <a href="#fig-contradata2">Figure&nbsp;<span>6.2</span></a>,</p>
+<div class="cell" data-execution_count="12">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(contra) <span class="op">*</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>age <span class="op">=&gt;</span> <span class="st">"Centered age (yr)"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>use <span class="op">=&gt;</span> <span class="op">==</span>(<span class="st">"Y"</span>) <span class="op">=&gt;</span> <span class="st">"Frequency of contraceptive use"</span>;</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=:</span>urban <span class="op">=&gt;</span> <span class="fu">renamer</span>([<span class="st">"N"</span> <span class="op">=&gt;</span> <span class="st">"Rural"</span>, <span class="st">"Y"</span> <span class="op">=&gt;</span> <span class="st">"Urban"</span>]),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>ch <span class="op">=&gt;</span> <span class="st">"Children"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">smooth</span>();</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div id="fig-contradata2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="glmmbernoulli_files/figure-html/fig-contradata2-output-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.2: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey. The livch factor has been collapsed to children/nochildren.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>indicates that all four groups have a quadratic trend with respect to age but the location of the peak proportion is shifted for those without children relative to those with children. Incorporating an interaction of <code>age</code> and <code>ch</code> allows for such a shift.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>com04 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="pp">@formula</span>(use <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> urban <span class="op">+</span> ch <span class="op">*</span> age <span class="op">+</span> age <span class="op">&amp;</span> age <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dist))</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts, nAGQ)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Minimizing 149   Time: 0:00:00 ( 0.98 ms/it)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_dist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">-0.3614</td>
+<td style="text-align: right;">0.1275</td>
+<td style="text-align: right;">-2.84</td>
+<td style="text-align: right;">0.0046</td>
+<td style="text-align: right;">0.4757</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">urban: Y</td>
+<td style="text-align: right;">0.3567</td>
+<td style="text-align: right;">0.0602</td>
+<td style="text-align: right;">5.93</td>
+<td style="text-align: right;">&lt;1e-08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ch: true</td>
+<td style="text-align: right;">0.6054</td>
+<td style="text-align: right;">0.1035</td>
+<td style="text-align: right;">5.85</td>
+<td style="text-align: right;">&lt;1e-08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">-0.0131</td>
+<td style="text-align: right;">0.0110</td>
+<td style="text-align: right;">-1.19</td>
+<td style="text-align: right;">0.2352</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ch: true &amp; age</td>
+<td style="text-align: right;">0.0342</td>
+<td style="text-align: right;">0.0127</td>
+<td style="text-align: right;">2.69</td>
+<td style="text-align: right;">0.0072</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age &amp; age</td>
+<td style="text-align: right;">-0.0058</td>
+<td style="text-align: right;">0.0008</td>
+<td style="text-align: right;">-6.89</td>
+<td style="text-align: right;">&lt;1e-11</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Comparing this fitted model to the previous one</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(com03, com04)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 63%">
+<col style="width: 9%">
+<col style="width: 8%">
+<col style="width: 3%">
+<col style="width: 6%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">model-dof</th>
+<th style="text-align: right;">deviance</th>
+<th style="text-align: right;">χ²</th>
+<th style="text-align: right;">χ²-dof</th>
+<th style="text-align: left;">P(&gt;χ²)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">use ~ 1 + urban + ch + age + age &amp; age + (1 | dist)</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2373</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">use ~ 1 + urban + ch + age + ch &amp; age + age &amp; age + (1 | dist)</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">2365</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">0.0047</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>confirms the usefulness of this term.</p>
+<p>A series of such model fits led to a model with random effects for the combinations of <code>dist</code> and <code>urban</code>, because differences between urban and rural women in the same district were comparable to differences between districts, even after accounting for an effect of <code>urban</code> at the fixed-effects (or population) level.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>com05 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    use <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> urban <span class="op">+</span> ch <span class="op">*</span> age <span class="op">+</span> age <span class="op">&amp;</span> age <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dist <span class="op">&amp;</span> urban)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, contra, <span class="fu">Bernoulli</span>(); contrasts, nAGQ)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Minimizing 150   Time: 0:00:00 ( 0.96 ms/it)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<table class="table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Est.</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">z</th>
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">σ_dist &amp; urban</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">-0.3415</td>
+<td style="text-align: right;">0.1269</td>
+<td style="text-align: right;">-2.69</td>
+<td style="text-align: right;">0.0071</td>
+<td style="text-align: right;">0.5761</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">urban: Y</td>
+<td style="text-align: right;">0.3936</td>
+<td style="text-align: right;">0.0859</td>
+<td style="text-align: right;">4.58</td>
+<td style="text-align: right;">&lt;1e-05</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ch: true</td>
+<td style="text-align: right;">0.6064</td>
+<td style="text-align: right;">0.1045</td>
+<td style="text-align: right;">5.80</td>
+<td style="text-align: right;">&lt;1e-08</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age</td>
+<td style="text-align: right;">-0.0129</td>
+<td style="text-align: right;">0.0112</td>
+<td style="text-align: right;">-1.16</td>
+<td style="text-align: right;">0.2471</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ch: true &amp; age</td>
+<td style="text-align: right;">0.0332</td>
+<td style="text-align: right;">0.0128</td>
+<td style="text-align: right;">2.59</td>
+<td style="text-align: right;">0.0096</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age &amp; age</td>
+<td style="text-align: right;">-0.0056</td>
+<td style="text-align: right;">0.0008</td>
+<td style="text-align: right;">-6.66</td>
+<td style="text-align: right;">&lt;1e-10</td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>In more detail,</p>
+<div class="cell" data-execution_count="16">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(com05)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generalized Linear Mixed Model fit by maximum likelihood (nAGQ = 9)
+  use ~ 1 + urban + ch + age + ch &amp; age + age &amp; age + (1 | dist &amp; urban)
+  Distribution: </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bernoulli{Float64}
+  Link: LogitLink()
+
+   logLik    deviance     AIC       AICc        BIC    
+ -1177.2418</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  2353.8242  2368.4836  2368.5418  2407.4550
+
+Variance components:
+                Column   Variance Std.Dev. 
+dist &amp; urban (Intercept)  0.331928 0.576132
+
+ Number of obs: 1934; levels of grouping factors: 102
+
+Fixed-effects parameters:
+────────────────────────────────────────────────────────
+                      Coef.  Std. Error      z  Pr(&gt;|z|)
+────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)     -0.341475     0.126906   -2.69    0.0071
+urban: Y         0.393592     0.0859086   4.58    &lt;1e-05
+ch: true         0.606449     0.10453     5.80    &lt;1e-08
+age             -0.0129098    0.0111549  -1.16    0.2471
+ch: true &amp; age   0.0332106    0.0128228   2.59    0.0096
+age &amp; age       -0.00562463   0.0008441  -6.66    &lt;1e-10
+────────────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>Notice that, although there are 60 distinct districts, there are only 102 distinct combinations of <code>dist</code> and <code>urban</code> represented in the data. In 15 of the 60 districts there are no rural women in the sample and in 3 districts there are no urban women in the sample, as shown in a frequency table</p>
+<div class="cell" data-execution_count="17">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">freqtable</span>(contra, <span class="op">:</span>urban, <span class="op">:</span>dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>2×60 Named Matrix{Int64}
+urban ╲ dist │ D01  D02  D03  D04  D05  D06  …  D56  D57  D58  D59  D60  D61
+─────────────┼──────────────────────────────────────────────────────────────
+N            │  54   20    0   19   37   58  …   24   23   20   10   22   31
+Y            │  63    0    2   11    2    7  …   21    4   13    0   10   11</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-glmmlink" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="sec-glmmlink"><span class="header-section-number">6.2</span> Link functions and interpreting coefficients</h2>
+<p>To this point the only difference we have encountered between fitting generalized linear mixed models (GLMMs) and linear mixed models (LMMs) is the need to specify the distribution family in a call to <code>fit</code>. The formula specification is identical and the assessment of the significance of terms using likelihood ratio tests is similar. This is intentional. We have emphasized the use of likelihood ratio tests on terms, whether fixed-effects or random-effects terms, exactly so the approach will be general.</p>
+<p>However, the interpretation of the coefficient estimates in the different types of models is different. In a linear mixed model the conditional mean (or “expected value”) of the response given the random effects is simply the value of the <em>linear predictor</em>, <span class="math inline">\({\boldsymbol{\mu}}={\boldsymbol{\eta}}={\mathbf{X}}{\boldsymbol{\beta}}+{\mathbf{Z}}{\mathbf{b}}\)</span> . That is, if we assume that we know the values of the fixed-effects parameters, <span class="math inline">\({\boldsymbol{\beta}}\)</span>, and the random effects, <span class="math inline">\({\mathbf{b}}\)</span>, then the expected response for a particular combination of covariate values is a linear combination of these coefficients where the particular linear combination is determined by values of the covariates for that observation. Individual coefficients can be interpreted as slopes of the fitted response with respect to a numeric covariate or as shifts between levels of a categorical covariate.</p>
+<p>It is worthwhile emphasizing this relationship, and how it is used to form predictions from the model, by illustrating the process on a grid of covariate values. To this end, we will take a brief excursion into creating grids of covariate values and evaluating linear predictors.</p>
+<section id="sec-covariategrid" class="level3" data-number="6.2.1">
+<h3 data-number="6.2.1" class="anchored" data-anchor-id="sec-covariategrid"><span class="header-section-number">6.2.1</span> Creating grids of covariate values</h3>
+<p>Suppose that we wish to plot the “population” linear predictor values from model <code>com05</code>. That is, we will consider only the fixed-effects terms in the model formula and ignore the random effects. We want to create a plot like <a href="#fig-contradata2">Figure&nbsp;<span>6.2</span></a> by evaluating the linear predictor for a range of <code>age</code> values for each of the combinations of <code>ch</code> and <code>urban</code>.</p>
+<p>First we construct a table of covariate values, <code>newdata</code>, containing the <em>Cartesian product</em> of values of these covariates, created using a <a href="https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions">generator expression</a> returning <a href="https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple">NamedTuples</a>, which is the standard row-wise represention of tabular data.</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  (; age, ch, urban) <span class="cf">for</span> age <span class="kw">in</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">20</span>, ch <span class="kw">in</span> [<span class="cn">false</span>, <span class="cn">true</span>],</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  urban <span class="kw">in</span> [<span class="st">"N"</span>, <span class="st">"Y"</span>]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>Table with 3 columns and 44 rows:
+      age  ch     urban
+    ┌──────────────────
+ 1  │ -10  false  N
+ 2  │ -7   false  N
+ 3  │ -4   false  N
+ 4  │ -1   false  N
+ 5  │ 2    false  N
+ 6  │ 5    false  N
+ 7  │ 8    false  N
+ 8  │ 11   false  N
+ 9  │ 14   false  N
+ 10 │ 17   false  N
+ 11 │ 20   false  N
+ 12 │ -10  true   N
+ 13 │ -7   true   N
+ 14 │ -4   true   N
+ 15 │ -1   true   N
+ 16 │ 2    true   N
+ 17 │ 5    true   N
+ 18 │ 8    true   N
+ 19 │ 11   true   N
+ 20 │ 14   true   N
+ 21 │ 17   true   N
+ 22 │ 20   true   N
+ 23 │ -10  false  Y
+ ⋮  │  ⋮     ⋮      ⋮</code></pre>
+</div>
+</div>
+<p>Next we isolate the fixed-effects terms from the formula for model <code>com05</code> by selecting its <code>rhs</code> property (the right-hand side of the formula) then filtering out any random-effects terms in the expression.</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>feform <span class="op">=</span> <span class="fu">filter</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  t <span class="op">-&gt;</span> !<span class="fu">isa</span>(t, MixedModels.AbstractReTerm),</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  com05.formula.rhs,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Add extractors for different parts of the formula to MixedModels.jl</p>
+</div>
+</div>
+<p>Finally, we evaluate the model columns for this reduced formula. These are returned as an array of matrices, in this case containing only one matrix.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>newX <span class="op">=</span> <span class="fu">only</span>(StatsModels.<span class="fu">modelcols</span>(feform, newdata))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>44×6 Matrix{Float64}:
+ 1.0  -1.0  -1.0  -10.0   10.0  100.0
+ 1.0  -1.0  -1.0   -7.0    7.0   49.0
+ 1.0  -1.0  -1.0   -4.0    4.0   16.0
+ 1.0  -1.0  -1.0   -1.0    1.0    1.0
+ 1.0  -1.0  -1.0    2.0   -2.0    4.0
+ 1.0  -1.0  -1.0    5.0   -5.0   25.0
+ 1.0  -1.0  -1.0    8.0   -8.0   64.0
+ 1.0  -1.0  -1.0   11.0  -11.0  121.0
+ 1.0  -1.0  -1.0   14.0  -14.0  196.0
+ 1.0  -1.0  -1.0   17.0  -17.0  289.0
+ 1.0  -1.0  -1.0   20.0  -20.0  400.0
+ 1.0  -1.0   1.0  -10.0  -10.0  100.0
+ 1.0  -1.0   1.0   -7.0   -7.0   49.0
+ ⋮                                ⋮
+ 1.0   1.0  -1.0   20.0  -20.0  400.0
+ 1.0   1.0   1.0  -10.0  -10.0  100.0
+ 1.0   1.0   1.0   -7.0   -7.0   49.0
+ 1.0   1.0   1.0   -4.0   -4.0   16.0
+ 1.0   1.0   1.0   -1.0   -1.0    1.0
+ 1.0   1.0   1.0    2.0    2.0    4.0
+ 1.0   1.0   1.0    5.0    5.0   25.0
+ 1.0   1.0   1.0    8.0    8.0   64.0
+ 1.0   1.0   1.0   11.0   11.0  121.0
+ 1.0   1.0   1.0   14.0   14.0  196.0
+ 1.0   1.0   1.0   17.0   17.0  289.0
+ 1.0   1.0   1.0   20.0   20.0  400.0</code></pre>
+</div>
+</div>
+<p>The predicted linear predictor, <span class="math inline">\({\boldsymbol{\eta}}\)</span>, for the <code>newdata</code> table and the fixed-effects estimate for model <code>com05</code> is the product of this model matrix and the <code>fixef</code> coefficients.</p>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(newdata; η<span class="op">=</span>newX <span class="op">*</span> <span class="fu">fixef</span>(com05))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>Table with 4 columns and 44 rows:
+      age  ch     urban  η
+    ┌─────────────────────────────
+ 1  │ -10  false  N      -1.44278
+ 2  │ -7   false  N      -1.29428
+ 3  │ -4   false  N      -1.24703
+ 4  │ -1   false  N      -1.30102
+ 5  │ 2    false  N      -1.45626
+ 6  │ 5    false  N      -1.71273
+ 7  │ 8    false  N      -2.07046
+ 8  │ 11   false  N      -2.52942
+ 9  │ 14   false  N      -3.08963
+ 10 │ 17   false  N      -3.75108
+ 11 │ 20   false  N      -4.51378
+ 12 │ -10  true   N      -0.894089
+ 13 │ -7   true   N      -0.546331
+ 14 │ -4   true   N      -0.299815
+ 15 │ -1   true   N      -0.154543
+ 16 │ 2    true   N      -0.110515
+ 17 │ 5    true   N      -0.167729
+ 18 │ 8    true   N      -0.326188
+ 19 │ 11   true   N      -0.585889
+ 20 │ 14   true   N      -0.946834
+ 21 │ 17   true   N      -1.40902
+ 22 │ 20   true   N      -1.97245
+ 23 │ -10  false  Y      -0.65559
+ ⋮  │  ⋮     ⋮      ⋮        ⋮</code></pre>
+</div>
+</div>
+<p>Plotting the result, <a href="#fig-com05pred">Figure&nbsp;<span>6.3</span></a>,</p>
+<div class="cell" data-execution_count="22">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(newdata) <span class="op">*</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>age <span class="op">=&gt;</span> <span class="st">"Centered age (yr)"</span>,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>η <span class="op">=&gt;</span> <span class="st">"Linear predictor value from model com05"</span>;</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=:</span>urban <span class="op">=&gt;</span> <span class="fu">renamer</span>([<span class="st">"N"</span> <span class="op">=&gt;</span> <span class="st">"Rural"</span>, <span class="st">"Y"</span> <span class="op">=&gt;</span> <span class="st">"Urban"</span>]),</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>ch <span class="op">=&gt;</span> <span class="st">"Children"</span>,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">smooth</span>();</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div id="fig-com05pred" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="glmmbernoulli_files/figure-html/fig-com05pred-output-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.3: Linear predictor versus centered age from model com05</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>shows that these curves follow the general trends of the data plot. However, the vertical axis is not on a probability scale. Indeed most of the values of the linear predictor are negative.</p>
+<p>This brings us to the topic of link functions.</p>
+</section>
+<section id="sec-logitlink" class="level3" data-number="6.2.2">
+<h3 data-number="6.2.2" class="anchored" data-anchor-id="sec-logitlink"><span class="header-section-number">6.2.2</span> The logit link function for binary responses</h3>
+<p>The probability model for a binary response is the Bernoulli distribution, which is a very simple probability distribution in that its “support” — the set of possible values of the random variable — is just <code>0</code> or <code>1</code>. If the probability of the response <code>1</code> is <span class="math inline">\(p\)</span> then the probability of <code>0</code> must be <span class="math inline">\(1-p\)</span>. It is easy to establish that the expected value is also <span class="math inline">\(p\)</span>. For consistency across distribution families we write this expected response as <span class="math inline">\(\mu\)</span> instead of <span class="math inline">\(p\)</span>. We should, however, keep in mind that, for this distribution, <span class="math inline">\(\mu\)</span> corresponds to a probability and hence must satisfy <span class="math inline">\(0\le\mu\le 1\)</span>.</p>
+<p>In general we don’t want to have restrictions on the values of the linear predictor so we equate the linear predictor to a function of <span class="math inline">\(\mu\)</span> that has an unrestricted range. In the case of the Bernoulli distribution with the canonical link function we equate the linear predictor to the <em>log odds</em> or <em>logit</em> of the positive response. That is <span id="eq-logodds"><span class="math display">\[
+\eta = \log\left(\frac{\mu}{1-\mu}\right) .
+\tag{6.2}\]</span></span></p>
+<p>To understand why this is called the “log odds” recall that <span class="math inline">\(\mu\)</span> corresponds to a probability in <span class="math inline">\([0,1]\)</span>. The corresponding odds ratio, <span class="math inline">\(\frac{\mu}{1-\mu}\)</span>, is in <span class="math inline">\([0,\infty)\)</span> and the logarithm of the odds ratio, <span class="math inline">\(\mathrm{logit}(\mu)\)</span>, is in <span class="math inline">\((-\infty, \infty)\)</span>.</p>
+<p>The inverse of the logit link function, <span id="eq-logitinv"><span class="math display">\[
+\mu = \frac{1}{1+\exp(-\eta)} ,
+\tag{6.3}\]</span></span> is called the <em>logistic</em> function and is shown in <a href="#fig-logitinv">Figure&nbsp;<span>6.4</span></a>.</p>
+<div class="cell" data-execution_count="23">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  fig <span class="op">=</span> <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>))</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  ax <span class="op">=</span> <span class="fu">Axis</span>(fig[<span class="fl">1</span>, <span class="fl">1</span>]; xlabel<span class="op">=</span><span class="st">"η"</span>, ylabel<span class="op">=</span><span class="st">"μ"</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lines!</span>(ax, <span class="op">-</span><span class="fl">5.5</span> <span class="op">..</span> <span class="fl">5.5</span>, η <span class="op">-&gt;</span> <span class="fu">inv</span>(<span class="fl">1</span> <span class="op">+</span> <span class="fu">exp</span>(<span class="op">-</span>η)))</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  fig</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div id="fig-logitinv" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="glmmbernoulli_files/figure-html/fig-logitinv-output-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.4: The logistic function, which is the inverse to the logit link function.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The inverse link takes a value on the unrestricted range, <span class="math inline">\((-\infty,\infty)\)</span>, and maps it to the probability range, <span class="math inline">\([0,1]\)</span>. It happens this function is also the cumulative distribution function for the standard logistic distribution, available in <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a> as <code>cdf(Logistic(), η)</code>. In some presentations the relationship between the logit link and the logistic distribution is emphasized but that often leads to questions of why we should focus on the logistic distribution. Also, it is not clear how this approach would generalize to other distributions such as the Poisson or the Gamma distributions.</p>
+</section>
+<section id="sec-canonicallink" class="level3" data-number="6.2.3">
+<h3 data-number="6.2.3" class="anchored" data-anchor-id="sec-canonicallink"><span class="header-section-number">6.2.3</span> Canonical link functions</h3>
+<p>A way of deriving the logit link that does generalize to a class of common distributions, in what is called the <em>exponential family</em>, is to consider the logarithm of the probability function (for discrete distributions) or the probability density function (for continuous distributions). The probability function for the Bernoulli distribution is <span class="math inline">\(\mu\)</span> for <span class="math inline">\(y=1\)</span> and <span class="math inline">\(1-\mu\)</span> for <span class="math inline">\(y=0\)</span>. If we write this in a somewhat contrived way as <span class="math inline">\(\mu^y+(1-\mu)^{1-y}\)</span> for <span class="math inline">\(y\in\{0,1\}\)</span> then the logarithm of the probability function becomes <span id="eq-BernoulliProb"><span class="math display">\[
+\log\left(\mu^y+(1-\mu)^{1-y}\right) = \log(1-\mu) +
+y\,\log\left(\frac{\mu}{1-\mu}\right) .
+\tag{6.4}\]</span></span> Notice that the logit link function is the multiple of <span class="math inline">\(y\)</span> in the last term.</p>
+<p>The characteristic of distributions in the exponential family is that the logarithm of the probability mass function or probability density function, whichever is appropriate, can be expressed as a sum of up to three terms: one that involves <span class="math inline">\(y\)</span> only, one that involves the parameters only, and the product of <span class="math inline">\(y\)</span> and a function of the parameters. This function is the canonical link for the distribution.</p>
+<p>In the case of the Poisson distribution the probability function is <span class="math inline">\(\frac{e^{-\mu}\mu^y}{y!}\)</span> for <span class="math inline">\(y\in\{0,1,2,\dots\}\)</span> so the log probability function is <span id="eq-PoissonProb"><span class="math display">\[
+-\log(y!)-\mu+y\log(\mu) .
+\tag{6.5}\]</span></span> and the canonical link function is <span class="math inline">\(\log(\mu)\)</span>.</p>
+</section>
+<section id="sec-GLMMcoefficients" class="level3" data-number="6.2.4">
+<h3 data-number="6.2.4" class="anchored" data-anchor-id="sec-GLMMcoefficients"><span class="header-section-number">6.2.4</span> Interpreting coefficient estimates</h3>
+<p>Returning to the interpretation of the estimated coefficients in model <code>com05</code> we apply exactly the same interpretation as for a linear mixed model but taking into account that slopes or differences in levels are with respect to the logit or log-odds function. If we wish to express results in the probability scale then we should apply the logistic function to whatever combination of coefficients is of interest to us.</p>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">logistic</span>(η) <span class="op">=</span> <span class="fu">inv</span>(<span class="fu">one</span>(η) <span class="op">+</span> <span class="fu">exp</span>(<span class="op">-</span>η))</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(newdata; μ<span class="op">=</span><span class="fu">logistic</span>.(newdata.η))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>Table with 5 columns and 44 rows:
+      age  ch     urban  η          μ
+    ┌────────────────────────────────────────
+ 1  │ -10  false  N      -1.44278   0.191116
+ 2  │ -7   false  N      -1.29428   0.215129
+ 3  │ -4   false  N      -1.24703   0.223215
+ 4  │ -1   false  N      -1.30102   0.213993
+ 5  │ 2    false  N      -1.45626   0.189041
+ 6  │ 5    false  N      -1.71273   0.152809
+ 7  │ 8    false  N      -2.07046   0.112002
+ 8  │ 11   false  N      -2.52942   0.0738212
+ 9  │ 14   false  N      -3.08963   0.043537
+ 10 │ 17   false  N      -3.75108   0.0229531
+ 11 │ 20   false  N      -4.51378   0.0108382
+ 12 │ -10  true   N      -0.894089  0.290267
+ 13 │ -7   true   N      -0.546331  0.366716
+ 14 │ -4   true   N      -0.299815  0.425603
+ 15 │ -1   true   N      -0.154543  0.461441
+ 16 │ 2    true   N      -0.110515  0.472399
+ 17 │ 5    true   N      -0.167729  0.458166
+ 18 │ 8    true   N      -0.326188  0.419169
+ 19 │ 11   true   N      -0.585889  0.357579
+ 20 │ 14   true   N      -0.946834  0.279522
+ 21 │ 17   true   N      -1.40902   0.196388
+ 22 │ 20   true   N      -1.97245   0.122126
+ 23 │ -10  false  Y      -0.65559   0.341731
+ ⋮  │  ⋮     ⋮      ⋮        ⋮          ⋮</code></pre>
+</div>
+</div>
+<p>producing the population predictions on the probability scale, as shown in <a href="#fig-com05predmu">Figure&nbsp;<span>6.5</span></a>.</p>
+<div class="cell" data-execution_count="25">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(newdata) <span class="op">*</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>age <span class="op">=&gt;</span> <span class="st">"Centered age (yr)"</span>,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>μ <span class="op">=&gt;</span> <span class="st">"Probability of contraceptive use"</span>;</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>    col<span class="op">=:</span>urban <span class="op">=&gt;</span> <span class="fu">renamer</span>([<span class="st">"N"</span> <span class="op">=&gt;</span> <span class="st">"Rural"</span>, <span class="st">"Y"</span> <span class="op">=&gt;</span> <span class="st">"Urban"</span>]),</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>ch <span class="op">=&gt;</span> <span class="st">"Children"</span>,</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">smooth</span>();</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div id="fig-com05predmu" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="glmmbernoulli_files/figure-html/fig-com05predmu-output-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.5: Predicted probability of contraception use versus centered age from model com05.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>On the probability scale we can compare the predictions to the observed frequencies shown with scatterplot smoother lines in <a href="#fig-contradata2">Figure&nbsp;<span>6.2</span></a>.</p>
+<p>Consider the predictions on both the linear predictor and probability (or expected value) scales for women with centered ages of 2.0.</p>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(r <span class="op">-&gt;</span> r.age <span class="op">==</span> <span class="fl">2</span>, newdata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<pre><code>Table with 5 columns and 4 rows:
+     age  ch     urban  η          μ
+   ┌───────────────────────────────────────
+ 1 │ 2    false  N      -1.45626   0.189041
+ 2 │ 2    true   N      -0.110515  0.472399
+ 3 │ 2    false  Y      -0.669071  0.338705
+ 4 │ 2    true   Y      0.67667    0.662995</code></pre>
+</div>
+</div>
+<p>The predicted probability of woman with centered age of 2, with children, living in an urban environment using artificial contraception is about 2/3, which is reasonably close to the smoothed frequency for that combination of covariates in <a href="#fig-contradata2">Figure&nbsp;<span>6.2</span></a>.</p>
+<p>Similarly, a woman of centered age of 2 without children living in a rural environment has a predicted probability of using artificial contraception of a little less than 20%, which also corresponds to the smoother line for that combination (blue line in the left panel) in <a href="#fig-contradata2">Figure&nbsp;<span>6.2</span></a>.</p>
+</section>
+</section>
+<section id="sec-glmmrandomeff" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="sec-glmmrandomeff"><span class="header-section-number">6.3</span> Interpretation of random effects</h2>
+<p>We should also be aware that the random effects are defined on the linear predictor scale and not on the probability scale. A normal probability plot of the conditional modes of the random effects for model <code>com05</code>, <a href="#fig-com05qqcaterpillar">Figure&nbsp;<span>6.6</span></a></p>
+<div class="cell" data-execution_count="27">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar</span>(com05)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<div id="fig-com05qqcaterpillar" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="glmmbernoulli_files/figure-html/fig-com05qqcaterpillar-output-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6.6: Caterpillar plot of the conditional modes of the random-effects for model <code>com05</code></figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>shows that the smallest random effects are approximately -1 and the largest are approximately 1.</p>
+<p>The numerical values and the identifier of the combination of <code>dist</code> and <code>urban</code> for these extreme values can be obtained from the first few rows and the last few rows of the sorted random-effects table.</p>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>srtdre <span class="op">=</span> <span class="kw">let</span> retbl <span class="op">=</span> <span class="fu">only</span>(<span class="fu">raneftables</span>(com05))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  retbl[<span class="fu">sortperm</span>(<span class="fu">last</span>.(retbl))]</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(srtdre, <span class="fl">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>Table with 2 columns and 6 rows:
+     dist &amp; urban  (Intercept)
+   ┌──────────────────────────
+ 1 │ ("D01", "N")  -0.957366
+ 2 │ ("D11", "N")  -0.931981
+ 3 │ ("D24", "N")  -0.603419
+ 4 │ ("D01", "Y")  -0.580203
+ 5 │ ("D27", "N")  -0.576648
+ 6 │ ("D55", "Y")  -0.548262</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(srtdre, <span class="fl">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>Table with 2 columns and 6 rows:
+     dist &amp; urban  (Intercept)
+   ┌──────────────────────────
+ 1 │ ("D43", "N")  0.64408
+ 2 │ ("D04", "Y")  0.644669
+ 3 │ ("D42", "N")  0.665115
+ 4 │ ("D58", "N")  0.677419
+ 5 │ ("D14", "Y")  0.695322
+ 6 │ ("D34", "N")  1.08591</code></pre>
+</div>
+</div>
+<p>The largest random effect is for rural settings in <code>D34</code>. There were 26 women in the sample from rural <code>D34</code></p>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>D34N <span class="op">=</span> <span class="fu">filter</span>(r <span class="op">-&gt;</span> r.dist <span class="op">==</span> <span class="st">"D34"</span> <span class="op">&amp;&amp;</span> r.urban <span class="op">==</span> <span class="st">"N"</span>, contra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>Table with 6 columns and 26 rows:
+      dist  urban  livch  age     use  ch
+    ┌───────────────────────────────────────
+ 1  │ D34   N      0      -11.56  Y    false
+ 2  │ D34   N      1      3.44    Y    true
+ 3  │ D34   N      2      4.44    Y    true
+ 4  │ D34   N      3+     -3.56   Y    true
+ 5  │ D34   N      0      -8.56   Y    false
+ 6  │ D34   N      2      8.44    N    true
+ 7  │ D34   N      3+     8.44    Y    true
+ 8  │ D34   N      3+     4.44    Y    true
+ 9  │ D34   N      2      -3.56   Y    true
+ 10 │ D34   N      3+     8.44    Y    true
+ 11 │ D34   N      2      -3.56   N    true
+ 12 │ D34   N      1      -9.56   N    true
+ 13 │ D34   N      3+     -2.56   Y    true
+ 14 │ D34   N      3+     2.44    Y    true
+ 15 │ D34   N      2      0.44    Y    true
+ 16 │ D34   N      1      4.44    N    true
+ 17 │ D34   N      2      -7.56   Y    true
+ 18 │ D34   N      3+     11.44   Y    true
+ 19 │ D34   N      0      -12.56  N    false
+ 20 │ D34   N      3+     9.44    N    true
+ 21 │ D34   N      1      -2.56   Y    true
+ 22 │ D34   N      3+     -2.56   Y    true
+ 23 │ D34   N      2      13.44   Y    true
+ ⋮  │  ⋮      ⋮      ⋮      ⋮      ⋮     ⋮</code></pre>
+</div>
+</div>
+<p>of whom 20 used contraception, an unusually large proportion for a rural setting.</p>
+<p>But this happens when you have relatively small survey sizes - we expect considerable variation.</p>
+<p>Also there is considerable variability in the lengths of the prediction intervals in <a href="#fig-com05qqcaterpillar">Figure&nbsp;<span>6.6</span></a> because the data are unbalanced with respect to district and rural/urban districts.</p>
+<p>Consider the cross-tabulation of counts of interviewees by district and urban/rural status presented at the end of <a href="#sec-contramodelbuilding"><span>Section&nbsp;6.1.3</span></a>. The data contains responses from 54 rural women in district <code>D01</code> but only 21 rural women from <code>D11</code>. Thus the bottom line in <a href="#fig-com05qqcaterpillar">Figure&nbsp;<span>6.6</span></a>, for <code>("D21", "N")</code>, and based on 54 responses, is shorter than the line second from the bottom, for <code>("D11", "N")</code> and based on 21 women only.</p>
+<section id="conversion-of-random-effects-to-relative-odds" class="level3" data-number="6.3.1">
+<h3 data-number="6.3.1" class="anchored" data-anchor-id="conversion-of-random-effects-to-relative-odds"><span class="header-section-number">6.3.1</span> Conversion of random effects to relative odds</h3>
+<p>The exponential of the random effect is the relative odds of a woman in a particular urban/district combination using artificial birth control compared to her counterpart (same age, same with/without children status, same urban/rural status) in a typical district. The thus, the relative odds of a rural woman in district <code>D01</code> using artifical contraception relative to the general population of women her age is</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">last</span>(<span class="fu">first</span>(srtdre)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>0.3839027419651145</code></pre>
+</div>
+</div>
+<p>or about 40%.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list" style="display: none">
+<div id="ref-huq:cleland:1990" class="csl-entry" role="listitem">
+Huq, N. M., &amp; Cleland, J. (1990). <em>Bangladesh fertility survey 1989 (main report)</em>. National Institute of Population Research; Training.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./largescaleobserved.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A large-scale observational study</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
