@@ -17,8 +17,8 @@ julia> Pkg.add("IJulia")
 julia> using IJulia
 
 julia> installkernel("julia", "--threads=auto", "--project=@.")
-[ Info: Installing julia kernelspec in ~/.local/share/jupyter/kernels/julia-1.8
-"~/.local/share/jupyter/kernels/julia-1.8"
+[ Info: Installing julia kernelspec in ~/.local/share/jupyter/kernels/julia-1.9
+"~/.local/share/jupyter/kernels/julia-1.9"
 
 julia> Pkg.activate(".")
   Activating project at `~/EmbraceUncertainty`

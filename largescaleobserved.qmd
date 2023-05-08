@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.8
+jupyter: julia-1.9
 ---
 
 \newcommand{\bbtheta}{{\boldsymbol\theta}}
@@ -16,10 +16,8 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
+using EmbraceUncertainty
 using GLM
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL
-end
 using MixedModels
 using MixedModelsMakie
 using ProgressMeter
@@ -43,6 +41,7 @@ at that site, consisting of over 27,000,000 ratings of movies by 280,000 users.
 The total number of movies rated is over 58,000.
 
 As the name `ml-latest.zip` could become ambiguous, we provide the table of contents of this zip file to help identify the dataset being used.
+
 ```
 Archive:  /home/bates/Downloads/ml-latest.zip
   Length      Date    Time    Name
@@ -69,7 +68,7 @@ The `subject` and `item` factors are "incompletely crossed" in that each item oc
 Similarly in the movie ratings, each instance of a rating is associated with a user and a movie and these factors are incompletely crossed.
 
 ```{julia}
-ratings = Arrow.Table(datadir("ratings.arrow"))
+ratings = EmbraceUncertainty.dataset("ratings")
 ```
 
 Convert this table to a `DataFrame` and drop the `timestamp` column, which we won't be using.
@@ -117,7 +116,7 @@ Because the distribution of the number of ratings per movie or per user is so hi
 #| fig-cap: "Empirical distribution plots of the number of ratings per movie and per user.  The horizontal axes are on a logarithmic scale."
 #| label: fig-nrtngsecdf
 let
-  f = Figure(; resolution=(1000,400))
+  f = Figure(; resolution=(1000, 400))
   xscale = log10
   xminorticksvisible = true
   xminorgridvisible = true
@@ -126,24 +125,31 @@ let
   ylabel = "Relative cumulative frequency"
   nrtngs = sort(movies.nrtngs)
   ecdfplot(
-    f[1,1],
+    f[1, 1],
     nrtngs;
     npoints=last(nrtngs),
     axis=(
       xlabel="Number of ratings per movie (logarithmic scale)",
-      xminorgridvisible, xminorticks, xminorticksvisible, xscale,
-      ylabel, yminorticksvisible, 
+      xminorgridvisible,
+      xminorticks,
+      xminorticksvisible,
+      xscale,
+      ylabel,
+      yminorticksvisible,
     ),
   )
   urtngs = sort(users.urtngs)
   ecdfplot(
-    f[1,2],
+    f[1, 2],
     urtngs;
     npoints=last(urtngs),
     axis=(
       xlabel="Number of ratings per user (logarithmic scale)",
-      xminorgridvisible, xminorticks, xminorticksvisible, xscale,
-      yminorticksvisible, 
+      xminorgridvisible,
+      xminorticks,
+      xminorticksvisible,
+      xscale,
+      yminorticksvisible,
     ),
   )
   f
@@ -177,7 +183,7 @@ disallowmissing!(
     ),
     users;
     on=:userId,
-  )
+  ),
 )
 ```
 
@@ -190,7 +196,8 @@ then create a bar chart of the two distributions
 let
   fiveplus = zeros(Int, 10)
   onlyone = zeros(Int, 10)
-  for (i, n) in zip(round.(Int, Float32(2) .* ratings.rating), ratings.nrtngs)
+  for (i, n) in
+      zip(round.(Int, Float32(2) .* ratings.rating), ratings.nrtngs)
     if n > 4
       fiveplus[i] += 1
     elseif isone(n)
@@ -199,20 +206,18 @@ let
   end
   fiveprop = fiveplus ./ sum(fiveplus)
   oneprop = onlyone ./ sum(onlyone)
-  data(
-    (;
-      props=vcat(fiveprop, oneprop), 
-      rating=repeat(0.5:0.5:5.0; outer=2),
-      nratings=repeat(["≥5", "only 1"]; inner=10),
-    )
-  ) *
-  mapping(
-    :rating => nonnumeric,
-    :props => "Proportion of ratings";
-    color=:nratings => "Ratings/movie",
-    dodge=:nratings,
-  ) *
-  visual(BarPlot) |> draw 
+  draw(data((;
+         props=vcat(fiveprop, oneprop),
+         rating=repeat(0.5:0.5:5.0; outer=2),
+         nratings=repeat(["≥5", "only 1"]; inner=10),
+       )) *
+       mapping(
+         :rating => nonnumeric,
+         :props => "Proportion of ratings";
+         color=:nratings => "Ratings/movie",
+         dodge=:nratings,
+       ) *
+       visual(BarPlot))
 end
 ```
 
@@ -228,6 +233,7 @@ describe(ratings)
 ```
 
 ::: {.callout-note collapse="true"}
+
 ### Seemingly inconsistent medians of "nrtngs" and "urtngs"
 
 The medians in this table of `nrtngs` and `urtngs` are much higher than the values from the `movies` and `users` tables because a movie with 98,000 ratings occurs 98,000 times in this table whereas it occurs only once in the `movies` table.
@@ -269,7 +275,7 @@ sizespeed = let
 end
 llabels = string.(refpool(sizespeed.uc))
 lelements = [
-  PolyElement(polycolor = c) for c in
+  PolyElement(polycolor=c) for c in
   get.(
     Ref(Makie.colorschemes[:viridis]),
     range(0, 1, length(llabels)),
@@ -289,20 +295,36 @@ let
   xticks = (1:7, string.(refpool(sizespeed.mc)))
   uc = refarray(sizespeed.uc)
   Legend(
-    f[1,1], lelements, llabels, ltitle;
-    orientation=:horizontal, tellwidth=false, tellheight=true,
+    f[1, 1],
+    lelements,
+    llabels,
+    ltitle;
+    orientation=:horizontal,
+    tellwidth=false,
+    tellheight=true,
   )
   barplot!(
-    Axis(f[2,1]; xticks, ylabel="Number of users",),
-    mc, sizespeed.nusers; xticks, dodge=uc, color=uc,
+    Axis(f[2, 1]; xticks, ylabel="Number of users"),
+    mc,
+    sizespeed.nusers;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   barplot!(
-    Axis(f[3,1]; xticks, ylabel="Number of movies",),
-    mc, sizespeed.nmvie; xticks, dodge=uc, color=uc,
+    Axis(f[3, 1]; xticks, ylabel="Number of movies"),
+    mc,
+    sizespeed.nmvie;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   barplot!(
-    Axis(f[4,1]; xlabel, xticks, ylabel="Number of observations",),
-    mc, sizespeed.nratings; dodge=uc, color=uc,
+    Axis(f[4, 1]; xlabel, xticks, ylabel="Number of observations"),
+    mc,
+    sizespeed.nratings;
+    dodge=uc,
+    color=uc,
   )
   f
 end
@@ -360,6 +382,7 @@ This display gives the types of two blocked matrices: `A` which is derived from 
 The only difference in their structures is in the [2,2] block, which is diagonal in `A` and a dense, lower triangular matrix in `L`.
 
 The memory footprint (bytes) of each of the blocks is
+
 ```{julia}
 #| code-fold: true
 let
@@ -369,7 +392,11 @@ let
       push!(block, "[$i,$j]")
     end
   end
-  Table((; block, Abytes = Base.summarysize.(mvm20u20.A), Lbytes=Base.summarysize.(mvm20u20.L)))
+  Table((;
+    block,
+    Abytes=Base.summarysize.(mvm20u20.A),
+    Lbytes=Base.summarysize.(mvm20u20.L),
+  ))
 end
 ```
 
@@ -377,7 +404,9 @@ resulting in total memory footprints (GiB) of
 
 ```{julia}
 #| code-fold: true
-NamedTuple{(:A, :L)}(Base.summarysize.(getproperty.(Ref(mvm20u20), (:A, :L))) ./ 2^30)
+NamedTuple{(:A, :L)}(
+  Base.summarysize.(getproperty.(Ref(mvm20u20), (:A, :L))) ./ 2^30,
+)
 ```
 
 That is, `L` requires roughly 10 times the amount of storage as does `A`, and that difference is entirely due to the different structure of the [2,2] block.
@@ -411,20 +440,37 @@ let
   xticks = (1:7, string.(refpool(sizespeed.mc)))
   uc = refarray(sizespeed.uc)
   Legend(
-    f[1,1], lelements, llabels, ltitle;
-    orientation=:horizontal, tellwidth=false, tellheight=true,
+    f[1, 1],
+    lelements,
+    llabels,
+    ltitle;
+    orientation=:horizontal,
+    tellwidth=false,
+    tellheight=true,
   )
   barplot!(
-    Axis(f[2,1]; xticks, ylabel="Memory requirement (GiB)",),
-    mc, sizespeed.modelsz; xticks, dodge=uc, color=uc,
+    Axis(f[2, 1]; xticks, ylabel="Memory requirement (GiB)"),
+    mc,
+    sizespeed.modelsz;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   barplot!(
-    Axis(f[3,1]; xticks, ylabel="Size of L[2,2] (GiB)",),
-    mc, sizespeed.L22sz; xticks, dodge=uc, color=uc,
+    Axis(f[3, 1]; xticks, ylabel="Size of L[2,2] (GiB)"),
+    mc,
+    sizespeed.L22sz;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   barplot!(
-    Axis(f[4,1]; xlabel, xticks, ylabel="L[2,2] memory fraction",),
-    mc, sizespeed.L22prop; xticks, dodge=uc, color=uc,
+    Axis(f[4, 1]; xlabel, xticks, ylabel="L[2,2] memory fraction"),
+    mc,
+    sizespeed.L22prop;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   f
 end
@@ -458,20 +504,50 @@ let
   xticks = (1:7, string.(refpool(sizespeed.mc)))
   uc = refarray(sizespeed.uc)
   Legend(
-    f[1,1], lelements, llabels, ltitle;
-    orientation=:horizontal, tellwidth=false, tellheight=true,
+    f[1, 1],
+    lelements,
+    llabels,
+    ltitle;
+    orientation=:horizontal,
+    tellwidth=false,
+    tellheight=true,
   )
   barplot!(
-    Axis(f[2,1]; xticks, ylabel="Log-likelihood evaluation time (m)",),
-    mc, sizespeed.evtime ./ 60; xticks, dodge=uc, color=uc,
+    Axis(
+      f[2, 1];
+      xticks,
+      ylabel="Log-likelihood evaluation time (m)",
+    ),
+    mc,
+    sizespeed.evtime ./ 60;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   barplot!(
-    Axis(f[3,1]; xticks, ylabel="Number of evaluations to convergence",),
-    mc, sizespeed.nv; xticks, dodge=uc, color=uc,
+    Axis(
+      f[3, 1];
+      xticks,
+      ylabel="Number of evaluations to convergence",
+    ),
+    mc,
+    sizespeed.nv;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   barplot!(
-    Axis(f[4,1]; xlabel, xticks, ylabel="Time (hr) to fit the model",),
-    mc, sizespeed.fittime ./ 3600; xticks, dodge=uc, color=uc,
+    Axis(
+      f[4, 1];
+      xlabel,
+      xticks,
+      ylabel="Time (hr) to fit the model",
+    ),
+    mc,
+    sizespeed.fittime ./ 3600;
+    xticks,
+    dodge=uc,
+    color=uc,
   )
   f
 end
@@ -485,7 +561,8 @@ Most of these models required between 20 and 25 evaluations but some required al
 The derivation of the log-likelihood for linear mixed-effects models is given in @sec-lmmtheory, which provides a rather remarkable result:
 the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.
 
-There are two blocked matrices, `A` and `L`, stored in the model representation and, for large models such as we are considering these are the largest fields in 
+There are two blocked matrices, `A` and `L`, stored in the model representation and, for large models such as we are considering these are the largest fields in
+
 ## Model size and speed for different thresholds
 
 ```{julia}
@@ -497,16 +574,17 @@ draw(
   mapping(
     :L22sz => "Size (GiB) of 2,2 block of L",
     :modelsz => "Size (GiB) of model representation";
-    color = :uc,
-  ) * 
-  visual(Scatter)
+    color=:uc,
+  ) *
+  visual(Scatter),
 )
 ```
 
 Linear regression of the `modelsz` versus the number of users and `L22sz`.
 
 ```{julia}
-sizemod = lm(@formula(Float64(modelsz) ~ 1 + nusers + L22sz), sizespeed)
+sizemod =
+  lm(@formula(Float64(modelsz) ~ 1 + nusers + L22sz), sizespeed)
 coeftable(sizemod)
 ```
 

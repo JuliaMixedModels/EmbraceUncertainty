@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.8
+jupyter: julia-1.9
 ---
 
 # Models With Multiple Random-effects Terms {#sec-Multiple}
@@ -518,7 +518,7 @@ Because typical standards for "small" p-values are 5% or 1%, a p-value over 50% 
 
 We do need to be cautious in quoting this p-value, however, because the parameter value being tested, $\sigma_2=0$, is on the boundary of set of possible values, $\sigma_2\ge 0$, for this parameter.
 The argument for using a $\chi^2_1$ distribution to calculate a p-value for the change in the deviance does not apply when the parameter value being tested is on the boundary.
-As shown in @pinheiro00:_mixed_effec_model_in_s [, Sect. 2.5], the p-value from the $\chi^2_1$ distribution will be "conservative" in the sense that it is larger than a simulation-based p-value would be.
+As shown in @pinheirobates2000 [, Sect. 2.5], the p-value from the $\chi^2_1$ distribution will be "conservative" in the sense that it is larger than a simulation-based p-value would be.
 In the worst-case scenario the $\chi^2$-based p-value will be twice as large as it should be but, even if that were true, an effective p-value of 26% would not cause us to reject $H_0$ in favor of $H_a$.
 
 ### Assessing the reduced model, psm02 {#sec-assessReduced}

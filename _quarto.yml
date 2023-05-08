@@ -14,10 +14,12 @@ book:
     - longitudinal.qmd
     - largescaledesigned.qmd
     - largescaleobserved.qmd
-    - glmmbinomial.qmd
+    - glmmbernoulli.qmd
     - references.qmd
   appendices:
+    - datatables.qmd
     - linalg.qmd
+    - aGHQ.qmd
 
 execute-dir: project
 
@@ -27,12 +29,8 @@ csl: apa-annotated-bibliography.csl
 format:
   html:
     theme: cosmo
-  pdf:
-    toc: true
-    number-sections: true
-    colorlinks: true
 
-jupyter: julia-1.8
+jupyter: julia-1.9
 execute:
   cache: true
   freeze: auto

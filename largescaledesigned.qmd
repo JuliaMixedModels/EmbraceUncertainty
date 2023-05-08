@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.8
+jupyter: julia-1.9
 ---
 
 # A large-scale designed experiment {#sec-largescaledesigned}
@@ -8,6 +8,7 @@ Load the packages to be used.
 
 ```{julia}
 #| code-fold: true
+#| output: false
 using AlgebraOfGraphics
 using Arrow
 using CairoMakie
@@ -22,11 +23,12 @@ using ProgressMeter
 using StandardizedPredictors
 using StatsBase
 
-const contrasts = Dict{Symbol,Any}();
+const contrasts =
+  Dict{Symbol,Any}(:item => Grouping(), :subj => Grouping())
 datadir(paths::AbstractString...) =
   joinpath(@__DIR__, "data", paths...)
-CairoMakie.activate!(; type="svg");
-ProgressMeter.ijulia_behavior(:clear);
+CairoMakie.activate!(; type="svg")
+ProgressMeter.ijulia_behavior(:clear)
 ```
 
 As with many techniques in data science, the place where "the rubber meets the road", as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.
@@ -50,7 +52,8 @@ ldttrial = Arrow.Table(datadir("ELP_ldt_trial.arrow"))
 ```
 
 ```{julia}
-ldttrial = @transform!(DataFrame(ldttrial), :s2 = :seq > 2000)
+ldttrial =
+  transform!(DataFrame(ldttrial), :seq => (x -> x .> 2000) => :s2)
 describe(ldttrial)
 ```
 
@@ -143,8 +146,7 @@ A barchart of the word length counts, @fig-ldtwrdlenhist, shows that the majorit
 #| code-fold: true
 #| fig-cap: "Histogram of word lengths in the items used in the lexical decision task."
 #| label: fig-ldtwrdlenhist
-let
-  wlen = 1:21
+let wlen = 1:21
   draw(
     data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
     mapping(:wrdlen => "Length of word", :count) *
@@ -162,7 +164,7 @@ but accuracy decreases with increasing word length for the nonwords.
 #| fig-cap: "Smoothed curves of accuracy versus word length in the lexical decision task."
 #| label: fig-ldtaccsmooth
 draw(
-  data(@subset(ldttrial, !ismissing(:acc))) *
+  data(filter(:acc => !ismissing, ldttrial)) *
   mapping(
     :wrdlen => "Word length",
     :acc => "Accuracy";
@@ -289,7 +291,7 @@ The majority of the subjects whose median response time is less than 500 ms. are
 Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.
 
 ```{julia}
-minimum(@subset(bysubj, :spropacc > 0.9).smedianrt)
+minimum(filter(:spropacc => >(0.9), bysubj).smedianrt)
 ```
 
 It is common in analyses of response latency in a lexical discrimination task to consider only the latencies on correct identifications and to trim outliers.
@@ -344,7 +346,11 @@ The density of the response speed, in responses per second, is shown in @fig-elp
 draw(
   data(pruned) *
   mapping(
-    :rt => (x -> 1000 / x) => "Response speed (s⁻¹) for correct responses") *
+    :rt =>
+      (
+        x -> 1000 / x
+      ) => "Response speed (s⁻¹) for correct responses",
+  ) *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
@@ -390,7 +396,7 @@ draw(
   data(pruned) *
   mapping(
     :wrdlen => "Word length",
-    :rt => (x -> 1000/x) => "Speed of response (s⁻¹)";
+    :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)";
     :color => :isword,
   ) *
   smooth();
@@ -410,7 +416,7 @@ let
   plt = data(@subset(pruned, :wrdlen > 3, :wrdlen < 14))
   plt *= mapping(
     :wrdlen => "Word length",
-    :rt => (x -> 1000/x) => "Speed of response (s⁻¹)",
+    :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)",
     color=:isword,
     side=:isword,
   )
@@ -441,8 +447,6 @@ Thus the `(Intercept)` coefficient is the predicted speed of response for a typi
 Set these contrasts
 
 ```{julia}
-contrasts[:subj] = Grouping();
-contrasts[:item] = Grouping();
 contrasts[:isword] = EffectsCoding(; base=false);
 contrasts[:wrdlen] = Center(8);
 ```
@@ -450,11 +454,9 @@ contrasts[:wrdlen] = Center(8);
 and fit a first model with simple, scalar, random effects for `subj` and `item`.
 
 ```{julia}
-elm01 = let
-  form = @formula(
-    1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
-  )
-  fit(MixedModel, form, pruned; contrasts)
+elm01 = let f = @formula 1000/rt ~
+    1 + isword * wrdlen + (1 | item) + (1 | subj)
+  fit(MixedModel, f, pruned; contrasts)
 end
 ```
 
@@ -464,16 +466,13 @@ The predicted response speed by word length and word/nonword status can be summa
 effects(Dict(:isword => [false, true], :wrdlen => 4:2:12), elm01)
 ```
 
-
 If we restrict to only those subjects with 80% accuracy or greater the model becomes
 
 ```{julia}
-elm02 = let
-  form = @formula(
-    1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
-  )
-  dat = @subset(pruned, :spropacc > 0.8)
-  fit(MixedModel, form, dat; contrasts)
+elm02 = let f = @formula 1000 / rt ~
+    1 + isword * wrdlen + (1 | item) + (1 | subj)
+  dat = filter(:spropacc => >(0.8), pruned)
+  fit(MixedModel, f, dat; contrasts)
 end
 ```
 
@@ -536,11 +535,9 @@ saveoptsum("./optsums/elm01.json", elm01);
 
 ```{julia}
 elm01a = restoreoptsum!(
-  let
-    form = @formula(
-      1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
-    )
-    MixedModel(form, pruned; contrasts)
+  let f = @formula 1000 / rt ~
+      1 + isword * wrdlen + (1 | item) + (1 | subj)
+    MixedModel(f, pruned; contrasts)
   end,
   "./optsums/elm01.json",
 )
