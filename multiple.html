@@ -473,7 +473,7 @@ div.csl-indent {
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, penicillin; contrasts)</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 44    Time: 0:00:00 ( 9.28 ms/it)</code></pre>
+<pre><code>Minimizing 44    Time: 0:00:00 (15.97 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <table class="table table-sm table-striped small">
@@ -687,7 +687,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">only</span>(pnm01.beta) <span class="op">.+</span> [<span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>] <span class="op">*</span> <span class="fu">only</span>(pnm01.stderror))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[21.483030272252066, 24.461414172196214]</code></pre>
+<pre><code>[21.48303059205525, 24.461413852387082]</code></pre>
 </div>
 </div>
 <p>The densities of the variance-components, on the scale of the standard deviation parameters, are diffuse but do not exhibit point masses at zero.</p>
@@ -860,7 +860,7 @@ div.csl-indent {
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, pastes; contrasts)</span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 35    Time: 0:00:00 ( 5.97 ms/it)</code></pre>
+<pre><code>Minimizing 35    Time: 0:00:00 (10.03 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="20">
 <table class="table table-sm table-striped small">
@@ -1388,7 +1388,7 @@ div.csl-indent {
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, insteval; contrasts)</span>
 <span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 97    Time: 0:00:00 ( 8.85 ms/it)</code></pre>
+<pre><code>Minimizing 100   Time: 0:00:00 ( 7.53 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="33">
 <table class="table table-sm table-striped small">
@@ -1463,7 +1463,7 @@ div.csl-indent {
 <span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
 <span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(iem02, iem01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 47    Time: 0:00:00 ( 6.56 ms/it)</code></pre>
+<pre><code>Minimizing 47    Time: 0:00:00 ( 4.40 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="35">
 <table class="table table-sm table-striped small">
@@ -1551,7 +1551,7 @@ div.csl-indent {
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, insteval; contrasts)</span>
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 112   Time: 0:00:01 ( 9.33 ms/it)</code></pre>
+<pre><code>Minimizing 107   Time: 0:00:00 ( 5.97 ms/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="37">
 <table class="table table-sm table-striped small">
@@ -1582,11 +1582,11 @@ div.csl-indent {
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: right;">3.2826</td>
 <td style="text-align: right;">0.0284</td>
-<td style="text-align: right;">115.54</td>
+<td style="text-align: right;">115.51</td>
 <td style="text-align: right;">&lt;1e-99</td>
 <td style="text-align: right;">0.3255</td>
 <td style="text-align: right;">0.5150</td>
-<td style="text-align: right;">0.0785</td>
+<td style="text-align: right;">0.0786</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">service: Y</td>
@@ -1686,7 +1686,7 @@ div.csl-indent {
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I0066</td>
-<td style="text-align: right;">1.03151</td>
+<td style="text-align: right;">1.0315</td>
 <td style="text-align: right;">0.105472</td>
 </tr>
 <tr class="even">
@@ -1707,15 +1707,15 @@ div.csl-indent {
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I1866</td>
-<td style="text-align: right;">1.06625</td>
+<td style="text-align: right;">1.06626</td>
 <td style="text-align: right;">0.123321</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I1258</td>
-<td style="text-align: right;">1.17205</td>
-<td style="text-align: right;">0.188496</td>
+<td style="text-align: right;">1.17206</td>
+<td style="text-align: right;">0.188497</td>
 </tr>
 </tbody>
 </table>
