@@ -28,7 +28,12 @@ csl: apa-annotated-bibliography.csl
 
 format:
   html:
-    theme: cosmo
+    # for more info, see
+    # https://quarto.org/docs/output-formats/html-themes.html
+    theme: [sandstone, theme.scss]
+    # sets the background of inline code and code output but not code blocks?
+    # also overrides code-bg in the SCSS file
+    # monobackgroundcolor: '#fafafa'
 
 jupyter: julia-1.9
 execute:
