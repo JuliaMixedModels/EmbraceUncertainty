@@ -10,6 +10,7 @@ Load the packages to be used.
 
 ```{julia}
 #| code-fold: true
+#| output: false
 using AlgebraOfGraphics
 using Arrow
 using CairoMakie
@@ -25,12 +26,10 @@ using SparseArrays
 using Statistics
 using TypedTables
 
-datadir(paths::AbstractString...) =
-  joinpath(@__DIR__, "data", paths...)
 optsumdir(paths::AbstractString...) =
   joinpath(@__DIR__, "optsums", paths...)
-CairoMakie.activate!(; type="svg");
-ProgressMeter.ijulia_behavior(:clear);
+CairoMakie.activate!(; type="svg")
+ProgressMeter.ijulia_behavior(:clear)
 ```
 
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
@@ -68,14 +67,15 @@ The `subject` and `item` factors are "incompletely crossed" in that each item oc
 Similarly in the movie ratings, each instance of a rating is associated with a user and a movie and these factors are incompletely crossed.
 
 ```{julia}
-ratings = EmbraceUncertainty.dataset("ratings")
+ratings = EmbraceUncertainty.dataset(:ratings)
 ```
 
 Convert this table to a `DataFrame` and drop the `timestamp` column, which we won't be using.
 (For small data sets dropping such columns is not important but with over 27 million ratings it does help to drop unnecessary columns to save some memory space.)
 
 ```{julia}
-ratings = select!(DataFrame(ratings), Not(:timestamp));
+ratings =
+  Table(getproperties(ratings, (:userId, :movieId, :rating)))
 ```
 
 Information on the movies is available as
@@ -83,8 +83,11 @@ Information on the movies is available as
 ```{julia}
 movies = disallowmissing!(
   leftjoin!(
-    combine(groupby(ratings, :movieId), :rating => mean => :mnrtng),
-    DataFrame(Arrow.Table(datadir("movies.arrow")));
+    combine(
+      groupby(DataFrame(ratings), :movieId),
+      :rating => mean => :mnrtng,
+    ),
+    DataFrame(EmbraceUncertainty.dataset(:movies));
     on=:movieId,
   );
   error=false,
@@ -101,11 +104,14 @@ extrema(movies.nrtngs)
 The number of ratings per user is also highly skewed
 
 ```{julia}
-users = combine(
-  groupby(ratings, :userId),
-  :userId => (x -> Int32(length(x))) => :urtngs,
+users = Table(
+  combine(
+    groupby(DataFrame(ratings), :userId),
+    nrow => :urtngs,
+    :rating => mean => :umnrtng,
+  ),
 )
-extrema(users.urtngs)  # minimum and maximum number of ratings per user
+extrema(users.urtngs)
 ```
 
 One way of visualizing the imbalance in the number of ratings per movie or per user is as an [empirical cumulative distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function) (ecdf) plot, which is a "stair-step" plot where the vertical axis is the proportion of observations less than or equal to the corresponding value on the horizontal axis.
@@ -174,15 +180,17 @@ Furthermore, the distribution of ratings for movies with only one rating is syst
 First, add `nrtngs` and `urtngs` as columns of the `ratings` table.
 
 ```{julia}
-disallowmissing!(
-  leftjoin!(
+ratings = Table(
+  disallowmissing!(
     leftjoin!(
-      ratings,
-      select(DataFrame(movies), :movieId, :nrtngs; copycols=false);
-      on=:movieId,
+      leftjoin!(
+        DataFrame(ratings),
+        DataFrame(getproperties(movies, (:movieId, :nrtngs)));
+        on=:movieId,
+      ),
+      DataFrame(users);
+      on=:userId,
     ),
-    users;
-    on=:userId,
   ),
 )
 ```
@@ -206,18 +214,20 @@ let
   end
   fiveprop = fiveplus ./ sum(fiveplus)
   oneprop = onlyone ./ sum(onlyone)
-  draw(data((;
-         props=vcat(fiveprop, oneprop),
-         rating=repeat(0.5:0.5:5.0; outer=2),
-         nratings=repeat(["≥5", "only 1"]; inner=10),
-       )) *
-       mapping(
-         :rating => nonnumeric,
-         :props => "Proportion of ratings";
-         color=:nratings => "Ratings/movie",
-         dodge=:nratings,
-       ) *
-       visual(BarPlot))
+  draw(
+    data((;
+      props=vcat(fiveprop, oneprop),
+      rating=repeat(0.5:0.5:5.0; outer=2),
+      nratings=repeat(["≥5", "only 1"]; inner=10),
+    )) *
+    mapping(
+      :rating => nonnumeric,
+      :props => "Proportion of ratings";
+      color=:nratings => "Ratings/movie",
+      dodge=:nratings,
+    ) *
+    visual(BarPlot),
+  )
 end
 ```
 
@@ -229,7 +239,7 @@ For example, a companion data set on grouplens.org, available in the [ml-25m.zip
 To be able to select ratings on according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
 
 ```{julia}
-describe(ratings)
+describe(DataFrame(ratings))
 ```
 
 ::: {.callout-note collapse="true"}
@@ -345,7 +355,7 @@ This, and any of the models shown in the table, can be restored in a few minutes
 function ratingsoptsum(
   mcutoff::Integer,
   ucutoff::Integer;
-  data=ratings,
+  data=Table(ratings),
   form=@formula(rating ~ 1 + (1 | userId) + (1 | movieId)),
   contrasts=Dict(:movieId => Grouping(), :userId => Grouping()),
 )
@@ -357,7 +367,10 @@ function ratingsoptsum(
   return restoreoptsum!(
     LinearMixedModel(
       form,
-      @subset(data, :nrtngs ≥ mcutoff, :urtngs ≥ ucutoff);
+      filter(
+        r -> (r.nrtngs ≥ mcutoff) & (r.urtngs ≥ ucutoff),
+        data,
+      );
       contrasts,
     ),
     optsumfnm,
