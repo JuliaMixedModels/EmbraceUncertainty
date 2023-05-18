@@ -118,7 +118,7 @@ using StatsBase         # basic statistical summaries
 using EmbraceUncertainty: dataset # `dataset` means this one
 
 CairoMakie.activate!(; type="svg")    # Scalable Vector Graphics
-ProgressMeter.ijulia_behavior(:clear) # suppress output
+ProgressMeter.ijulia_behavior(:clear) # suppress progress output
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -259,7 +259,7 @@ In `yet-to-be-written-appendix` we review some of the principles of data graphic
 For example, in this plot the levels of `batch` are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are *jittered* to avoid overplotting of points.
 (Note that the two lowest yields of samples from batch `A` are identical.)
 
-::: {.callout-note collapse="true"}
+::: {.callout-note}
 
 ### Jittering has not yet been added.
 
