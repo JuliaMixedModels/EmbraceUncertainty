@@ -28,6 +28,7 @@ Attach the packages to be used in this chapter
 
 ```{julia}
 #| code-fold: true
+#| output: false
 const hide_progress = true
 
 using AlgebraOfGraphics
@@ -35,9 +36,7 @@ using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL
-end
+using EmbraceUncertainty: dataset
 using MixedModels
 using MixedModelsMakie
 using ProgressMeter
@@ -45,8 +44,17 @@ using Random
 using RCall
 using StatsBase
 
-ProgressMeter.ijulia_behavior(:clear);
-CairoMakie.activate!(; type="svg");
+const contrasts = Dict{Symbol,Any}(
+  :sample => Grouping(),
+  :plate => Grouping(),
+  :s => Grouping(),
+  :batch => Grouping(),
+  :d => Grouping(),
+  :dept => Grouping(),
+)
+
+ProgressMeter.ijulia_behavior(:clear)
+CairoMakie.activate!(; type="svg")
 ```
 
 The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient.
@@ -85,7 +93,7 @@ The data are derived from Table 6.6, p. 144 of @davies72:_statis_method_in_res
 As with the `dyestuff` data, we examine the structure
 
 ```{julia}
-penicillin = MixedModels.dataset(:penicillin)
+penicillin = dataset(:penicillin)
 ```
 
 and a summary
@@ -174,10 +182,8 @@ Even when we apply each of the six samples to each of the 24 plates, something c
 A model incorporating random effects for both the `plate` and the `sample` is straightforward to specify --- we include simple, scalar random effects terms for both these factors.
 
 ```{julia}
-pnm01 = let
-  contrasts = Dict(:plate => Grouping(), :sample => Grouping())
-  form = @formula(diameter ~ 1 + (1 | plate) + (1 | sample))
-  fit(MixedModel, form, penicillin; contrasts)
+pnm01 = let f = @formula diameter ~ 1 + (1 | plate) + (1 | sample)
+  fit(MixedModel, f, penicillin; contrasts)
 end
 ```
 
@@ -319,7 +325,7 @@ The third example from @davies72:_statis_method_in_resear_and_produc [, Table 6
 The structure and summary of the data object are
 
 ```{julia}
-pastes = MixedModels.dataset(:pastes)
+pastes = dataset(:pastes)
 ```
 
 ```{julia}
@@ -404,10 +410,8 @@ Fitting a model with simple, scalar random effects for nested factors is done in
 We include random-effects terms for each factor, as in
 
 ```{julia}
-psm01 = let
-  contrasts = Dict(:sample => Grouping(), :batch => Grouping())
-  form = @formula(strength ~ 1 + (1 | sample) + (1 | batch))
-  fit(MixedModel, form, pastes; contrasts)
+psm01 = let f = @formula strength ~ 1 + (1 | sample) + (1 | batch)
+  fit(MixedModel, f, pastes; contrasts)
 end
 ```
 
@@ -500,10 +504,8 @@ An approximate reference distribution for an LRT statistic is the $\chi^2_\nu$ d
 The restricted model fit
 
 ```{julia}
-psm02 = let
-  form = @formula(strength ~ 1 + (1 | sample))
-  contrasts = Dict(:sample => Grouping())
-  fit(MixedModel, form, pastes; contrasts)
+psm02 = let f = @formula strength ~ 1 + (1 | sample)
+  fit(MixedModel, f, pastes; contrasts)
 end
 ```
 
@@ -536,7 +538,7 @@ psm02samp = parametricbootstrap(
   Random.seed!(9753579),
   10_000,
   psm02;
-  hide_progress=true,
+  hide_progress,
 )
 DataFrame(shortestcovint(psm02samp))
 ```
@@ -566,12 +568,11 @@ These data have been slightly simplified and identifying labels have been remove
 The variables
 
 ```{julia}
-insteval = MixedModels.dataset(:insteval)
+insteval = dataset(:insteval)
 ```
 
 ```{julia}
-insteval = DataFrame(insteval)
-describe(insteval)
+describe(DataFrame(insteval))
 ```
 
 have somewhat cryptic names.
@@ -585,7 +586,7 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
 draw(
-  data(DataFrame(response=1:5, count=counts(insteval.y))) *
+  data(Table(response=1:5, count=counts(insteval.y))) *
   mapping(:response => "Rating", :count => "Count") *
   visual(BarPlot);
   figure=(; resolution=(800, 450)),
@@ -597,11 +598,8 @@ it is sufficiently diffuse to warrant treating it as if it were a continuous res
 At this point we will fit models that have random effects for student, instructor, and department (or the combination of department and service) to these data.
 
 ```{julia}
-contrasts =
-  Dict(:s => Grouping(), :d => Grouping(), :dept => Grouping())
-iem01 = let
-  form = @formula(y ~ 1 + (1 | s) + (1 | d) + (1 | dept))
-  fit(MixedModel, form, insteval; contrasts)
+iem01 = let f = @formula y ~ 1 + (1 | s) + (1 | d) + (1 | dept)
+  fit(MixedModel, f, insteval; contrasts)
 end
 ```
 
@@ -619,9 +617,8 @@ caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
 
 ```{julia}
-iem02 = let
-  form = @formula(y ~ 1 + (1 | s) + (1 | d))
-  fit(MixedModel, form, insteval; contrasts)
+iem02 = let f = @formula y ~ 1 + (1 | s) + (1 | d)
+  fit(MixedModel, f, insteval; contrasts)
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
@@ -641,11 +638,17 @@ We could profile this model fit but doing so would take a very long time and, in
 Before leaving this model we examine the sparse Cholesky factor, $\bbL$, which is of size $4116\times4116$.
 
 ```{julia}
-sparseL(iem01; full=true)
+L = sparseL(iem01; full=true)
 ```
 
-Even as a sparse matrix this factor requires a considerable amount of memory, but as a triangular dense matrix it would require nearly 10 times as much.
-There are $(4116\times 4117)/2$ elements on and below the diagonal, each of which would require 8 bytes of storage.
+Even as a sparse matrix `L` requires a considerable amount of memory, about 9 MB,
+
+```{julia}
+(Base.summarysize(L), Base.summarysize(collect(L)))
+```
+
+but as a triangular dense matrix it requires over 10 times as much (about 135 MB).
+There are $4116^2$ elements in the triangular matrix, each of which requires 8 bytes of storage.
 
 ### Effect of service courses
 
@@ -655,10 +658,10 @@ There are several ways in which `service` can be incorporated in a model like th
 The simplest approach is to add `service` to the fixed-effects specification
 
 ```{julia}
-iem03 = let
-  form = @formula(y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept))
-  fit(MixedModel, form, insteval; contrasts)
-end
+iem03 =
+  let f = @formula y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept)
+    fit(MixedModel, f, insteval; contrasts)
+  end
 ```
 
 In model `iem03` the effect of `service` is considered to be constant across departments and is modeled with a single fixed-effects parameter, which is the difference in a typical rating in a service course to a non-service course.
@@ -689,7 +692,7 @@ shows the differences in precision due to different numbers of observations for 
 #| fig-cap: "Histogram of the number of observations per instructor in the insteval data"
 #| label: fig-iednobshist
 draw(
-  data(combine(groupby(insteval, :d), nrow => :n)) *
+  data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
   mapping(:n => "Number of observations") *
   AlgebraOfGraphics.histogram(; bins=410);
   figure=(; resolution=(800, 600)),

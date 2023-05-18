@@ -25,6 +25,7 @@ Attach the packages to be used in this chapter
 using AlgebraOfGraphics
 using CairoMakie
 using DataFrames         # only used for `describe`
+using EmbraceUncertainty: dataset
 using FreqTables
 using MixedModels
 using MixedModelsMakie
@@ -32,7 +33,9 @@ using ProgressMeter
 using StatsBase
 using StatsModels
 
-const contrasts = Dict{Symbol,Any}()
+if !@isdefined(contrasts)
+  const contrasts = Dict{Symbol,Any}()
+end
 const nAGQ = 9
 CairoMakie.activate!(; type="svg")
 ProgressMeter.ijulia_behavior(:clear)
@@ -59,15 +62,14 @@ One of the test data sets from the Center for Multilevel Modelling, University o
 The data are a subsample of 1934 women selected from 60 of the 64 political districts or *zila*, available as the `contra` data set in the `MixedModels` package.
 
 ```{julia}
-contra = Table(MixedModels.dataset(:contra))
+contra = Table(dataset(:contra))
 ```
 
 with summary
 
 ```{julia}
 #| code-fold: true
-let
-  df = DataFrame(contra)
+let df = DataFrame(contra)
   describe(df, :mean, :min, :median, :max, :nunique, :eltype)
 end
 ```
@@ -135,8 +137,9 @@ contrasts[:urban] = HelmertCoding()
 contrasts[:dist] = Grouping()
 
 com01 = let
-  form = @formula(use ~ 1 + livch + (age + abs2(age)) * urban + (1 | dist))
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ)
+  f = @formula use ~
+    1 + livch + (age + abs2(age)) * urban + (1 | dist)
+  fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
 end
 ```
 
@@ -177,8 +180,7 @@ contra = Table(contra; ch=contra.livch .!= "0")
 
 ```{julia}
 #| code-fold: true
-let
-  df = DataFrame(contra)
+let df = DataFrame(contra)
   describe(df, :mean, :min, :median, :max, :nunique, :eltype)
 end
 ```
@@ -186,10 +188,10 @@ end
 we fit a reduced model.
 
 ```{julia}
-com02 = let
-  form = @formula(use ~ 1 + ch + age * age * urban + (1 | dist))
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ)
-end
+com02 =
+  let f = @formula use ~ 1 + ch + age * age * urban + (1 | dist)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+  end
 ```
 
 Comparing this model to the previous model
@@ -203,10 +205,10 @@ indicates that the reduced model is adequate.
 Apparently neither the second-order interaction `age & urban` nor the third-order interaction `age & age & urban` is significant and we fit a model without these terms.
 
 ```{julia}
-com03 = let
-  form = @formula(use ~ 1 + urban + ch + age * age + (1 | dist))
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ)
-end
+com03 =
+  let f = @formula use ~ 1 + urban + ch + age * age + (1 | dist)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+  end
 ```
 
 A likelihood ratio test
@@ -240,11 +242,11 @@ indicates that all four groups have a quadratic trend with respect to age but th
 Incorporating an interaction of `age` and `ch` allows for such a shift.
 
 ```{julia}
-com04 = let
-  form =
-    @formula(use ~ 1 + urban + ch * age + age & age + (1 | dist))
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ)
-end
+com04 =
+  let f =
+      @formula use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+  end
 ```
 
 Comparing this fitted model to the previous one
@@ -258,12 +260,11 @@ confirms the usefulness of this term.
 A series of such model fits led to a model with random effects for the combinations of `dist` and `urban`, because differences between urban and rural women in the same district were comparable to differences between districts, even after accounting for an effect of `urban` at the fixed-effects (or population) level.
 
 ```{julia}
-com05 = let
-  form = @formula(
-    use ~ 1 + urban + ch * age + age & age + (1 | dist & urban)
-  )
-  fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ)
-end
+com05 =
+  let f = @formula use ~
+      1 + urban + ch * age + abs2(age) + (1 | dist & urban)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+  end
 ```
 
 In more detail,
@@ -496,7 +497,7 @@ The largest random effect is for rural settings in `D34`.
 There were 26 women in the sample from rural `D34`
 
 ```{julia}
-D34N = filter(r -> r.dist == "D34" && r.urban == "N", contra)
+D34N = filter(r -> (r.dist == "D34") & (r.urban == "N"), contra)
 ```
 
 of whom 20 used contraception, an unusually large proportion for a rural setting.

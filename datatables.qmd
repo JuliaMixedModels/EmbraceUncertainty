@@ -9,6 +9,7 @@ Load the packages to be used
 ```{julia}
 #| code-fold: true
 using DataFrames
+using EmbraceUncertainty: dataset
 using MixedModels
 using Tables
 using TypedTables
@@ -42,7 +43,7 @@ The data sets in the `MixedModels` package and the auxillary data sets used in t
 There are many examples throughout this book of loading such data sets.
 
 ```{julia}
-contra = MixedModels.dataset(:contra)
+contra = dataset(:contra)
 ```
 
 Often, for ease of access and for display, we convert the Arrow table to a `Table`, which, contrary to convention, is a type defined in [TypedTables.jl](https://github.com/JuliaData/TypedTables.jl) and not in [Tables.jl](https://github.com/JuliaData/Tables.jl).
@@ -150,7 +151,7 @@ contratbl[contratbl.dist .== "D49"]
 
 ::: {.callout-note collapse="true"}
 
-### .== is the vectorized form of the equality comparison ==
+### .== is the vectorized form of the equality comparison, ==
 
 When comparing a vector, like `contratbl.dist` to a single string or number, like `"D47"` we must "vectorize" the operation, which is done here using [dot vectorization](https://docs.julialang.org/en/v1/manual/functions/#man-vectorized)
 :::
@@ -158,7 +159,7 @@ When comparing a vector, like `contratbl.dist` to a single string or number, lik
 Or we could `filter` the rows of the table by applying a function to each row to determine if the `dist` field has the value `"D49"`.
 
 ```{julia}
-isD49dist(row) = row.dist == "D49"    # a simple 'one-liner' function definition
+isD49dist(row) = row.dist == "D49" # a 'one-liner' function definition
 filter(isD49dist, contratbl)
 ```
 

@@ -5,16 +5,19 @@ using CSV
 using DataFrames
 using Downloads
 using Markdown
+using MixedModels
 using Scratch
 using ZipFile
 
 const CACHE = Ref("")
+const MMDS = String[]
 const ML_LATEST_URL = "https://files.grouplens.org/datasets/movielens/ml-latest.zip"
 
 _file(x) = joinpath(CACHE[], string(x, ".arrow"))
 
 function __init__()
     CACHE[] = @get_scratch!("data")
+    append!(MMDS, MixedModels.datasets())
 end
 
 clear_scratchspaces!() = Scratch.clear_scratchspaces!(@__MODULE__)
@@ -84,10 +87,34 @@ function load_quiver()
     return quiver
 end
 
+const OSF_IO_URIs = Dict{String,String}(
+    "box" => "tkxnh",
+    "elstongrizzle" => "5vrbw",
+    "oxboys" => "cz6g3",
+    "sizespeed" => "kazgm",
+    "ELP_ldt_item" => "c6gxd",
+    "ELP_ldt_subj" => "rqenu",
+    "ELP_ldt_trial" => "3evhy",
+    "movies" => "kvdch",
+    "ratings" => "v73ym",
+)
+
+function osf_io_dataset(name::AbstractString)
+    if haskey(OSF_IO_URIs, name)
+        Downloads.download(
+            string("https://osf.io/", OSF_IO_URIs[name], "/download"),
+            _file(name),
+        )
+        return true
+    end
+    return false
+end        
+
 dataset(name::Symbol) = dataset(string(name))
 function dataset(name::AbstractString)
+    name in MMDS && return MixedModels.dataset(name)
     f = _file(name)
-    isfile(f) || f in load_quiver() ||
+    isfile(f) || osf_io_dataset(name) ||
         throw(ArgumentError("$(name) is not a dataset "))
     return Arrow.Table(f)
 end

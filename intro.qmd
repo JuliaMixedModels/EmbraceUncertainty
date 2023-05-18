@@ -101,14 +101,12 @@ To access these data within `Julia` we must first attach this package, and other
 
 ```{julia}
 #| code-fold: show
+#| output: false
 using AlgebraOfGraphics # high-level graphics
 using CairoMakie        # graphics back-end
 using CategoricalArrays # factors and ordered factors
 using DataFrameMacros   # elegant DataFrame manipulation
 using DataFrames        # DataFrame implementation
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL             # faster LAPACK on Intel processors
-end
 using Markdown          # utilities for generating markdown text
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
@@ -117,10 +115,10 @@ using ProgressMeter     # progress of optimizer iterations
 using Random            # random number generation
 using StatsBase         # basic statistical summaries
 
-using AlgebraOfGraphics: AlgebraOfGraphics as AoG # for easy access to some non exported methods
+using EmbraceUncertainty: dataset # `dataset` means this one
 
-CairoMakie.activate!(; type="svg");
-ProgressMeter.ijulia_behavior(:clear);
+CairoMakie.activate!(; type="svg")    # Scalable Vector Graphics
+ProgressMeter.ijulia_behavior(:clear) # suppress output
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -129,17 +127,25 @@ If you are using Julia version 1.8.0 or later the error report will include inst
 
 In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.
 
-The `MixedModels` package includes several datasets that are used in examples and in tests of the package.
-Individual datasets can be loaded with the `dataset` function.
-To allow for other packages to incorporate their own `dataset` function without causing name clashes, this function is not exported and must be called with the fully-qualified name `MixedModels.dataset`.
-(If this explanation sounds like gibberish to you, the bottom line is that you must use `MixedModels.dataset(:dyestuff)` and not just `dataset(:dyestuff)`.)
+The `EmbraceUncertainty` package provides access to the datasets used in this book.
+The directive
 
-:::{.callout-note}
-Add metadata to Arrow files for datasets
+```
+using EmbraceUncertainty: dataset
+```
+
+provides access to the `dataset` function in that package without having to "qualify" the name by writing `EmbraceUncertainty.dataset`.
+The definition of this particular `dataset` function also provides access to the datasets used
+in examples and in tests of the `MixedModels` package.
+
+:::{.callout-note collapse="true"}
+
+### Add metadata to Arrow files for datasets
+
 :::
 
 ```{julia}
-dyestuff = MixedModels.dataset(:dyestuff)
+dyestuff = dataset(:dyestuff)
 ```
 
 The output indicates that this dataset is a `Table` read from a file in the [Arrow](https://arrow.apache.org) data format.
@@ -253,8 +259,10 @@ In `yet-to-be-written-appendix` we review some of the principles of data graphic
 For example, in this plot the levels of `batch` are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are *jittered* to avoid overplotting of points.
 (Note that the two lowest yields of samples from batch `A` are identical.)
 
-::: {.callout-note}
-Jittering has not yet been added.
+::: {.callout-note collapse="true"}
+
+### Jittering has not yet been added.
+
 :::
 
 At this point we will concentrate on the information conveyed by the plot and not on how the plot is created.
@@ -276,7 +284,7 @@ The data are simulated data presented in @box73:_bayes_infer_statis_analy [, Tab
 The structure and summary
 
 ```{julia}
-dyestuff2 = MixedModels.dataset(:dyestuff2)
+dyestuff2 = dataset(:dyestuff2)
 ```
 
 ```{julia}
@@ -478,9 +486,9 @@ Int.(dsm01.X')
 A linear model without random effects can be described as $\mcY\sim\mcN(\bbX\bbbeta, \sigma^2\bbI)$.
 That is, the expected value of the response vector is the *linear predictor*, $\bbX\bbbeta$, and the covariance matrix of the multivariate Gaussian distribution for the response is $\sigma^2\bbI$, corresponding to independent, constant variance per-observation noise terms.
 
-For the linear mixed model, we describe the conditional distribution of the response, given a particular value, $\bbb$, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, $\bbb$, and the fixed-effects parameter vector $\bbbeta$.
+For the linear mixed model, we describe the conditional distribution of the response, given a particular value, $\bbb$, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, $\bbb$, and the fixed-effects parameter vector, $\bbbeta$,
 $$
-(\mcY|\mcB=\bbb)\sim\mcN(\bbX\bbbeta+\bbZ\bbb,\sigma^2\bbI)
+(\mcY|\mcB=\bbb)\sim\mcN(\bbX\bbbeta+\bbZ\bbb,\sigma^2\bbI) .
 $$
 
 The complete model can be written as
@@ -538,7 +546,7 @@ $$
 \end{bmatrix}
 $$
 
-The parameters enter into the computation via a *relative covariance factor*, $\bbLambda_{\boldsymbol\theta}$, which is the $6\times 6$ matrix $\theta\,\bbI$ in this case.
+The parameters enter into the computation via a *relative covariance factor*, $\bbLambda_{\boldsymbol\theta}$, which is the $6\times 6$ matrix, $\theta\,\bbI_6$, in this case.
 
 The method hinges on being able to evaluate efficiently the *Cholesky factor* (see @sec-cholesky for details) of
 $$
@@ -588,6 +596,12 @@ dsm01pars = DataFrame(dsm01samp.allpars)
 first(dsm01pars, 7)
 ```
 
+:::{.callout-note}
+
+### Switch to Table(dsm01samp.tbl) formulation
+
+:::
+
 ```{julia}
 last(dsm01pars, 7)
 ```
@@ -613,12 +627,15 @@ draw(
     :value => "Bootstrap samples of β";
     color=(:names => "Names"),
   ) *
-  AoG.density();
+  AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
 ```
 
-:::{.callout-note}
+:::{.callout-note collapse="true"}
+
+### Use :compact=true when interpolating numeric values
+
 Find a way to use `:compact=true` when interpolating numeric values into the text
 :::
 
@@ -648,7 +665,7 @@ draw(
     :value => "Bootstrap samples of σ";
     color=(:group => "Group"),
   ) *
-  AoG.density();
+  AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
 ```
@@ -668,7 +685,10 @@ The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_
 A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation) approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a *kernel* such as a narrow Gaussian distribution (see the linked article for details).
 In this case the distribution of the estimates is a combination of a continuous distribution and a spike or point mass at zero as shown in a histogram, @fig-dsm01_bs_sigma_hist.
 
-:::{.callout-note}
+:::{.callout-note collapse="true"}
+
+### Adjust the alpha in multiple histograms
+
 Use a lower alpha in the colors for multiple histograms so the bars behind another color are more visible
 :::
 
@@ -682,7 +702,7 @@ draw(
     :value => "Bootstrap parameter estimates of σ";
     color=(:group => "Group"),
   ) *
-  AoG.histogram(; bins=80);
+  AlgebraOfGraphics.histogram(; bins=80);
   figure=(; resolution=(800, 450)),
 )
 ```
@@ -691,7 +711,7 @@ Nearly 1000 of the 10,000 bootstrap fits are "singular" in that one (or more) of
 For this model the only way singularity can occur is for $\sigma_1$ to be zero.
 
 ```{julia}
-countmap(issingular(dsm01samp))
+count(issingular(dsm01samp))
 ```
 
 The distribution of the estimator of $\sigma_1$ with this point mass at zero is not at all like a Gaussian or normal distribution.
@@ -710,7 +730,7 @@ draw(
     :value_abs2 => "Bootstrap sample of estimates of σ²",
     color=:group,
   ) *
-  AoG.histogram(; bins=200);
+  AlgebraOfGraphics.histogram(; bins=200);
   figure=(; resolution=(800, 450)),
 )
 ```
@@ -743,10 +763,6 @@ The interval on the residual standard deviation, $\sigma$, is reasonable, given 
 ### Tracking the progress of the iterations {#sec-dsm01trace}
 
 The optional argument, `thin=1`, in a call to `fit` causes all the values of $\boldsymbol\theta$ and the corresponding value of objective from the iterative optimization to be stored in the `optsum` property.
-
-:::{.callout-note}
-Fix the recording of the fitlog so that the initial value is not recorded twice
-:::
 
 ```{julia}
 dsm01trace = fit(
@@ -826,7 +842,7 @@ caterpillar!(
 
 The `caterpillar` function returns a plot with linear spacing of the
 levels on the y axis.
-An alternative
+An alternative, the `qqcaterpillar` function
 
 ```{julia}
 #| code-fold: true
@@ -838,7 +854,7 @@ qqcaterpillar!(
 )
 ```
 
-returns a plot where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.
+returns a plot like @fig-qqcaterpillar_dsm01 where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.
 
 The `caterpillar` plot is preferred when there are only a few levels of the grouping factor, as in this case.
 When there are hundreds or thousands of random effects the `qqcaterpillar` form is preferred because it focuses attention on the "important few" at the extremes and de-emphasizes the "trivial many" that are close to zero.
@@ -911,9 +927,8 @@ Thus `dsm01` can be assigned as
 ```{julia}
 #| code-fold: false
 #| eval: false
-dsm01 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff; contrasts)
+dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff; contrasts)
 end
 ```
 

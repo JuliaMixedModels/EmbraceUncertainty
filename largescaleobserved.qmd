@@ -15,15 +15,14 @@ using AlgebraOfGraphics
 using Arrow
 using CairoMakie
 using CategoricalArrays
-using DataFrameMacros
 using DataFrames
-using EmbraceUncertainty
-using GLM
+using EmbraceUncertainty: dataset
+using GLM                  # for the lm function
 using MixedModels
 using MixedModelsMakie
 using ProgressMeter
-using SparseArrays
-using Statistics
+using SparseArrays         # for the nnz function
+using Statistics           # for the mean function
 using TypedTables
 
 optsumdir(paths::AbstractString...) =
@@ -64,13 +63,13 @@ One of the purposes of this chapter is to study which dimensions of the data hav
 The two datasets examined in @sec-largescaledesigned, from the English Lexicon Project [@Balota_2007], consist of `trials` or `instances` associated with `subject` and `item` factors.
 The `subject` and `item` factors are "incompletely crossed" in that each item occurred in trials with several subjects, but not all subjects, and each subject responded to several different items, but not to all items.
 
-Similarly in the movie ratings, each instance of a rating is associated with a user and a movie and these factors are incompletely crossed.
+Similarly in the movie ratings, each instance of a rating is associated with a user and with a movie, and these factors are incompletely crossed.
 
 ```{julia}
-ratings = EmbraceUncertainty.dataset(:ratings)
+ratings = dataset(:ratings)
 ```
 
-Convert this table to a `DataFrame` and drop the `timestamp` column, which we won't be using.
+Convert this Arrow table to a `Table` and drop the `timestamp` column, which we won't be using.
 (For small data sets dropping such columns is not important but with over 27 million ratings it does help to drop unnecessary columns to save some memory space.)
 
 ```{julia}
@@ -78,19 +77,21 @@ ratings =
   Table(getproperties(ratings, (:userId, :movieId, :rating)))
 ```
 
-Information on the movies is available as
+Information on the movies is available in the `movies` dataset, which we supplement with the mean rating for each movie in the `ratings` table.
 
 ```{julia}
-movies = disallowmissing!(
-  leftjoin!(
-    combine(
-      groupby(DataFrame(ratings), :movieId),
-      :rating => mean => :mnrtng,
-    ),
-    DataFrame(EmbraceUncertainty.dataset(:movies));
-    on=:movieId,
-  );
-  error=false,
+movies = Table(
+  disallowmissing!(
+    leftjoin!(
+      combine(
+        groupby(DataFrame(ratings), :movieId),
+        :rating => mean => :mnrtng,
+      ),
+      DataFrame(dataset(:movies));
+      on=:movieId,
+    );
+    error=false,
+  )
 )
 ```
 
@@ -111,6 +112,9 @@ users = Table(
     :rating => mean => :umnrtng,
   ),
 )
+```
+
+```{julia}
 extrema(users.urtngs)
 ```
 
@@ -188,7 +192,7 @@ ratings = Table(
         DataFrame(getproperties(movies, (:movieId, :nrtngs)));
         on=:movieId,
       ),
-      DataFrame(users);
+      DataFrame(getproperties(users, (:userId, :urtngs)));
       on=:userId,
     ),
   ),
@@ -259,7 +263,7 @@ The results are summarized in the following table
 
 ```{julia}
 #| code-fold: true
-sizespeed = Table(Arrow.Table("./data/sizespeed.arrow"))
+sizespeed = Table(dataset(:sizespeed))
 ```
 
 In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nev` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.

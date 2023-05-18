@@ -30,15 +30,12 @@ Load the packages to be used.
 #| output: false
 
 using AlgebraOfGraphics
-using Arrow
 using CairoMakie
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
+using EmbraceUncertainty: dataset
 using LinearAlgebra
-if contains(first(Sys.cpu_info()).model, "Intel")
-  using MKL
-end
 using MixedModels
 using MixedModelsMakie
 using ProgressMeter
@@ -50,9 +47,9 @@ using StandardizedPredictors
 
 if !isdefined(Main, :contrasts)
   const contrasts = Dict{Symbol,Any}()
-end;
-CairoMakie.activate!(; type="svg");
-ProgressMeter.ijulia_behavior(:clear);
+end
+CairoMakie.activate!(; type="svg")
+ProgressMeter.ijulia_behavior(:clear)
 ```
 
 Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time.
@@ -67,7 +64,7 @@ In this chapter we introduce graphical and statistical techniques for the analys
 Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
 
 ```{julia}
-elstongrizzle = Arrow.Table("./data/elstongrizzle.arrow")
+elstongrizzle = dataset(:elstongrizzle)
 ```
 
 Converting the table to a data frame provides the description
@@ -84,12 +81,13 @@ A common way of plotting such longitudinal data is response versus time on a sin
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
-egplt =
-  data(egdf) *
-  mapping(:time => "Age (yr)", :resp => "Ramus bone length (mm)")
 draw(
-  egplt *
-  mapping(; color=:Subj) *
+  data(egdf) *
+  mapping(
+    :time => "Age (yr)",
+    :resp => "Ramus bone length (mm)",
+    color=:Subj,
+  ) *
   (visual(Scatter) + visual(Lines)),
 )
 ```
@@ -132,9 +130,8 @@ Although it seems that there isn't a strong correlation between initial bone len
 
 ```{julia}
 contrasts[:Subj] = Grouping()
-egm01 = let
-  form = @formula(resp ~ 1 + time + (1 + time | Subj))
-  fit(MixedModel, form, egdf; contrasts)
+egm01 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
+  fit(MixedModel, f, egdf; contrasts)
 end
 println(egm01)
 ```
@@ -177,9 +174,8 @@ A model with `time` centered at 8 years of age can be fit as
 
 ```{julia}
 contrasts[:time] = Center(8)
-egm02 = let
-  form = @formula(resp ~ 1 + time + (1 + time | Subj))
-  fit(MixedModel, form, egdf; contrasts)
+egm02 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
+  fit(MixedModel, f, egdf; contrasts)
 end
 println(egm02)
 ```
@@ -200,9 +196,8 @@ A third option is to center the `time` covariate at the mean of the original `ti
 
 ```{julia}
 contrasts[:time] = Center()
-egm03 = let
-  form = @formula(resp ~ 1 + time + (1 + time | Subj))
-  fit(MixedModel, form, egdf; contrasts)
+egm03 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
+  fit(MixedModel, f, egdf; contrasts)
 end
 println(egm03)
 ```
@@ -249,13 +244,12 @@ The usual cautions about polynomial terms in regression models apply even more e
 For balanced data like `egdf` we usually center the `time` axis about the mean, producing
 
 ```{julia}
-egm04 = let
-  form = @formula(
-    resp ~ 1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
-  )
-  dat = @transform(egdf, :ctime = :time - 8.75)
-  fit(MixedModel, form, dat; contrasts)
-end
+egm04 =
+  let f = @formula resp ~
+      1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
+    dat = @transform(egdf, :ctime = :time - 8.75)
+    fit(MixedModel, f, dat; contrasts)
+  end
 println(egm04)
 ```
 
@@ -283,7 +277,7 @@ Often the "subjects" on which longitudinal measurements are made are divided int
 Many of the examples cited in @davis2002 are of this type, including one from @box1950
 
 ```{julia}
-box1950 = Arrow.Table("./data/box.arrow")
+box1950 = dataset(:box)
 ```
 
 ```{julia}
@@ -424,25 +418,21 @@ We can begin with a main effect for `Group`, as in
 
 ```{julia}
 delete!(contrasts, :time)
-bxm01 = let
-  form = @formula(
-    resp ~
+bxm01 =
+  let f = @formula resp ~
       (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
-  )
-  fit(MixedModel, form, bxdf; contrasts)
-end
+    fit(MixedModel, f, bxdf; contrasts)
+  end
 ```
 
 but we expect that a model without the main effect for `Group`,
 
 ```{julia}
-bxm02 = let
-  form = @formula(
-    resp ~
+bxm02 =
+  let f = @formula resp ~
       1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
-  )
-  fit(MixedModel, form, bxdf; contrasts)
-end
+    fit(MixedModel, f, bxdf; contrasts)
+  end
 ```
 
 will be adequate, as confirmed by
@@ -471,12 +461,11 @@ A model without systematic differences between groups in the initial weight and 
 It would indicate that the groups are initially homogeneous both in weight and growth rate but, as the trial proceeds, the different treatments change the rate of growth.
 
 ```{julia}
-bxm03 = let
-  form = @formula(
-    resp ~ 1 + time + time^2 & Group + (1 + time + time^2 | Subj)
-  )
-  fit(MixedModel, form, bxdf; contrasts)
-end
+bxm03 =
+  let f = @formula resp ~
+      1 + time + time^2 & Group + (1 + time + time^2 | Subj)
+    fit(MixedModel, f, bxdf; contrasts)
+  end
 ```
 
 ```{julia}
@@ -632,11 +621,11 @@ end
 Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for `time ^ 2` reduces the model too much.
 
 ```{julia}
-bxm04 = let
-  form =
-    @formula(resp ~ 1 + time + time^2 & Group + (1 + time | Subj))
-  fit(MixedModel, form, bxdf; contrasts)
-end
+bxm04 =
+  let f =
+      @formula resp ~ 1 + time + time^2 & Group + (1 + time | Subj)
+    fit(MixedModel, f, bxdf; contrasts)
+  end
 ```
 
 ```{julia}
@@ -646,17 +635,15 @@ MixedModels.likelihoodratiotest(bxm04, bxm03)
 as does eliminating within-subject correlations between the random-effects for the `time^2` random effect and the other random effects.
 
 ```{julia}
-bxm05 = let
-  form = @formula(
-    resp ~
+bxm05 =
+  let f = @formula resp ~
       1 +
       time +
       time^2 & Group +
       (1 + time | Subj) +
       (0 + time^2 | Subj)
-  )
-  fit(MixedModel, form, bxdf; contrasts)
-end
+    fit(MixedModel, f, bxdf; contrasts)
+  end
 ```
 
 ```{julia}

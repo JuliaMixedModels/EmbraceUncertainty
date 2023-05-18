@@ -10,6 +10,6 @@ _book/
 _freeze/
 .jupyter_cache/
 docs/
-
+data/
 
 /.quarto/
