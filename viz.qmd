@@ -1,0 +1,60 @@
+---
+jupyter: julia-1.9
+---
+
+# Vizualization of Mixed Models {#sec-viz}
+
+
+```{julia}
+#| code-fold: true
+const hide_progress = true
+
+using AlgebraOfGraphics
+using CairoMakie
+using DataFrames
+if contains(first(Sys.cpu_info()).model, "Intel")
+  using MKL
+end
+using MixedModels
+using MixedModelsMakie
+using ProgressMeter
+using Random
+
+ProgressMeter.ijulia_behavior(:clear);
+CairoMakie.activate!(; type="svg");
+```
+
+```{julia}
+kb07 = DataFrame(MixedModels.dataset("kb07"))
+contrasts = Dict(:item => Grouping(),
+                 :subj => Grouping(),
+                 :spkr => EffectsCoding(),
+                 :prec => EffectsCoding(),
+                 :load => EffectsCoding())
+
+fm1 = fit(MixedModel, @formula(1000 / rt_raw ~ spkr * prec * load + (1|item) + (1|subj)), kb07; contrasts, progress=true, thin=1)
+```
+
+
+```{julia}
+let f = Figure()
+  ax1 = Axis(f[1,1], title="Subject")
+  caterpillar!(ax1, fm1, :subj)
+  # caterpillar!(ax2, fm1, :subj)
+  f
+end
+
+    let f = Figure(; resolution=(1000, 600))
+        gl = f[1,1] = GridLayout()
+        re = ranefinfo(m2)
+        qqcaterpillar!(gl, re[:item])
+        Label(gl[end+1, :], "Item"; font=:bold)
+        gl = f[1,2] = GridLayout()
+        qqcaterpillar!(gl, re[:subj])
+        Label(gl[end+1, :], "Subject"; font=:bold)
+        Label(f[0, :], "Conditional Modes")
+        colsize!(f.layout, 1, Auto(0.5))
+        save(joinpath(OUTDIR, "qqcat_kb07_joint.png"), f)
+        f
+    end
+```
