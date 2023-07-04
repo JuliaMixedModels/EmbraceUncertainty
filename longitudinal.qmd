@@ -31,7 +31,6 @@ Load the packages to be used.
 
 using AlgebraOfGraphics
 using CairoMakie
-using CategoricalArrays
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
@@ -320,8 +319,9 @@ Considering first the control group, whose trajectories can be plotted in a "spa
 #| label: fig-bxctrlspaghetti
 bxaxes =
   mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")
+bxgdf = groupby(bxdf, :Group)
 draw(
-  data(@subset(bxdf, :Group == "Control")) *
+  data(bxgdf[("Control",)]) *
   bxaxes *
   mapping(; color=:Subj) *
   (visual(Scatter) + visual(Lines)),
@@ -334,17 +334,14 @@ or in separate panels ordered by initial weight, @fig-bxctrllayout.
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth.
 #| label: fig-bxctrllayout
-let
-  df = @subset(bxdf, :Group == "Control")
-  df.orderedsubj = CategoricalArray(
-    df.Subj;
-    levels=sort(@subset(df, iszero(:time)), :resp).Subj,
-    ordered=true,
-  )
+let df = bxgdf[("Control",)]
   draw(
     data(df) *
     bxaxes *
-    mapping(; layout=:orderedsubj) *
+    mapping(;
+      layout=:Subj =>
+        sorter(sort!(filter(:time => iszero, df), :resp).Subj),
+    ) *
     visual(ScatterLines);
     axis=(height=250, width=150),
   )
@@ -360,16 +357,14 @@ A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
 #| fig-cap: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth.
 #| label: fig-bxthiolayout
 let
-  df = @subset(bxdf, :Group == "Thioracil")
-  df.orderedsubj = CategoricalArray(
-    df.Subj;
-    levels=sort(@subset(df, iszero(:time)), :resp).Subj,
-    ordered=true,
-  )
+  df = bxgdf[("Thioracil",)]
   draw(
     data(df) *
     bxaxes *
-    mapping(; layout=:orderedsubj) *
+    mapping(
+      layout=:Subj =>
+        sorter(sort!(filter(:time => iszero, df), :resp).Subj),
+    ) *
     visual(ScatterLines);
     axis=(height=250, width=150),
   )
@@ -382,19 +377,17 @@ By contrast, in the Thyroxin group, @fig-bxthyrlayout,
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Weight (g) of rats in the Thyroxingroup versus time in trial (wk). Panels are ordered by increasing initial weigth.
+#| fig-cap: Weight (g) of rats in the Thyroxin group versus time in trial (wk). Panels are ordered by increasing initial weigth.
 #| label: fig-bxthyrlayout
 let
-  df = @subset(bxdf, :Group == "Thyroxin")
-  df.orderedsubj = CategoricalArray(
-    df.Subj;
-    levels=sort(@subset(df, iszero(:time)), :resp).Subj,
-    ordered=true,
-  )
+  df = bxgdf[("Thyroxin",)]
   draw(
     data(df) *
     bxaxes *
-    mapping(; layout=:orderedsubj) *
+    mapping(
+      layout=:Subj =>
+        sorter(sort!(filter(:time => iszero, df), :resp).Subj),
+    ) *
     visual(ScatterLines);
     axis=(height=250, width=150),
   )
