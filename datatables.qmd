@@ -254,3 +254,5 @@ contratbl = Table(
 
 The [JuliaData](https://github.com/JuliaData) organization manages the development of several packages related to data science and data management, including [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl), a comprehensive system for working with column-oriented data tables in Julia.
 @Kaminski2023, written by the primary author of that package, provides an in-depth introduction to data science facilities, in particular the `DataFrames` package, in Julia.
+
+This package is particularly well-suited to more advanced data manipulation such as the `split-apply-combine` strategy [@Wickham2011] and "joins" of data tables.
