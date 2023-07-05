@@ -131,6 +131,7 @@ Load the packages to be used
 using AlgebraOfGraphics
 using BenchmarkTools
 using CairoMakie
+using EmbraceUncertainty: dataset
 using FreqTables
 using LinearAlgebra
 using MixedModels
@@ -232,7 +233,7 @@ We illustrate some of these computations using only the fixed-effects specificat
 ```{julia}
 #| code-fold: show
 #| output: false
-contra = let tbl = MixedModels.dataset(:contra)
+contra = let tbl = dataset(:contra)
   Table(tbl; ch=tbl.livch .≠ "0")
 end
 contrasts = Dict{Symbol,Any}(
@@ -241,9 +242,9 @@ contrasts = Dict{Symbol,Any}(
   :dist => Grouping(),
 )
 com05 =
-  let form = @formula use ~
+  let f = @formula use ~
       1 + urban + ch * age + age & age + (1 | dist & urban)
-    fit(MixedModel, form, contra, Bernoulli(); contrasts, nAGQ=9)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ=9)
   end
 ```
 

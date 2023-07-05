@@ -29,6 +29,7 @@ Attach the packages to be used in this appendix
 
 ```{julia}
 #| code-fold: true
+using EmbraceUncertainty: dataset
 using LinearAlgebra
 using MixedModels
 ```
@@ -376,7 +377,7 @@ However, for the linear mixed model, a similar calculation must be done for ever
 Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject `S372` in the `sleepstudy` dataset.
 
 ```{julia}
-sleepstudy = Table(MixedModels.dataset(:sleepstudy))
+sleepstudy = Table(dataset(:sleepstudy))
 S372 = sleepstudy[sleepstudy.subj .== "S372"]
 ```
 

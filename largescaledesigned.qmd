@@ -16,6 +16,7 @@ using Chain
 using DataFrameMacros
 using DataFrames
 using Effects
+using EmbraceUncertainty: dataset
 using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
@@ -25,8 +26,6 @@ using StatsBase
 
 const contrasts =
   Dict{Symbol,Any}(:item => Grouping(), :subj => Grouping())
-datadir(paths::AbstractString...) =
-  joinpath(@__DIR__, "data", paths...)
 CairoMakie.activate!(; type="svg")
 ProgressMeter.ijulia_behavior(:clear)
 ```
@@ -48,7 +47,7 @@ Several covariates, some relating to the subject and some relating to the target
 Initially we consider only the trial-level data.
 
 ```{julia}
-ldttrial = Arrow.Table(datadir("ELP_ldt_trial.arrow"))
+ldttrial = dataset(:ELP_ldt_trial)
 ```
 
 ```{julia}
@@ -546,14 +545,14 @@ elm01a = restoreoptsum!(
 Other covariates associated with the item are available as
 
 ```{julia}
-elpldtitem = DataFrame(Arrow.Table(datadir("ELP_ldt_item.arrow")))
+elpldtitem = DataFrame(dataset(:ELP_ldt_item))
 describe(elpldtitem)
 ```
 
 and those associated with the subject are
 
 ```{julia}
-elpldtsubj = DataFrame(Arrow.Table(datadir("ELP_ldt_subj.arrow")))
+elpldtsubj = DataFrame(dataset(:ELP_ldt_subj))
 describe(elpldtsubj)
 ```
 
