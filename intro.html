@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.340">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -110,7 +110,8 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
@@ -135,7 +136,7 @@ div.csl-indent {
       <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./intro.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -317,44 +318,45 @@ div.csl-indent {
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics </span><span class="co"># high-level graphics</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie        </span><span class="co"># graphics back-end</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays </span><span class="co"># factors and ordered factors</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrameMacros   </span><span class="co"># elegant DataFrame manipulation</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames        </span><span class="co"># DataFrame implementation</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="fu">contains</span>(<span class="fu">first</span>(<span class="bu">Sys</span>.<span class="fu">cpu_info</span>()).model, <span class="st">"Intel"</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="im">using</span> <span class="bu">MKL             </span><span class="co"># faster LAPACK on Intel processors</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Markdown          </span><span class="co"># utilities for generating markdown text</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels       </span><span class="co"># fit and examine mixed-effects models</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie  </span><span class="co"># graphics for mixed-effects models</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Printf            </span><span class="co"># formatted printing</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter     </span><span class="co"># progress of optimizer iterations</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random            </span><span class="co"># random number generation</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase         </span><span class="co"># basic statistical summaries</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span>: AlgebraOfGraphics as AoG <span class="co"># for easy access to some non exported methods</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>);</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrameMacros   </span><span class="co"># elegant DataFrame manipulation</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames        </span><span class="co"># DataFrame implementation</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Markdown          </span><span class="co"># utilities for generating markdown text</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels       </span><span class="co"># fit and examine mixed-effects models</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie  </span><span class="co"># graphics for mixed-effects models</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Printf            </span><span class="co"># formatted printing</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter     </span><span class="co"># progress of optimizer iterations</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random            </span><span class="co"># random number generation</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase         </span><span class="co"># basic statistical summaries</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset <span class="co"># `dataset` means this one</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>)    <span class="co"># Scalable Vector Graphics</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear) <span class="co"># suppress progress output</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>A package must be attached before any of the data sets or functions in the package can be used. If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s). If you are using Julia version 1.8.0 or later the error report will include instructions on how to do this.</p>
 <p>In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.</p>
-<p>The <code>MixedModels</code> package includes several datasets that are used in examples and in tests of the package. Individual datasets can be loaded with the <code>dataset</code> function. To allow for other packages to incorporate their own <code>dataset</code> function without causing name clashes, this function is not exported and must be called with the fully-qualified name <code>MixedModels.dataset</code>. (If this explanation sounds like gibberish to you, the bottom line is that you must use <code>MixedModels.dataset(:dyestuff)</code> and not just <code>dataset(:dyestuff)</code>.)</p>
+<p>The <code>EmbraceUncertainty</code> package provides access to the datasets used in this book. The directive</p>
+<pre><code>using EmbraceUncertainty: dataset</code></pre>
+<p>provides access to the <code>dataset</code> function in that package without having to “qualify” the name by writing <code>EmbraceUncertainty.dataset</code>. The definition of this particular <code>dataset</code> function also provides access to the datasets used in examples and in tests of the <code>MixedModels</code> package.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Add metadata to Arrow files for datasets
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Add metadata to Arrow files for datasets</p>
+
+</div>
 </div>
 </div>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dyestuff <span class="op">=</span> MixedModels.<span class="fu">dataset</span>(<span class="op">:</span>dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dyestuff <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>Arrow.Table with 30 rows, 2 columns, and schema:
  :batch  String
@@ -364,7 +366,7 @@ Note
 <p>The output indicates that this dataset is a <code>Table</code> read from a file in the <a href="https://arrow.apache.org">Arrow</a> data format.</p>
 <p>A <code>Table</code> is a general, but “bare bones”, tabular form defined in the <a href="https://github.com/JuliaData/Tables.jl">Tables</a> package. This particular table, read from an <code>Arrow</code> file, will be read-only. Often it is convenient to convert the read-only table form to a <code>DataFrame</code> to be able to use the full power of the <a href="https://github.com/JuliaData/DataFrames.jl">DataFrames</a> package.</p>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dyestuff <span class="op">=</span> <span class="fu">DataFrame</span>(dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dyestuff <span class="op">=</span> <span class="fu">DataFrame</span>(dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <div><div style="float: left;"><span>30×2 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">5 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
@@ -518,7 +520,7 @@ Note
 </div>
 <p>The <code>describe</code> method for a <code>DataFrame</code> provides a concise description of the structure of the data,</p>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div><div style="float: left;"><span>2×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
@@ -572,14 +574,14 @@ Note
 </div>
 <p>Combining this information with the initial description of the <code>Table</code> we see that the data frame consists of 30 observations of the <code>yield</code>, the response variable, and of the covariate, <code>batch</code>, which is a categorical variable whose levels are character strings.</p>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(dyestuff.batch)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(dyestuff.batch)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}</code></pre>
 </div>
 </div>
 <p>(<code>DictEncoded</code> is the <code>Arrow</code> term for a categorical structure where the levels form a dictionary or lookup table and the values are stored as indices into this lookup table.)</p>
 <div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">levels</span>(dyestuff.batch))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">levels</span>(dyestuff.batch))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>["A", "B", "C", "D", "E", "F"]</code></pre>
 </div>
@@ -588,7 +590,7 @@ Note
 <p>It is a good practice to apply <code>describe</code> to any data frame the first time you work with it and to check carefully that any categorical variables are indeed represented as factors.</p>
 <p>The data in a data frame are viewed as a table with columns corresponding to variables and rows to observations. The functions <code>first</code> and <code>last</code> select the first or last few rows of the table.</p>
 <div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(dyestuff, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(dyestuff, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <div><div style="float: left;"><span>7×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
@@ -646,7 +648,7 @@ Note
 </div>
 </div>
 <div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(dyestuff, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(dyestuff, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div><div style="float: left;"><span>7×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
@@ -705,7 +707,7 @@ Note
 </div>
 <p>or we could tabulate the data using <code>groupby</code> and <code>combine</code> from <a href="https://github.com/JuliaData/DataFrames.jl">DataFrames</a>.</p>
 <div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span>(<span class="fu">groupby</span>(dyestuff, <span class="op">:</span>batch), <span class="op">:</span>yield <span class="op">=&gt;</span> mean, nrow <span class="op">=&gt;</span> <span class="op">:</span>n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span>(<span class="fu">groupby</span>(dyestuff, <span class="op">:</span>batch), <span class="op">:</span>yield <span class="op">=&gt;</span> mean, nrow <span class="op">=&gt;</span> <span class="op">:</span>n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div><div style="float: left;"><span>6×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
@@ -769,46 +771,18 @@ Note
 <div class="cell" data-execution_count="10">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="st">    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">Returns a `DataFrame` created from df with the levels of `grps` reordered according to</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">`combine(groupby(df, grps), resp =&gt; sumryf)` and this summary DataFrame, also with the</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">levels of `grps` reordered.</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">_meanrespfrm</span>(</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  df,</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  resp<span class="op">::</span><span class="dt">Symbol</span>,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  grps<span class="op">::</span><span class="dt">Symbol</span>;</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  sumryf<span class="op">::</span><span class="dt">Function</span>=mean,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ensure the relevant columns are types that Makie can deal with</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="fu">transform</span>(</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    df,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=&gt;</span> <span class="dt">Array</span>,</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    grps <span class="op">=&gt;</span> CategoricalArray;</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    renamecols<span class="op">=</span><span class="cn">false</span>,</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create a summary table by mean resp</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  sumry <span class="op">=</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sort!</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(df, grps), resp <span class="op">=&gt;</span> sumryf <span class="op">=&gt;</span> resp), resp)</span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  glevs <span class="op">=</span> <span class="fu">string</span>.(sumry[!, grps])   <span class="co"># group levels in ascending order of mean resp</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">levels!</span>(df[!, grps], glevs)</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">levels!</span>(sumry[!, grps], glevs)</span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> df, sumry</span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  df, sumry <span class="op">=</span> <span class="fu">_meanrespfrm</span>(dyestuff, <span class="op">:</span>yield, <span class="op">:</span>batch)</span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>yield <span class="op">=&gt;</span> <span class="st">"Yield of dyestuff [g]"</span>,</span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>batch <span class="op">=&gt;</span> <span class="st">"Batch of intermediate product"</span>,</span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(df) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Scatter; marker<span class="op">=</span><span class="ch">'○'</span>, markersize<span class="op">=</span><span class="fl">12</span>)) <span class="op">+</span></span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(sumry) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Lines));</span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>)),</span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  sumry <span class="op">=</span> <span class="fu">sort!</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(dyestuff, <span class="op">:</span>batch), <span class="op">:</span>yield <span class="op">=&gt;</span> mean <span class="op">=&gt;</span> <span class="op">:</span>yield), <span class="op">:</span>yield)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>yield <span class="op">=&gt;</span> <span class="st">"Yield of dyestuff [g]"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>batch <span class="op">=&gt;</span> <span class="fu">sorter</span>(sumry.batch) <span class="op">=&gt;</span> <span class="st">"Batch of intermediate product"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(dyestuff) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Scatter; marker<span class="op">=</span><span class="ch">'○'</span>, markersize<span class="op">=</span><span class="fl">12</span>)) <span class="op">+</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(sumry) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Lines));</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>)),</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <div id="fig-dyestuffdata" class="quarto-figure quarto-figure-center anchored">
@@ -821,7 +795,7 @@ Note
 </div>
 <p>than we do from numerical summaries.</p>
 <p>In <a href="#fig-dyestuffdata">Figure&nbsp;<span>1.1</span></a> we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability. For example, four of the five preparations from batch F produced lower yields than did any of the preparations from batches B, C, and E.</p>
-<p>This plot, and essentially all the other plots in this book, were created using the <a href="https://makie.juliaplots.io">Makie</a> package (<span class="citation" data-cites="DanischKrumbiegel2021">Danisch &amp; Krumbiegel (<a href="references.html#ref-DanischKrumbiegel2021" role="doc-biblioref">2021</a>)</span>).</p>
+<p>This plot, and essentially all the other plots in this book, were created using the <a href="https://makie.juliaplots.io">Makie</a> package <span class="citation" data-cites="DanischKrumbiegel2021">(<a href="references.html#ref-DanischKrumbiegel2021" role="doc-biblioref">Danisch &amp; Krumbiegel, 2021</a>)</span>.</p>
 <p>In <code>yet-to-be-written-appendix</code> we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot. For example, in this plot the levels of <code>batch</code> are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are <em>jittered</em> to avoid overplotting of points. (Note that the two lowest yields of samples from batch <code>A</code> are identical.)</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -829,11 +803,11 @@ Note
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Jittering has not yet been added.
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Jittering has not yet been added.</p>
+
 </div>
 </div>
 <p>At this point we will concentrate on the information conveyed by the plot and not on how the plot is created.</p>
@@ -847,7 +821,7 @@ Note
 </blockquote>
 <p>The structure and summary</p>
 <div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dyestuff2 <span class="op">=</span> MixedModels.<span class="fu">dataset</span>(<span class="op">:</span>dyestuff2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dyestuff2 <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>dyestuff2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>Arrow.Table with 30 rows, 2 columns, and schema:
  :batch  String
@@ -855,8 +829,8 @@ Note
 </div>
 </div>
 <div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dyestuff2 <span class="op">=</span> <span class="fu">DataFrame</span>(dyestuff2)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(dyestuff2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dyestuff2 <span class="op">=</span> <span class="fu">DataFrame</span>(dyestuff2)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(dyestuff2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div><div style="float: left;"><span>2×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
@@ -913,15 +887,18 @@ Note
 <div class="cell" data-execution_count="13">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  df, sumry <span class="op">=</span> <span class="fu">_meanrespfrm</span>(dyestuff2, <span class="op">:</span>yield, <span class="op">:</span>batch)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(<span class="op">:</span>yield <span class="op">=&gt;</span> <span class="st">"Simulated yield"</span>, <span class="op">:</span>batch <span class="op">=&gt;</span> <span class="st">"Batch"</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(df) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Scatter; marker<span class="op">=</span><span class="ch">'○'</span>, markersize<span class="op">=</span><span class="fl">12</span>)) <span class="op">+</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(sumry) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Lines));</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>)),</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  sumry <span class="op">=</span> <span class="fu">sort!</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(dyestuff2, <span class="op">:</span>batch), <span class="op">:</span>yield <span class="op">=&gt;</span> mean <span class="op">=&gt;</span> <span class="op">:</span>yield), <span class="op">:</span>yield)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>yield <span class="op">=&gt;</span> <span class="st">"Simulated yield"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>batch <span class="op">=&gt;</span> <span class="fu">sorter</span>(sumry.batch) <span class="op">=&gt;</span> <span class="st">"Batch"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(dyestuff2) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Scatter; marker<span class="op">=</span><span class="ch">'○'</span>, markersize<span class="op">=</span><span class="fl">12</span>)) <span class="op">+</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">data</span>(sumry) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(Lines));</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>)),</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div id="fig-dyestuff2data" class="quarto-figure quarto-figure-center anchored">
@@ -945,10 +922,10 @@ Note
 <h3 data-number="1.3.1" class="anchored" data-anchor-id="sec-dyestuffLMM"><span class="header-section-number">1.3.1</span> A model for the dyestuff data</h3>
 <p>We fit a model to the data allowing for an overall level of the <code>yield</code> and for an additive random effect for each level of <code>batch</code>.</p>
 <div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch))</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dyestuff)</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="kw">let</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dyestuff)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <table class="table table-sm table-striped small">
 <thead>
@@ -984,7 +961,7 @@ Note
 </div>
 <p>By default, this compact display of mixed-effects model fits is used in <a href="https://jupyter.org">Jupyter</a> notebooks, which are the evaluation engine for <a href="https://quarto.org/docs/books/">quarto books</a> with Julia code chunks. To obtain more information we can <code>print</code> the model, as in</p>
 <div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(dsm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(dsm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
  yield ~ 1 + (1 | batch)
@@ -998,15 +975,13 @@ Residual              2451.2501 49.5101
  Number of obs: 30; levels of grouping factors: 6
 
   Fixed-effects parameters:
-────────────────────────────────────────────────</code></pre>
+────────────────────────────────────────────────
+              Coef.  Std. Error      z  Pr(&gt;|z|)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-              Coef.  Std. Error      z  Pr(&gt;|z|)
-────────────────────────────────────────────────</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>(Intercept)  1527.5     17.6946  86.33    &lt;1e-99
+────────────────────────────────────────────────
+(Intercept)  1527.5     17.6946  86.33    &lt;1e-99
 ────────────────────────────────────────────────</code></pre>
 </div>
 </div>
@@ -1151,8 +1126,8 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 </div>
 </div>
 <p>A linear model without random effects can be described as <span class="math inline">\({\mathcal{Y}}\sim{\mathcal{N}}({\mathbf{X}}{\boldsymbol{\beta}}, \sigma^2{\mathbf{I}})\)</span>. That is, the expected value of the response vector is the <em>linear predictor</em>, <span class="math inline">\({\mathbf{X}}{\boldsymbol{\beta}}\)</span>, and the covariance matrix of the multivariate Gaussian distribution for the response is <span class="math inline">\(\sigma^2{\mathbf{I}}\)</span>, corresponding to independent, constant variance per-observation noise terms.</p>
-<p>For the linear mixed model, we describe the conditional distribution of the response, given a particular value, <span class="math inline">\({\mathbf{b}}\)</span>, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, <span class="math inline">\({\mathbf{b}}\)</span>, and the fixed-effects parameter vector <span class="math inline">\({\boldsymbol{\beta}}\)</span>. <span class="math display">\[
-({\mathcal{Y}}|{\mathcal{B}}={\mathbf{b}})\sim{\mathcal{N}}({\mathbf{X}}{\boldsymbol{\beta}}+{\mathbf{Z}}{\mathbf{b}},\sigma^2{\mathbf{I}})
+<p>For the linear mixed model, we describe the conditional distribution of the response, given a particular value, <span class="math inline">\({\mathbf{b}}\)</span>, of the random effects as multivariate Gaussian with mean determined by a linear predictor expression involving both the assumed random effects value, <span class="math inline">\({\mathbf{b}}\)</span>, and the fixed-effects parameter vector, <span class="math inline">\({\boldsymbol{\beta}}\)</span>, <span class="math display">\[
+({\mathcal{Y}}|{\mathcal{B}}={\mathbf{b}})\sim{\mathcal{N}}({\mathbf{X}}{\boldsymbol{\beta}}+{\mathbf{Z}}{\mathbf{b}},\sigma^2{\mathbf{I}}) .
 \]</span></p>
 <p>The complete model can be written as <span id="eq-lmmdist"><span class="math display">\[
 \begin{aligned}
@@ -1206,7 +1181,7 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 {\mathbf{y}}'{\mathbf{X}}&amp; {\mathbf{y}}'{\mathbf{y}}
 \end{bmatrix}
 \]</span></p>
-<p>The parameters enter into the computation via a <em>relative covariance factor</em>, <span class="math inline">\({\boldsymbol{\Lambda}}_{\boldsymbol\theta}\)</span>, which is the <span class="math inline">\(6\times 6\)</span> matrix <span class="math inline">\(\theta\,{\mathbf{I}}\)</span> in this case.</p>
+<p>The parameters enter into the computation via a <em>relative covariance factor</em>, <span class="math inline">\({\boldsymbol{\Lambda}}_{\boldsymbol\theta}\)</span>, which is the <span class="math inline">\(6\times 6\)</span> matrix, <span class="math inline">\(\theta\,{\mathbf{I}}_6\)</span>, in this case.</p>
 <p>The method hinges on being able to evaluate efficiently the <em>Cholesky factor</em> (see <a href="linalg.html#sec-cholesky"><span>Section&nbsp;B.2.2</span></a> for details) of <span class="math display">\[
 \begin{bmatrix}
 {\boldsymbol{\Lambda}}_\theta'\mathbf{Z'Z}{\boldsymbol{\Lambda}}_\theta+{\mathbf{I}}&amp;
@@ -1332,6 +1307,19 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 </tbody>
 </table>
 </div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Switch to Table(dsm01samp.tbl) formulation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
 </div>
 </div>
 <div class="cell" data-execution_count="28">
@@ -1667,7 +1655,7 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of β"</span>;</span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Names"</span>),</span>
 <span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  AoG.<span class="fu">density</span>();</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
 <span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1681,22 +1669,25 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Use :compact=true when interpolating numeric values
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Find a way to use <code>:compact=true</code> when interpolating numeric values into the text</p>
+</div>
 </div>
 </div>
 <div class="cell" data-execution_count="31">
 <div class="cell-output cell-output-display" data-execution_count="32">
 <p>The distribution of the estimates of <code>β₁</code> is more-or-less a Gaussian (or “normal”) shape, with a mean value of 1528.021212 which is close to the estimated <code>β₁</code> of 1527.500000.</p>
-<p>Similarly the standard deviation of the simulated β values, 17.711433258971017 is close to the standard error of the parameter, 17.694552727788437.</p>
+<p>Similarly the standard deviation of the simulated β values, 17.71143325897102 is close to the standard error of the parameter, 17.694552727788437.</p>
 </div>
 </div>
 <p>In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect. The estimates are approximately normally distributed centered about the “true” parameter value with a standard deviation given by the standard error of the parameter.</p>
@@ -1710,7 +1701,7 @@ Note
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of σ"</span>;</span>
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>group <span class="op">=&gt;</span> <span class="st">"Group"</span>),</span>
 <span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  AoG.<span class="fu">density</span>();</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
 <span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1731,16 +1722,19 @@ Note
 </div>
 <p>The apparent distribution of the estimates of <span class="math inline">\(\sigma_1\)</span> in <a href="#fig-dsm01_bs_sigma_density">Figure&nbsp;<span>1.4</span></a> is being distorted by the method of approximating the density. A <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">kernel density estimate</a> approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a <em>kernel</em> such as a narrow Gaussian distribution (see the linked article for details). In this case the distribution of the estimates is a combination of a continuous distribution and a spike or point mass at zero as shown in a histogram, <a href="#fig-dsm01_bs_sigma_hist">Figure&nbsp;<span>1.5</span></a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Adjust the alpha in multiple histograms
 </div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Use a lower alpha in the colors for multiple histograms so the bars behind another color are more visible</p>
+</div>
 </div>
 </div>
 <div class="cell" data-execution_count="34">
@@ -1752,7 +1746,7 @@ Note
 <span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap parameter estimates of σ"</span>;</span>
 <span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>group <span class="op">=&gt;</span> <span class="st">"Group"</span>),</span>
 <span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  AoG.<span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">80</span>);</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">80</span>);</span>
 <span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1767,11 +1761,9 @@ Note
 </div>
 <p>Nearly 1000 of the 10,000 bootstrap fits are “singular” in that one (or more) of the estimated unconditional distribution(s) of the random effects are degenerate. For this model the only way singularity can occur is for <span class="math inline">\(\sigma_1\)</span> to be zero.</p>
 <div class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">countmap</span>(<span class="fu">issingular</span>(dsm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="fu">issingular</span>(dsm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="36">
-<pre><code>Dict{Bool, Int64} with 2 entries:
-  0 =&gt; 9007
-  1 =&gt; 993</code></pre>
+<pre><code>993</code></pre>
 </div>
 </div>
 <p>The distribution of the estimator of <span class="math inline">\(\sigma_1\)</span> with this point mass at zero is not at all like a Gaussian or normal distribution. This is why characterizing the uncertainty of these parameter estimates with a standard error is misleading. Quoting an estimate and a standard error for the estimate is only meaningful if these values adequately characterize the distribution of the values of the estimator.</p>
@@ -1785,7 +1777,7 @@ Note
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value_abs2 <span class="op">=&gt;</span> <span class="st">"Bootstrap sample of estimates of σ²"</span>,</span>
 <span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>group,</span>
 <span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  AoG.<span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">200</span>);</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">200</span>);</span>
 <span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
 <span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
@@ -1843,7 +1835,7 @@ Note
 <td style="text-align: left;">batch</td>
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: right;">0.0</td>
-<td style="text-align: right;">54.3061</td>
+<td style="text-align: right;">54.3062</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
@@ -1870,19 +1862,6 @@ Note
 <section id="sec-dsm01trace" class="level3" data-number="1.5.2">
 <h3 data-number="1.5.2" class="anchored" data-anchor-id="sec-dsm01trace"><span class="header-section-number">1.5.2</span> Tracking the progress of the iterations</h3>
 <p>The optional argument, <code>thin=1</code>, in a call to <code>fit</code> causes all the values of <span class="math inline">\(\boldsymbol\theta\)</span> and the corresponding value of objective from the iterative optimization to be stored in the <code>optsum</code> property.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Fix the recording of the fitlog so that the initial value is not recorded twice</p>
-</div>
-</div>
 <div class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>dsm01trace <span class="op">=</span> <span class="fu">fit</span>(</span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  MixedModel,</span>
@@ -2044,7 +2023,7 @@ Note
 </div>
 </div>
 </div>
-<p>The <code>caterpillar</code> function returns a plot with linear spacing of the levels on the y axis. An alternative</p>
+<p>The <code>caterpillar</code> function returns a plot with linear spacing of the levels on the y axis. An alternative, the <code>qqcaterpillar</code> function</p>
 <div class="cell" data-execution_count="43">
 <details>
 <summary>Code</summary>
@@ -2062,7 +2041,7 @@ Note
 </div>
 </div>
 </div>
-<p>returns a plot where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.</p>
+<p>returns a plot like <a href="#fig-qqcaterpillar_dsm01">Figure&nbsp;<span>1.8</span></a> where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.</p>
 <p>The <code>caterpillar</code> plot is preferred when there are only a few levels of the grouping factor, as in this case. When there are hundreds or thousands of random effects the <code>qqcaterpillar</code> form is preferred because it focuses attention on the “important few” at the extremes and de-emphasizes the “trivial many” that are close to zero.</p>
 </section>
 <section id="sec-stylistic" class="level2" data-number="1.7">
@@ -2099,10 +2078,9 @@ Note
 <p>A <code>let</code> block is a way of making temporary assignments that do not affect the global state. An assignment to a variable name inside a <code>let</code> block is local to the block.</p>
 <p>Thus <code>dsm01</code> can be assigned as</p>
 <div class="cell" data-execution_count="47">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="kw">let</span></span>
-<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  form <span class="op">=</span> <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch))</span>
-<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, form, dyestuff; contrasts)</span>
-<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span>(yield <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch))</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, dyestuff; contrasts)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-ChIntroSummary" class="level2" data-number="1.8">
@@ -2123,7 +2101,7 @@ Note
 Box, G. E. P., &amp; Tiao, G. C. (1973). <em>Bayesian inference in statistical analysis</em>. Addison-Wesley.
 </div>
 <div id="ref-DanischKrumbiegel2021" class="csl-entry" role="listitem">
-Danisch, S., &amp; Krumbiegel, J. (2021). Makie.jl: Flexible high-performance data visualization for julia. <em>Journal of Open Source Software</em>, <em>6</em>(65), 3349. <a href="https://doi.org/10.21105/joss.03349">https://doi.org/10.21105/joss.03349</a>
+Danisch, S., &amp; Krumbiegel, J. (2021). Makie.jl: Flexible high-performance data visualization for <span>J</span>ulia. <em>Journal of Open Source Software</em>, <em>6</em>(65), 3349. <a href="https://doi.org/10.21105/joss.03349">https://doi.org/10.21105/joss.03349</a>
 </div>
 <div id="ref-davies72:_statis_method_in_resear_and_produc" class="csl-entry" role="listitem">
 Davies, O. L., &amp; Goldsmith, P. L. (Eds.). (1972). <em>Statistical methods in research and production</em> (4th ed.). Hafner.

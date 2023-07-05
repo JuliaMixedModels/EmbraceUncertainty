@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.340">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -110,7 +110,8 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -132,7 +133,7 @@ div.csl-indent {
       <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./datatables.html">Appendices</a></li><li class="breadcrumb-item"><a href="./linalg.html"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -282,8 +283,9 @@ div.csl-indent {
 <div class="cell" data-execution_count="1">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>In this appendix we describe properties of the multivariate Gaussian (or “normal”) distribution and how linear models and linear mixed models can be formulated in terms of this distribution.</p>
@@ -500,7 +502,7 @@ r^2({\boldsymbol{\beta}})&amp;=\|{\mathbf{y}}-{\mathbf{X}}{\boldsymbol{\beta}}\|
 <h2 data-number="B.5" class="anchored" data-anchor-id="numerical-example"><span class="header-section-number">B.5</span> Numerical example</h2>
 <p>Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject <code>S372</code> in the <code>sleepstudy</code> dataset.</p>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sleepstudy <span class="op">=</span> <span class="fu">Table</span>(MixedModels.<span class="fu">dataset</span>(<span class="op">:</span>sleepstudy))</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sleepstudy <span class="op">=</span> <span class="fu">Table</span>(<span class="fu">dataset</span>(<span class="op">:</span>sleepstudy))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>S372 <span class="op">=</span> sleepstudy[sleepstudy.subj <span class="op">.==</span> <span class="st">"S372"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>Table with 3 columns and 10 rows:
@@ -560,8 +562,8 @@ U factor:
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">=</span> chfac <span class="op">\</span> (X<span class="op">'</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>2-element Vector{Float64}:
- 267.04479999999995
-  11.298073333333345</code></pre>
+ 267.04479999999984
+  11.298073333333367</code></pre>
 </div>
 </div>
 <p>Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for <span class="math inline">\(\mathbf{r}_{Xy}\)</span></p>
@@ -570,7 +572,7 @@ U factor:
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>2-element Vector{Float64}:
  1005.244207376381
-  102.61984718485859</code></pre>
+  102.61984718485874</code></pre>
 </div>
 </div>
 <p>then solving in-place to obtain <span class="math inline">\(\widehat{{\boldsymbol{\beta}}}\)</span></p>
@@ -578,8 +580,8 @@ U factor:
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ldiv!</span>(chfac.U, rXy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>2-element Vector{Float64}:
- 267.0447999999998
-  11.298073333333367</code></pre>
+ 267.04479999999967
+  11.298073333333384</code></pre>
 </div>
 </div>
 <p>The residual vector, <span class="math inline">\({\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}}\)</span>, is</p>
@@ -587,23 +589,23 @@ U factor:
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> y <span class="op">-</span> X <span class="op">*</span> β̂</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>10-element Vector{Float64}:
-   2.3669000000000437
-  -4.868873333333283
-   7.955853333333323
-   9.69258000000002
- -25.06449333333336
+   2.3669000000001574
+  -4.868873333333227
+   7.95585333333338
+   9.692580000000078
+ -25.064493333333303
    6.072433333333322
   -0.35144000000002507
-  -2.911413333333371
-  11.712313333333327
-  -4.603860000000054</code></pre>
+  -2.911413333333428
+  11.712313333333213
+  -4.603860000000111</code></pre>
 </div>
 </div>
 <p>with geometric length or “norm”,</p>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
-<pre><code>31.915932906580302</code></pre>
+<pre><code>31.915932906580256</code></pre>
 </div>
 </div>
 <p>For the extended Cholesky factor, create the extended matrix of sums of squares and cross products</p>
@@ -749,7 +751,7 @@ Vt factor:
 <div class="cell-output cell-output-display" data-execution_count="21">
 <pre><code>2-element Vector{Float64}:
  267.04479999999995
-  11.29807333333336</code></pre>
+  11.298073333333347</code></pre>
 </div>
 </div>
 <p>In the extensions to linear mixed-effects models we will emphasize the Cholesky factorization over the QR decomposition or the SVD.</p>
