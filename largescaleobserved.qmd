@@ -12,7 +12,6 @@ Load the packages to be used.
 #| code-fold: true
 #| output: false
 using AlgebraOfGraphics
-using Arrow
 using CairoMakie
 using CategoricalArrays
 using DataFrames
@@ -240,7 +239,7 @@ Similarly, users who rate very few movies add little information, even about the
 One way of dealing with the extreme imbalance in the number of observations per user or per movie is to set a threshold on the number of observations for a user or a movie to be included in the data used to fit the model.
 For example, a companion data set on grouplens.org, available in the [ml-25m.zip](https://files.grouplens.org/datasets/movielens/ml-25n.zip) archive, included only users who had rated at least 20 movies.
 
-To be able to select ratings on according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
+To be able to select ratings according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
 
 ```{julia}
 describe(DataFrame(ratings))
@@ -279,7 +278,7 @@ First we consider the effects of the minimum number of ratings per user and per 
 #| echo: false
 #| output: false
 sizespeed = let
-  ord(x) = categorical(x; ordered=true)
+  ord(x) = categorical(x; ordered=true)  # replace this with sorter
   transform!(
     DataFrame(sizespeed),
     :mc => ord => :mc,

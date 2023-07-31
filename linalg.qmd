@@ -625,7 +625,7 @@ That is
 
 $$
 f_{\mcY,\mcU}(\bby,\mathbf{u})=
-\frac{1}{\left(2\pi\sigma^2\right)^{-(n+q)/2}}\exp
+\frac{1}{\left(2\pi\sigma^2\right)^{(n+q)/2}}\exp
 \left(\frac{\left\|\bby-\bbX\bbbeta
 -\mathbf{Z}\bbLambda_\theta\mathbf{u}\right\|^2+
 \left\|\mathbf{u}\right\|^2}{-2\sigma^2}\right) .
