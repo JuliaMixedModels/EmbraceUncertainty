@@ -20,6 +20,7 @@ book:
     - datatables.qmd
     - linalg.qmd
     - aGHQ.qmd
+    - viz.qmd
 
 execute-dir: project
 
