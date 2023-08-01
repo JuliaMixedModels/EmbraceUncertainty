@@ -252,13 +252,13 @@ A parametric bootstrap sample of the parameter estimates
 #| code-fold: true
 bsrng = Random.seed!(9876789)
 pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress)
-pnm01pars = DataFrame(pnm01samp.allpars);
+pnm01stbl = Table(pnm01samp.tbl)
 ```
 
 can be used to create shortest 95% coverage intervals for the parameters in the model.
 
 ```{julia}
-DataFrame(shortestcovint(pnm01samp))
+Table(shortestcovint(pnm01samp))
 ```
 
 As for model `dsm01` the bootstrap parameter estimates of the fixed-effects parameter have approximately a "normal" or Gaussian shape, as shown in the kernel density plot (@fig-pnm01bsbeta)
@@ -268,11 +268,8 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
 draw(
-  data(@subset(pnm01pars, :type == "β")) *
-  mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
-  ) *
+  data(pnm01stbl) *
+  mapping(:β1 => "Bootstrap samples of β₁") *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
@@ -292,11 +289,11 @@ The densities of the variance-components, on the scale of the standard deviation
 #| label: fig-pnm01bssigma
 #| code-fold: true
 draw(
-  data(@subset(pnm01pars, :type == "σ")) *
+  data(pnm01stbl) *
   mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
+    [:σ, :σ1, :σ2] .=> "Bootstrap samples of standard deviations",
   ) *
+  mapping(color=dims(1) => renamer(["σ", "σ₁", "σ₂"])) *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
@@ -459,7 +456,7 @@ Furthermore, kernel density estimates from a parametric bootstrap sample of the 
 ```{julia}
 Random.seed!(4567654)
 psm01samp = parametricbootstrap(10_000, psm01; hide_progress)
-psm01pars = DataFrame(psm01samp.allpars);
+psm01stbl = Table(psm01samp.tbl)
 ```
 
 ```{julia}
@@ -467,11 +464,11 @@ psm01pars = DataFrame(psm01samp.allpars);
 #| label: fig-psm01bssampdens
 #| code-fold: true
 draw(
-  data(@subset(psm01pars, :type == "σ")) *
+  data(psm01stbl) *
   mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
+    [:σ, :σ1, :σ2] .=> "Bootstrap samples of standard deviations",
   ) *
+  mapping(color=dims(1) => renamer(["σ", "σ₁", "σ₂"])) *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
@@ -529,7 +526,7 @@ Comparing the coverage intervals for models `psm01` and `psm02`
 
 ```{julia}
 #| code-fold: true
-DataFrame(shortestcovint(psm01samp))
+Table(shortestcovint(psm01samp))
 ```
 
 ```{julia}
@@ -540,7 +537,7 @@ psm02samp = parametricbootstrap(
   psm02;
   hide_progress,
 )
-DataFrame(shortestcovint(psm02samp))
+Table(shortestcovint(psm02samp))
 ```
 
 The confidence intervals on $\sigma$ and $\beta_0$ are similar for the two models.
