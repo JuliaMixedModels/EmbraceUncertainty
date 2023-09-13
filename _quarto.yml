@@ -26,6 +26,10 @@ execute-dir: project
 bibliography: references.bib
 csl: apa-annotated-bibliography.csl
 
+github:
+  owner: JuliaMixedModels
+  repo: EmbraceUncertainty
+
 format:
   html:
     # for more info, see

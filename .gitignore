@@ -11,5 +11,8 @@ _freeze/
 .jupyter_cache/
 docs/
 data/
+*_files/
 
 /.quarto/
+
+/.luarc.json

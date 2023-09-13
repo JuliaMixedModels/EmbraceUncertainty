@@ -716,3 +716,5 @@ Other points to make:
     5. Probably go with `bxm03` in this case, even though it gives a degenerate dist'n of random effects.  The idea is that the random effects are absorbing a form of rat-to-rat variability.  The residual standard deviation does reflect this.
 
 :::
+
+*This page was rendered from git revision {{< git-rev short=true >}}.*
