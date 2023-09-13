@@ -24,7 +24,7 @@ return {
     local owner = pandoc.utils.stringify(meta["github.owner"])
     local repo = pandoc.utils.stringify(meta["github.repo"])
     local url = "https://github.com/" 
-                .. owner .. "/" .. repo .. "/commit/" .. rev 
+                .. owner .. "/" .. repo .. "/tree/" .. rev 
     
     -- return as link
     return pandoc.Link(pandoc.Str(rev), url)
