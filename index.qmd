@@ -3,3 +3,5 @@
 This is a Quarto book.
 
 To learn more about Quarto books visit [https://quarto.org/docs/books](https://quarto.org/docs/books).
+
+*This page was rendered from git revision {{< git-rev short=true >}}.*

@@ -256,3 +256,5 @@ The [JuliaData](https://github.com/JuliaData) organization manages the developme
 @Kaminski2023, written by the primary author of that package, provides an in-depth introduction to data science facilities, in particular the `DataFrames` package, in Julia.
 
 This package is particularly well-suited to more advanced data manipulation such as the `split-apply-combine` strategy [@Wickham2011] and "joins" of data tables.
+
+*This page was rendered from git revision {{< git-rev short=true >}}.*

@@ -609,3 +609,5 @@ provides an $r^2$ value very close to one, indicating an almost perfect fit.
 ```{julia}
 r²(sizemod)
 ```
+
+*This page was rendered from git revision {{< git-rev short=true >}}.*

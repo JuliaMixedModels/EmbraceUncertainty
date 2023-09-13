@@ -743,3 +743,5 @@ That is, profile-based confidence intervals on the fixed-effects parameter, $\be
 Profile-based confidence intervals for the standard deviations of random effects ($\sigma_1$, $\sigma_2$, etc.) are symmetric on a logarithmic scale except for those that could be zero.
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.
+
+*This page was rendered from git revision {{< git-rev short=true >}}.*
