@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.433">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -278,7 +278,7 @@ div.csl-indent {
 </header>
 
 <p>Load the packages to be used.</p>
-<div class="cell" data-execution_count="1">
+<div class="cell" data-execution_count="2">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
@@ -309,7 +309,7 @@ div.csl-indent {
 <h2 data-number="4.1" class="anchored" data-anchor-id="trial-level-data-from-the-ldt"><span class="header-section-number">4.1</span> Trial-level data from the LDT</h2>
 <p>In the lexical decision task the study participant is shown a character string, under carefully controlled conditions, and responds according to whether they identify the string as a word or not. Two responses are recorded: whether the choice of word/non-word is correct and the time that elapsed between exposure to the string and registering a decision.</p>
 <p>Several covariates, some relating to the subject and some relating to the target, were recorded. Initially we consider only the trial-level data.</p>
-<div class="cell" data-execution_count="2">
+<div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ldttrial <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_trial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>Arrow.Table with 2745952 rows, 5 columns, and schema:
@@ -325,7 +325,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
   "source"    =&gt; "https://osf.io/n63s2"</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="3">
+<div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ldttrial <span class="op">=</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform!</span>(<span class="fu">DataFrame</span>(ldttrial), <span class="op">:</span>seq <span class="op">=&gt;</span> (x <span class="op">-&gt;</span> x <span class="op">.&gt;</span> <span class="fl">2000</span>) <span class="op">=&gt;</span> <span class="op">:</span>s2)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(ldttrial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -429,7 +429,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <section id="summaries-by-item" class="level3" data-number="4.2.1">
 <h3 data-number="4.2.1" class="anchored" data-anchor-id="summaries-by-item"><span class="header-section-number">4.2.1</span> Summaries by item</h3>
 <p>To summarize by item we group the trials by item and use <code>combine</code> to produce the various summary statistics. As we will create similar summaries by subject, we incorporate an ‘i’ in the names of these summaries (and an ‘s’ in the name of the summaries by subject) to be able to identify the grouping used.</p>
-<div class="cell" data-execution_count="4">
+<div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>byitem <span class="op">=</span> <span class="pp">@chain</span> ldttrial <span class="cf">begin</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groupby</span>(<span class="op">:</span>item)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@combine</span>(</span>
@@ -735,7 +735,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 <p>It can be seen that the items occur in word/nonword pairs and the pairs are sorted alphabetically by the word in the pair (ignoring case). We can add the word/nonword status for the items as</p>
-<div class="cell" data-execution_count="5">
+<div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>byitem.isword <span class="op">=</span> <span class="fu">isodd</span>.(<span class="fu">eachindex</span>(byitem.item))</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -850,7 +850,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 <p>This table shows that some of the items were never identified correctly. These are</p>
-<div class="cell" data-execution_count="6">
+<div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(<span class="op">:</span>iacc <span class="op">=&gt;</span> iszero, byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div><div style="float: left;"><span>9×8 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -986,7 +986,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 <p>Notice that these are all words but somewhat obscure words such that none of the subjects exposed to the word identified it correctly.</p>
 <p>We can incorporate characteristics like <code>wrdlen</code> and <code>isword</code> back into the original trial table with a “left join”. This operation joins two tables by values in a common column. It is called a <em>left</em> join because the left (or first) table takes precedence, in the sense that every row in the left table is present in the result. If there is no matching row in the second table then missing values are inserted for the columns from the right table in the result.</p>
-<div class="cell" data-execution_count="7">
+<div class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leftjoin!</span>(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    ldttrial,</span>
@@ -1107,7 +1107,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 <p>Notice that the <code>wrdlen</code> and <code>isword</code> variables in this table allow for missing values, because they are derived from the second argument, but there are no missing values for these variables. If there is no need to allow for missing values, there is a slight advantage in disallowing them in the element type, because the code to check for and handle missing values is not needed.</p>
 <p>This could be done separately for each column or for the whole data frame, as in</p>
-<div class="cell" data-execution_count="8">
+<div class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">disallowmissing!</span>(ldttrial; error<span class="op">=</span><span class="cn">false</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <div><div style="float: left;"><span>8×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -1237,7 +1237,7 @@ Named argument “error”
 </div>
 </div>
 <p>A barchart of the word length counts, <a href="#fig-ldtwrdlenhist">Figure&nbsp;<span>4.1</span></a>, shows that the majority of the items are between 3 and 14 characters.</p>
-<div class="cell" data-execution_count="9">
+<div class="cell" data-execution_count="10">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> wlen <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">21</span></span>
@@ -1258,7 +1258,7 @@ Named argument “error”
 </div>
 </div>
 <p>To examine trends in accuracy by word length we use a scatterplot smoother on the binary response, as described in <a href="glmmbernoulli.html#sec-plottingbinary"><span>Section&nbsp;6.1.1</span></a>. The resulting plot, <a href="#fig-ldtaccsmooth">Figure&nbsp;<span>4.2</span></a>, shows the accuracy of identifying words is more-or-less constant at around 84%, but accuracy decreases with increasing word length for the nonwords.</p>
-<div class="cell" data-execution_count="10">
+<div class="cell" data-execution_count="11">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -1282,14 +1282,14 @@ Named argument “error”
 </div>
 </div>
 <p><a href="#fig-ldtaccsmooth">Figure&nbsp;<span>4.2</span></a> may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few. Over 95% of the words are between 4 and 13 characters in length</p>
-<div class="cell" data-execution_count="11">
+<div class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(x <span class="op">-&gt;</span> <span class="fl">4</span> <span class="op">≤</span> x <span class="op">≤</span> <span class="fl">13</span>, byitem.wrdlen) <span class="op">/</span> <span class="fu">nrow</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>0.9654899829549666</code></pre>
 </div>
 </div>
 <p>If we restrict the smoother curves to this range, as in <a href="#fig-ldtaccsmoothrestrict">Figure&nbsp;<span>4.3</span></a>,</p>
-<div class="cell" data-execution_count="12">
+<div class="cell" data-execution_count="13">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -1314,7 +1314,7 @@ Named argument “error”
 </div>
 <p>the differences are less dramatic.</p>
 <p>Another way to visualize these results is by plotting the proportion accurate versus word-length separately for words and non-words with the area of each marker proportional to the number of observations for that combinations (<a href="#fig-propvswrdlen">Figure&nbsp;<span>4.4</span></a>).</p>
-<div class="cell" data-execution_count="13">
+<div class="cell" data-execution_count="14">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
@@ -1354,7 +1354,7 @@ Named argument “error”
 <section id="sec-elpsumrysubj" class="level3" data-number="4.2.2">
 <h3 data-number="4.2.2" class="anchored" data-anchor-id="sec-elpsumrysubj"><span class="header-section-number">4.2.2</span> Summaries by subject</h3>
 <p>A summary of accuracy and median response time by subject</p>
-<div class="cell" data-execution_count="14">
+<div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bysubj <span class="op">=</span> <span class="pp">@chain</span> ldttrial <span class="cf">begin</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">groupby</span>(<span class="op">:</span>subj)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@combine</span>(</span>
@@ -1629,7 +1629,7 @@ Named argument “error”
 </div>
 </div>
 <p>shows some anomalies</p>
-<div class="cell" data-execution_count="15">
+<div class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(bysubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <div><div style="float: left;"><span>6×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -1723,7 +1723,7 @@ Named argument “error”
 </div>
 </div>
 <p>First, some subjects are accurate on only about half of their trials, which is the proportion that would be expected from random guessing. A plot of the median response time versus proportion accurate, <a href="#fig-ldtmedianrtvspropacc">Figure&nbsp;<span>4.5</span></a>, shows that the subjects with lower accuracy are some of the fastest responders, further indicating that these subjects are sacrificing accuracy for speed.</p>
-<div class="cell" data-execution_count="16">
+<div class="cell" data-execution_count="17">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -1746,14 +1746,14 @@ Named argument “error”
 </div>
 <p>As described in <span class="citation" data-cites="Balota_2007">Balota et al. (<a href="references.html#ref-Balota_2007" role="doc-biblioref">2007</a>)</span>, the participants performed the trials in blocks of 250 followed by a short break. During the break they were given feedback concerning accuracy and response latency in the previous block of trials. If the accuracy was less than 80% the participant was encouraged to improve their accuracy. Similarly, if the mean response latency was greater than 1000 ms, the participant was encouraged to decrease their response time. During the trials immediate feedback was given if the response was incorrect.</p>
 <p>Nevertheless, approximately 15% of the subjects were unable to maintain 80% accuracy on their trials</p>
-<div class="cell" data-execution_count="17">
+<div class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="fu">&lt;</span>(<span class="fl">0.8</span>), bysubj.spropacc) <span class="op">/</span> <span class="fu">nrow</span>(bysubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>0.15233415233415235</code></pre>
 </div>
 </div>
 <p>and there is some association of faster response times with low accuracy. The majority of the subjects whose median response time is less than 500 ms. are accurate on less than 75% of their trials. Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.</p>
-<div class="cell" data-execution_count="18">
+<div class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">minimum</span>(<span class="fu">filter</span>(<span class="op">:</span>spropacc <span class="op">=&gt;</span> <span class="fu">&gt;</span>(<span class="fl">0.9</span>), bysubj).smedianrt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="19">
 <pre><code>505.0</code></pre>
@@ -1762,7 +1762,7 @@ Named argument “error”
 <p>It is common in analyses of response latency in a lexical discrimination task to consider only the latencies on correct identifications and to trim outliers. In <span class="citation" data-cites="Balota_2007">Balota et al. (<a href="references.html#ref-Balota_2007" role="doc-biblioref">2007</a>)</span> a two-stage outlier removal strategy was used; first removing responses less than 200 ms or greater than 3000 ms then removing responses more than three standard deviations from the participant’s mean response.</p>
 <p>As described in <a href="#sec-ldtrtscale"><span>Section&nbsp;4.2.3</span></a> we will analyze these data on a speed scale (the inverse of response time) using only the first-stage outlier removal of response latencies less than 200 ms or greater than 3000 ms. On the speed scale the limits are 0.333 per second up to 5 per second.</p>
 <p>To examine the effects of the fast but inaccurate responders we will fit models to the data from all the participants and to the data from the 85% of participants who maintained an overall accuracy of 80% or greater.</p>
-<div class="cell" data-execution_count="19">
+<div class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pruned <span class="op">=</span> <span class="pp">@chain</span> ldttrial <span class="cf">begin</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@subset</span>(!<span class="fu">ismissing</span>(<span class="op">:</span>acc), <span class="fl">200</span> <span class="op">≤</span> <span class="op">:</span>rt <span class="op">≤</span> <span class="fl">3000</span>,)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">leftjoin!</span>(<span class="fu">select</span>(bysubj, <span class="op">:</span>subj, <span class="op">:</span>spropacc); on<span class="op">=:</span>subj)</span>
@@ -1773,7 +1773,7 @@ Named argument “error”
 <pre><code>(2714311, 9)</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="20">
+<div class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(pruned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
 <div><div style="float: left;"><span>9×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -1901,7 +1901,7 @@ Named argument “error”
 <h3 data-number="4.2.3" class="anchored" data-anchor-id="sec-ldtrtscale"><span class="header-section-number">4.2.3</span> Choice of response scale</h3>
 <p>As we have indicated, generally the response times are analyzed for the correct identifications only. Furthermore, unrealistically large or small response times are eliminated. For this example we only use the responses between 200 and 3000 ms.</p>
 <p>A density plot of the pruned response times, <a href="#fig-elpldtrtdens">Figure&nbsp;<span>4.6</span></a>, shows they are skewed to the right.</p>
-<div class="cell" data-execution_count="21">
+<div class="cell" data-execution_count="22">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -1922,7 +1922,7 @@ Named argument “error”
 </div>
 <p>In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.</p>
 <p>The density of the response speed, in responses per second, is shown in <a href="#fig-elpldtspeeddens">Figure&nbsp;<span>4.7</span></a>.</p>
-<div class="cell" data-execution_count="22">
+<div class="cell" data-execution_count="23">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -1947,7 +1947,7 @@ Named argument “error”
 </div>
 </div>
 <p><a href="#fig-elpldtrtdens">Figure&nbsp;<span>4.6</span></a> and <a href="#fig-elpldtspeeddens">Figure&nbsp;<span>4.7</span></a> indicate that it may be more reasonable to establish a lower bound of 1/3 second (333 ms) on the response latency, corresponding to an upper bound of 3 per second on the response speed. However, only about one half of one percent of the correct responses have latencies in the range of 200 ms. to 333 ms.</p>
-<div class="cell" data-execution_count="23">
+<div class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  r <span class="op">-&gt;</span> !<span class="fu">ismissing</span>(r.acc) <span class="op">&amp;&amp;</span> <span class="fl">200</span> <span class="op">&lt;</span> r.rt <span class="op">&lt;</span> <span class="fl">333</span>,</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eachrow</span>(ldttrial),</span>
@@ -1958,7 +1958,7 @@ Named argument “error”
 </div>
 <p>so the exact position of the lower cut-off point on the response latencies is unlikely to be very important.</p>
 <p>As noted in <span class="citation" data-cites="Box1964">Box &amp; Cox (<a href="references.html#ref-Box1964" role="doc-biblioref">1964</a>)</span>, a transformation of the response that produces a more Gaussian distribution often will also produce a simpler model structure. For example, <a href="#fig-ldtrtvswrdlen">Figure&nbsp;<span>4.8</span></a> shows the smoothed relationship between word length and response time for words and non-words separately,</p>
-<div class="cell" data-execution_count="24">
+<div class="cell" data-execution_count="25">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -1981,7 +1981,7 @@ Named argument “error”
 </div>
 </div>
 <p>and <a href="#fig-ldtspeedvswrdlen">Figure&nbsp;<span>4.9</span></a> shows the similar relationships for speed</p>
-<div class="cell" data-execution_count="25">
+<div class="cell" data-execution_count="26">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
@@ -2005,7 +2005,7 @@ Named argument “error”
 </div>
 <p>For the most part the smoother lines in <a href="#fig-ldtspeedvswrdlen">Figure&nbsp;<span>4.9</span></a> are reasonably straight. The small amount of curvature is associated with short word lengths, say less than 4 characters, of which there are comparatively few in the study.</p>
 <p><a href="#fig-speedviolin">Figure&nbsp;<span>4.10</span></a> shows a “violin plot” - the empirical density of the response speed by word length separately for words and nonwords. The lines on the plot are fit by linear regression.</p>
-<div class="cell" data-execution_count="26">
+<div class="cell" data-execution_count="27">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
@@ -2042,18 +2042,18 @@ Named argument “error”
 <p>Because there are a large number of items in the data set it is important to assign a <code>Grouping()</code> contrast to <code>item</code> (and, less importantly, to <code>subj</code>). For the <code>isword</code> factor we will use an <code>EffectsCoding</code> contrast with the base level as <code>false</code>. The non-words are assigned -1 in this contrast and the words are assigned +1. The <code>wrdlen</code> covariate is on its original scale but centered at 8 characters.</p>
 <p>Thus the <code>(Intercept)</code> coefficient is the predicted speed of response for a typical subject and typical item (without regard to word/non-word status) of 8 characters.</p>
 <p>Set these contrasts</p>
-<div class="cell" data-execution_count="27">
+<div class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>isword] <span class="op">=</span> <span class="fu">EffectsCoding</span>(; base<span class="op">=</span><span class="cn">false</span>);</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>contrasts[<span class="op">:</span>wrdlen] <span class="op">=</span> <span class="fu">Center</span>(<span class="fl">8</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>and fit a first model with simple, scalar, random effects for <code>subj</code> and <code>item</code>.</p>
-<div class="cell" data-execution_count="28">
+<div class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>elm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> <span class="fl">1000</span><span class="op">/</span>rt <span class="op">~</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="op">+</span> isword <span class="op">*</span> wrdlen <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> item) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> subj)</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pruned; contrasts)</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 53    Time: 0:00:03 (75.43 ms/it)</code></pre>
+<pre><code>Minimizing 53    Time: 0:00:11 ( 0.22  s/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="29">
 <table class="table table-sm table-striped small">
@@ -2128,7 +2128,7 @@ Named argument “error”
 </div>
 </div>
 <p>The predicted response speed by word length and word/nonword status can be summarized as</p>
-<div class="cell" data-execution_count="29">
+<div class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">effects</span>(<span class="fu">Dict</span>(<span class="op">:</span>isword <span class="op">=&gt;</span> [<span class="cn">false</span>, <span class="cn">true</span>], <span class="op">:</span>wrdlen <span class="op">=&gt;</span> <span class="fl">4</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="fl">12</span>), elm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="30">
 <div><div style="float: left;"><span>10×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -2186,7 +2186,7 @@ Named argument “error”
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.2373</td>
-<td style="text-align: right;">0.00898133</td>
+<td style="text-align: right;">0.00898134</td>
 <td style="text-align: right;">1.22832</td>
 <td style="text-align: right;">1.24628</td>
 </tr>
@@ -2240,7 +2240,7 @@ Named argument “error”
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.24151</td>
-<td style="text-align: right;">0.00903127</td>
+<td style="text-align: right;">0.00903128</td>
 <td style="text-align: right;">1.23248</td>
 <td style="text-align: right;">1.25054</td>
 </tr>
@@ -2250,14 +2250,14 @@ Named argument “error”
 </div>
 </div>
 <p>If we restrict to only those subjects with 80% accuracy or greater the model becomes</p>
-<div class="cell" data-execution_count="30">
+<div class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>elm02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> <span class="fl">1000</span> <span class="op">/</span> rt <span class="op">~</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="fl">1</span> <span class="op">+</span> isword <span class="op">*</span> wrdlen <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> item) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> subj)</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  dat <span class="op">=</span> <span class="fu">filter</span>(<span class="op">:</span>spropacc <span class="op">=&gt;</span> <span class="fu">&gt;</span>(<span class="fl">0.8</span>), pruned)</span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, dat; contrasts)</span>
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 53    Time: 0:00:02 (52.78 ms/it)</code></pre>
+<pre><code>Minimizing 53    Time: 0:00:07 ( 0.14  s/it)</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <table class="table table-sm table-striped small">
@@ -2295,7 +2295,7 @@ Named argument “error”
 <td style="text-align: left;">isword: true</td>
 <td style="text-align: right;">0.0656</td>
 <td style="text-align: right;">0.0005</td>
-<td style="text-align: right;">133.73</td>
+<td style="text-align: right;">133.72</td>
 <td style="text-align: right;">&lt;1e-99</td>
 <td style="text-align: right;"></td>
 <td style="text-align: right;"></td>
@@ -2331,7 +2331,7 @@ Named argument “error”
 </table>
 </div>
 </div>
-<div class="cell" data-execution_count="31">
+<div class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">effects</span>(<span class="fu">Dict</span>(<span class="op">:</span>isword <span class="op">=&gt;</span> [<span class="cn">false</span>, <span class="cn">true</span>], <span class="op">:</span>wrdlen <span class="op">=&gt;</span> <span class="fl">4</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="fl">12</span>), elm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="32">
 <div><div style="float: left;"><span>10×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -2362,7 +2362,7 @@ Named argument “error”
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.45036</td>
-<td style="text-align: right;">0.00892466</td>
+<td style="text-align: right;">0.00892467</td>
 <td style="text-align: right;">1.44144</td>
 <td style="text-align: right;">1.45929</td>
 </tr>
@@ -2380,7 +2380,7 @@ Named argument “error”
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.29557</td>
-<td style="text-align: right;">0.00885308</td>
+<td style="text-align: right;">0.00885309</td>
 <td style="text-align: right;">1.28672</td>
 <td style="text-align: right;">1.30443</td>
 </tr>
@@ -2389,7 +2389,7 @@ Named argument “error”
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.21818</td>
-<td style="text-align: right;">0.0088711</td>
+<td style="text-align: right;">0.00887111</td>
 <td style="text-align: right;">1.20931</td>
 <td style="text-align: right;">1.22705</td>
 </tr>
@@ -2398,7 +2398,7 @@ Named argument “error”
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.14078</td>
-<td style="text-align: right;">0.00892486</td>
+<td style="text-align: right;">0.00892487</td>
 <td style="text-align: right;">1.13186</td>
 <td style="text-align: right;">1.14971</td>
 </tr>
@@ -2407,7 +2407,7 @@ Named argument “error”
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.62735</td>
-<td style="text-align: right;">0.00892465</td>
+<td style="text-align: right;">0.00892466</td>
 <td style="text-align: right;">1.61842</td>
 <td style="text-align: right;">1.63627</td>
 </tr>
@@ -2416,7 +2416,7 @@ Named argument “error”
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.52702</td>
-<td style="text-align: right;">0.008871</td>
+<td style="text-align: right;">0.00887101</td>
 <td style="text-align: right;">1.51815</td>
 <td style="text-align: right;">1.53589</td>
 </tr>
@@ -2434,7 +2434,7 @@ Named argument “error”
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.32637</td>
-<td style="text-align: right;">0.00887109</td>
+<td style="text-align: right;">0.0088711</td>
 <td style="text-align: right;">1.3175</td>
 <td style="text-align: right;">1.33524</td>
 </tr>
@@ -2443,7 +2443,7 @@ Named argument “error”
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.22605</td>
-<td style="text-align: right;">0.00892483</td>
+<td style="text-align: right;">0.00892484</td>
 <td style="text-align: right;">1.21712</td>
 <td style="text-align: right;">1.23497</td>
 </tr>
@@ -2453,7 +2453,7 @@ Named argument “error”
 </div>
 </div>
 <p>To compare the conditional means of the random effects for item in these two models we incorporate them into the <code>byitem</code> table.</p>
-<div class="cell" data-execution_count="32">
+<div class="cell" data-execution_count="33">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"png"</span>)</span>
@@ -2498,7 +2498,7 @@ Note
 </div>
 </div>
 <p><a href="#fig-itemreelm01vselm02">Figure&nbsp;<span>4.11</span></a> is exactly of the form that would be expected in a sample from a correlated multivariate Gaussian distribution. The correlation of the two sets of conditional means is about 96%.</p>
-<div class="cell" data-execution_count="33">
+<div class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="fu">Matrix</span>(<span class="fu">select</span>(condmeans, <span class="op">:</span>elm01, <span class="op">:</span>elm02)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="34">
 <pre><code>2×2 Matrix{Float64}:
@@ -2508,10 +2508,10 @@ Note
 </div>
 <p>These models take only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.</p>
 <p>The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers. We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the <code>MixedModel</code> object followed by restoring the <code>optsum</code> object.</p>
-<div class="cell" data-execution_count="35">
+<div class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveoptsum</span>(<span class="st">"./optsums/elm01.json"</span>, elm01);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="36">
+<div class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>elm01a <span class="op">=</span> <span class="fu">restoreoptsum!</span>(</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> <span class="fl">1000</span> <span class="op">/</span> rt <span class="op">~</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span> isword <span class="op">*</span> wrdlen <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> item) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> subj)</span>
@@ -2592,7 +2592,7 @@ Note
 </div>
 </div>
 <p>Other covariates associated with the item are available as</p>
-<div class="cell" data-execution_count="37">
+<div class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>elpldtitem <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_item))</span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
@@ -2717,7 +2717,7 @@ Note
 </div>
 </div>
 <p>and those associated with the subject are</p>
-<div class="cell" data-execution_count="38">
+<div class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>elpldtsubj <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_subj))</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtsubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="39">
@@ -2952,7 +2952,7 @@ Note
 </div>
 </div>
 <p>For the simple model <code>elm01</code> the estimated standard deviation of the random effects for subject is greater than that of the random effects for item, a common occurrence. A caterpillar plot, <a href="#fig-elm01caterpillarsubj">Figure&nbsp;<span>4.12</span></a>,</p>
-<div class="cell" data-execution_count="39">
+<div class="cell" data-execution_count="40">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(</span>
@@ -2971,7 +2971,7 @@ Note
 </div>
 <p>shows definite distinctions between subjects because the widths of the prediction intervals are small compared to the range of the conditional modes. Also, there is at least one outlier with a conditional mode over 1.0.</p>
 <p><a href="#fig-elm02caterpillarsubj">Figure&nbsp;<span>4.13</span></a> is the corresponding caterpillar plot for model <code>elm02</code> fit to the data with inaccurate responders eliminated.</p>
-<div class="cell" data-execution_count="40">
+<div class="cell" data-execution_count="41">
 <details>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(</span>
@@ -2988,6 +2988,9 @@ Note
 </div>
 </div>
 </div>
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/c35fb1d
+">c35fb1d
+</a>.</em></p>
 
 
 <div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list" style="display: none">
