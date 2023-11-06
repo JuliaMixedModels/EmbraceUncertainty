@@ -709,7 +709,7 @@ draw(
 )
 ```
 
-The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accomodate non-normal distributions.
+The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accommodate non-normal distributions.
 
 ### Confidence intervals on the parameters {#sec-confints}
 
@@ -857,7 +857,7 @@ The colon creates an expression but, if the expression consists of a single name
 
 It is best to get into the habit of specifying `Grouping()` contrasts for any grouping factors in the data.
 Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter.
-However, when the number of levels is large, as for some of the models in later chapters, failure to specify `Grouping()` contrasts can cause memory faults when constructing the numeric represention of the model.
+However, when the number of levels is large, as for some of the models in later chapters, failure to specify `Grouping()` contrasts can cause memory faults when constructing the numeric representation of the model.
 
 There is an advantage in assigning the contrasts dictionary to the name `contrasts` because a call to `fit` with the optional, named argument `contrasts`
 

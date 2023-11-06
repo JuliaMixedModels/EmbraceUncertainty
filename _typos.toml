@@ -8,6 +8,13 @@ missings = "missings"
 [default.extend-words]
 Lik = "Lik"
 missings = "missings"
+represention = "representation"
+
+[type.qmd]
+extend-glob = ["*.qmd"]
+
+[type.qmd.extend-words]
+multline = "multline"
 
 [type.package_toml]
 # Don't check spellings in these files
@@ -17,4 +24,9 @@ check-file = false
 [type.bib]
 # contain lots of names, which are a great spot for false positives
 extend-glob = ["*.bib"]
+check-file = false
+
+[type.csl]
+# contains lots of boilerplate in other languages
+extend-glob = ["*.csl"]
 check-file = false

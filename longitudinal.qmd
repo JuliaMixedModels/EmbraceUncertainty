@@ -332,7 +332,7 @@ or in separate panels ordered by initial weight, @fig-bxctrllayout.
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weigth.
+#| fig-cap: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxctrllayout
 let df = bxgdf[("Control",)]
   draw(
@@ -354,7 +354,7 @@ A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weigth.
+#| fig-cap: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxthiolayout
 let
   df = bxgdf[("Thioracil",)]
@@ -377,7 +377,7 @@ By contrast, in the Thyroxin group, @fig-bxthyrlayout,
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Weight (g) of rats in the Thyroxin group versus time in trial (wk). Panels are ordered by increasing initial weigth.
+#| fig-cap: Weight (g) of rats in the Thyroxin group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxthyrlayout
 let
   df = bxgdf[("Thyroxin",)]

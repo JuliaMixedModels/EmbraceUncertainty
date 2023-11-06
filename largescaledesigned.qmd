@@ -231,7 +231,7 @@ let
 end
 ```
 
-The pattern in the range of word lengths with non-negligible counts (there are points in the plot down to word lengths of 1 and up to word lengths of 21 but these points are very small) is that the accuracy for words is nearly constant at about 84% and the accuracy fof nonwords is slightly higher until lengths of 13, at which point it falls off a bit.
+The pattern in the range of word lengths with non-negligible counts (there are points in the plot down to word lengths of 1 and up to word lengths of 21 but these points are very small) is that the accuracy for words is nearly constant at about 84% and the accuracy for nonwords is slightly higher until lengths of 13, at which point it falls off a bit.
 
 ### Summaries by subject {#sec-elpsumrysubj}
 
