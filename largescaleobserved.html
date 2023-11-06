@@ -250,7 +250,7 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#dimensions-of-the-model-versus-cut-off-values" id="toc-dimensions-of-the-model-versus-cut-off-values" class="nav-link" data-scroll-target="#dimensions-of-the-model-versus-cut-off-values"><span class="header-section-number">5.2.1</span> Dimensions of the model versus cut-off values</a></li>
   <li><a href="#sec-lrgobsmemprint" id="toc-sec-lrgobsmemprint" class="nav-link" data-scroll-target="#sec-lrgobsmemprint"><span class="header-section-number">5.2.2</span> Memory footprint of the model representation</a></li>
-  <li><a href="#speed-of-log-likelihood-evalation" id="toc-speed-of-log-likelihood-evalation" class="nav-link" data-scroll-target="#speed-of-log-likelihood-evalation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evalation</a></li>
+  <li><a href="#speed-of-log-likelihood-evaluation" id="toc-speed-of-log-likelihood-evaluation" class="nav-link" data-scroll-target="#speed-of-log-likelihood-evaluation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evaluation</a></li>
   </ul></li>
   <li><a href="#model-size-and-speed-for-different-thresholds" id="toc-model-size-and-speed-for-different-thresholds" class="nav-link" data-scroll-target="#model-size-and-speed-for-different-thresholds"><span class="header-section-number">5.3</span> Model size and speed for different thresholds</a></li>
   </ul>
@@ -1039,8 +1039,8 @@ Residual              0.732964 0.856133
 <p>In a sense this is good news because the amount of storage required for the <code>[2,2]</code> block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix. The <a href="https://netlib.org/lapack/lawnspdf/lawn199.pdf">rectangular full packed format</a> looks especially promising for this purpose.</p>
 <p>In general, for models with scalar random effects for two incompletely crossed grouping factors, the memory footprint depends strongly on the smaller of the number of levels of the grouping factors, less strongly on the larger number, and almost not at all on the number of observations.</p>
 </section>
-<section id="speed-of-log-likelihood-evalation" class="level3" data-number="5.2.3">
-<h3 data-number="5.2.3" class="anchored" data-anchor-id="speed-of-log-likelihood-evalation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evalation</h3>
+<section id="speed-of-log-likelihood-evaluation" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="speed-of-log-likelihood-evaluation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evaluation</h3>
 <p>The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates. The time for one evaluation is given in the <code>evtime</code> column of <code>sizespeed</code>. Also given is the number of evaluations to convergence, <code>nev</code>, and the time to fit the model, <code>fittime</code> The reason for considering <code>evtime</code> in addition to <code>fittime</code> and <code>nev</code> is because the <code>evtime</code> for one model, relative to other models, is reasonably stable across computers whereas <code>nev</code>, and hence, <code>fittime</code>, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).</p>
 <p>That is, we can’t expect to reproduce <code>nev</code> exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in <code>evtime</code> with respect to <code>uc</code> and <code>mc</code> can be expected to reproducible.</p>
 <div class="cell" data-execution_count="23">
@@ -1206,8 +1206,8 @@ Residual              0.732964 0.856133
 <pre><code>0.9999981449902416</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/c35fb1d
-">c35fb1d
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a7a872e
+">a7a872e
 </a>.</em></p>
 
 

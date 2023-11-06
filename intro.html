@@ -1797,7 +1797,7 @@ Adjust the alpha in multiple histograms
 </div>
 </div>
 </div>
-<p>The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accomodate non-normal distributions.</p>
+<p>The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accommodate non-normal distributions.</p>
 <section id="sec-confints" class="level3" data-number="1.5.1">
 <h3 data-number="1.5.1" class="anchored" data-anchor-id="sec-confints"><span class="header-section-number">1.5.1</span> Confidence intervals on the parameters</h3>
 <p>A bootstrap sample of parameter estimates also provides us with a method of creating bootstrap coverage intervals, which can be regarded as confidence intervals on the parameters.</p>
@@ -2061,7 +2061,7 @@ Adjust the alpha in multiple histograms
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>contrasts <span class="op">=</span> <span class="fu">Dict</span>(<span class="op">:</span>batch <span class="op">=&gt;</span> <span class="fu">Grouping</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>(Symbols in Julia can be written as a colon followed by the name of the symbol. The colon creates an expression but, if the expression consists of a single name, then the expression is the symbol.)</p>
-<p>It is best to get into the habit of specifying <code>Grouping()</code> contrasts for any grouping factors in the data. Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter. However, when the number of levels is large, as for some of the models in later chapters, failure to specify <code>Grouping()</code> contrasts can cause memory faults when constructing the numeric represention of the model.</p>
+<p>It is best to get into the habit of specifying <code>Grouping()</code> contrasts for any grouping factors in the data. Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter. However, when the number of levels is large, as for some of the models in later chapters, failure to specify <code>Grouping()</code> contrasts can cause memory faults when constructing the numeric representation of the model.</p>
 <p>There is an advantage in assigning the contrasts dictionary to the name <code>contrasts</code> because a call to <code>fit</code> with the optional, named argument <code>contrasts</code></p>
 <div class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>dsm01 <span class="op">=</span> <span class="fu">fit</span>(</span>
@@ -2101,8 +2101,8 @@ Adjust the alpha in multiple histograms
 <p>The maximum likelihood estimates of the parameters are obtained by minimizing the deviance. For linear mixed models we can minimize the profiled deviance, which is a function of <span class="math inline">\({\boldsymbol{\theta}}\)</span> only, thereby considerably simplifying the optimization problem.</p>
 <p>To assess the precision of the parameter estimates we use a parametric bootstrap sample, when feasible. Re-fitting a simple model, such as those shown in this chapter, to a randomly generated response vector is quite fast and it is reasonable to work with bootstrap samples of tens of thousands of replicates. With larger data sets and more complex models, large bootstrap samples of parameter estimates could take much longer.</p>
 <p>Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/c35fb1d
-">c35fb1d
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a7a872e
+">a7a872e
 </a>.</em></p>
 
 

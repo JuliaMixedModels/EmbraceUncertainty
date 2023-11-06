@@ -1248,7 +1248,7 @@ Y            │  63    0    2   11    2    7  …   21    4   13    0   10   11
 <section id="sec-covariategrid" class="level3" data-number="6.2.1">
 <h3 data-number="6.2.1" class="anchored" data-anchor-id="sec-covariategrid"><span class="header-section-number">6.2.1</span> Creating grids of covariate values</h3>
 <p>Suppose that we wish to plot the “population” linear predictor values from model <code>com05</code>. That is, we will consider only the fixed-effects terms in the model formula and ignore the random effects. We want to create a plot like <a href="#fig-contradata2">Figure&nbsp;<span>6.2</span></a> by evaluating the linear predictor for a range of <code>age</code> values for each of the combinations of <code>ch</code> and <code>urban</code>.</p>
-<p>First we construct a table of covariate values, <code>newdata</code>, containing the <em>Cartesian product</em> of values of these covariates, created using a <a href="https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions">generator expression</a> returning <a href="https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple">NamedTuples</a>, which is the standard row-wise represention of tabular data.</p>
+<p>First we construct a table of covariate values, <code>newdata</code>, containing the <em>Cartesian product</em> of values of these covariates, created using a <a href="https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions">generator expression</a> returning <a href="https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple">NamedTuples</a>, which is the standard row-wise representation of tabular data.</p>
 <div class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  (; age, ch, urban) <span class="cf">for</span> age <span class="kw">in</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">20</span>, ch <span class="kw">in</span> [<span class="cn">false</span>, <span class="cn">true</span>],</span>
@@ -1608,7 +1608,7 @@ y\,\log\left(\frac{\mu}{1-\mu}\right) .
 <p>Consider the cross-tabulation of counts of interviewees by district and urban/rural status presented at the end of <a href="#sec-contramodelbuilding"><span>Section&nbsp;6.1.3</span></a>. The data contains responses from 54 rural women in district <code>D01</code> but only 21 rural women from <code>D11</code>. Thus the bottom line in <a href="#fig-com05qqcaterpillar">Figure&nbsp;<span>6.6</span></a>, for <code>("D21", "N")</code>, and based on 54 responses, is shorter than the line second from the bottom, for <code>("D11", "N")</code> and based on 21 women only.</p>
 <section id="conversion-of-random-effects-to-relative-odds" class="level3" data-number="6.3.1">
 <h3 data-number="6.3.1" class="anchored" data-anchor-id="conversion-of-random-effects-to-relative-odds"><span class="header-section-number">6.3.1</span> Conversion of random effects to relative odds</h3>
-<p>The exponential of the random effect is the relative odds of a woman in a particular urban/district combination using artificial birth control compared to her counterpart (same age, same with/without children status, same urban/rural status) in a typical district. The thus, the relative odds of a rural woman in district <code>D01</code> using artifical contraception relative to the general population of women her age is</p>
+<p>The exponential of the random effect is the relative odds of a woman in a particular urban/district combination using artificial birth control compared to her counterpart (same age, same with/without children status, same urban/rural status) in a typical district. The thus, the relative odds of a rural woman in district <code>D01</code> using artificial contraception relative to the general population of women her age is</p>
 <div class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">last</span>(<span class="fu">first</span>(srtdre)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="32">
@@ -1616,8 +1616,8 @@ y\,\log\left(\frac{\mu}{1-\mu}\right) .
 </div>
 </div>
 <p>or about 40%.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/c35fb1d
-">c35fb1d
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a7a872e
+">a7a872e
 </a>.</em></p>
 
 
