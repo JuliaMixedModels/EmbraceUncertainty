@@ -30,6 +30,9 @@ github:
   owner: JuliaMixedModels
   repo: EmbraceUncertainty
 
+resources:
+  - CNAME
+  
 format:
   html:
     # for more info, see
