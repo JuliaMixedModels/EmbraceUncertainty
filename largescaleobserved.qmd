@@ -500,7 +500,7 @@ The [rectangular full packed format](https://netlib.org/lapack/lawnspdf/lawn199.
 
 In general, for models with scalar random effects for two incompletely crossed grouping factors, the memory footprint depends strongly on the smaller of the number of levels of the grouping factors, less strongly on the larger number, and almost not at all on the number of observations.
 
-### Speed of log-likelihood evalation
+### Speed of log-likelihood evaluation
 
 The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates.
 The time for one evaluation is given in the `evtime` column of `sizespeed`.

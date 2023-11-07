@@ -39,7 +39,7 @@ Instead it implements the format in Julia code in such a way that Arrow vectors 
 That is, Arrow vectors are a subtype of `AbstractVector`.
 A similar approach is taken in the implementations of the Arrow format for the [Rust](https://rustlang.org) language.
 
-The data sets in the `MixedModels` package and the auxillary data sets used in this book are stored in the Arrow file format and retrieved as `Arrow.Table`s.
+The data sets in the `MixedModels` package and the auxiliary data sets used in this book are stored in the Arrow file format and retrieved as `Arrow.Table`s.
 There are many examples throughout this book of loading such data sets.
 
 ```{julia}
@@ -56,7 +56,7 @@ An important characteristic of any system for working with data tables is whethe
 
 As described above, most implementations of data frames for data science store the data column-wise.
 
-In *relational database management systems* (RDBMS), such as [PostgreSQL](https://postgresql.org), [SQLite](https://sqlite.org), and a multitude of commerical systems, a data table, called a *relation*, is typically stored row-wise.
+In *relational database management systems* (RDBMS), such as [PostgreSQL](https://postgresql.org), [SQLite](https://sqlite.org), and a multitude of commercial systems, a data table, called a *relation*, is typically stored row-wise.
 Such systems typically use [SQL](https://en.wikipedia.org/wiki/SQL), the *structured query language*, to define and access the data in tables, which is why that acronym appears in many of the names.
 There are exceptions to the row-wise rule, such as [DuckDB](https://duckdb.org), an SQL-based RDBMS, that, as mentioned above, represents relations as Arrow tables.
 

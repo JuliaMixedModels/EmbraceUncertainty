@@ -303,7 +303,7 @@ Suppose that we wish to plot the "population" linear predictor values from model
 That is, we will consider only the fixed-effects terms in the model formula and ignore the random effects.
 We want to create a plot like @fig-contradata2 by evaluating the linear predictor for a range of `age` values for each of the combinations of `ch` and `urban`.
 
-First we construct a table of covariate values, `newdata`, containing the *Cartesian product* of values of these covariates, created using a [generator expression](https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions) returning [NamedTuples](https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple), which is the standard row-wise represention of tabular data.
+First we construct a table of covariate values, `newdata`, containing the *Cartesian product* of values of these covariates, created using a [generator expression](https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions) returning [NamedTuples](https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple), which is the standard row-wise representation of tabular data.
 
 ```{julia}
 newdata = Table(
@@ -515,7 +515,7 @@ for `("D11", "N")` and based on 21 women only.
 ### Conversion of random effects to relative odds
 
 The exponential of the random effect is the relative odds of a woman in a particular urban/district combination using artificial birth control compared to her counterpart (same age, same with/without children status, same urban/rural status) in a typical district.
-The thus, the relative odds of a rural woman in district `D01` using artifical contraception relative to the general population of women her age is
+The thus, the relative odds of a rural woman in district `D01` using artificial contraception relative to the general population of women her age is
 
 ```{julia}
 exp(last(first(srtdre)))
