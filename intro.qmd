@@ -109,10 +109,9 @@ using DataFrames        # DataFrame implementation
 using Markdown          # utilities for generating markdown text
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
-using Printf            # formatted printing
 using ProgressMeter     # progress of optimizer iterations
 using Random            # random number generation
-using StatsBase         # basic statistical summaries
+using Statistics        # basic statistical summaries
 
 using EmbraceUncertainty: dataset # `dataset` means this one
 
@@ -121,7 +120,7 @@ ProgressMeter.ijulia_behavior(:clear) # suppress progress output
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
-If entering this line results in an error report stating that there is no package by one of these names then you must first install the package(s).
+If entering this block of code results in an error report stating that there is no package by one of these names then you must first install the package(s).
 If you are using Julia version 1.8.0 or later the error report will include instructions on how to do this.
 
 In what follows, we will assume that these packages have been installed and attached to the session before any of the code shown has been run.
@@ -196,7 +195,7 @@ last(dyestuff, 7)
 or we could tabulate the data using `groupby` and `combine` from [DataFrames](https://github.com/JuliaData/DataFrames.jl).
 
 ```{julia}
-combine(groupby(dyestuff, :batch), :yield => mean, nrow => :n)
+combine(groupby(dyestuff, :batch), :yield => mean, nrow)
 ```
 
 Although this table does show us an important property of the data, namely that there are exactly 5 observations on each batch --- a property that we will describe by saying that the data are *balanced* with respect to `batch` --- we usually learn much more about the structure of such data from plots like @fig-dyestuffdata
@@ -206,14 +205,21 @@ Although this table does show us an important property of the data, namely that 
 #| label: fig-dyestuffdata
 #| code-fold: true
 let
-  sumry = sort!(combine(groupby(dyestuff, :batch), :yield => mean => :yield), :yield)
+  sumry = sort!(
+    combine(groupby(dyestuff, :batch), :yield => mean => :yield),
+    :yield,
+  )
   mp = mapping(
     :yield => "Yield of dyestuff [g]",
-    :batch => sorter(sumry.batch) => "Batch of intermediate product",
+    :batch =>
+      sorter(sumry.batch) => "Batch of intermediate product",
   )
   draw(
-    (data(dyestuff) * mp * visual(Scatter; marker='○', markersize=12)) +
-    (data(sumry) * mp * visual(Lines));
+    (
+      data(dyestuff) *
+      mp *
+      visual(Scatter; marker='○', markersize=12)
+    ) + (data(sumry) * mp * visual(Lines));
     figure=(; resolution=(800, 400)),
   )
 end
@@ -272,14 +278,20 @@ A data plot (@fig-dyestuff2data)
 #| label: fig-dyestuff2data
 #| code-fold: true
 let
-  sumry = sort!(combine(groupby(dyestuff2, :batch), :yield => mean => :yield), :yield)
+  sumry = sort!(
+    combine(groupby(dyestuff2, :batch), :yield => mean => :yield),
+    :yield,
+  )
   mp = mapping(
     :yield => "Simulated yield",
     :batch => sorter(sumry.batch) => "Batch",
   )
   draw(
-    (data(dyestuff2) * mp * visual(Scatter; marker='○', markersize=12)) +
-    (data(sumry) * mp * visual(Lines));
+    (
+      data(dyestuff2) *
+      mp *
+      visual(Scatter; marker='○', markersize=12)
+    ) + (data(sumry) * mp * visual(Lines));
     figure=(; resolution=(800, 400)),
   )
 end
@@ -304,9 +316,8 @@ We will explain the structure of the formula after we have considered an example
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
 ```{julia}
-dsm01 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff)
+dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff)
 end
 ```
 
@@ -379,9 +390,8 @@ An alternative measure of precision of the estimate - a coverage interval based 
 Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\sigma}_1=0$.
 
 ```{julia}
-dsm02 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff2)
+dsm02 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff2)
 end
 println(dsm02)
 ```
@@ -559,32 +569,14 @@ For methods that involve simulation, it is best to initialize a random number ge
 Beginning with Julia v1.7.0 the default random number generator is the `Xoshiro` generator, which we initialize to an arbitrary, but reproducible, value.
 
 The object returned by a call to `parametricbootstrap` has a somewhat complex internal structure to allow for the ability to simulate from complex models while still maintaining a comparatively small storage footprint.
-To examine the distribution of the parameter estimates we extract a table of all the estimated parameters and convert it to a `DataFrame`.
+To examine the distribution of the parameter estimates we extract a `Table` of all the estimated parameters.
 
 ```{julia}
 #| warning: false
 const hide_progress = true # hide the progress bar when sampling
 Random.seed!(4321234)      # random number generator
 dsm01samp = parametricbootstrap(10_000, dsm01; hide_progress)
-dsm01pars = DataFrame(dsm01samp.allpars)
-first(dsm01pars, 7)
-```
-
-:::{.callout-note}
-
-### Switch to Table(dsm01samp.tbl) formulation
-
-:::
-
-```{julia}
-last(dsm01pars, 7)
-```
-
-Plots of the bootstrap estimates for individual parameters are obtained by extracting subsets of the rows of this dataframe using `subset` methods from the `DataFrames` package or the `@subset` macro from the `DataFramesMacros` package.
-For example,
-
-```{julia}
-βdf = @subset(dsm01pars, :type == "β")
+dsm01stbl = Table(dsm01samp.tbl)
 ```
 
 We begin by examining density plots constructed using the [AlgebraOfGraphics](https://github.com/JuliaGraphics/AlgebraOfGraphics.jl) package.
@@ -596,32 +588,24 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
 draw(
-  data(@subset(dsm01pars, :type == "β")) *
-  mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
-  ) *
+  data(dsm01stbl) *
+  mapping(:β1 => "Bootstrap samples of β") *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
 ```
 
-:::{.callout-note collapse="true"}
-
-### Use :compact=true when interpolating numeric values
-
-Find a way to use `:compact=true` when interpolating numeric values into the text
-:::
-
 ```{julia}
 #| echo: false
-Markdown.parse(
-  """
-  The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of $(@sprintf("%f", mean(βdf.value)))  which is close to the estimated `β₁` of $(@sprintf("%f", only(dsm01.β))).
+let context = (:compact => true)
+  Markdown.parse(
+    """
+    The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of $(repr(mean(dsm01stbl.β1); context)), which is close to the estimated `β₁` of $(repr(only(dsm01.β); context)).
 
-  Similarly the standard deviation of the simulated β values, $(std(βdf.value)) is close to the standard error of the parameter, $(only(stderror(dsm01))).
-""",
-)
+    Similarly the standard deviation of the simulated β values, $(repr(std(dsm01stbl.β1); context)), is close to the standard error of the parameter, $(repr(only(stderror(dsm01)); context)).
+  """,
+  )
+end
 ```
 
 In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect.
@@ -634,11 +618,11 @@ The situation is different for the estimates of the standard deviation parameter
 #| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
 draw(
-  data(@subset(dsm01pars, :type == "σ")) *
+  data(dsm01stbl) *
   mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
+    [:σ, :σ1] .=> "Bootstrap samples of standard deviations",
   ) *
+  mapping(color=dims(1) => renamer(["σ", "σ₁"])) *
   AlgebraOfGraphics.density();
   figure=(; resolution=(800, 450)),
 )
@@ -648,11 +632,13 @@ The estimator for the residual standard deviation, $\sigma$, is approximately no
 
 ```{julia}
 #| echo: false
-Markdown.parse(
-  """
-There is one peak around the "true" value for the simulation, $(only(dsm01.σs.batch)), and another peak at zero.
-""",
-)
+let context = :compact => true
+  Markdown.parse(
+    """
+    There is one peak around the "true" value for the simulation, $(repr(only(dsm01.σs.batch); context)), and another peak at zero.
+    """,
+  )
+end
 ```
 
 The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_density is being distorted by the method of approximating the density.
@@ -671,11 +657,11 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 #| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
 #| label: fig-dsm01_bs_sigma_hist
 draw(
-  data(@subset(dsm01pars, :type == "σ")) *
+  data(dsm01stbl) *
   mapping(
-    :value => "Bootstrap parameter estimates of σ";
-    color=(:group => "Group"),
+    [:σ, :σ1] .=> "Bootstrap samples of standard deviations",
   ) *
+  mapping(color=dims(1) => renamer(["σ", "σ₁"])) *
   AlgebraOfGraphics.histogram(; bins=80);
   figure=(; resolution=(800, 450)),
 )
@@ -699,11 +685,12 @@ In many cases standard errors are quoted for estimates of the variance component
 #| fig-cap: Histogram of bootstrap variance-components from model dsm01
 #| label: fig-dsm01_bs_sigmasqr_hist
 draw(
-  data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
+  data(dsm01stbl) *
   mapping(
-    :value_abs2 => "Bootstrap sample of estimates of σ²",
-    color=:group,
+    [:σ, :σ1] .=>
+      abs2 .=> "Bootstrap samples of standard deviations",
   ) *
+  mapping(color=dims(1) => renamer(["σ", "σ₁"])) *
   AlgebraOfGraphics.histogram(; bins=200);
   figure=(; resolution=(800, 450)),
 )
@@ -723,7 +710,7 @@ For example, from the sorted parameter values we could return the interval from 
 The `shortestcovint` method returns the shortest of all these potential intervals which will correspond to the interval with the highest empirical density.
 
 ```{julia}
-DataFrame(shortestcovint(dsm01samp))
+Table(shortestcovint(dsm01samp))
 ```
 
 For the `(Intercept)` fixed-effects parameter the interval is similar to an "asymptotic" or Wald interval constructed as the estimate plus or minus two standard errors.
@@ -750,11 +737,13 @@ DataFrame(dsm01trace.optsum.fitlog)
 
 ```{julia}
 #| echo: false
-Markdown.parse(
-  """
-Here the algorithm converges after 18 function evaluations to a profiled deviance of $(dsm01trace.objective) at θ = $(only(dsm01trace.theta)).
-""",
-)
+let context = :compact => true
+  Markdown.parse(
+    """
+    Here the algorithm converges after 18 function evaluations to a profiled deviance of $(repr(dsm01trace.objective; context)) at θ = $(repr(only(dsm01trace.theta); context)).
+    """,
+  )
+end
 ```
 
 ## Assessing the random effects {#sec-assessRE}

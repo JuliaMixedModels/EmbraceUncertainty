@@ -60,7 +60,7 @@ In this chapter we introduce graphical and statistical techniques for the analys
 
 ## The elstongrizzle data
 
-Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
+Data from a dental study measuring the lengths of the ramus of the mandible (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
 
 ```{julia}
 elstongrizzle = dataset(:elstongrizzle)
@@ -78,13 +78,13 @@ A common way of plotting such longitudinal data is response versus time on a sin
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
+#| fig-cap: Length of the ramus of the mandible versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
 draw(
   data(egdf) *
   mapping(
     :time => "Age (yr)",
-    :resp => "Ramus bone length (mm)",
+    :resp => "Length of the ramus of the mandible (mm)",
     color=:Subj,
   ) *
   (visual(Scatter) + visual(Lines)),
@@ -97,7 +97,7 @@ A preferred alternative is to plot response versus time with each subject's data
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
+#| fig-cap: Length of the ramus of the mandible versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
 #| label: fig-eglayout
 RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=7)
 R"""
@@ -109,7 +109,7 @@ print(
     aspect="xy",
     index.cond=function(x,y) coef(lm(y ~ x)) %*% c(1,8),
     xlab="Age (yr)",
-    ylab="Ramus bone length (mm)",
+    ylab="Length of the ramus of the mandible (mm)",
     ),
   )
 """;
@@ -567,8 +567,17 @@ bxm03samp = parametricbootstrap(
   bxm03;
   hide_progress=true,
 )
+bxm03stbl = Table(bxm03samp.tbl)
+```
+
+::: {.callout-note}
+
+### Add rho parameters to samp.tbl
+:::
+
+```{julia}
 bxm03pars = DataFrame(bxm03samp.allpars)
-DataFrame(shortestcovint(bxm03samp))
+Table(shortestcovint(bxm03samp))
 ```
 
 shows that the coverage intervals for both of the correlation parameters involving the `(Intercept)` extend out to one of the limits of the allowable range [-1, 1] of correlations.
