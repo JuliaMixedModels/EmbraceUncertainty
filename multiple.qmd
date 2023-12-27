@@ -29,7 +29,7 @@ Attach the packages to be used in this chapter
 ```{julia}
 #| code-fold: true
 #| output: false
-const hide_progress = true
+const progress = false
 
 using AlgebraOfGraphics
 using CairoMakie
@@ -210,7 +210,7 @@ caterpillar!(
 )
 ```
 
-The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` much less variability than does the conditional distribution of the random effects for `sample`.  (Note that the horizontal scales on these two plots are different.)
+The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` exhibits much less variability than does the conditional distribution of the random effects for `sample`.  (Note that the horizontal scales on these two plots are different.)
 However, the conditional distribution of the random effect for a particular sample, say sample `F`, has less variability than the conditional distribution of the random effect for a particular plate, say plate `m`.
 That is, the lines in @fig-pnm01samplepred are wider than the lines in @fig-pnm01platepred, even after taking the different axis scales into account.
 This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.
@@ -251,8 +251,8 @@ A parametric bootstrap sample of the parameter estimates
 ```{julia}
 #| code-fold: true
 bsrng = Random.seed!(9876789)
-pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress)
-pnm01stbl = Table(pnm01samp.tbl)
+pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; progress)
+pnm01stbl = pnm01samp.tbl
 ```
 
 can be used to create shortest 95% coverage intervals for the parameters in the model.
@@ -455,8 +455,8 @@ Furthermore, kernel density estimates from a parametric bootstrap sample of the 
 
 ```{julia}
 Random.seed!(4567654)
-psm01samp = parametricbootstrap(10_000, psm01; hide_progress)
-psm01stbl = Table(psm01samp.tbl)
+psm01samp = parametricbootstrap(10_000, psm01; progress)
+psm01stbl = psm01samp.tbl
 ```
 
 ```{julia}
@@ -535,7 +535,7 @@ psm02samp = parametricbootstrap(
   Random.seed!(9753579),
   10_000,
   psm02;
-  hide_progress,
+  progress,
 )
 Table(shortestcovint(psm02samp))
 ```

@@ -137,7 +137,6 @@ using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
 using NLopt
-using PooledArrays
 using ProgressMeter
 using StatsAPI
 

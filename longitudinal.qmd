@@ -565,18 +565,12 @@ bxm03samp = parametricbootstrap(
   Xoshiro(8642468),
   10_000,
   bxm03;
-  hide_progress=true,
+  progress=false,
 )
-bxm03stbl = Table(bxm03samp.tbl)
+bxm03stbl = bxm03samp.tbl
 ```
 
-::: {.callout-note}
-
-### Add rho parameters to samp.tbl
-:::
-
 ```{julia}
-bxm03pars = DataFrame(bxm03samp.allpars)
 Table(shortestcovint(bxm03samp))
 ```
 
@@ -589,12 +583,13 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 #| fig-cap: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodens
 draw(
-  data(@subset(bxm03pars, :type == "ρ")) *
+  data(bxm03stbl) *
   mapping(
-    :value => "Bootstrap replicates of correlation estimates";
-    color=(:names => "Variables"),
+    [:ρ1, :ρ2, :ρ3] .=> "Bootstrap samples of correlations of random effects",
   ) *
+  mapping(color=dims(1) => renamer(["ρ₁", "ρ₂", "ρ₃"])) *
   AlgebraOfGraphics.density();
+  figure=(; resolution=(800, 450)),
 )
 ```
 
@@ -604,20 +599,15 @@ Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/F
 #| code-fold: true
 #| fig-cap: Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodensatanh
-let
-  dat = @transform(
-    @subset(bxm03pars, :type == "ρ"),
-    :z = atanh(clamp(:value, -0.99999, 0.99999))
-  )
-  mp = mapping(
-    :z => "Fisher's z transformation of correlation estimates";
-    color=(:names => "Variables"),
-  )
-  draw(
-    data(dat) * mp * AlgebraOfGraphics.density();
-    figure=(; resolution=(800, 450)),
-  )
-end
+draw(
+  data(bxm03stbl) *
+  mapping(
+    [:ρ1, :ρ2, :ρ3] .=> (x -> atanh(clamp(x, -0.99999, 0.99999))).=> "Fisher's z transformation of correlation bootstrap estimates",
+  ) *
+  mapping(color=dims(1) => renamer(["ρ₁", "ρ₂", "ρ₃"])) *
+  AlgebraOfGraphics.density();
+  figure=(; resolution=(800, 450)),
+)
 ```
 
 Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for `time ^ 2` reduces the model too much.

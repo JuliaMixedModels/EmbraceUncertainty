@@ -1,0 +1,262 @@
+---
+jupyter: julia-1.9
+---
+
+\newcommand\bbL{{\mathbf{L}}}
+\newcommand\bbbeta{{\boldsymbol{\beta}}}
+\newcommand\bbtheta{{\boldsymbol{\theta}}}
+
+# Profile-based Inference {#sec-profiling}
+
+As described in @sec-modelformulation, in the `MixedModels.jl` package the *maximum likelihood estimates* (mle's) of the parameters of a mixed-effects model are determined by minimizing a *profiled objective* with respect to a reduced parameter vector, $\bbtheta$.
+The value of the objective is negative twice the log-likelihood for the model at the observed data, given the values of the parameters.
+The objective is *profiled* in the sense that the other parameters in the model, $\bbbeta$ and $\sigma$, are at their conditionally optimal values, given $\bbtheta$.
+
+In @sec-dyestuffLMM, where we fit a model to the *dyestuff* data (described in @sec-dyestuff), the parameter $\bbtheta$ is one-dimensional and we can easily visualize the function to be optimized.
+
+First attach the packages to be used, access the data sets, establish the contrasts dictionary, and fit the model.
+
+```{julia}
+#| code-fold: true
+using BSplineKit
+using CairoMakie
+using Distributions
+using MixedModels
+using MixedModelsMakie
+using ProgressMeter
+
+CairoMakie.activate!(; type="svg");
+ProgressMeter.ijulia_behavior(:clear);
+if !@isdefined contrasts
+    const contrasts = Dict{Symbol,Any}(:batch => Grouping())
+end
+dsm01 = let
+    f = @formula(yield ~ 1 + (1|batch))
+    fit(MixedModel, f, MixedModels.dataset(:dyestuff); contrasts)
+end
+```
+
+The `objective!` method for a single argument that is a `LinearMixedModel` returns a function that returns the value of the objective for the model from an argument that can be a scalar, an `AbstractVector`, or a `Tuple`.
+
+Because the value of the scalar $\theta$ that minimizes the objective is approximately 0.75.
+
+```{julia}
+only(dsm01.optsum.final)
+```
+
+we choose to plot the profiled objective over the interval `0.0 .. 2.1` in @fig-profiledobjdsm01.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Profiled objective function for model dsm01 as a function of the scalar parameter θ
+#| label: fig-profiledobjdsm01
+try
+    lines(
+        0.0 .. 2.1,
+        objective!(dsm01);
+        axis=(; xlabel="θ", ylabel="Profiled objective for dsm01"),
+    )
+finally
+    objective!(dsm01, dsm01.optsum.final) # restore parameter estimate
+end
+```
+
+## Differences in the profiled objective
+
+In a likelihood ratio test of the hypothesis $H_0: \theta = 0$ (i.e. the random effects are inert and the model reverts to a linear model) versus $H_a: \theta\ne0$, the test statistic is the difference in the profiled objective at $\theta=0$ to that at the optimum.
+The distribution of this test statistic is approximately a $\chi^2$ distribution where the degrees of freedom are the number of constraints on the parameters under $H_0$ --- one, in this case.
+
+Thus a more meaningful scale for the vertical axis is the difference of the profiled objective at $\theta$ to that at $\hat\theta$, as shown in @fig-profiledobjdsm01diff.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Difference of the profiled objective function for model dsm01 from that at the optimal θ.
+#| label: fig-profiledobjdsm01diff
+try
+    lines(
+        0.0 .. 2.1,
+        x -> objective!(dsm01, x) - dsm01.optsum.fmin;
+        axis=(; xlabel="θ", ylabel="Change in the profiled objective for dsm01"),
+    )
+finally
+    objective!(dsm01, dsm01.optsum.final) # restore parameter estimate
+end
+```
+
+### Profile-based confidence intervals
+
+Although not always presented in this way, general confidence intervals and confidence regions are associated with hypothesis tests on the corresponding parameter.
+A $(1- \alpha)$ confidence interval (or, more generally, confidence set) on a parameter like $\theta$ in this model is the set of values of $\theta_0$ for which $H_0: \theta = \theta_0$ versus $H_a: \theta \ne \theta_0$ is not rejected at level $\alpha$.
+
+Thus a 95% profile-based confidence interval on $\theta$ for this model is the set of values for which the difference in the profiled objective from the minimum profiled objective is less than
+
+```{julia}
+quantile(Chisq(1), 0.95)
+```
+
+Because a $\chi^2$ distribution on 1 degree of freedom is the square of a standard normal distribution, it can be more intuitive to consider the difference in the profiled objective from the minimum objective on the square root scale.
+A further enhancement is to use the *signed square root*, which is the square root of the profiled objective but with the sign of $\theta-\hat\theta$.
+This *profile ζ* function can be compared to quantiles of the standard normal (or Gaussian) distribution.
+
+The `profile` method for a `LinearMixedModel` returns a structure with a table of values of the profile ζ for each of the parameters in the model.
+In the case of the $\bbtheta$ parameters the profile ζ is either evaluated directly, when $\bbtheta$ is one-dimensional, or by conditional optimization of general profiled objective with respect to the other components of $\bbtheta$.
+For the other parameters the constrained optimization is customized for the type of parameter.
+
+```{julia}
+dspr01 = profile(dsm01)
+dspr01.tbl
+```
+
+The columns of the table are `p`, the parameter being profiled, $\zeta$, the signed square root of the difference between the profiled objective and the minimum objective, and the parameter values at the conditional optimum.
+
+@fig-thetazetadsm01 shows the profiled objective on the ζ scale (signed square root of the difference from the minimum value) versus the $\theta$ parameter.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Signed square-root of the difference of the profiled objective function for model dsm01 from that at the optimal θ.
+#| label: fig-thetazetadsm01
+lines(
+    0.0 .. 2.1,
+    identity ∘ dspr01.fwd[:θ1],
+    axis=(; xlabel="θ", ylabel="Profile ζ for dsm01"),
+)
+```
+
+The parameter values at the conditional optimum may list redundant parameters, such as $\sigma_1=\sigma\theta_1$, in this case.
+The reason for including possibly redundant parameters is because the $\bbtheta$ parameters are constructed to simplify the optimization process, whereas parameters like $\sigma$ and $\sigma_1$ have a direct interpretation in the model as standard deviations (i.e. scale parameters) in the description of the stochastic components of the model.
+
+
+The table can be filtered according to the parameter being profiled, which is stored as a symbol in column `p` of the table
+
+```{julia}
+filter(r -> r.p == :β1, dspr01.tbl)
+```
+
+Another way of writing the expression on which to filter is as a composition of a partially-applied equality comparison and the `first` function, which extracts the first element of each row.
+
+```{julia}
+#| output: false
+filter(==(:β1) ∘ first, dspr01.tbl)
+```
+
+The function `zetaplot!` in the `MixedModelsMakie` package produces plots of the profile ζ versus the parameter value, either on the ζ scale, @fig-sigmazetadsm01, or on the absolute value scale with confidence intervals added, @fig-sigmaabszetadsm01.
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Profile ζ as a function of the dispersion parameters in model dsm01
+#| label: fig-sigmazetadsm01
+let
+    f2 = Figure(; resolution=(1000,550))
+    zetaplot!(f2, dspr01; ptyp='σ')
+end
+```
+
+```{julia}
+#| code-fold: true
+#| fig-cap: The absolute value of the profile ζ as a function of the dispersion parameters in model dsm01.  The horizontal lines are confidence intervals with nominal 50%, 80%, 90%, 95% and 99% coverage.
+#| label: fig-sigmaabszetadsm01
+let
+    f = Figure(; resolution=(1000,550))
+    zetaplot!(f, dspr01; absv=true, ptyp='σ')
+end
+```
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Profile ζ as a function of the fixed-effects parameter in model dsm01
+#| label: fig-betazetadsm01
+let
+    f3 = Figure(; resolution=(600,550))
+    zetaplot!(f3, dspr01; ptyp='β')
+end
+```
+
+Numerical values for the endpoints of the confidence intervals are returned by `confint` methods.
+Applied to the model itself, confint returns intervals on only the fixed-effects parameters, and these are based on their estimates, their standard errors and quantiles of the standard normal distribution.
+Such intervals are sometimes called the "Wald intervals".
+
+```{julia}
+confint(dsm01)  # 95% confidence interval, by default
+```
+
+The method for a `MixedModelProfile` object returns the profile-based confidence intervals (95% coverage, by default), which more closely reflect the behavior of the estimators.
+
+```{julia}
+confint(dspr01)
+```
+
+These intervals correspond to the horizontal lines in @fig-sigmaabszetadsm01 that are second from the top.
+To get the endpoints of the uppermost horizontal lines, which are the 99% profile-based confidence intervals, use
+
+```{julia}
+confint(dspr01; level=0.99)
+```
+
+## Forward and reverse splines
+
+The profile table contains the results of individual optimizations or evaluations of the profiled objective.
+A `MixedModelProfile` object also contains cubic interpolation splines, created using the [BSplineKit.jl](https://github.com/jipolanco/BSplineKit.jl) package,
+in both the forward (parameter $\rightarrow\zeta$) and reverse ($\zeta\rightarrow$ parameter) directions.
+
+The slope of the profile ζ function at the estimate is the inverse of the standard error for the parameter.
+Thus the slope of the inverse profile ζ function at zero is the standard error.
+
+```{julia}
+((Derivative(1) * dspr01.rev[:β1])(0.0), only(stderror(dsm01)))
+```
+
+## Interpretation of the ζ plots
+
+A plot of the profile ζ versus the parameter, like the panels in @fig-sigmazetadsm01, gives information about the distribution of the estimator of the parameter that is similar to what we get from a normal probability plot of a sample from the distribution.
+
+If this plot is essentially a straight line over the region of interest then the distribution of the estimator of the parameter is very close to a normal distribution.
+
+## Other examples
+
+Set up the model evaluation
+```{julia}
+#| code-fold: true
+#| output: false
+contrasts[:sample] = contrasts[:plate] = contrasts[:batch] = contrasts[:cask] = Grouping()
+include(pkgdir(MixedModels, "test", "modelcache.jl"))
+```
+```{julia}
+pspr01 = profile(first(models(:pastes)))
+println(pspr01.m)
+```
+
+```{julia}
+confint(pspr01)
+```
+
+```{julia}
+#| code-fold: true
+#| fig-cap: The absolute value of the profile ζ as a function of the dispersion parameters in model psm01.  The horizontal lines are confidence intervals with nominal 50%, 80%, 90%, 95% and 99% coverage.
+#| label: fig-sigmaabszetasm01
+zetaplot!(Figure(;resolution=(800,400)), pspr01; ptyp='σ', absv=true)
+```
+
+```{julia}
+pspr02 = profile(last(models(:pastes)))
+confint(pspr02)
+```
+
+```{julia}
+#| code-fold: true
+#| fig-cap: The absolute value of the profile ζ as a function of the dispersion parameters in model psm02.  The horizontal lines are confidence intervals with nominal 50%, 80%, 90%, 95% and 99% coverage.
+
+#| label: fig-profileζpsm02abs
+zetaplot!(Figure(; resolution=(800,400)), pspr02; ptyp='σ', absv=true)
+```
+
+```{julia}
+pnpr01 = profile(first(models(:penicillin)))
+confint(pnpr01)
+```
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Profile ζ as a function of the standard deviation parameters in model psm02.
+#| label: fig-sigmazetapnpr01
+zetaplot!(Figure(;resolution=(1000,400)), pnpr01; ptyp='σ')
+```

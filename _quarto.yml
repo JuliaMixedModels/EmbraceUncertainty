@@ -19,6 +19,7 @@ book:
   appendices:
     - datatables.qmd
     - linalg.qmd
+    - profiling.qmd
     - aGHQ.qmd
 
 execute-dir: project

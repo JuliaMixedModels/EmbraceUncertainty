@@ -102,21 +102,22 @@ To access these data within `Julia` we must first attach this package, and other
 ```{julia}
 #| code-fold: show
 #| output: false
+import ProgressMeter    # progress of optimizer iterations
+ProgressMeter.ijulia_behavior(:clear) # suppress progress output
+
 using AlgebraOfGraphics # high-level graphics
 using CairoMakie        # graphics back-end
-using DataFrameMacros   # elegant DataFrame manipulation
 using DataFrames        # DataFrame implementation
 using Markdown          # utilities for generating markdown text
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
-using ProgressMeter     # progress of optimizer iterations
 using Random            # random number generation
 using Statistics        # basic statistical summaries
 
 using EmbraceUncertainty: dataset # `dataset` means this one
+using AlgebraOfGraphics: density  # `density` means this one
 
 CairoMakie.activate!(; type="svg")    # Scalable Vector Graphics
-ProgressMeter.ijulia_behavior(:clear) # suppress progress output
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -573,10 +574,10 @@ To examine the distribution of the parameter estimates we extract a `Table` of a
 
 ```{julia}
 #| warning: false
-const hide_progress = true # hide the progress bar when sampling
+const progress = false # hide the progress bar when sampling
 Random.seed!(4321234)      # random number generator
-dsm01samp = parametricbootstrap(10_000, dsm01; hide_progress)
-dsm01stbl = Table(dsm01samp.tbl)
+dsm01samp = parametricbootstrap(10_000, dsm01; progress)
+dsm01stbl = dsm01samp.tbl
 ```
 
 We begin by examining density plots constructed using the [AlgebraOfGraphics](https://github.com/JuliaGraphics/AlgebraOfGraphics.jl) package.
@@ -590,8 +591,8 @@ You can check the details by clicking on the "Code" button in the HTML version o
 draw(
   data(dsm01stbl) *
   mapping(:β1 => "Bootstrap samples of β") *
-  AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  density();
+  figure=(; resolution=(800, 450))
 )
 ```
 
@@ -623,7 +624,7 @@ draw(
     [:σ, :σ1] .=> "Bootstrap samples of standard deviations",
   ) *
   mapping(color=dims(1) => renamer(["σ", "σ₁"])) *
-  AlgebraOfGraphics.density();
+  density();
   figure=(; resolution=(800, 450)),
 )
 ```
@@ -684,19 +685,46 @@ In many cases standard errors are quoted for estimates of the variance component
 #| code-fold: true
 #| fig-cap: Histogram of bootstrap variance-components from model dsm01
 #| label: fig-dsm01_bs_sigmasqr_hist
-draw(
-  data(dsm01stbl) *
-  mapping(
-    [:σ, :σ1] .=>
-      abs2 .=> "Bootstrap samples of standard deviations",
-  ) *
-  mapping(color=dims(1) => renamer(["σ", "σ₁"])) *
-  AlgebraOfGraphics.histogram(; bins=200);
-  figure=(; resolution=(800, 450)),
-)
+let σs = ["σ", "σ1"]
+  draw(
+    data(dsm01stbl) *
+    mapping(
+      σs .=> abs2 .=> "Bootstrap samples of variance components",
+      color=dims(1) => renamer(σs),
+    ) *
+    AlgebraOfGraphics.histogram(; bins=200);
+    figure=(; resolution=(800, 450)),
+  )
+end
 ```
 
 The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accomodate non-normal distributions.
+
+## Quantile-quantile plots and profile-based confidence intervals
+
+Because the distribution of the bootstrap replications of $\sigma_1$ is a hybrid distribution --- that is, a continuous distribution of positive values with a non-zero probability of exactly zero --- neither a kernel density plot (@fig-dsm01_bs_sigma_density) nor a histogram (@fig-dsm01_bs_sigma_hist) is an ideal depiction of it.
+
+A *quantile-quantile* or [Q-Q plot](https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot) provides an alternative representation of the distribution in which the "pulse" at zero can be easily discerned.
+If we choose to plot the quantiles of the standard normal (or Gaussian) distribution versus the sample quantiles, as in @fig-dsm01_bs_beta_qq, we have a visual assessment of the extent to which the distribution deviates from a normal distribution.
+Such a plot is also called a [normal probability plot](https://en.wikipedia.org/wiki/Normal_probability_plot).
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Normal probability plot of bootstrap fixed-effects coefficients from model dsm01
+#| label: fig-dsm01_bs_beta_qq
+let f = Figure(; size=(1000,400)),
+  pars = [:β1 => "β", :σ => "σ", :σ1 => "σ₁"],
+  ppts = inv(512):inv(256):1.0,
+  z = quantile(Normal(), ppts)
+  map(enumerate(pars)) do (j, p)
+    ax = Axis(f[1, j]; xlabel=last(p), aspect=1)
+    lines!(quantile(getproperty(dsm01stbl, first(p)), ppts), z)
+  end
+  f
+end
+```
+
+
 
 ### Confidence intervals on the parameters {#sec-confints}
 
