@@ -5,7 +5,30 @@ project:
 book:
   title: "Embrace Uncertainty"
   subtitle: "Mixed-effects models with Julia"
-  author: "Phillip Alday, Reinhold Kliegl, and Douglas Bates"
+  author: 
+    - name: Phillip Alday
+      email: me@phillipalday.com
+      orcid: 0000-0002-9984-5745
+      affiliation:
+        - name: Beacon Biosignals
+          url: https://beacon.bio
+    - name: Reinhold Kliegl
+      email: reinhold.kliegl@gmail.com
+      orcid: 0000-0002-0180-8488
+      affiliation:
+        - name: University of Potsdam
+          city: Potsdam
+          country: Germany
+          url: https://uni-potsdam.de
+    - name: Douglas Bates
+      email: dmbates@gmail.com
+      orcid: 0000-0001-8316-9503
+      affiliation:
+        - name: University of Wisconsin - Madison
+          city: Madison
+          state: WI
+          url: https://www.wisc.edu
+          department: Statistics
   date: today
   chapters:
     - index.qmd
@@ -44,5 +67,5 @@ format:
 
 jupyter: julia-1.9
 execute:
-  cache: true
+  cache: false    # inline results conflict with cache use
   freeze: auto
