@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # Generalized Linear Mixed Models for Binary Responses {#sec-glmmbinomial}

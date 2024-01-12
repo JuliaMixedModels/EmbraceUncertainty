@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}

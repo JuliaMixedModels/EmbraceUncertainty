@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
