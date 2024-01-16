@@ -80,6 +80,7 @@ A common way of plotting such longitudinal data is response versus time on a sin
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
+#| warning: false
 draw(
   data(egdf) *
   mapping(
@@ -146,6 +147,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| code-fold: true
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
+#| warning: false
 caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
 ```
 
@@ -188,6 +190,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02
 #| label: fig-egm02caterpillar
 #| code-fold: true
+#| warning: false
 caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
 ```
 
@@ -222,6 +225,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm02shrinkage
+#| warning: false
 shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
 ```
 
@@ -261,6 +265,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm04shrinkage
+#| warning: false
 shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
 ```
 
@@ -317,6 +322,7 @@ Considering first the control group, whose trajectories can be plotted in a "spa
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the control group of bxdf versus time in trial (wk).
 #| label: fig-bxctrlspaghetti
+#| warning: false
 bxaxes =
   mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")
 bxgdf = groupby(bxdf, :Group)
@@ -334,6 +340,7 @@ or in separate panels ordered by initial weight, @fig-bxctrllayout.
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxctrllayout
+#| warning: false
 let df = bxgdf[("Control",)]
   draw(
     data(df) *
@@ -356,6 +363,7 @@ A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxthiolayout
+#| warning: false
 let
   df = bxgdf[("Thioracil",)]
   draw(
@@ -379,6 +387,7 @@ By contrast, in the Thyroxin group, @fig-bxthyrlayout,
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the Thyroxin group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxthyrlayout
+#| warning: false
 let
   df = bxgdf[("Thyroxin",)]
   draw(
@@ -473,6 +482,7 @@ A caterpillar plot created from the conditional means and standard deviations of
 #| code-fold: true
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03
 #| label: fig-bxm03caterpillar
+#| warning: false
 caterpillar(bxm03)
 ```
 
@@ -482,6 +492,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-bxm03shrinkage
+#| warning: false
 shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
 ```
 
@@ -512,6 +523,7 @@ can help to see that these points lie on a plane.
 #| code-fold: true
 #| fig-cap: Two views of the conditional means of the random effects from model bxm03. The lines from the origin are the principal axes of the unconditional distribution of the random effects.  The panel on the right is looking in along the negative of the second principle axis (red line in left panel).
 #| label: fig-bxm03plane
+#| warning: false
 let
   bpts = Point3f.(eachcol(only(bxm03.b)))
   Upts = Point3f.(eachcol(svd(only(bxm03.λ)).U))
@@ -579,6 +591,7 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 #| code-fold: true
 #| fig-cap: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodens
+#| warning: false
 draw(
   data(@subset(bxm03pars, :type == "ρ")) *
   mapping(
@@ -595,6 +608,7 @@ Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/F
 #| code-fold: true
 #| fig-cap: Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodensatanh
+#| warning: false
 let
   dat = @transform(
     @subset(bxm03pars, :type == "ρ"),
@@ -657,6 +671,7 @@ The models give essentially the same predictions of weight versus time for a "ty
 #| code-fold: true
 #| fig-cap: Typical weight curves from models bxm03, bxm04, and bxm05 for each of the three treatment groups.
 #| label: fig-bxmodfitted
+#| warning: false
 let
   times = Float32.((0:256) / 64)
   times² = abs2.(times)

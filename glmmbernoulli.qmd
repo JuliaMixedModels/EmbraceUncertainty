@@ -98,6 +98,7 @@ as in @fig-contradata,
 #| code-fold: true
 #| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey
 #| label: fig-contradata
+#| warning: false
 draw(
   data(contra) *
   mapping(
@@ -225,6 +226,7 @@ A plot of the smoothed observed proportions versus centered age by `urban` and `
 #| code-fold: true
 #| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey.  The livch factor has been collapsed to children/nochildren.
 #| label: fig-contradata2
+#| warning: false
 draw(
   data(contra) *
   mapping(
@@ -344,6 +346,7 @@ Plotting the result, @fig-com05pred,
 #| code-fold: true
 #| fig-cap: Linear predictor versus centered age from model com05
 #| label: fig-com05pred
+#| warning: false
 draw(
   data(newdata) *
   mapping(
@@ -392,6 +395,7 @@ is called the *logistic* function and is shown in @fig-logitinv.
 #| code-fold: true
 #| fig-cap: 'The logistic function, which is the inverse to the logit link function.'
 #| label: fig-logitinv
+#| warning: false
 let
   fig = Figure(; resolution=(800, 400))
   ax = Axis(fig[1, 1]; xlabel="η", ylabel="μ")
@@ -441,6 +445,7 @@ producing the population predictions on the probability scale, as shown in @fig-
 #| code-fold: true
 #| fig-cap: Predicted probability of contraception use versus centered age from model com05.
 #| label: fig-com05predmu
+#| warning: false
 draw(
   data(newdata) *
   mapping(
@@ -475,6 +480,7 @@ A normal probability plot of the conditional modes of the random effects for mod
 #| code-fold: true
 #| fig-cap: Caterpillar plot of the conditional modes of the random-effects for model `com05`
 #| label: fig-com05qqcaterpillar
+#| warning: false
 qqcaterpillar(com05)
 ```
 
