@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # Working with data tables {#sec-datatables}

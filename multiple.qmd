@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # Models With Multiple Random-effects Terms {#sec-Multiple}
@@ -109,6 +109,7 @@ of the data, then plot it
 #| code-fold: true
 #| fig-cap: "Diameter of inhibition zone by plate and sample. Plates are ordered by increasing mean response."
 #| label: fig-penicillindot
+#| warning: false
 """
     _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)
 
@@ -194,6 +195,7 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for plate in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01platepred
+#| warning: false
 caterpillar!(
   Figure(; resolution=(800, 480)),
   ranefinfo(pnm01, :plate),
@@ -204,6 +206,7 @@ caterpillar!(
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for sample in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01samplepred
+#| warning: false
 caterpillar!(
   Figure(; resolution=(800, 160)),
   ranefinfo(pnm01, :sample),
@@ -267,6 +270,7 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| code-fold: true
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
+#| warning: false
 draw(
   data(@subset(pnm01pars, :type == "β")) *
   mapping(
@@ -291,6 +295,7 @@ The densities of the variance-components, on the scale of the standard deviation
 #| fig-cap: "Parametric bootstrap estimates of variance components in model pnm01"
 #| label: fig-pnm01bssigma
 #| code-fold: true
+#| warning: false
 draw(
   data(@subset(pnm01pars, :type == "σ")) *
   mapping(
@@ -446,6 +451,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| code-fold: true
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
+#| warning: false
 caterpillar!(
   Figure(resolution=(800, 300)),
   ranefinfo(psm01, :batch),
@@ -466,6 +472,7 @@ psm01pars = DataFrame(psm01samp.allpars);
 #| fig-cap: "Kernel density plots of bootstrap estimates of σ for model psm01"
 #| label: fig-psm01bssampdens
 #| code-fold: true
+#| warning: false
 draw(
   data(@subset(psm01pars, :type == "σ")) *
   mapping(
@@ -585,6 +592,7 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| code-fold: true
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
+#| warning: false
 draw(
   data(Table(response=1:5, count=counts(insteval.y))) *
   mapping(:response => "Rating", :count => "Count") *
@@ -611,6 +619,7 @@ It is not surprising that zero is within most of the prediction intervals on the
 #| code-fold: true
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
+#| warning: false
 caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
 ```
 
@@ -679,6 +688,7 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| code-fold: true
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
 #| label: fig-iem01qqcaterpillard
+#| warning: false
 qqcaterpillar!(
   Figure(; resolution=(800, 650)),
   ranefinfo(iem01, :d),
@@ -691,6 +701,7 @@ shows the differences in precision due to different numbers of observations for 
 #| code-fold: true
 #| fig-cap: "Histogram of the number of observations per instructor in the insteval data"
 #| label: fig-iednobshist
+#| warning: false
 draw(
   data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
   mapping(:n => "Number of observations") *

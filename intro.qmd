@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
@@ -205,6 +205,7 @@ Although this table does show us an important property of the data, namely that 
 #| fig-cap: Yield of dyestuff by batch.  The line joins the mean yields.
 #| label: fig-dyestuffdata
 #| code-fold: true
+#| warning: false
 let
   sumry = sort!(combine(groupby(dyestuff, :batch), :yield => mean => :yield), :yield)
   mp = mapping(
@@ -271,6 +272,7 @@ A data plot (@fig-dyestuff2data)
 #| fig-cap: Artificial data of yield by batch.  The line joins the mean yields.
 #| label: fig-dyestuff2data
 #| code-fold: true
+#| warning: false
 let
   sumry = sort!(combine(groupby(dyestuff2, :batch), :yield => mean => :yield), :yield)
   mp = mapping(
@@ -595,6 +597,7 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| code-fold: true
 #| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
+#| warning: false
 draw(
   data(@subset(dsm01pars, :type == "β")) *
   mapping(
@@ -633,6 +636,7 @@ The situation is different for the estimates of the standard deviation parameter
 #| code-fold: true
 #| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
+#| warning: false
 draw(
   data(@subset(dsm01pars, :type == "σ")) *
   mapping(
@@ -670,6 +674,7 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 #| code-fold: true
 #| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
 #| label: fig-dsm01_bs_sigma_hist
+#| warning: false
 draw(
   data(@subset(dsm01pars, :type == "σ")) *
   mapping(
@@ -698,6 +703,7 @@ In many cases standard errors are quoted for estimates of the variance component
 #| code-fold: true
 #| fig-cap: Histogram of bootstrap variance-components from model dsm01
 #| label: fig-dsm01_bs_sigmasqr_hist
+#| warning: false
 draw(
   data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
   mapping(
@@ -808,6 +814,7 @@ A plot of these prediction intervals is sometimes called a *caterpillar plot* be
 #| code-fold: true
 #| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
+#| warning: false
 caterpillar!(
   Figure(resolution=(800, 250)),
   ranefinfo(dsm01, :batch),
@@ -822,6 +829,7 @@ An alternative, the `qqcaterpillar` function
 #| code-fold: true
 #| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
+#| warning: false
 qqcaterpillar!(
   Figure(resolution=(800, 250)),
   ranefinfo(dsm01, :batch),

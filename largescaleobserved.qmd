@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 \newcommand{\bbtheta}{{\boldsymbol\theta}}
@@ -124,6 +124,7 @@ Because the distribution of the number of ratings per movie or per user is so hi
 #| code-fold: true
 #| fig-cap: "Empirical distribution plots of the number of ratings per movie and per user.  The horizontal axes are on a logarithmic scale."
 #| label: fig-nrtngsecdf
+#| warning: false
 let
   f = Figure(; resolution=(1000, 400))
   xscale = log10
@@ -204,6 +205,7 @@ then create a bar chart of the two distributions
 #| code-fold: true
 #| fig-cap: "Distribution of ratings for movies with only one rating compared to movies with at least 5 ratings"
 #| label: fig-ratingsbarcharts
+#| warning: false
 let
   fiveplus = zeros(Int, 10)
   onlyone = zeros(Int, 10)
@@ -301,6 +303,7 @@ ltitle = "Minimum number of ratings per user"
 #| fig-cap: "Bar plot of data set dimensions by minimum number of ratings per user and per movie."
 #| code-fold: true
 #| label: fig-dimsbarchart
+#| warning: false
 let
   f = Figure(resolution=(800, 1000))
   xlabel = "Minimum number of ratings per movie"
@@ -449,6 +452,7 @@ The first two parts of this conclusion are illustrated in @fig-memoryfootprint.
 #| fig-cap: "Bar plot of memory footprint of the model representation by minimum number of ratings per user and per movie."
 #| code-fold: true
 #| label: fig-memoryfootprint
+#| warning: false
 let
   f = Figure(resolution=(800, 1000))
   xlabel = "Minimum number of ratings per movie"
@@ -513,6 +517,7 @@ That is, we can't expect to reproduce `nev` exactly when fitting the same model 
 #| fig-cap: "Bar plot of function log-likelihood evaluation time by minimum number of ratings per user and per movie."
 #| code-fold: true
 #| label: fig-timetoconverge
+#| warning: false
 let
   f = Figure(resolution=(800, 1000))
   xlabel = "Minimum number of ratings per movie"
@@ -585,6 +590,7 @@ There are two blocked matrices, `A` and `L`, stored in the model representation 
 #| code-fold: true
 #| fig-cap: "Amount of storage for L[2,2] versus amount of storage for the entire model.  Colors are determined by the minimum number of ratings per user in the data to which the model was fit."
 #| label: fig-L22vsmodelsz
+#| warning: false
 draw(
   data(sizespeed) *
   mapping(

@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
@@ -1113,6 +1113,7 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| code-fold: true
 #| fig-cap: Weights and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghnine
+#| warning: false
 draw(
   data(gausshermitenorm(9)) *
   mapping(:abscissae => "Positions", :weights),
@@ -1125,6 +1126,7 @@ Notice that the magnitudes of the weights drop quite dramatically away from zero
 #| code-fold: true
 #| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghninelog
+#| warning: false
 draw(
   data(gausshermitenorm(9)) * mapping(
     :abscissae => "Positions",
@@ -1223,6 +1225,7 @@ We begin with plots of the difference in the penalized deviance from its value a
 #| code-fold: true
 #| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of u.
 #| label: fig-uscalepdev
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1246,6 +1249,7 @@ then shift and scale the horizontal axis to the $z$ scale for this difference in
 #| code-fold: true
 #| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of z.
 #| label: fig-zscalepdev
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1267,6 +1271,7 @@ The next stage is to plot, on the $z$ scale, the difference between the penalize
 #| code-fold: true
 #| fig-cap: The difference between the contribution to the penalized deviance and its quadratic approximation for each of first 5 groups in model com05 as a function of z.
 #| label: fig-zpdevdiff
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1290,6 +1295,7 @@ and, finally, the exponential of negative half of this difference in @fig-zexpne
 #| code-fold: true
 #| fig-cap: Exponential of half the difference between the quadratic approximation and the contribution to the penalized deviance, for each of first 5 groups in model com05 as a function of z.
 #| label: fig-zexpneghalfdiff
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
