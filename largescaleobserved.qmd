@@ -6,28 +6,36 @@ jupyter: julia-1.10
 
 # A large-scale observational study {#sec-largescaleobserved}
 
-Load the packages to be used.
+Load the packages to be used,
 
 ```{julia}
 #| code-fold: true
 #| output: false
+#| label: packages05
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrames
 using EmbraceUncertainty: dataset
 using GLM                  # for the lm function
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using SparseArrays         # for the nnz function
 using Statistics           # for the mean function
 using TypedTables
+```
 
+and define some constants and a utility function
+
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants05
 optsumdir(paths::AbstractString...) =
   joinpath(@__DIR__, "optsums", paths...)
-CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear)
+@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
+@isdefined(progress) || const progress=false
 ```
 
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
