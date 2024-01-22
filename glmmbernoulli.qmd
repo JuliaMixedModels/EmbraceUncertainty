@@ -22,23 +22,28 @@ Attach the packages to be used in this chapter
 ```{julia}
 #| code-fold: true
 #| output: false
+#| label: packages06
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using DataFrames         # only used for `describe`
 using EmbraceUncertainty: dataset
 using FreqTables
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using StatsBase
 using StatsModels
+```
 
-if !@isdefined(contrasts)
-  const contrasts = Dict{Symbol,Any}()
-end
-const nAGQ = 9
-CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear)
+and defined some constants, if not already defined.
+
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants06
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(nAGQ) || const nAGQ = 9
+@isdefined(progress) || const progress = false
 ```
 
 In this chapter we consider mixed-effects models for data sets in which the response is *binary*, representing  yes/no or true/false or correct/incorrect responses.
@@ -135,12 +140,11 @@ Establishing the contrasts and fitting a preliminary model with random effects f
 ```{julia}
 contrasts[:livch] = EffectsCoding(; base="0")
 contrasts[:urban] = HelmertCoding()
-contrasts[:dist] = Grouping()
 
 com01 = let
   f = @formula use ~
     1 + livch + (age + abs2(age)) * urban + (1 | dist)
-  fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+  fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
 end
 ```
 
@@ -191,7 +195,7 @@ we fit a reduced model.
 ```{julia}
 com02 =
   let f = @formula use ~ 1 + ch + age * age * urban + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
   end
 ```
 
@@ -208,7 +212,7 @@ Apparently neither the second-order interaction `age & urban` nor the third-orde
 ```{julia}
 com03 =
   let f = @formula use ~ 1 + urban + ch + age * age + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
   end
 ```
 
@@ -247,7 +251,7 @@ Incorporating an interaction of `age` and `ch` allows for such a shift.
 com04 =
   let f =
       @formula use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
   end
 ```
 
@@ -265,7 +269,7 @@ A series of such model fits led to a model with random effects for the combinati
 com05 =
   let f = @formula use ~
       1 + urban + ch * age + abs2(age) + (1 | dist & urban)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
   end
 ```
 

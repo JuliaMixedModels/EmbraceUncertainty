@@ -29,32 +29,29 @@ Attach the packages to be used in this chapter
 ```{julia}
 #| code-fold: true
 #| output: false
-const hide_progress = true
-
+#| label: packages02
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using Random
 using RCall
 using StatsBase
+```
 
-const contrasts = Dict{Symbol,Any}(
-  :sample => Grouping(),
-  :plate => Grouping(),
-  :s => Grouping(),
-  :batch => Grouping(),
-  :d => Grouping(),
-  :dept => Grouping(),
-)
+and define some constants, if not already defined,
 
-ProgressMeter.ijulia_behavior(:clear)
-CairoMakie.activate!(; type="svg")
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants02
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(progress) || const progress = false
 ```
 
 The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient.
@@ -184,7 +181,7 @@ A model incorporating random effects for both the `plate` and the `sample` is st
 
 ```{julia}
 pnm01 = let f = @formula diameter ~ 1 + (1 | plate) + (1 | sample)
-  fit(MixedModel, f, penicillin; contrasts)
+  fit(MixedModel, f, penicillin; contrasts, progress)
 end
 ```
 
@@ -254,7 +251,7 @@ A parametric bootstrap sample of the parameter estimates
 ```{julia}
 #| code-fold: true
 bsrng = Random.seed!(9876789)
-pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress)
+pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; progress)
 pnm01pars = DataFrame(pnm01samp.allpars);
 ```
 
@@ -416,7 +413,7 @@ We include random-effects terms for each factor, as in
 
 ```{julia}
 psm01 = let f = @formula strength ~ 1 + (1 | sample) + (1 | batch)
-  fit(MixedModel, f, pastes; contrasts)
+  fit(MixedModel, f, pastes; contrasts, progress)
 end
 ```
 
@@ -464,7 +461,7 @@ Furthermore, kernel density estimates from a parametric bootstrap sample of the 
 
 ```{julia}
 Random.seed!(4567654)
-psm01samp = parametricbootstrap(10_000, psm01; hide_progress)
+psm01samp = parametricbootstrap(10_000, psm01; progress)
 psm01pars = DataFrame(psm01samp.allpars);
 ```
 
@@ -512,7 +509,7 @@ The restricted model fit
 
 ```{julia}
 psm02 = let f = @formula strength ~ 1 + (1 | sample)
-  fit(MixedModel, f, pastes; contrasts)
+  fit(MixedModel, f, pastes; contrasts, progress)
 end
 ```
 
@@ -545,7 +542,7 @@ psm02samp = parametricbootstrap(
   Random.seed!(9753579),
   10_000,
   psm02;
-  hide_progress,
+  progress,
 )
 DataFrame(shortestcovint(psm02samp))
 ```
@@ -607,7 +604,7 @@ At this point we will fit models that have random effects for student, instructo
 
 ```{julia}
 iem01 = let f = @formula y ~ 1 + (1 | s) + (1 | d) + (1 | dept)
-  fit(MixedModel, f, insteval; contrasts)
+  fit(MixedModel, f, insteval; contrasts, progress)
 end
 ```
 
@@ -627,7 +624,7 @@ However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
 
 ```{julia}
 iem02 = let f = @formula y ~ 1 + (1 | s) + (1 | d)
-  fit(MixedModel, f, insteval; contrasts)
+  fit(MixedModel, f, insteval; contrasts, progress)
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
@@ -669,7 +666,7 @@ The simplest approach is to add `service` to the fixed-effects specification
 ```{julia}
 iem03 =
   let f = @formula y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept)
-    fit(MixedModel, f, insteval; contrasts)
+    fit(MixedModel, f, insteval; contrasts, progress)
   end
 ```
 

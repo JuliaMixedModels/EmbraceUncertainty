@@ -23,32 +23,33 @@ jupyter: julia-1.10
 \newcommand\mcB{{\mathcal{B}}}
 \newcommand\mcY{{\mathcal{Y}}}
 
-Load the packages to be used.
+Load the packages to be used,
 
 ```{julia}
 #| code-fold: true
 #| output: false
-
+#| label: packages03
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
 using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using Random
 using RCall
 using StandardizedPredictors
+```
 
-#using CairoMakie: scatter! # PA I have no idea why this is failing to resolve later since this exported
-
-if !isdefined(Main, :contrasts)
-  const contrasts = Dict{Symbol,Any}()
-end
-CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear)
+and declare some constants, if not already defined.
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants03
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(progress) || const progress = false
 ```
 
 Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time.
@@ -129,9 +130,8 @@ Similarly, `S06` and `S11` have longer initial bone lengths and a low growth rat
 Although it seems that there isn't a strong correlation between initial bone length and growth rate in these data, a model with an overall linear trend and possibly correlated random effects for intercept and slope by subject estimates a strong negative correlation (-0.97) between these random effects.
 
 ```{julia}
-contrasts[:Subj] = Grouping()
 egm01 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts)
+  fit(MixedModel, f, egdf; contrasts, progress)
 end
 println(egm01)
 ```
@@ -176,7 +176,7 @@ A model with `time` centered at 8 years of age can be fit as
 ```{julia}
 contrasts[:time] = Center(8)
 egm02 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts)
+  fit(MixedModel, f, egdf; contrasts, progress)
 end
 println(egm02)
 ```
@@ -199,7 +199,7 @@ A third option is to center the `time` covariate at the mean of the original `ti
 ```{julia}
 contrasts[:time] = Center()
 egm03 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts)
+  fit(MixedModel, f, egdf; contrasts, progress)
 end
 println(egm03)
 ```
@@ -251,7 +251,7 @@ egm04 =
   let f = @formula resp ~
       1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
     dat = @transform(egdf, :ctime = :time - 8.75)
-    fit(MixedModel, f, dat; contrasts)
+    fit(MixedModel, f, dat; contrasts, progress)
   end
 println(egm04)
 ```
@@ -423,7 +423,7 @@ delete!(contrasts, :time)
 bxm01 =
   let f = @formula resp ~
       (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -433,7 +433,7 @@ but we expect that a model without the main effect for `Group`,
 bxm02 =
   let f = @formula resp ~
       1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -466,7 +466,7 @@ It would indicate that the groups are initially homogeneous both in weight and g
 bxm03 =
   let f = @formula resp ~
       1 + time + time^2 & Group + (1 + time + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -577,7 +577,7 @@ bxm03samp = parametricbootstrap(
   Xoshiro(8642468),
   10_000,
   bxm03;
-  hide_progress=true,
+  progress=false,
 )
 bxm03pars = DataFrame(bxm03samp.allpars)
 DataFrame(shortestcovint(bxm03samp))
@@ -631,7 +631,7 @@ Because of these high correlations, trying to deal with the degenerate random ef
 bxm04 =
   let f =
       @formula resp ~ 1 + time + time^2 & Group + (1 + time | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -649,7 +649,7 @@ bxm05 =
       time^2 & Group +
       (1 + time | Subj) +
       (0 + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 

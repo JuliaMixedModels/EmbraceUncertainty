@@ -102,6 +102,7 @@ To access these data within `Julia` we must first attach this package, and other
 ```{julia}
 #| code-fold: show
 #| output: false
+#| label: packages01
 using AlgebraOfGraphics # high-level graphics
 using CairoMakie        # graphics back-end
 using DataFrameMacros   # elegant DataFrame manipulation
@@ -110,14 +111,11 @@ using Markdown          # utilities for generating markdown text
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
 using Printf            # formatted printing
-using ProgressMeter     # progress of optimizer iterations
 using Random            # random number generation
 using StatsBase         # basic statistical summaries
 
-using EmbraceUncertainty: dataset # `dataset` means this one
-
-CairoMakie.activate!(; type="svg")    # Scalable Vector Graphics
-ProgressMeter.ijulia_behavior(:clear) # suppress progress output
+CairoMakie.activate!(; type="svg") # set Scalable Vector Graphics output
+using EmbraceUncertainty: dataset  # `dataset` means this one
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -144,6 +142,7 @@ in examples and in tests of the `MixedModels` package.
 :::
 
 ```{julia}
+#| label: dyestuff_data
 dyestuff = dataset(:dyestuff)
 ```
 
@@ -154,12 +153,14 @@ This particular table, read from an `Arrow` file, will be read-only.
 Often it is convenient to convert the read-only table form to a `DataFrame` to be able to use the full power of the [DataFrames](https://github.com/JuliaData/DataFrames.jl) package.
 
 ```{julia}
+#| label: dyestuff_dataframe
 dyestuff = DataFrame(dyestuff)
 ```
 
 The `describe` method for a `DataFrame` provides a concise description of the structure of the data,
 
 ```{julia}
+#| label: describe_dyestuff
 describe(dyestuff)
 ```
 
@@ -196,6 +197,7 @@ last(dyestuff, 7)
 or we could tabulate the data using `groupby` and `combine` from [DataFrames](https://github.com/JuliaData/DataFrames.jl).
 
 ```{julia}
+#| label: dyestuff_summary
 combine(groupby(dyestuff, :batch), :yield => mean, nrow => :n)
 ```
 
@@ -256,10 +258,12 @@ The data are simulated data presented in @box73:_bayes_infer_statis_analy [, Tab
 The structure and summary
 
 ```{julia}
+#| label: dyestuff2
 dyestuff2 = dataset(:dyestuff2)
 ```
 
 ```{julia}
+#| label: dyestuff2_dataframe
 dyestuff2 = DataFrame(dyestuff2)
 describe(dyestuff2)
 ```
@@ -306,9 +310,9 @@ We will explain the structure of the formula after we have considered an example
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
 ```{julia}
-dsm01 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff)
+#| label: dsm01
+dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff; progress=false)
 end
 ```
 
@@ -381,9 +385,9 @@ An alternative measure of precision of the estimate - a coverage interval based 
 Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\sigma}_1=0$.
 
 ```{julia}
-dsm02 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff2)
+#| label: dsm02
+dsm02 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff2; progress=false)
 end
 println(dsm02)
 ```
@@ -564,10 +568,10 @@ The object returned by a call to `parametricbootstrap` has a somewhat complex in
 To examine the distribution of the parameter estimates we extract a table of all the estimated parameters and convert it to a `DataFrame`.
 
 ```{julia}
+#| label: dsm01samp
 #| warning: false
-const hide_progress = true # hide the progress bar when sampling
 Random.seed!(4321234)      # random number generator
-dsm01samp = parametricbootstrap(10_000, dsm01; hide_progress)
+dsm01samp = parametricbootstrap(10_000, dsm01; progress=false)
 dsm01pars = DataFrame(dsm01samp.allpars)
 first(dsm01pars, 7)
 ```
@@ -690,6 +694,7 @@ Nearly 1000 of the 10,000 bootstrap fits are "singular" in that one (or more) of
 For this model the only way singularity can occur is for $\sigma_1$ to be zero.
 
 ```{julia}
+#| label: dsm01samp_singular
 count(issingular(dsm01samp))
 ```
 
@@ -745,11 +750,13 @@ The interval on the residual standard deviation, $\sigma$, is reasonable, given 
 The optional argument, `thin=1`, in a call to `fit` causes all the values of $\boldsymbol\theta$ and the corresponding value of objective from the iterative optimization to be stored in the `optsum` property.
 
 ```{julia}
+#| label: dsm01trace
 dsm01trace = fit(
   MixedModel,
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   thin=1,
+  progress=false,
 )
 DataFrame(dsm01trace.optsum.fitlog)
 ```
@@ -877,6 +884,7 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts=contrasts,
+  progress=false,
 )
 ```
 
@@ -890,12 +898,15 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts,
+  progress=false
 )
 ```
 
 That is, if the name of the object to be passed as a named argument is the same as the name of the argument, like `contrasts=contrasts`, then the name does not need to be repeated.
 Note that the comma after the positional arguments must be changed to a semicolon in this convention.
 This is necessary because it indicates that arguments following the semicolon are named arguments, not positional.
+
+Similarly, we could (and will, in later chapters), bind the name `progress` to `false` in the Main environment and use `progress` as a named argument instead of `progress=false` to suppress output of the progress of the iterations.
 
 Another convention we will use is assigning the formula separately from the call to `fit` as part of a `let` block.
 Often the formula can become rather long, sometimes needing multiple lines in the call, and it becomes difficult to keep track of the other arguments.
@@ -910,7 +921,7 @@ Thus `dsm01` can be assigned as
 #| code-fold: false
 #| eval: false
 dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff; contrasts)
+  fit(MixedModel, f, dyestuff; contrasts, progress=false)
 end
 ```
 
