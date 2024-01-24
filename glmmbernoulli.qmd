@@ -2,7 +2,7 @@
 jupyter: julia-1.10
 ---
 
-# Generalized Linear Mixed Models for Binary Responses {#sec-glmmbinomial}
+# Generalized linear mixed models for binary responses {#sec-glmmbinomial}
 
 \newcommand\bbb{{\mathbf{b}}}
 \newcommand\bbX{{\mathbf{X}}}
@@ -277,7 +277,7 @@ In more detail,
 
 ```{julia}
 #| code-fold: true
-println(com05)
+print(com05)
 ```
 
 Notice that, although there are 60 distinct districts, there are only 102 distinct combinations of `dist` and `urban` represented in the data.

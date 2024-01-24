@@ -2,7 +2,7 @@
 jupyter: julia-1.10
 ---
 
-# Models With Multiple Random-effects Terms {#sec-Multiple}
+# Models with multiple random-effects terms {#sec-Multiple}
 
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
@@ -210,7 +210,8 @@ caterpillar!(
 )
 ```
 
-The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` much less variability than does the conditional distribution of the random effects for `sample`.  (Note that the horizontal scales on these two plots are different.)
+The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` displays much less variability than does the conditional distribution of the random effects for `sample`.
+(Note that the horizontal scales on these two plots are different.)
 However, the conditional distribution of the random effect for a particular sample, say sample `F`, has less variability than the conditional distribution of the random effect for a particular plate, say plate `m`.
 That is, the lines in @fig-pnm01samplepred are wider than the lines in @fig-pnm01platepred, even after taking the different axis scales into account.
 This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.
@@ -219,6 +220,8 @@ In @sec-examlmm we saw that a model with a single, simple, scalar random-effects
 When we have multiple, simple, scalar random-effects terms, as in model `pnm01`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\bbZ$ whose transpose is
 
 ```{julia}
+#| lst-label: lst-pnm01sparsel
+#| lst-cap: Pattern of non-zeros in the transpose of the model matrix Z for model pnm01
 vcat(transpose.(sparse.(pnm01.reterms))...)
 ```
 
@@ -379,7 +382,7 @@ For example, batches I and D, with low mean strength relative to the other batch
 Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength.
 In @sec-assessingfm04 we will examine the need for incorporating batch-to-batch variability, in addition to sample-to-sample variability, in the statistical model.
 
-### Nested Factors {#sec-nestedcrossed}
+### Nested factors {#sec-nestedcrossed}
 
 Because each level of `sample` occurs with one and only one level of `batch` we say that `sample` is *nested within* `batch`.
 Some presentations of mixed-effects models, especially those related to *multilevel modeling* [@MLwiNUser:2000] or *hierarchical linear models* [@Rauden:Bryk:2002], leave the impression that one can only define random effects with respect to factors that are nested.
@@ -428,7 +431,7 @@ sparseL(psm01; full=true)
 BlockDescription(psm01)
 ```
 
-of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
+of `psm01` to that of `pnm01` [@lst-pnm01sparsel] shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
 This type of structure has the desirable property that there is no "fill-in" during calculation of the Cholesky factor.
 In other words, the number of non-zeros in $\bbL$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\bbLambda'\bbZ'\bbZ\bbLambda+\bbI$ (which, because $\bbLambda$ is diagonal, has the same structure as $\bbZ'\bbZ$).
 
@@ -437,7 +440,7 @@ It is an important issue when we have millions of random effects in complex conf
 
 ### Assessing parameter estimates in psm01 {#sec-assessingfm04}
 
-The parameter estimates are: $\widehat{\sigma_1}$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}$, the standard deviation of the residual noise term; and $\widehat{\beta_1}=$, the overall mean response, which is labeled `(Intercept)` in these models.
+The parameter estimates are: $\widehat{\sigma_1}$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}$, the standard deviation of the residual noise term; and $\widehat{\beta_1}$, the overall mean response, which is labeled `(Intercept)` in these models.
 
 The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig-pastesdot.
 Indeed our conclusion from @fig-pastesdot was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.
@@ -481,7 +484,7 @@ draw(
 )
 ```
 
-Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only, we perform a statistical test of this hypothesis.
+Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only `sample`, we perform a statistical test of this hypothesis.
 
 ### Testing $H_0:\sigma_2=0$ versus $H_a:\sigma_2>0$ {#sec-TestingSig2is0}
 
@@ -722,23 +725,31 @@ but the conditional distribution of this random effect clearly overlaps signific
 
 ## Chapter summary {#sec-MultSummary}
 
-A simple, scalar random effects term in an model formula is of the form , where is an expression whose value is the *grouping factor* of the set of random effects generated by this term.
-Typically, `F` is simply the name of a factor, as in most of the examples in this chapter.
-However, the grouping factor can be the value of an expression, such as in the last example.
-
-Because simple, scalar random-effects terms can differ only in the description of the grouping factor we refer to configurations such as crossed or nested as applying to the terms or to the random effects, although it is more accurate to refer to the configuration as applying to the grouping factors.
+A simple, scalar random effects term in an model formula is of the form `(1|f)`, where `f` is an expression whose value is the *grouping factor* for the set of random effects generated by this term.
+Typically, `f` is simply the name of a factor, as in most of the examples in this chapter.
+However, the grouping factor can be the value of an expression.
 
 A model formula can include several such random effects terms.
 Because configurations such as nested or crossed or partially crossed grouping factors are a property of the data, the specification in the model formula does not depend on the configuration.
 We simply include multiple random effects terms in the formula specifying the model.
 
 One apparent exception to this rule occurs with implicitly nested factors, in which the levels of one factor are only meaningful within a particular level of the other factor.
-In the pastes data, levels of the factor cask are only meaningful within a particular level of the factor batch.
-A model formula of would result in a fitted model that did not appropriately reflect the sources of variability in the data.
+In the `pastes` data, levels of the factor `cask` are only meaningful within a particular level of the factor batch.
+A model formula of `strength ~ 1 + (1|batch) + (1|cask)` would result in a fitted model that did not appropriately reflect the sources of variability in the data.
 Following the simple rule that the factor should be defined so that distinct experimental or observational units correspond to distinct levels of the factor will avoid such ambiguity.
 
-For convenience, a model with multiple, nested random-effects terms can be specified as which internally is re-expressed as
-We will avoid terms of the form , preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
+For convenience, multiple, nested random-effects terms can be specified using a slash to separate grouping factors, e.g. `(1 | batch / cask)`, which internally is re-expressed as `(1 | batch & cask) + (1 | batch)`
+
+```{julia}
+#| label: psm01alt
+print(
+  let f = @formula(strength ~ 1 + (1 | batch / cask))
+    fit(MixedModel, f, pastes; progress)
+  end
+)
+```
+
+We will avoid terms of this form, preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
 
 The insteval data, described in @sec-insteval, illustrate some of the characteristics of the real data to which mixed-effects models are now fit.
 There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed.
@@ -747,8 +758,7 @@ Much of the literature on mixed-effects models leaves the impression that multip
 The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.
 
 The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter.
-That is, profile-based confidence intervals on the fixed-effects parameter, $\beta_0$, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution and the logarithm of the residual standard deviation, $\log(\sigma)$, has a good normal approximation.
-Profile-based confidence intervals for the standard deviations of random effects ($\sigma_1$, $\sigma_2$, etc.) are symmetric on a logarithmic scale except for those that could be zero.
+That is, profile-based confidence intervals on the fixed-effects parameter, $\beta_0$, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution.
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.
 
