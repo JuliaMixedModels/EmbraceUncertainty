@@ -328,10 +328,11 @@ The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum
 :::{.callout-note collapse="true"}
 ### The named argument, progress=false
 
-The optional, named argument, `progress=false`, suppresses the creation and display of a progress meter for the iterations.
-Such displays are useful in interactive sessions to monitor the progress of the iterations but not in a static display for a book.
-The comma used to separate argument values can be replaced by a semi-colon when it separates positional arguments, which must precede named arguments, from the first named argument.
+The estimates are determined via an iterative optimization algorithm.
+In an interactive session a progress bar showing the number of iterations, the current value of the objective and the average time per iteration is displayed during this optimization.
+For a static display of the results in a book we suppress this display with the optional, named argument `progress=false`.
 
+Note that the punctuation used to separate the positional arguments (the first three arguments) from the named argument is a semi-colon, not a comma.
 In this function call the semi-colon is optional -- a comma could be used instead.
 In @sec-stylistic we describe a form of argument passing for which the semi-colon is required.
 
