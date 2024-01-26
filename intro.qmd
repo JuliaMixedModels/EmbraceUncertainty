@@ -881,7 +881,7 @@ In the past it was helpful to specify a `Grouping()` contrast for grouping facto
 contrasts = Dict(:batch => Grouping())
 ```
 
-but current versions of the `MixedModels` package do this automatically.
+but versions 4.21 of the `MixedModels` package or later do this automatically.
 
 :::{.callout-note}
 ### Replace "current versions" by a specific version number
