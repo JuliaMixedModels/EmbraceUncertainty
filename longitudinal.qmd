@@ -2,7 +2,7 @@
 jupyter: julia-1.10
 ---
 
-# Models for Longitudinal Data {#sec-longitudinal}
+# Models for longitudinal data {#sec-longitudinal}
 
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
@@ -61,7 +61,8 @@ In this chapter we introduce graphical and statistical techniques for the analys
 
 ## The elstongrizzle data
 
-Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
+Data from a dental study measuring the lengths of the [ramus of the mandible](https://en.wikipedia.org/wiki/Mandible#Ramus) (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
+(Following the description in both of these references we will refer to these as measurements of the "ramus bone", even though this is somewhat inaccurate.)
 
 ```{julia}
 elstongrizzle = dataset(:elstongrizzle)
@@ -70,7 +71,7 @@ elstongrizzle = dataset(:elstongrizzle)
 Converting the table to a data frame provides the description
 
 ```{julia}
-#| echo: false
+#| code-fold: true
 egdf = DataFrame(elstongrizzle)
 describe(egdf)
 ```
@@ -133,7 +134,7 @@ Although it seems that there isn't a strong correlation between initial bone len
 egm01 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
   fit(MixedModel, f, egdf; contrasts, progress)
 end
-println(egm01)
+print(egm01)
 ```
 
 The reason for this seemingly unlikely result is that the `(Intercept)` term in the fixed effects and the random effects represents the bone length at age 0, which is not of interest here.
@@ -178,7 +179,7 @@ contrasts[:time] = Center(8)
 egm02 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
   fit(MixedModel, f, egdf; contrasts, progress)
 end
-println(egm02)
+print(egm02)
 ```
 
 Comparing the parameter estimates from models `egm01` and `egm02`, we find that the only differences are in the estimates for the `(Intercept)` terms in the fixed-effects parameters and the variance component parameters and in the correlation of the random effects.
@@ -201,10 +202,10 @@ contrasts[:time] = Center()
 egm03 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
   fit(MixedModel, f, egdf; contrasts, progress)
 end
-println(egm03)
+print(egm03)
 ```
 
-Because the default for the `Center` contrast is to center about the mean, this `contrasts` argument can be written
+The default for the `Center` contrast is to center about the mean and we write this `contrasts` value as, simply, `Center()`.
 
 Notice that in this model the estimated correlation of the random effects for `Subj` is positive.
 
@@ -253,7 +254,7 @@ egm04 =
     dat = @transform(egdf, :ctime = :time - 8.75)
     fit(MixedModel, f, dat; contrasts, progress)
   end
-println(egm04)
+print(egm04)
 ```
 
 We see that the estimate for the population quadratic coefficient, -0.04, is small, relative to its standard error, 0.20, indicating that it is not significantly different from zero.

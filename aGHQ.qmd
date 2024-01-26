@@ -947,7 +947,7 @@ fit!(m);
 
 ```{julia}
 #| code-fold: true
-println(
+print(
   "Converged to θ = ",
   first(m.θβ),
   " and β =",
@@ -959,7 +959,7 @@ These estimates differ somewhat from those for model `com05`.
 
 ```{julia}
 #| code-fold: true
-println(
+print(
   "Estimates for com05: θ = ",
   only(com05.θ),
   ", fmin = ",

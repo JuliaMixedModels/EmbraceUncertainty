@@ -391,7 +391,7 @@ function ratingsoptsum(
   )
 end
 mvm20u20 = ratingsoptsum(20, 20)
-println(mvm20u20)
+print(mvm20u20)
 ```
 
 Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
