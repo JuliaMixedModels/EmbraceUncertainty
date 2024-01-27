@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.549">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Embrace Uncertainty - 2&nbsp; Models With Multiple Random-effects Terms</title>
+<title>Embrace Uncertainty - 2&nbsp; Models with multiple random-effects terms</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -58,6 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -76,7 +77,7 @@ div.csl-indent {
 }</style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -100,7 +101,13 @@ div.csl-indent {
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -109,33 +116,60 @@ div.csl-indent {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
 </head>
 
 <body class="nav-sidebar floating">
-
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./multiple.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./multiple.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models with multiple random-effects terms</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
@@ -145,7 +179,7 @@ div.csl-indent {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Embrace Uncertainty</a> 
@@ -167,19 +201,19 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A simple, linear, mixed-effects model</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./multiple.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models with multiple random-effects terms</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for longitudinal data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -197,7 +231,7 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./glmmbernoulli.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized linear mixed models for binary responses</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -224,7 +258,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./linalg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></span></a>
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Linear algebra for linear models</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -238,7 +272,7 @@ div.csl-indent {
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -254,7 +288,7 @@ div.csl-indent {
   <li><a href="#sec-NestedRE" id="toc-sec-NestedRE" class="nav-link" data-scroll-target="#sec-NestedRE"><span class="header-section-number">2.2</span> A model with nested random effects</a>
   <ul class="collapse">
   <li><a href="#sec-pastesData" id="toc-sec-pastesData" class="nav-link" data-scroll-target="#sec-pastesData"><span class="header-section-number">2.2.1</span> The pastes data</a></li>
-  <li><a href="#sec-nestedcrossed" id="toc-sec-nestedcrossed" class="nav-link" data-scroll-target="#sec-nestedcrossed"><span class="header-section-number">2.2.2</span> Nested Factors</a></li>
+  <li><a href="#sec-nestedcrossed" id="toc-sec-nestedcrossed" class="nav-link" data-scroll-target="#sec-nestedcrossed"><span class="header-section-number">2.2.2</span> Nested factors</a></li>
   <li><a href="#sec-fittingPastes" id="toc-sec-fittingPastes" class="nav-link" data-scroll-target="#sec-fittingPastes"><span class="header-section-number">2.2.3</span> Fitting a model with nested random effects</a></li>
   <li><a href="#sec-assessingfm04" id="toc-sec-assessingfm04" class="nav-link" data-scroll-target="#sec-assessingfm04"><span class="header-section-number">2.2.4</span> Assessing parameter estimates in psm01</a></li>
   <li><a href="#sec-TestingSig2is0" id="toc-sec-TestingSig2is0" class="nav-link" data-scroll-target="#sec-TestingSig2is0"><span class="header-section-number">2.2.5</span> Testing <span class="math inline">\(H_0:\sigma_2=0\)</span> versus <span class="math inline">\(H_a:\sigma_2&gt;0\)</span></a></li>
@@ -276,7 +310,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-Multiple" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></span></h1>
+<h1 class="title"><span id="sec-Multiple" class="quarto-section-identifier"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models with multiple random-effects terms</span></span></h1>
 </div>
 
 
@@ -289,38 +323,34 @@ div.csl-indent {
   </div>
   
 
+
 </header>
 
+
 <p>Attach the packages to be used in this chapter</p>
-<div class="cell" data-execution_count="2">
-<details>
+<div id="packages02" class="cell" data-execution_count="1">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> hide_progress <span class="op">=</span> <span class="cn">true</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrameMacros</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">RCall</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> contrasts <span class="op">=</span> <span class="fu">Dict</span><span class="dt">{Symbol,Any}</span>(</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>sample <span class="op">=&gt;</span> <span class="fu">Grouping</span>(),</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>plate <span class="op">=&gt;</span> <span class="fu">Grouping</span>(),</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>s <span class="op">=&gt;</span> <span class="fu">Grouping</span>(),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>batch <span class="op">=&gt;</span> <span class="fu">Grouping</span>(),</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>d <span class="op">=&gt;</span> <span class="fu">Grouping</span>(),</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>dept <span class="op">=&gt;</span> <span class="fu">Grouping</span>(),</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrameMacros</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Random</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">RCall</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">StatsBase</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>and define some constants, if not already defined,</p>
+<div id="constants02" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@isdefined</span>(contrasts) <span class="op">||</span> <span class="kw">const</span> contrasts <span class="op">=</span> <span class="fu">Dict</span><span class="dt">{Symbol,Any}</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@isdefined</span>(progress) <span class="op">||</span> <span class="kw">const</span> progress <span class="op">=</span> <span class="cn">false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient. Although such models can be useful, it is with the facility to use multiple random-effects terms and to use random-effects terms beyond a simple, scalar term that we can begin to realize the flexibility and versatility of mixed models.</p>
@@ -336,9 +366,9 @@ div.csl-indent {
 <p>assess the variability between samples of penicillin by the <em>B.&nbsp;subtilis</em> method. In this test method a bulk-inoculated nutrient agar medium is poured into a Petri dish of approximately 90 mm. diameter, known as a plate. When the medium has set, six small hollow cylinders or pots (about 4 mm. in diameter) are cemented onto the surface at equally spaced intervals. A few drops of the penicillin solutions to be compared are placed in the respective cylinders, and the whole plate is placed in an incubator for a given time. Penicillin diffuses from the pots into the agar, and this produces a clear circular zone of inhibition of growth of the organisms, which can be readily measured. The diameter of the zone is related in a known way to the concentration of penicillin in the solution.</p>
 </blockquote>
 <p>As with the <code>dyestuff</code> data, we examine the structure</p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>penicillin <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>penicillin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="46fac2b4" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>penicillin <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>penicillin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>Arrow.Table with 144 rows, 3 columns, and schema:
  :plate     String
  :sample    String
@@ -346,14 +376,14 @@ div.csl-indent {
 </div>
 </div>
 <p>and a summary</p>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>penicillin <span class="op">=</span> <span class="fu">DataFrame</span>(penicillin)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(penicillin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div id="4760f526" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>penicillin <span class="op">=</span> <span class="fu">DataFrame</span>(penicillin)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(penicillin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div><div style="float: left;"><span>3×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
@@ -411,77 +441,78 @@ div.csl-indent {
 </div>
 </div>
 <p>of the data, then plot it</p>
-<div class="cell" data-execution_count="5">
-<details>
+<div id="cell-fig-penicillindot" class="cell" data-execution_count="5">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="st">    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="st">Returns a `DataFrame` created from df with the levels of `grps` reordered according to</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">`combine(groupby(df, grps), resp =&gt; sumryf)` and this summary DataFrame, also with the</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">levels of `grps` reordered.</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">_meanrespfrm</span>(</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  df,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  resp<span class="op">::</span><span class="dt">Symbol</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  grps<span class="op">::</span><span class="dt">Symbol</span>;</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  sumryf<span class="op">::</span><span class="dt">Function</span>=mean,</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ensure the relevant columns are types that Makie can deal with </span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="fu">transform</span>(</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    df,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=&gt;</span> <span class="dt">Array</span>,</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    grps <span class="op">=&gt;</span> CategoricalArray;</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    renamecols<span class="op">=</span><span class="cn">false</span>,</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create a summary table by mean resp</span></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  sumry <span class="op">=</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sort!</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(df, grps), resp <span class="op">=&gt;</span> sumryf <span class="op">=&gt;</span> resp), resp)</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  glevs <span class="op">=</span> <span class="fu">string</span>.(sumry[!, grps])   <span class="co"># group levels in ascending order of mean resp</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">levels!</span>(df[!, grps], glevs)</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">levels!</span>(sumry[!, grps], glevs)</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> df, sumry</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  df, _ <span class="op">=</span> <span class="fu">_meanrespfrm</span>(penicillin, <span class="op">:</span>diameter, <span class="op">:</span>plate)</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort!</span>(df, [<span class="op">:</span>plate, <span class="op">:</span>sample])</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>diameter <span class="op">=&gt;</span> <span class="st">"Diameter of inhibition zone [mm]"</span>,</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>plate <span class="op">=&gt;</span> <span class="st">"Plate"</span>;</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>sample,</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(ScatterLines; marker<span class="op">=</span><span class="ch">'○'</span>, markersize<span class="op">=</span><span class="fl">12</span>),</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="st">    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">Returns a `DataFrame` created from df with the levels of `grps` reordered according to</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">`combine(groupby(df, grps), resp =&gt; sumryf)` and this summary DataFrame, also with the</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">levels of `grps` reordered.</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">_meanrespfrm</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  df,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  resp<span class="op">::</span><span class="dt">Symbol</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  grps<span class="op">::</span><span class="dt">Symbol</span>;</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  sumryf<span class="op">::</span><span class="dt">Function</span>=mean,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ensure the relevant columns are types that Makie can deal with </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> <span class="fu">transform</span>(</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    df,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=&gt;</span> <span class="dt">Array</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    grps <span class="op">=&gt;</span> CategoricalArray;</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    renamecols<span class="op">=</span><span class="cn">false</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create a summary table by mean resp</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  sumry <span class="op">=</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sort!</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(df, grps), resp <span class="op">=&gt;</span> sumryf <span class="op">=&gt;</span> resp), resp)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  glevs <span class="op">=</span> <span class="fu">string</span>.(sumry[!, grps])   <span class="co"># group levels in ascending order of mean resp</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">levels!</span>(df[!, grps], glevs)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">levels!</span>(sumry[!, grps], glevs)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> df, sumry</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  df, _ <span class="op">=</span> <span class="fu">_meanrespfrm</span>(penicillin, <span class="op">:</span>diameter, <span class="op">:</span>plate)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort!</span>(df, [<span class="op">:</span>plate, <span class="op">:</span>sample])</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  mp <span class="op">=</span> <span class="fu">mapping</span>(</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>diameter <span class="op">=&gt;</span> <span class="st">"Diameter of inhibition zone [mm]"</span>,</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>plate <span class="op">=&gt;</span> <span class="st">"Plate"</span>;</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>sample,</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>(df) <span class="op">*</span> mp <span class="op">*</span> <span class="fu">visual</span>(ScatterLines; marker<span class="op">=</span><span class="ch">'○'</span>, markersize<span class="op">=</span><span class="fl">12</span>),</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<div id="fig-penicillindot" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-penicillindot-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.1: Diameter of inhibition zone by plate and sample. Plates are ordered by increasing mean response.</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="fig-penicillindot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-penicillindot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-penicillindot-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-penicillindot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: Diameter of inhibition zone by plate and sample. Plates are ordered by increasing mean response.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>The variation in the diameter is associated with the plates and with the samples. Because each plate is used only for the six samples shown here we are not interested in the contributions of specific plates as much as we are interested in the variation due to plates, and in assessing the potency of the samples after accounting for this variation. Thus, we will use random effects for the <code>plate</code> factor. We will also use random effects for the <code>sample</code> factor because, as in the dyestuff example, we are more interested in the sample-to-sample variability in the penicillin samples than in the potency of a particular sample.</p>
-<p>In this experiment each sample is used on each plate. We say that the <code>plate</code> and <code>sample</code> factors are <em>crossed</em>, as opposed to <em>nested</em> factors, which we will describe in the next section. By itself, the designation “crossed” just means that the factors are not nested. If we wish to be more specific, we could describe these factors as being <em>completely crossed</em>, which means that we have at least one observation for each combination of a level of <code>plate</code> and a level of <code>sample</code>. We can see this in <a href="#fig-penicillindot">Figure&nbsp;<span>2.1</span></a>. Alternatively, because there are moderate numbers of levels in these factors, we could also check by a cross-tabulation of these factors.</p>
+<p>In this experiment each sample is used on each plate. We say that the <code>plate</code> and <code>sample</code> factors are <em>crossed</em>, as opposed to <em>nested</em> factors, which we will describe in the next section. By itself, the designation “crossed” just means that the factors are not nested. If we wish to be more specific, we could describe these factors as being <em>completely crossed</em>, which means that we have at least one observation for each combination of a level of <code>plate</code> and a level of <code>sample</code>. We can see this in <a href="#fig-penicillindot" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>. Alternatively, because there are moderate numbers of levels in these factors, we could also check by a cross-tabulation of these factors.</p>
 <p>Like the <code>dyestuff</code> data, the factors in the <code>penicillin</code> data are balanced. That is, there are exactly the same number of observations on each plate and for each sample and, furthermore, there is the same number of observations on each combination of levels. In this case there is exactly one observation for each combination of sample and plate. We would describe the configuration of these two factors as an unreplicated, completely balanced, crossed design.</p>
 <p>In general, balance is a desirable but precarious property of a data set. We may be able to impose balance in a designed experiment but we typically cannot expect that data from an observation study will be balanced. Also, as anyone who analyzes real data soon finds out, expecting that balance in the design of an experiment will produce a balanced data set is contrary to <a href="https://en.wikipedia.org/wiki/Murphy%27s_law">Murphy’s law</a>. That’s why statisticians allow for missing data. Even when we apply each of the six samples to each of the 24 plates, something could go wrong for one of the samples on one of the plates, leaving us without a measurement for that combination of levels and thus an unbalanced data set.</p>
 </section>
 <section id="sec-PenicillinModel" class="level3" data-number="2.1.2">
 <h3 data-number="2.1.2" class="anchored" data-anchor-id="sec-PenicillinModel"><span class="header-section-number">2.1.2</span> A model for the penicillin data</h3>
 <p>A model incorporating random effects for both the <code>plate</code> and the <code>sample</code> is straightforward to specify — we include simple, scalar random effects terms for both these factors.</p>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pnm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> diameter <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> plate) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, penicillin; contrasts)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 44    Time: 0:00:01 (28.59 ms/it)</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="315d1924" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pnm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> diameter <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> plate) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, penicillin; contrasts, progress)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="7">
 <table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
@@ -517,46 +548,63 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<p>This model display indicates that the sample-to-sample variability has the greatest contribution, then plate-to-plate variability and finally the “residual” variability that cannot be attributed to either the sample or the plate. These conclusions are consistent with what we see in the data plot (<a href="#fig-penicillindot">Figure&nbsp;<span>2.1</span></a>).</p>
-<div class="cell" data-execution_count="7">
-<details>
+<p>This model display indicates that the sample-to-sample variability has the greatest contribution, then plate-to-plate variability and finally the “residual” variability that cannot be attributed to either the sample or the plate. These conclusions are consistent with what we see in the data plot (<a href="#fig-penicillindot" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>).</p>
+<div id="cell-fig-pnm01platepred" class="cell" data-execution_count="7">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">480</span>)),</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(pnm01, <span class="op">:</span>plate),</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="7">
-<div id="fig-pnm01platepred" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-pnm01platepred-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.2: Conditional modes and 95% prediction intervals of random effects for plate in model pnm01</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="fig-pnm01platepred" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pnm01platepred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-pnm01platepred-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pnm01platepred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: Conditional modes and 95% prediction intervals of random effects for plate in model pnm01
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="8">
-<details>
+<div id="cell-fig-pnm01samplepred" class="cell" data-execution_count="8">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">160</span>)),</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(pnm01, <span class="op">:</span>sample),</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="8">
-<div id="fig-pnm01samplepred" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-pnm01samplepred-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.3: Conditional modes and 95% prediction intervals of random effects for sample in model pnm01</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div id="fig-pnm01samplepred" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pnm01samplepred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-pnm01samplepred-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pnm01samplepred-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: Conditional modes and 95% prediction intervals of random effects for sample in model pnm01
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>The prediction intervals on the random effects (<a href="#fig-pnm01platepred">Figure&nbsp;<span>2.2</span></a> and <a href="#fig-pnm01samplepred">Figure&nbsp;<span>2.3</span></a>) confirm that the conditional distribution of the random effects for <code>plate</code> much less variability than does the conditional distribution of the random effects for <code>sample</code>. (Note that the horizontal scales on these two plots are different.) However, the conditional distribution of the random effect for a particular sample, say sample <code>F</code>, has less variability than the conditional distribution of the random effect for a particular plate, say plate <code>m</code>. That is, the lines in <a href="#fig-pnm01samplepred">Figure&nbsp;<span>2.3</span></a> are wider than the lines in <a href="#fig-pnm01platepred">Figure&nbsp;<span>2.2</span></a>, even after taking the different axis scales into account. This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.</p>
-<p>In <a href="intro.html"><span>Chapter&nbsp;1</span></a> we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, <span class="math inline">\({\mathbf{Z}}\)</span>, that is the matrix of indicators of the levels of the grouping factor. When we have multiple, simple, scalar random-effects terms, as in model <code>pnm01</code>, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix <span class="math inline">\({\mathbf{Z}}\)</span> whose transpose is</p>
-<div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vcat</span>(<span class="fu">transpose</span>.(<span class="fu">sparse</span>.(pnm01.reterms))<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="9">
+<p>The prediction intervals on the random effects (<a href="#fig-pnm01platepred" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> and <a href="#fig-pnm01samplepred" class="quarto-xref">Figure&nbsp;<span>2.3</span></a>) confirm that the conditional distribution of the random effects for <code>plate</code> displays much less variability than does the conditional distribution of the random effects for <code>sample</code>. (Note that the horizontal scales on these two plots are different.) However, the conditional distribution of the random effect for a particular sample, say sample <code>F</code>, has less variability than the conditional distribution of the random effect for a particular plate, say plate <code>m</code>. That is, the lines in <a href="#fig-pnm01samplepred" class="quarto-xref">Figure&nbsp;<span>2.3</span></a> are wider than the lines in <a href="#fig-pnm01platepred" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>, even after taking the different axis scales into account. This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.</p>
+<p>In <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a> we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, <span class="math inline">\({\mathbf{Z}}\)</span>, that is the matrix of indicators of the levels of the grouping factor. When we have multiple, simple, scalar random-effects terms, as in model <code>pnm01</code>, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix <span class="math inline">\({\mathbf{Z}}\)</span> whose transpose is</p>
+<div id="be5a6aaa" class="cell" data-execution_count="9">
+<div id="lst-pnm01sparsel" class="julia cell-code listing quarto-float">
+<figure class="quarto-float quarto-float-lst figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-pnm01sparsel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Listing&nbsp;2.1: Pattern of non-zeros in the transpose of the model matrix Z for model pnm01
+</figcaption>
+<div aria-describedby="lst-pnm01sparsel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="sourceCode cell-code" id="lst-pnm01sparsel"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="lst-pnm01sparsel-1"><a href="#lst-pnm01sparsel-1" aria-hidden="true" tabindex="-1"></a><span class="fu">vcat</span>(<span class="fu">transpose</span>.(<span class="fu">sparse</span>.(pnm01.reterms))<span class="op">...</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</figure>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>30×144 SparseArrays.SparseMatrixCSC{Float64, Int32} with 288 stored entries:
 ⎡⠉⠙⠒⠒⠒⠤⠤⠤⢄⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎤
 ⎢⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠒⠒⠒⠦⠤⠤⢤⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
@@ -565,18 +613,18 @@ div.csl-indent {
 </div>
 </div>
 <p>The relative covariance factor, <span class="math inline">\({\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}\)</span>, for this model is block diagonal, with two blocks, one of size 24 and one of size 6, each of which is a multiple of the identity. The diagonal elements of the two blocks are <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span>, respectively. The numeric values of these parameters can be obtained as</p>
-<div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pnm01.θ<span class="ch">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div id="561f7f2c" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pnm01.θ<span class="ch">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>1×2 adjoint(::Vector{Float64}) with eltype Float64:
  1.53758  3.21975</code></pre>
 </div>
 </div>
 <p>The first parameter is the relative standard deviation of the random effects for plate, which has the value <span class="math inline">\(0.845565/0.549933=1.53758\)</span> at convergence, and the second is the relative standard deviation of the sample random effects (<span class="math inline">\(1.770648/0.549933=3.21975\)</span>).</p>
 <p>Because <span class="math inline">\({\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}\)</span> is diagonal, the pattern of non-zeros in <span class="math inline">\({\boldsymbol{\Lambda}}_{\boldsymbol{\theta}}'{\mathbf{Z}}'{\mathbf{Z}}{\boldsymbol{\Lambda}}_{\boldsymbol{\theta}}+{\mathbf{I}}\)</span> will be the same as that in <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span>. The sparse Cholesky factor, <span class="math inline">\({\mathbf{L}}\)</span>, is lower triangular and has non-zero elements in the lower right hand corner in positions where <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span> has systematic zeros.</p>
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sparseL</span>(pnm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div id="0b2388be" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sparseL</span>(pnm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>30×30 SparseArrays.SparseMatrixCSC{Float64, Int32} with 189 stored entries:
 ⎡⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎤
 ⎢⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
@@ -593,27 +641,22 @@ div.csl-indent {
 <section id="sec-Penicillinprecision" class="level3" data-number="2.1.3">
 <h3 data-number="2.1.3" class="anchored" data-anchor-id="sec-Penicillinprecision"><span class="header-section-number">2.1.3</span> Precision of parameter estimates in the Pencillin model</h3>
 <p>A parametric bootstrap sample of the parameter estimates</p>
-<div class="cell" data-execution_count="12">
-<details>
+<div id="fd980be0" class="cell" data-execution_count="12">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bsrng <span class="op">=</span> <span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">9876789</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>pnm01samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(bsrng, <span class="fl">10_000</span>, pnm01; hide_progress)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>pnm01pars <span class="op">=</span> <span class="fu">DataFrame</span>(pnm01samp.allpars);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bsrng <span class="op">=</span> <span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">9876789</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>pnm01samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(bsrng, <span class="fl">10_000</span>, pnm01; progress)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>pnm01pars <span class="op">=</span> <span class="fu">DataFrame</span>(pnm01samp.allpars);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stderr">
-<pre><code>┌ Warning: `hide_progress` is deprecated, please use `progress` instead.NB: `progress` is a positive action, i.e. `progress=true` means show the progress bar.
-│   caller = kwcall(::NamedTuple{(:hide_progress,), Tuple{Bool}}, ::typeof(parametricbootstrap), rng::TaskLocalRNG, n::Int64, morig::LinearMixedModel{Float64}) at bootstrap.jl:204
-└ @ MixedModels ~/.julia/packages/MixedModels/LJXGY/src/bootstrap.jl:204</code></pre>
-</div>
 </div>
 <p>can be used to create shortest 95% coverage intervals for the parameters in the model.</p>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(pnm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div id="86b08a5d" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(pnm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div><div style="float: left;"><span>4×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">type</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">group</th>
@@ -668,58 +711,66 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<p>As for model <code>dsm01</code> the bootstrap parameter estimates of the fixed-effects parameter have approximately a “normal” or Gaussian shape, as shown in the kernel density plot (<a href="#fig-pnm01bsbeta">Figure&nbsp;<span>2.4</span></a>)</p>
-<div class="cell" data-execution_count="14">
-<details>
+<p>As for model <code>dsm01</code> the bootstrap parameter estimates of the fixed-effects parameter have approximately a “normal” or Gaussian shape, as shown in the kernel density plot (<a href="#fig-pnm01bsbeta" class="quarto-xref">Figure&nbsp;<span>2.4</span></a>)</p>
+<div id="cell-fig-pnm01bsbeta" class="cell" data-execution_count="14">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(pnm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"β"</span>)) <span class="op">*</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of β"</span>;</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Names"</span>),</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(pnm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"β"</span>)) <span class="op">*</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of β"</span>;</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>names <span class="op">=&gt;</span> <span class="st">"Names"</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="14">
-<div id="fig-pnm01bsbeta" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-pnm01bsbeta-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.4: Parametric bootstrap estimates of fixed-effects parameters in model pnm01</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div id="fig-pnm01bsbeta" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pnm01bsbeta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-pnm01bsbeta-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pnm01bsbeta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.4: Parametric bootstrap estimates of fixed-effects parameters in model pnm01
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>and the shortest coverage interval on this parameter is close to the Wald interval</p>
-<div class="cell" data-execution_count="15">
-<details>
+<div id="1c4113a1" class="cell" data-execution_count="15">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">only</span>(pnm01.beta) <span class="op">.+</span> [<span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>] <span class="op">*</span> <span class="fu">only</span>(pnm01.stderror))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">only</span>(pnm01.beta) <span class="op">.+</span> [<span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>] <span class="op">*</span> <span class="fu">only</span>(pnm01.stderror))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[21.483030356780876, 24.461414087669024]</code></pre>
+<pre><code>[21.483030339365666, 24.461414105078195]</code></pre>
 </div>
 </div>
 <p>The densities of the variance-components, on the scale of the standard deviation parameters, are diffuse but do not exhibit point masses at zero.</p>
-<div class="cell" data-execution_count="16">
-<details>
+<div id="cell-fig-pnm01bssigma" class="cell" data-execution_count="16">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(pnm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"σ"</span>)) <span class="op">*</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of σ"</span>;</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>group <span class="op">=&gt;</span> <span class="st">"Group"</span>),</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(pnm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"σ"</span>)) <span class="op">*</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of σ"</span>;</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>group <span class="op">=&gt;</span> <span class="st">"Group"</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="16">
-<div id="fig-pnm01bssigma" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-pnm01bssigma-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.5: Parametric bootstrap estimates of variance components in model pnm01</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div id="fig-pnm01bssigma" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pnm01bssigma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-pnm01bssigma-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pnm01bssigma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.5: Parametric bootstrap estimates of variance components in model pnm01
+</figcaption>
 </figure>
 </div>
 </div>
@@ -737,24 +788,24 @@ div.csl-indent {
 <p>deliveries of a chemical paste product contained in casks where, in addition to sampling and testing errors, there are variations in quality between deliveries …As a routine, three casks selected at random from each delivery were sampled and the samples were kept for reference. …Ten of the delivery batches were sampled at random and two analytical tests carried out on each of the 30 samples.</p>
 </blockquote>
 <p>The structure and summary of the data object are</p>
-<div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pastes <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>pastes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div id="6cab6b4a" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>pastes <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>pastes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>Arrow.Table with 60 rows, 3 columns, and schema:
  :batch     String
  :cask      String
  :strength  Float64</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>pastes <span class="op">=</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@transform</span>(<span class="fu">DataFrame</span>(pastes), <span class="op">:</span>sample <span class="op">=</span> <span class="fu">string</span>(<span class="op">:</span>batch, <span class="op">:</span>cask))</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(pastes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div id="789c7669" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pastes <span class="op">=</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@transform</span>(<span class="fu">DataFrame</span>(pastes), <span class="op">:</span>sample <span class="op">=</span> <span class="fu">string</span>(<span class="op">:</span>batch, <span class="op">:</span>cask))</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(pastes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
 <div><div style="float: left;"><span>4×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
@@ -823,38 +874,42 @@ div.csl-indent {
 </div>
 <p>As stated in the description in <span class="citation" data-cites="davies72:_statis_method_in_resear_and_produc">Davies &amp; Goldsmith (<a href="references.html#ref-davies72:_statis_method_in_resear_and_produc" role="doc-biblioref">1972</a>)</span>, there are 30 samples, three from each of the 10 delivery batches. We have created a <code>sample</code> factor by concatenating the label of the <code>batch</code> factor with ‘a’, ‘b’ or ‘c’ to distinguish the three samples taken from that batch.</p>
 <p>When plotting the strength versus batch and cask in the data we should remember that we have two strength measurements on each of the 30 samples. It is tempting to use the cask designation (‘a’, ‘b’ and ‘c’) to determine, say, the plotting symbol within a batch. It would be fine to do this within a batch but the plot would be misleading if we used the same symbol for cask ‘a’ in different batches. There is no relationship between cask ‘a’ in batch ‘A’ and cask ‘a’ in batch ‘B’. The labels ‘a’, ‘b’ and ‘c’ are used only to distinguish the three samples within a batch; they do not have a meaning across batches.</p>
-<div class="cell" data-execution_count="19">
-<details>
+<div id="cell-fig-pastesdot" class="cell" data-execution_count="19">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>RCall.<span class="fu">ijulia_setdevice</span>(<span class="fu">MIME</span>(<span class="st">"image/svg+xml"</span>); width<span class="op">=</span><span class="fl">8</span>, height<span class="op">=</span><span class="fl">8</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>R<span class="st">"""</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="st">require("lattice", quietly=TRUE)</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="st">pp &lt;- </span><span class="sc">$</span>pastes</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="st">pp &lt;- within(pp, bb &lt;- reorder(batch, strength))</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="st">print(</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="st">  dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="st">    strip.left = TRUE, layout = c(1, 10),</span></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="st">    scales = list(y = list(relation = "free")),</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="st">    ylab = "Sample within batch", type = c("p", "a"),</span></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="st">    xlab = "Paste strength", jitter.y = TRUE)</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="st">)</span></span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>RCall.<span class="fu">ijulia_setdevice</span>(<span class="fu">MIME</span>(<span class="st">"image/svg+xml"</span>); width<span class="op">=</span><span class="fl">8</span>, height<span class="op">=</span><span class="fl">8</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>R<span class="st">"""</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="st">require("lattice", quietly=TRUE)</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="st">pp &lt;- </span><span class="sc">$</span>pastes</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="st">pp &lt;- within(pp, bb &lt;- reorder(batch, strength))</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="st">print(</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="st">  dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="st">    strip.left = TRUE, layout = c(1, 10),</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="st">    scales = list(y = list(relation = "free")),</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="st">    ylab = "Sample within batch", type = c("p", "a"),</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="st">    xlab = "Paste strength", jitter.y = TRUE)</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="st">)</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-pastesdot" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-pastesdot-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.6: Strength of paste preparations according to sample within batch</figcaption>
+<div id="fig-pastesdot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pastesdot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-pastesdot-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pastesdot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.6: Strength of paste preparations according to sample within batch
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>In <a href="#fig-pastesdot">Figure&nbsp;<span>2.6</span></a> we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample. The perceptive reader will have noticed that the levels of the factors on the vertical axis in this figure, and in <a href="intro.html#fig-dyestuffdata">Figure&nbsp;<span>1.1</span></a>, and <a href="#fig-penicillindot">Figure&nbsp;<span>2.1</span></a>, have been reordered according to increasing average response. In all these cases there is no inherent ordering of the levels of the covariate such as batch or plate. Rather than confuse our interpretation of the plot by determining the vertical displacement of points according to a random ordering, we impose an ordering according to increasing mean response. This allows us to more easily check for structure in the data, including undesirable characteristics like increasing variability of the response with increasing mean level of the response.</p>
-<p>In <a href="#fig-pastesdot">Figure&nbsp;<span>2.6</span></a> we order the samples within each batch separately then order the batches according to increasing mean strength.</p>
-<p><a href="#fig-pastesdot">Figure&nbsp;<span>2.6</span></a> shows considerable variability in strength between samples relative to the variability within samples. There is some indication of variability between batches, in addition to the variability induced by the samples, but not a strong indication of a batch effect. For example, batches I and D, with low mean strength relative to the other batches, each contained one sample (I:b and D:c, respectively) that had high mean strength relative to the other samples. Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength. In <a href="#sec-assessingfm04"><span>Section&nbsp;2.2.4</span></a> we will examine the need for incorporating batch-to-batch variability, in addition to sample-to-sample variability, in the statistical model.</p>
+<p>In <a href="#fig-pastesdot" class="quarto-xref">Figure&nbsp;<span>2.6</span></a> we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample. The perceptive reader will have noticed that the levels of the factors on the vertical axis in this figure, and in <a href="intro.html#fig-dyestuffdata" class="quarto-xref">Figure&nbsp;<span>1.1</span></a>, and <a href="#fig-penicillindot" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>, have been reordered according to increasing average response. In all these cases there is no inherent ordering of the levels of the covariate such as batch or plate. Rather than confuse our interpretation of the plot by determining the vertical displacement of points according to a random ordering, we impose an ordering according to increasing mean response. This allows us to more easily check for structure in the data, including undesirable characteristics like increasing variability of the response with increasing mean level of the response.</p>
+<p>In <a href="#fig-pastesdot" class="quarto-xref">Figure&nbsp;<span>2.6</span></a> we order the samples within each batch separately then order the batches according to increasing mean strength.</p>
+<p><a href="#fig-pastesdot" class="quarto-xref">Figure&nbsp;<span>2.6</span></a> shows considerable variability in strength between samples relative to the variability within samples. There is some indication of variability between batches, in addition to the variability induced by the samples, but not a strong indication of a batch effect. For example, batches I and D, with low mean strength relative to the other batches, each contained one sample (I:b and D:c, respectively) that had high mean strength relative to the other samples. Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength. In <a href="#sec-assessingfm04" class="quarto-xref"><span>Section 2.2.4</span></a> we will examine the need for incorporating batch-to-batch variability, in addition to sample-to-sample variability, in the statistical model.</p>
 </section>
 <section id="sec-nestedcrossed" class="level3" data-number="2.2.2">
-<h3 data-number="2.2.2" class="anchored" data-anchor-id="sec-nestedcrossed"><span class="header-section-number">2.2.2</span> Nested Factors</h3>
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="sec-nestedcrossed"><span class="header-section-number">2.2.2</span> Nested factors</h3>
 <p>Because each level of <code>sample</code> occurs with one and only one level of <code>batch</code> we say that <code>sample</code> is <em>nested within</em> <code>batch</code>. Some presentations of mixed-effects models, especially those related to <em>multilevel modeling</em>&nbsp;<span class="citation" data-cites="MLwiNUser:2000">(<a href="references.html#ref-MLwiNUser:2000" role="doc-biblioref">Rasbash et al., 2000</a>)</span> or <em>hierarchical linear models</em>&nbsp;<span class="citation" data-cites="Rauden:Bryk:2002">(<a href="references.html#ref-Rauden:Bryk:2002" role="doc-biblioref">Raudenbush &amp; Bryk, 2002</a>)</span>, leave the impression that one can only define random effects with respect to factors that are nested. This is the origin of the terms “multilevel”, referring to multiple, nested levels of variability, and “hierarchical”, also invoking the concept of a hierarchy of levels. To be fair, both those references do describe the use of models with random effects associated with non-nested factors, but such models tend to be treated as a special case.</p>
 <p>The blurring of mixed-effects models with the concept of multiple, hierarchical levels of variation results in an unwarranted emphasis on “levels” when defining a model and leads to considerable confusion. It is perfectly legitimate to define models having random effects associated with non-nested factors. The reasons for the emphasis on defining random effects with respect to nested factors only are that such cases do occur frequently in practice and that some of the computational methods for estimating the parameters in the models can only be easily applied to nested factors.</p>
 <p>This is not the case for the methods used <code>MixedModels.jl</code>. Indeed there is nothing special done for models with random effects for nested factors. When random effects are associated with multiple factors exactly the same computational methods are used whether the factors form a nested sequence or are partially crossed or are completely crossed.</p>
@@ -864,14 +919,11 @@ div.csl-indent {
 <section id="sec-fittingPastes" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="sec-fittingPastes"><span class="header-section-number">2.2.3</span> Fitting a model with nested random effects</h3>
 <p>Fitting a model with simple, scalar random effects for nested factors is done in exactly the same way as fitting a model with random effects for crossed grouping factors. We include random-effects terms for each factor, as in</p>
-<div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>psm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pastes; contrasts)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 35    Time: 0:00:00 (18.44 ms/it)</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div id="b8dba779" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>psm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pastes; contrasts, progress)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="21">
 <table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
@@ -908,9 +960,9 @@ div.csl-indent {
 </div>
 </div>
 <p>Not only is the model specification similar for nested and crossed factors, the internal calculations are performed according to the methods described in for each model type. Comparing the patterns in the matrices <span class="math inline">\({\boldsymbol{\Lambda}}\)</span>, <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span> and <span class="math inline">\({\mathbf{L}}\)</span> and the block structure</p>
-<div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sparseL</span>(psm01; full<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="c75d6f0d" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sparseL</span>(psm01; full<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
 <pre><code>42×42 SparseArrays.SparseMatrixCSC{Float64, Int32} with 153 stored entries:
 ⎡⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎤
 ⎢⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
@@ -925,9 +977,9 @@ div.csl-indent {
 ⎣⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠓⎦</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(psm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="22">
+<div id="1e9c35a9" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(psm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="23">
 <table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
@@ -960,78 +1012,81 @@ div.csl-indent {
 </table>
 </div>
 </div>
-<p>of <code>psm01</code> to that of <code>pnm01</code> shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, <span class="math inline">\({\mathbf{L}}\)</span>. This type of structure has the desirable property that there is no “fill-in” during calculation of the Cholesky factor. In other words, the number of non-zeros in <span class="math inline">\({\mathbf{L}}\)</span> is the same as the number of non-zeros in the lower triangle of the matrix being factored, <span class="math inline">\({\boldsymbol{\Lambda}}'{\mathbf{Z}}'{\mathbf{Z}}{\boldsymbol{\Lambda}}+{\mathbf{I}}\)</span> (which, because <span class="math inline">\({\boldsymbol{\Lambda}}\)</span> is diagonal, has the same structure as <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span>).</p>
+<p>of <code>psm01</code> to that of <code>pnm01</code> <a href="#lst-pnm01sparsel" class="quarto-xref">Listing&nbsp;<span>2.1</span></a> shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, <span class="math inline">\({\mathbf{L}}\)</span>. This type of structure has the desirable property that there is no “fill-in” during calculation of the Cholesky factor. In other words, the number of non-zeros in <span class="math inline">\({\mathbf{L}}\)</span> is the same as the number of non-zeros in the lower triangle of the matrix being factored, <span class="math inline">\({\boldsymbol{\Lambda}}'{\mathbf{Z}}'{\mathbf{Z}}{\boldsymbol{\Lambda}}+{\mathbf{I}}\)</span> (which, because <span class="math inline">\({\boldsymbol{\Lambda}}\)</span> is diagonal, has the same structure as <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span>).</p>
 <p>Fill-in of the Cholesky factor is not an important issue when we have a few dozen random effects, as we do here. It is an important issue when we have millions of random effects in complex configurations, as has been the case in some of the models that have been fit using MixedModels.</p>
 </section>
 <section id="sec-assessingfm04" class="level3" data-number="2.2.4">
 <h3 data-number="2.2.4" class="anchored" data-anchor-id="sec-assessingfm04"><span class="header-section-number">2.2.4</span> Assessing parameter estimates in psm01</h3>
-<p>The parameter estimates are: <span class="math inline">\(\widehat{\sigma_1}\)</span>, the standard deviation of the random effects for <code>sample</code>; <span class="math inline">\(\widehat{\sigma_2}\)</span>, the standard deviation of the random effects for <code>batch</code>; <span class="math inline">\(\widehat{\sigma}\)</span>, the standard deviation of the residual noise term; and <span class="math inline">\(\widehat{\beta_1}=\)</span>, the overall mean response, which is labeled <code>(Intercept)</code> in these models.</p>
-<p>The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in <a href="#fig-pastesdot">Figure&nbsp;<span>2.6</span></a>. Indeed our conclusion from <a href="#fig-pastesdot">Figure&nbsp;<span>2.6</span></a> was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.</p>
-<p>Plots of the prediction intervals of the random effects (<a href="#fig-psm01batchcaterpillar">Figure&nbsp;<span>2.7</span></a>)</p>
-<div class="cell" data-execution_count="23">
-<details>
+<p>The parameter estimates are: <span class="math inline">\(\widehat{\sigma_1}\)</span>, the standard deviation of the random effects for <code>sample</code>; <span class="math inline">\(\widehat{\sigma_2}\)</span>, the standard deviation of the random effects for <code>batch</code>; <span class="math inline">\(\widehat{\sigma}\)</span>, the standard deviation of the residual noise term; and <span class="math inline">\(\widehat{\beta_1}\)</span>, the overall mean response, which is labeled <code>(Intercept)</code> in these models.</p>
+<p>The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in <a href="#fig-pastesdot" class="quarto-xref">Figure&nbsp;<span>2.6</span></a>. Indeed our conclusion from <a href="#fig-pastesdot" class="quarto-xref">Figure&nbsp;<span>2.6</span></a> was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.</p>
+<p>Plots of the prediction intervals of the random effects (<a href="#fig-psm01batchcaterpillar" class="quarto-xref">Figure&nbsp;<span>2.7</span></a>)</p>
+<div id="cell-fig-psm01batchcaterpillar" class="cell" data-execution_count="23">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">300</span>)),</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(psm01, <span class="op">:</span>batch),</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">300</span>)),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(psm01, <span class="op">:</span>batch),</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="23">
-<div id="fig-psm01batchcaterpillar" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-psm01batchcaterpillar-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.7: Plot of <em>batch</em> prediction intervals from <em>psm01</em></figcaption>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div id="fig-psm01batchcaterpillar" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-psm01batchcaterpillar-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-psm01batchcaterpillar-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-psm01batchcaterpillar-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.7: Plot of <em>batch</em> prediction intervals from <em>psm01</em>
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>confirm this impression in that all the prediction intervals for the random effects for contain zero.</p>
 <p>Furthermore, kernel density estimates from a parametric bootstrap sample of the estimated standard deviations of the random effects and residuals</p>
-<div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">4567654</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>psm01samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(<span class="fl">10_000</span>, psm01; hide_progress)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>psm01pars <span class="op">=</span> <span class="fu">DataFrame</span>(psm01samp.allpars);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>┌ Warning: `hide_progress` is deprecated, please use `progress` instead.NB: `progress` is a positive action, i.e. `progress=true` means show the progress bar.
-│   caller = parametricbootstrap at bootstrap.jl:204 [inlined]
-└ @ Core ~/.julia/packages/MixedModels/LJXGY/src/bootstrap.jl:204</code></pre>
+<div id="b3cd854f" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">4567654</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>psm01samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(<span class="fl">10_000</span>, psm01; progress)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>psm01pars <span class="op">=</span> <span class="fu">DataFrame</span>(psm01samp.allpars);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<div class="cell" data-execution_count="25">
-<details>
+<div id="cell-fig-psm01bssampdens" class="cell" data-execution_count="25">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(psm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"σ"</span>)) <span class="op">*</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of σ"</span>;</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>group <span class="op">=&gt;</span> <span class="st">"Group"</span>),</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="pp">@subset</span>(psm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"σ"</span>)) <span class="op">*</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>value <span class="op">=&gt;</span> <span class="st">"Bootstrap samples of σ"</span>;</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>(<span class="op">:</span>group <span class="op">=&gt;</span> <span class="st">"Group"</span>),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">density</span>();</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="25">
-<div id="fig-psm01bssampdens" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-psm01bssampdens-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm01</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div id="fig-psm01bssampdens" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-psm01bssampdens-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-psm01bssampdens-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-psm01bssampdens-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm01
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Because there are several indications that <span class="math inline">\(\sigma_2\)</span> could reasonably be zero, resulting in a simpler model incorporating random effects for only, we perform a statistical test of this hypothesis.</p>
+<p>Because there are several indications that <span class="math inline">\(\sigma_2\)</span> could reasonably be zero, resulting in a simpler model incorporating random effects for only <code>sample</code>, we perform a statistical test of this hypothesis.</p>
 </section>
 <section id="sec-TestingSig2is0" class="level3" data-number="2.2.5">
 <h3 data-number="2.2.5" class="anchored" data-anchor-id="sec-TestingSig2is0"><span class="header-section-number">2.2.5</span> Testing <span class="math inline">\(H_0:\sigma_2=0\)</span> versus <span class="math inline">\(H_a:\sigma_2&gt;0\)</span></h3>
 <p>One of the many famous statements attributed to Albert Einstein is “Everything should be made as simple as possible, but not simpler.” In statistical modeling this <em>principal of parsimony</em> is embodied in hypothesis tests comparing two models, one of which contains the other as a special case. Typically, one or more of the parameters in the more general model, which we call the <em>alternative hypothesis</em>, is constrained in some way, resulting in the restricted model, which we call the <em>null hypothesis</em>. Although we phrase the hypothesis test in terms of the parameter restriction, it is important to realize that we are comparing the quality of fits obtained with two nested models. That is, we are not assessing parameter values per se; we are comparing the model fit obtainable with some constraints on parameter values to that without the constraints. Because the more general model, <span class="math inline">\(H_a\)</span>, must provide a fit that is at least as good as the restricted model, <span class="math inline">\(H_0\)</span>, our purpose is to determine whether the change in the quality of the fit is sufficient to justify the greater complexity of model <span class="math inline">\(H_a\)</span>. This comparison is often reduced to a <em>p-value</em>, which is the probability of seeing a difference in the model fits as large as we did, or even larger, when, in fact, <span class="math inline">\(H_0\)</span> is adequate. Like all probabilities, a p-value must be between 0 and 1. When the p-value for a test is small (close to zero) we prefer the more complex model, saying that we “reject <span class="math inline">\(H_0\)</span> in favor of <span class="math inline">\(H_a\)</span>”. On the other hand, when the p-value is not small we “fail to reject <span class="math inline">\(H_0\)</span>”, arguing that there is a non-negligible probability that the observed difference in the model fits could reasonably be the result of random chance, not the inherent superiority of the model <span class="math inline">\(H_a\)</span>. Under these circumstances we prefer the simpler model, <span class="math inline">\(H_0\)</span>, according to the principal of parsimony.</p>
 <p>These are the general principles of statistical hypothesis tests. To perform a test in practice we must specify the criterion for comparing the model fits, the method for calculating the p-value from an observed value of the criterion, and the standard by which we will determine if the p-value is “small” or not. The criterion is called the <em>test statistic</em>, the p-value is calculated from a <em>reference distribution</em> for the test statistic, and the standard for small p-values is called the <em>level</em> of the test.</p>
-<p>In <a href="intro.html#sec-printeddetails"><span>Section&nbsp;1.3.2</span></a> we referred to likelihood ratio tests (LRTs) for which the test statistic is the difference in the deviance. That is, the LRT statistic is <span class="math inline">\(d_0-d_a\)</span> where <span class="math inline">\(d_a\)</span> is the deviance in the more general (<span class="math inline">\(H_a\)</span>) model fit and <span class="math inline">\(d_0\)</span> is the deviance in the constrained (<span class="math inline">\(H_0\)</span>) model. An approximate reference distribution for an LRT statistic is the <span class="math inline">\(\chi^2_\nu\)</span> distribution where <span class="math inline">\(\nu\)</span>, the degrees of freedom, is determined by the number of constraints imposed on the parameters of <span class="math inline">\(H_a\)</span> to produce <span class="math inline">\(H_0\)</span>.</p>
+<p>In <a href="intro.html#sec-printeddetails" class="quarto-xref"><span>Section 1.3.2</span></a> we referred to likelihood ratio tests (LRTs) for which the test statistic is the difference in the deviance. That is, the LRT statistic is <span class="math inline">\(d_0-d_a\)</span> where <span class="math inline">\(d_a\)</span> is the deviance in the more general (<span class="math inline">\(H_a\)</span>) model fit and <span class="math inline">\(d_0\)</span> is the deviance in the constrained (<span class="math inline">\(H_0\)</span>) model. An approximate reference distribution for an LRT statistic is the <span class="math inline">\(\chi^2_\nu\)</span> distribution where <span class="math inline">\(\nu\)</span>, the degrees of freedom, is determined by the number of constraints imposed on the parameters of <span class="math inline">\(H_a\)</span> to produce <span class="math inline">\(H_0\)</span>.</p>
 <p>The restricted model fit</p>
-<div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>psm02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pastes; contrasts)</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="26">
+<div id="77caf1e7" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>psm02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pastes; contrasts, progress)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="27">
 <table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
@@ -1065,9 +1120,9 @@ div.csl-indent {
 </div>
 </div>
 <p>is compared to model <code>psm01</code> as</p>
-<div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(psm02, psm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="27">
+<div id="a7d8da78" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(psm02, psm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="28">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 54%">
@@ -1114,16 +1169,16 @@ div.csl-indent {
 <section id="sec-assessReduced" class="level3" data-number="2.2.6">
 <h3 data-number="2.2.6" class="anchored" data-anchor-id="sec-assessReduced"><span class="header-section-number">2.2.6</span> Assessing the reduced model, psm02</h3>
 <p>Comparing the coverage intervals for models <code>psm01</code> and <code>psm02</code></p>
-<div class="cell" data-execution_count="28">
-<details>
+<div id="8a4a9c96" class="cell" data-execution_count="28">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(psm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(psm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="28">
+<div class="cell-output cell-output-display" data-execution_count="29">
 <div><div style="float: left;"><span>4×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">type</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">group</th>
@@ -1154,7 +1209,7 @@ div.csl-indent {
 <td style="text-align: left;">σ</td>
 <td style="text-align: left;">sample</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">1.93499</td>
+<td style="text-align: right;">1.93501</td>
 <td style="text-align: right;">3.61949</td>
 </tr>
 <tr class="odd">
@@ -1170,7 +1225,7 @@ div.csl-indent {
 <td style="text-align: left;">σ</td>
 <td style="text-align: left;">residual</td>
 <td style="text-align: left; font-style: italic;">missing</td>
-<td style="text-align: right;">0.608904</td>
+<td style="text-align: right;">0.608905</td>
 <td style="text-align: right;">1.02399</td>
 </tr>
 </tbody>
@@ -1178,22 +1233,22 @@ div.csl-indent {
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="29">
-<details>
+<div id="21a82886" class="cell" data-execution_count="29">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>psm02samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">9753579</span>),</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">10_000</span>,</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  psm02;</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  hide_progress,</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(psm02samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>psm02samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">9753579</span>),</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">10_000</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  psm02;</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  progress,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(psm02samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="29">
+<div class="cell-output cell-output-display" data-execution_count="30">
 <div><div style="float: left;"><span>3×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">type</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">group</th>
@@ -1252,9 +1307,9 @@ div.csl-indent {
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="sec-insteval"><span class="header-section-number">2.3.1</span> The insteval data</h3>
 <p>The data are from a special evaluation of lecturers by students at the Swiss Federal Institute for Technology–Zürich (ETH–Zürich), to determine who should receive the “best-liked professor” award. These data have been slightly simplified and identifying labels have been removed, so as to preserve anonymity.</p>
 <p>The variables</p>
-<div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>insteval <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>insteval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="30">
+<div id="b41eb30c" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>insteval <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>insteval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="31">
 <pre><code>Arrow.Table with 73421 rows, 7 columns, and schema:
  :s        String
  :d        String
@@ -1265,13 +1320,13 @@ div.csl-indent {
  :y        Int8</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(insteval))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="31">
+<div id="6e735063" class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(insteval))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
 <div><div style="float: left;"><span>7×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
@@ -1370,35 +1425,36 @@ div.csl-indent {
 </div>
 <p>have somewhat cryptic names. Factor <code>s</code> designates the student and <code>d</code> the instructor. The factor <code>dept</code> is the department for the course and <code>service</code> indicates whether the course was a service course taught to students from other departments.</p>
 <p>Although the response, <code>y</code>, is on a scale of 1 to 5,</p>
-<div class="cell" data-execution_count="32">
-<details>
+<div id="cell-fig-instevalhist" class="cell" data-execution_count="32">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="fu">Table</span>(response<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, count<span class="op">=</span><span class="fu">counts</span>(insteval.y))) <span class="op">*</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>response <span class="op">=&gt;</span> <span class="st">"Rating"</span>, <span class="op">:</span>count <span class="op">=&gt;</span> <span class="st">"Count"</span>) <span class="op">*</span></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visual</span>(BarPlot);</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="fu">Table</span>(response<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, count<span class="op">=</span><span class="fu">counts</span>(insteval.y))) <span class="op">*</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>response <span class="op">=&gt;</span> <span class="st">"Rating"</span>, <span class="op">:</span>count <span class="op">=&gt;</span> <span class="st">"Count"</span>) <span class="op">*</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visual</span>(BarPlot);</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">450</span>)),</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="32">
-<div id="fig-instevalhist" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-instevalhist-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.9: Histogram of instructor ratings in the <em>insteval</em> data</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="33">
+<div id="fig-instevalhist" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-instevalhist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-instevalhist-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-instevalhist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.9: Histogram of instructor ratings in the <em>insteval</em> data
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>it is sufficiently diffuse to warrant treating it as if it were a continuous response.</p>
 <p>At this point we will fit models that have random effects for student, instructor, and department (or the combination of department and service) to these data.</p>
-<div class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>iem01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dept)</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, insteval; contrasts)</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 102    Time: 0:00:02 (24.21 ms/it)</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="33">
+<div id="9aade711" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>iem01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dept)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, insteval; contrasts, progress)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="34">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 19%">
@@ -1427,7 +1483,7 @@ div.csl-indent {
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: right;">3.2519</td>
 <td style="text-align: right;">0.0279</td>
-<td style="text-align: right;">116.70</td>
+<td style="text-align: right;">116.69</td>
 <td style="text-align: right;">&lt;1e-99</td>
 <td style="text-align: right;">0.3264</td>
 <td style="text-align: right;">0.5173</td>
@@ -1448,31 +1504,32 @@ div.csl-indent {
 </div>
 </div>
 <p>All three estimated standard deviations of the random effects are less than <span class="math inline">\(\widehat{\sigma}\)</span>, with <span class="math inline">\(\widehat{\sigma}_3\)</span>, the estimated standard deviation of the random effects for the <code>dept</code>, less than one-tenth the estimated residual standard deviation.</p>
-<p>It is not surprising that zero is within most of the prediction intervals on the random effects for this factor (<a href="#fig-iem01caterpillardept">Figure&nbsp;<span>2.10</span></a>).</p>
-<div class="cell" data-execution_count="34">
-<details>
+<p>It is not surprising that zero is within most of the prediction intervals on the random effects for this factor (<a href="#fig-iem01caterpillardept" class="quarto-xref">Figure&nbsp;<span>2.10</span></a>).</p>
+<div id="cell-fig-iem01caterpillardept" class="cell" data-execution_count="34">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>)), <span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>dept))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">caterpillar!</span>(<span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">400</span>)), <span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>dept))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="34">
-<div id="fig-iem01caterpillardept" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-iem01caterpillardept-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.10: Prediction intervals on random effects for department in model iem01</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<div id="fig-iem01caterpillardept" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-iem01caterpillardept-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-iem01caterpillardept-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-iem01caterpillardept-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.10: Prediction intervals on random effects for department in model iem01
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>However, the p-value for the LRT of <span class="math inline">\(H_0:\sigma_3=0\)</span> versus <span class="math inline">\(H_a:\sigma_3&gt;0\)</span></p>
-<div class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>iem02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d)</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, insteval; contrasts)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(iem02, iem01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 47    Time: 0:00:00 (17.21 ms/it)</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="35">
+<div id="248048a0" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>iem02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, insteval; contrasts, progress)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(iem02, iem01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="36">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 53%">
@@ -1520,9 +1577,9 @@ div.csl-indent {
 <section id="sec-iem01L" class="level3" data-number="2.3.2">
 <h3 data-number="2.3.2" class="anchored" data-anchor-id="sec-iem01L"><span class="header-section-number">2.3.2</span> Structure of L for model iem01</h3>
 <p>Before leaving this model we examine the sparse Cholesky factor, <span class="math inline">\({\mathbf{L}}\)</span>, which is of size <span class="math inline">\(4116\times4116\)</span>.</p>
-<div class="cell" data-execution_count="36">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fu">sparseL</span>(iem01; full<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="36">
+<div id="939269a3" class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fu">sparseL</span>(iem01; full<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="37">
 <pre><code>4116×4116 SparseArrays.SparseMatrixCSC{Float64, Int32} with 741328 stored entries:
 ⎡⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎤
 ⎢⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⎥
@@ -1547,9 +1604,9 @@ div.csl-indent {
 </div>
 </div>
 <p>Even as a sparse matrix <code>L</code> requires a considerable amount of memory, about 9 MB,</p>
-<div class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>(<span class="bu">Base</span>.<span class="fu">summarysize</span>(L), <span class="bu">Base</span>.<span class="fu">summarysize</span>(<span class="fu">collect</span>(L)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="37">
+<div id="45da61a9" class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>(<span class="bu">Base</span>.<span class="fu">summarysize</span>(L), <span class="bu">Base</span>.<span class="fu">summarysize</span>(<span class="fu">collect</span>(L)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>(8912564, 135531688)</code></pre>
 </div>
 </div>
@@ -1559,15 +1616,12 @@ div.csl-indent {
 <h3 data-number="2.3.3" class="anchored" data-anchor-id="effect-of-service-courses"><span class="header-section-number">2.3.3</span> Effect of service courses</h3>
 <p>It is sometimes felt that it is more difficult to achieve favorable ratings from students in a service course (i.e.&nbsp;a course taught to students majoring in another program) as opposed to students taking a course in their major.</p>
 <p>There are several ways in which <code>service</code> can be incorporated in a model like this. The simplest approach is to add <code>service</code> to the fixed-effects specification</p>
-<div class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>iem03 <span class="op">=</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> service <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dept)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(MixedModel, f, insteval; contrasts)</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Minimizing 111    Time: 0:00:02 (21.19 ms/it)</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="38">
+<div id="1001b97d" class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>iem03 <span class="op">=</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> service <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dept)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(MixedModel, f, insteval; contrasts, progress)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="39">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 19%">
@@ -1631,56 +1685,64 @@ div.csl-indent {
 </section>
 <section id="best-liked" class="level3" data-number="2.3.4">
 <h3 data-number="2.3.4" class="anchored" data-anchor-id="best-liked"><span class="header-section-number">2.3.4</span> “Best-liked”</h3>
-<p>A <code>qqcaterpillar</code> plot of the instructor (i.e.&nbsp;factor <code>d</code> in the data) random effects, <a href="#fig-iem01qqcaterpillard">Figure&nbsp;<span>2.11</span></a>,</p>
-<div class="cell" data-execution_count="39">
-<details>
+<p>A <code>qqcaterpillar</code> plot of the instructor (i.e.&nbsp;factor <code>d</code> in the data) random effects, <a href="#fig-iem01qqcaterpillard" class="quarto-xref">Figure&nbsp;<span>2.11</span></a>,</p>
+<div id="cell-fig-iem01qqcaterpillard" class="cell" data-execution_count="39">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">650</span>)),</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>d),</span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">650</span>)),</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>d),</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="39">
-<div id="fig-iem01qqcaterpillard" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-iem01qqcaterpillard-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.11: Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="40">
+<div id="fig-iem01qqcaterpillard" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-iem01qqcaterpillard-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-iem01qqcaterpillard-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-iem01qqcaterpillard-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.11: Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>shows the differences in precision due to different numbers of observations for different instructors.</p>
-<div class="cell" data-execution_count="40">
-<details>
+<div id="cell-fig-iednobshist" class="cell" data-execution_count="40">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(<span class="fu">DataFrame</span>(insteval), <span class="op">:</span>d), nrow <span class="op">=&gt;</span> <span class="op">:</span>n)) <span class="op">*</span></span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>n <span class="op">=&gt;</span> <span class="st">"Number of observations"</span>) <span class="op">*</span></span>
-<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">410</span>);</span>
-<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">600</span>)),</span>
-<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(<span class="fu">combine</span>(<span class="fu">groupby</span>(<span class="fu">DataFrame</span>(insteval), <span class="op">:</span>d), nrow <span class="op">=&gt;</span> <span class="op">:</span>n)) <span class="op">*</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(<span class="op">:</span>n <span class="op">=&gt;</span> <span class="st">"Number of observations"</span>) <span class="op">*</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  AlgebraOfGraphics.<span class="fu">histogram</span>(; bins<span class="op">=</span><span class="fl">410</span>);</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  figure<span class="op">=</span>(; resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">600</span>)),</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="40">
-<div id="fig-iednobshist" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="multiple_files/figure-html/fig-iednobshist-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;2.12: Histogram of the number of observations per instructor in the insteval data</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<div id="fig-iednobshist" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-iednobshist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="multiple_files/figure-html/fig-iednobshist-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-iednobshist-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.12: Histogram of the number of observations per instructor in the insteval data
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>The precision of the conditional distributions of the random effects, as measured by the width of the intervals, varies considerably between instructors.</p>
 <p>We can determine that instructor <code>I1258</code> has the largest mean of the conditional distributions of the random effects</p>
-<div class="cell" data-execution_count="41">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(</span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">DataFrame</span>(<span class="fu">ranefinfotable</span>(<span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>d))), <span class="op">:</span>cmode),</span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">5</span>,</span>
-<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="41">
+<div id="c977e82e" class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">DataFrame</span>(<span class="fu">ranefinfotable</span>(<span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>d))), <span class="op">:</span>cmode),</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">5</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="42">
 <div><div style="float: left;"><span>5×4 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">name</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">level</th>
@@ -1701,7 +1763,7 @@ div.csl-indent {
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I0066</td>
 <td style="text-align: right;">1.03151</td>
-<td style="text-align: right;">0.105472</td>
+<td style="text-align: right;">0.105473</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -1722,7 +1784,7 @@ div.csl-indent {
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I1866</td>
 <td style="text-align: right;">1.06625</td>
-<td style="text-align: right;">0.123321</td>
+<td style="text-align: right;">0.123322</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
@@ -1741,20 +1803,47 @@ div.csl-indent {
 </section>
 <section id="sec-MultSummary" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="sec-MultSummary"><span class="header-section-number">2.4</span> Chapter summary</h2>
-<p>A simple, scalar random effects term in an model formula is of the form , where is an expression whose value is the <em>grouping factor</em> of the set of random effects generated by this term. Typically, <code>F</code> is simply the name of a factor, as in most of the examples in this chapter. However, the grouping factor can be the value of an expression, such as in the last example.</p>
-<p>Because simple, scalar random-effects terms can differ only in the description of the grouping factor we refer to configurations such as crossed or nested as applying to the terms or to the random effects, although it is more accurate to refer to the configuration as applying to the grouping factors.</p>
+<p>A simple, scalar random effects term in an model formula is of the form <code>(1|f)</code>, where <code>f</code> is an expression whose value is the <em>grouping factor</em> for the set of random effects generated by this term. Typically, <code>f</code> is simply the name of a factor, as in most of the examples in this chapter. However, the grouping factor can be the value of an expression.</p>
 <p>A model formula can include several such random effects terms. Because configurations such as nested or crossed or partially crossed grouping factors are a property of the data, the specification in the model formula does not depend on the configuration. We simply include multiple random effects terms in the formula specifying the model.</p>
-<p>One apparent exception to this rule occurs with implicitly nested factors, in which the levels of one factor are only meaningful within a particular level of the other factor. In the pastes data, levels of the factor cask are only meaningful within a particular level of the factor batch. A model formula of would result in a fitted model that did not appropriately reflect the sources of variability in the data. Following the simple rule that the factor should be defined so that distinct experimental or observational units correspond to distinct levels of the factor will avoid such ambiguity.</p>
-<p>For convenience, a model with multiple, nested random-effects terms can be specified as which internally is re-expressed as We will avoid terms of the form , preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.</p>
-<p>The insteval data, described in <a href="#sec-insteval"><span>Section&nbsp;2.3.1</span></a>, illustrate some of the characteristics of the real data to which mixed-effects models are now fit. There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed. Such data are common in sociological and educational studies but until recently it has been very difficult to fit models that appropriately reflect such a structure. Much of the literature on mixed-effects models leaves the impression that multiple random effects terms can only be associated with nested grouping factors. The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.</p>
-<p>The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter. That is, profile-based confidence intervals on the fixed-effects parameter, <span class="math inline">\(\beta_0\)</span>, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution and the logarithm of the residual standard deviation, <span class="math inline">\(\log(\sigma)\)</span>, has a good normal approximation. Profile-based confidence intervals for the standard deviations of random effects (<span class="math inline">\(\sigma_1\)</span>, <span class="math inline">\(\sigma_2\)</span>, etc.) are symmetric on a logarithmic scale except for those that could be zero.</p>
+<p>One apparent exception to this rule occurs with implicitly nested factors, in which the levels of one factor are only meaningful within a particular level of the other factor. In the <code>pastes</code> data, levels of the factor <code>cask</code> are only meaningful within a particular level of the factor batch. A model formula of <code>strength ~ 1 + (1|batch) + (1|cask)</code> would result in a fitted model that did not appropriately reflect the sources of variability in the data. Following the simple rule that the factor should be defined so that distinct experimental or observational units correspond to distinct levels of the factor will avoid such ambiguity.</p>
+<p>For convenience, multiple, nested random-effects terms can be specified using a slash to separate grouping factors, e.g.&nbsp;<code>(1 | batch / cask)</code>, which internally is re-expressed as <code>(1 | batch &amp; cask) + (1 | batch)</code></p>
+<div id="psm01alt" class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span>(strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch <span class="op">/</span> cask))</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(MixedModel, f, pastes; progress)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by maximum likelihood
+ strength ~ 1 + (1 | batch) + (1 | batch &amp; cask)
+   logLik   -2 logLik     AIC       AICc        BIC    
+  -123.9972   247.9945   255.9945   256.7217   264.3718
+
+Variance components:
+                Column   Variance Std.Dev. 
+batch &amp; cask (Intercept)  8.433616 2.904069
+batch        (Intercept)  1.199180 1.095071
+Residual                  0.678002 0.823409
+ Number of obs: 60; levels of grouping factors: 30, 10
+
+  Fixed-effects parameters:
+─────────────────────────────────────────────────
+               Coef.  Std. Error      z  Pr(&gt;|z|)
+─────────────────────────────────────────────────
+(Intercept)  60.0533    0.642136  93.52    &lt;1e-99
+─────────────────────────────────────────────────</code></pre>
+</div>
+</div>
+<p>We will avoid terms of this form, preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.</p>
+<p>The insteval data, described in <a href="#sec-insteval" class="quarto-xref"><span>Section 2.3.1</span></a>, illustrate some of the characteristics of the real data to which mixed-effects models are now fit. There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed. Such data are common in sociological and educational studies but until recently it has been very difficult to fit models that appropriately reflect such a structure. Much of the literature on mixed-effects models leaves the impression that multiple random effects terms can only be associated with nested grouping factors. The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.</p>
+<p>The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter. That is, profile-based confidence intervals on the fixed-effects parameter, <span class="math inline">\(\beta_0\)</span>, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution.</p>
 <p>Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be “statistically significant” even when its practical significance is questionable.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/573bdf6
-">573bdf6
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/4cd5e78
+">4cd5e78
 </a>.</em></p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
 <div id="ref-davies72:_statis_method_in_resear_and_produc" class="csl-entry" role="listitem">
 Davies, O. L., &amp; Goldsmith, P. L. (Eds.). (1972). <em>Statistical methods in research and production</em> (4th ed.). Hafner.
 </div>
@@ -1850,10 +1939,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1863,8 +1951,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1877,6 +1974,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1920,6 +2136,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1945,6 +2162,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -2006,17 +2249,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./intro.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></span>
+      <a href="./intro.html" class="pagination-link  aria-label=" &lt;span="" simple,="" linear,="" mixed-effects="" model&lt;="" span&gt;"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A simple, linear, mixed-effects model</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./longitudinal.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./longitudinal.html" class="pagination-link" aria-label="<span class='chapter-number'>3</span>&nbsp; <span class='chapter-title'>Models for longitudinal data</span>">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for longitudinal data</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
+
 
 
 

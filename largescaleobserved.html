@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.549">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -58,6 +58,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -76,7 +77,7 @@ div.csl-indent {
 }</style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -100,7 +101,13 @@ div.csl-indent {
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -109,33 +116,60 @@ div.csl-indent {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
 </head>
 
 <body class="nav-sidebar floating">
-
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./largescaleobserved.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A large-scale observational study</span></a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./largescaleobserved.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">A large-scale observational study</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
@@ -145,7 +179,7 @@ div.csl-indent {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Embrace Uncertainty</a> 
@@ -167,19 +201,19 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A Simple, Linear, Mixed-Effects Model</span></span></a>
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">A simple, linear, mixed-effects model</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./multiple.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models With Multiple Random-effects Terms</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Models with multiple random-effects terms</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./longitudinal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for Longitudinal Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Models for longitudinal data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -197,7 +231,7 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./glmmbernoulli.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized linear mixed models for binary responses</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -224,7 +258,7 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./linalg.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Linear Algebra for Linear Models</span></span></a>
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">Linear algebra for linear models</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -238,7 +272,7 @@ div.csl-indent {
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -274,29 +308,36 @@ div.csl-indent {
   </div>
   
 
+
 </header>
 
-<p>Load the packages to be used.</p>
-<div class="cell" data-execution_count="2">
-<details>
+
+<p>Load the packages to be used,</p>
+<div id="packages05" class="cell" data-execution_count="1">
+<details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">AlgebraOfGraphics</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CairoMakie</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">GLM                  </span><span class="co"># for the lm function</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">ProgressMeter</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">SparseArrays         </span><span class="co"># for the nnz function</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Statistics           </span><span class="co"># for the mean function</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">TypedTables</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">optsumdir</span>(paths<span class="op">::</span><span class="dt">AbstractString...</span>) <span class="op">=</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">"optsums"</span>, paths<span class="op">...</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>)</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>ProgressMeter.<span class="fu">ijulia_behavior</span>(<span class="op">:</span>clear)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>CairoMakie.<span class="fu">activate!</span>(; <span class="kw">type</span><span class="op">=</span><span class="st">"svg"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">CategoricalArrays</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">GLM</span>                  <span class="co"># for the lm function</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModelsMakie</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">SparseArrays</span>         <span class="co"># for the nnz function</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Statistics</span>           <span class="co"># for the mean function</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">TypedTables</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>and define some constants and a utility function</p>
+<div id="constants05" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">optsumdir</span>(paths<span class="op">::</span><span class="dt">AbstractString...</span>) <span class="op">=</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">joinpath</span>(<span class="pp">@__DIR__</span>, <span class="st">"optsums"</span>, paths<span class="op">...</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">@isdefined</span>(contrasts) <span class="op">||</span> <span class="kw">const</span> contrasts <span class="op">=</span> <span class="fu">Dict</span><span class="dt">{Symbol, Any}</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@isdefined</span>(progress) <span class="op">||</span> <span class="kw">const</span> progress<span class="op">=</span><span class="cn">false</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>In the previous chapter we explored and fit models to data from a large-scale designed experiment. Here we consider an observational study - ratings of movies by users of <a href="https://movielens.org">movielens.org</a> made available at the <a href="https://grouplens.org/datasets/movielens">grouplens.org download site</a> <span class="citation" data-cites="Harper2016">(<a href="references.html#ref-Harper2016" role="doc-biblioref">Harper &amp; Konstan, 2016</a>)</span>.</p>
@@ -318,11 +359,11 @@ div.csl-indent {
 <section id="structure-of-the-data" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="structure-of-the-data"><span class="header-section-number">5.1</span> Structure of the data</h2>
 <p>One of the purposes of this chapter is to study which dimensions of the data have the greatest effect on the amount of memory used to represent the model and the time required to fit a model.</p>
-<p>The two datasets examined in <a href="largescaledesigned.html"><span>Chapter&nbsp;4</span></a>, from the English Lexicon Project <span class="citation" data-cites="Balota_2007">(<a href="references.html#ref-Balota_2007" role="doc-biblioref">Balota et al., 2007</a>)</span>, consist of <code>trials</code> or <code>instances</code> associated with <code>subject</code> and <code>item</code> factors. The <code>subject</code> and <code>item</code> factors are “incompletely crossed” in that each item occurred in trials with several subjects, but not all subjects, and each subject responded to several different items, but not to all items.</p>
+<p>The two datasets examined in <a href="largescaledesigned.html" class="quarto-xref"><span>Chapter 4</span></a>, from the English Lexicon Project <span class="citation" data-cites="Balota_2007">(<a href="references.html#ref-Balota_2007" role="doc-biblioref">Balota et al., 2007</a>)</span>, consist of <code>trials</code> or <code>instances</code> associated with <code>subject</code> and <code>item</code> factors. The <code>subject</code> and <code>item</code> factors are “incompletely crossed” in that each item occurred in trials with several subjects, but not all subjects, and each subject responded to several different items, but not to all items.</p>
 <p>Similarly in the movie ratings, each instance of a rating is associated with a user and with a movie, and these factors are incompletely crossed.</p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>ratings)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div id="252cc35f" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>ratings)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>Arrow.Table with 27753444 rows, 4 columns, and schema:
  :userId     Int32
  :movieId    Int32
@@ -334,10 +375,10 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>Convert this Arrow table to a <code>Table</code> and drop the <code>timestamp</code> column, which we won’t be using. (For small data sets dropping such columns is not important but with over 27 million ratings it does help to drop unnecessary columns to save some memory space.)</p>
-<div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Table</span>(<span class="fu">getproperties</span>(ratings, (<span class="op">:</span>userId, <span class="op">:</span>movieId, <span class="op">:</span>rating)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
+<div id="050dc54d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Table</span>(<span class="fu">getproperties</span>(ratings, (<span class="op">:</span>userId, <span class="op">:</span>movieId, <span class="op">:</span>rating)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
 <pre><code>Table with 3 columns and 27753444 rows:
       userId  movieId  rating
     ┌────────────────────────
@@ -368,21 +409,21 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>Information on the movies is available in the <code>movies</code> dataset, which we supplement with the mean rating for each movie in the <code>ratings</code> table.</p>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>movies <span class="op">=</span> <span class="fu">Table</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disallowmissing!</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin!</span>(</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">combine</span>(</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">groupby</span>(<span class="fu">DataFrame</span>(ratings), <span class="op">:</span>movieId),</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>rating <span class="op">=&gt;</span> mean <span class="op">=&gt;</span> <span class="op">:</span>mnrtng,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>movies));</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      on<span class="op">=:</span>movieId,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    );</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    error<span class="op">=</span><span class="cn">false</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
+<div id="53c213c3" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>movies <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disallowmissing!</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin!</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">combine</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">groupby</span>(<span class="fu">DataFrame</span>(ratings), <span class="op">:</span>movieId),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">:</span>rating <span class="op">=&gt;</span> mean <span class="op">=&gt;</span> <span class="op">:</span>mnrtng,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>movies));</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      on<span class="op">=:</span>movieId,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    );</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    error<span class="op">=</span><span class="cn">false</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>Table with 25 columns and 53889 rows:
       movieId  mnrtng   nrtngs  title                 imdbId  tmdbId  Action  ⋯
     ┌──────────────────────────────────────────────────────────────────────────
@@ -413,22 +454,22 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>In contrast to data from a designed experiment, like the English Lexicon Project, the data from this observational study are extremely unbalanced with respect to the observational grouping factors, <code>userId</code> and <code>movieId</code>. The <code>movies</code> table includes an <code>nrtngs</code> column that gives the number of ratings for each movie, which varies from 1 to nearly 100,000.</p>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(movies.nrtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="6">
+<div id="5e0a59bc" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(movies.nrtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>(1, 97999)</code></pre>
 </div>
 </div>
 <p>The number of ratings per user is also highly skewed</p>
-<div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>users <span class="op">=</span> <span class="fu">Table</span>(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">combine</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>(<span class="fu">DataFrame</span>(ratings), <span class="op">:</span>userId),</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    nrow <span class="op">=&gt;</span> <span class="op">:</span>urtngs,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>rating <span class="op">=&gt;</span> mean <span class="op">=&gt;</span> <span class="op">:</span>umnrtng,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div id="aeb30829" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>users <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">combine</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>(<span class="fu">DataFrame</span>(ratings), <span class="op">:</span>userId),</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    nrow <span class="op">=&gt;</span> <span class="op">:</span>urtngs,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>rating <span class="op">=&gt;</span> mean <span class="op">=&gt;</span> <span class="op">:</span>umnrtng,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>Table with 3 columns and 283228 rows:
       userId  urtngs  umnrtng
     ┌────────────────────────
@@ -458,69 +499,73 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
  ⋮  │   ⋮       ⋮        ⋮</code></pre>
 </div>
 </div>
-<div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(users.urtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div id="541734f5" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(users.urtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>(1, 23715)</code></pre>
 </div>
 </div>
-<p>One way of visualizing the imbalance in the number of ratings per movie or per user is as an <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical cumulative distribution function</a> (ecdf) plot, which is a “stair-step” plot where the vertical axis is the proportion of observations less than or equal to the corresponding value on the horizontal axis. Because the distribution of the number of ratings per movie or per user is so highly skewed in the low range we use a logarithmic horizontal axis in <a href="#fig-nrtngsecdf">Figure&nbsp;<span>5.1</span></a>.</p>
-<div class="cell" data-execution_count="9">
-<details>
+<p>One way of visualizing the imbalance in the number of ratings per movie or per user is as an <a href="https://en.wikipedia.org/wiki/Empirical_distribution_function">empirical cumulative distribution function</a> (ecdf) plot, which is a “stair-step” plot where the vertical axis is the proportion of observations less than or equal to the corresponding value on the horizontal axis. Because the distribution of the number of ratings per movie or per user is so highly skewed in the low range we use a logarithmic horizontal axis in <a href="#fig-nrtngsecdf" class="quarto-xref">Figure&nbsp;<span>5.1</span></a>.</p>
+<div id="cell-fig-nrtngsecdf" class="cell" data-execution_count="9">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">1000</span>, <span class="fl">400</span>))</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  xscale <span class="op">=</span> log10</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  xminorticksvisible <span class="op">=</span> <span class="cn">true</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  xminorgridvisible <span class="op">=</span> <span class="cn">true</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  yminorticksvisible <span class="op">=</span> <span class="cn">true</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  xminorticks <span class="op">=</span> <span class="fu">IntervalsBetween</span>(<span class="fl">10</span>)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  ylabel <span class="op">=</span> <span class="st">"Relative cumulative frequency"</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  nrtngs <span class="op">=</span> <span class="fu">sort</span>(movies.nrtngs)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ecdfplot</span>(</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    nrtngs;</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    npoints<span class="op">=</span><span class="fu">last</span>(nrtngs),</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>      xlabel<span class="op">=</span><span class="st">"Number of ratings per movie (logarithmic scale)"</span>,</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>      xminorgridvisible,</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>      xminorticks,</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>      xminorticksvisible,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>      xscale,</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>      ylabel,</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>      yminorticksvisible,</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  urtngs <span class="op">=</span> <span class="fu">sort</span>(users.urtngs)</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ecdfplot</span>(</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">2</span>],</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    urtngs;</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    npoints<span class="op">=</span><span class="fu">last</span>(urtngs),</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>      xlabel<span class="op">=</span><span class="st">"Number of ratings per user (logarithmic scale)"</span>,</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>      xminorgridvisible,</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>      xminorticks,</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>      xminorticksvisible,</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>      xscale,</span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>      yminorticksvisible,</span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>  f</span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(; resolution<span class="op">=</span>(<span class="fl">1000</span>, <span class="fl">400</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  xscale <span class="op">=</span> log10</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  xminorticksvisible <span class="op">=</span> <span class="cn">true</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  xminorgridvisible <span class="op">=</span> <span class="cn">true</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  yminorticksvisible <span class="op">=</span> <span class="cn">true</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  xminorticks <span class="op">=</span> <span class="fu">IntervalsBetween</span>(<span class="fl">10</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  ylabel <span class="op">=</span> <span class="st">"Relative cumulative frequency"</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  nrtngs <span class="op">=</span> <span class="fu">sort</span>(movies.nrtngs)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ecdfplot</span>(</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    nrtngs;</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    npoints<span class="op">=</span><span class="fu">last</span>(nrtngs),</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>      xlabel<span class="op">=</span><span class="st">"Number of ratings per movie (logarithmic scale)"</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>      xminorgridvisible,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>      xminorticks,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>      xminorticksvisible,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>      xscale,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>      ylabel,</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>      yminorticksvisible,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  urtngs <span class="op">=</span> <span class="fu">sort</span>(users.urtngs)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ecdfplot</span>(</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">2</span>],</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    urtngs;</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    npoints<span class="op">=</span><span class="fu">last</span>(urtngs),</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    axis<span class="op">=</span>(</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>      xlabel<span class="op">=</span><span class="st">"Number of ratings per user (logarithmic scale)"</span>,</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>      xminorgridvisible,</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>      xminorticks,</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>      xminorticksvisible,</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>      xscale,</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>      yminorticksvisible,</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>  f</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="9">
-<div id="fig-nrtngsecdf" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="largescaleobserved_files/figure-html/fig-nrtngsecdf-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;5.1: Empirical distribution plots of the number of ratings per movie and per user. The horizontal axes are on a logarithmic scale.</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div id="fig-nrtngsecdf" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-nrtngsecdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="largescaleobserved_files/figure-html/fig-nrtngsecdf-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-nrtngsecdf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Empirical distribution plots of the number of ratings per movie and per user. The horizontal axes are on a logarithmic scale.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>In this collection of over 27 million ratings, nearly 20% of the movies are rated only once and nearly half of the movies were rated 6 or fewer times.</p>
-<div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="fu">≤</span>(<span class="fl">6</span>), movies.nrtngs) <span class="op">/</span> <span class="fu">length</span>(movies.nrtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div id="2950a096" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="fu">≤</span>(<span class="fl">6</span>), movies.nrtngs) <span class="op">/</span> <span class="fu">length</span>(movies.nrtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>0.4967989756722151</code></pre>
 </div>
 </div>
@@ -529,21 +574,21 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 <p>Movies with very few ratings provide little information about overall trends or even about the movie being rated. We can imagine that the “shrinkage” of random effects for movies with just a few ratings pulls their adjusted rating strongly towards the overall average.</p>
 <p>Furthermore, the distribution of ratings for movies with only one rating is systematically lower than the distribution of ratings for movies rated at least five times.</p>
 <p>First, add <code>nrtngs</code> and <code>urtngs</code> as columns of the <code>ratings</code> table.</p>
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> <span class="fu">Table</span>(</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disallowmissing!</span>(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin!</span>(</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">leftjoin!</span>(</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(ratings),</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(<span class="fu">getproperties</span>(movies, (<span class="op">:</span>movieId, <span class="op">:</span>nrtngs)));</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        on<span class="op">=:</span>movieId,</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">DataFrame</span>(<span class="fu">getproperties</span>(users, (<span class="op">:</span>userId, <span class="op">:</span>urtngs)));</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>      on<span class="op">=:</span>userId,</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="11">
+<div id="69800ed1" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disallowmissing!</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin!</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">leftjoin!</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(ratings),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">DataFrame</span>(<span class="fu">getproperties</span>(movies, (<span class="op">:</span>movieId, <span class="op">:</span>nrtngs)));</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        on<span class="op">=:</span>movieId,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">DataFrame</span>(<span class="fu">getproperties</span>(users, (<span class="op">:</span>userId, <span class="op">:</span>urtngs)));</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      on<span class="op">=:</span>userId,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>Table with 5 columns and 27753444 rows:
       userId  movieId  rating  nrtngs  urtngs
     ┌────────────────────────────────────────
@@ -574,43 +619,47 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>then create a bar chart of the two distributions</p>
-<div class="cell" data-execution_count="12">
-<details>
+<div id="cell-fig-ratingsbarcharts" class="cell" data-execution_count="12">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  fiveplus <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, <span class="fl">10</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  onlyone <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, <span class="fl">10</span>)</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i, n) <span class="kw">in</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">zip</span>(<span class="fu">round</span>.(<span class="dt">Int</span>, <span class="fu">Float32</span>(<span class="fl">2</span>) <span class="op">.*</span> ratings.rating), ratings.nrtngs)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&gt;</span> <span class="fl">4</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>      fiveplus[i] <span class="op">+=</span> <span class="fl">1</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elseif</span> <span class="fu">isone</span>(n)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>      onlyone[i] <span class="op">+=</span> <span class="fl">1</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  fiveprop <span class="op">=</span> fiveplus <span class="op">./</span> <span class="fu">sum</span>(fiveplus)</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  oneprop <span class="op">=</span> onlyone <span class="op">./</span> <span class="fu">sum</span>(onlyone)</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>((;</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>      props<span class="op">=</span><span class="fu">vcat</span>(fiveprop, oneprop),</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>      rating<span class="op">=</span><span class="fu">repeat</span>(<span class="fl">0.5</span><span class="op">:</span><span class="fl">0.5</span><span class="op">:</span><span class="fl">5.0</span>; outer<span class="op">=</span><span class="fl">2</span>),</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>      nratings<span class="op">=</span><span class="fu">repeat</span>([<span class="st">"≥5"</span>, <span class="st">"only 1"</span>]; inner<span class="op">=</span><span class="fl">10</span>),</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    )) <span class="op">*</span></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>rating <span class="op">=&gt;</span> nonnumeric,</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>props <span class="op">=&gt;</span> <span class="st">"Proportion of ratings"</span>;</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>      color<span class="op">=:</span>nratings <span class="op">=&gt;</span> <span class="st">"Ratings/movie"</span>,</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>      dodge<span class="op">=:</span>nratings,</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(BarPlot),</span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  fiveplus <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, <span class="fl">10</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  onlyone <span class="op">=</span> <span class="fu">zeros</span>(<span class="dt">Int</span>, <span class="fl">10</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i, n) <span class="kw">in</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">zip</span>(<span class="fu">round</span>.(<span class="dt">Int</span>, <span class="fu">Float32</span>(<span class="fl">2</span>) <span class="op">.*</span> ratings.rating), ratings.nrtngs)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&gt;</span> <span class="fl">4</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>      fiveplus[i] <span class="op">+=</span> <span class="fl">1</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elseif</span> <span class="fu">isone</span>(n)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>      onlyone[i] <span class="op">+=</span> <span class="fl">1</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  fiveprop <span class="op">=</span> fiveplus <span class="op">./</span> <span class="fu">sum</span>(fiveplus)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  oneprop <span class="op">=</span> onlyone <span class="op">./</span> <span class="fu">sum</span>(onlyone)</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw</span>(</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data</span>((;</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>      props<span class="op">=</span><span class="fu">vcat</span>(fiveprop, oneprop),</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>      rating<span class="op">=</span><span class="fu">repeat</span>(<span class="fl">0.5</span><span class="op">:</span><span class="fl">0.5</span><span class="op">:</span><span class="fl">5.0</span>; outer<span class="op">=</span><span class="fl">2</span>),</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>      nratings<span class="op">=</span><span class="fu">repeat</span>([<span class="st">"≥5"</span>, <span class="st">"only 1"</span>]; inner<span class="op">=</span><span class="fl">10</span>),</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    )) <span class="op">*</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mapping</span>(</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>rating <span class="op">=&gt;</span> nonnumeric,</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">:</span>props <span class="op">=&gt;</span> <span class="st">"Proportion of ratings"</span>;</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>      color<span class="op">=:</span>nratings <span class="op">=&gt;</span> <span class="st">"Ratings/movie"</span>,</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>      dodge<span class="op">=:</span>nratings,</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="op">*</span></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">visual</span>(BarPlot),</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="12">
-<div id="fig-ratingsbarcharts" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="largescaleobserved_files/figure-html/fig-ratingsbarcharts-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;5.2: Distribution of ratings for movies with only one rating compared to movies with at least 5 ratings</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div id="fig-ratingsbarcharts" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ratingsbarcharts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="largescaleobserved_files/figure-html/fig-ratingsbarcharts-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ratingsbarcharts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: Distribution of ratings for movies with only one rating compared to movies with at least 5 ratings
+</figcaption>
 </figure>
 </div>
 </div>
@@ -618,13 +667,13 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 <p>Similarly, users who rate very few movies add little information, even about the movies that they rated, because there isn’t sufficient information to contrast a specific rating with a typical rating for the user.</p>
 <p>One way of dealing with the extreme imbalance in the number of observations per user or per movie is to set a threshold on the number of observations for a user or a movie to be included in the data used to fit the model. For example, a companion data set on grouplens.org, available in the <a href="https://files.grouplens.org/datasets/movielens/ml-25n.zip">ml-25m.zip</a> archive, included only users who had rated at least 20 movies.</p>
 <p>To be able to select ratings according to the number of ratings per user and the number of ratings per movie, we left-joined the <code>movies.nrtngs</code> and <code>users.urtngs</code> columns into the <code>ratings</code> data frame.</p>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(ratings))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="13">
+<div id="3fd09d1b" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(ratings))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
 <div><div style="float: left;"><span>5×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
-<tr class="header header">
+<tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">variable</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
@@ -720,14 +769,14 @@ Seemingly inconsistent medians of “nrtngs” and “urtngs”
 </section>
 <section id="sec-lrgobsmods" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="sec-lrgobsmods"><span class="header-section-number">5.2</span> Models fit with lower bounds on ratings per user and per movie</h2>
-<p>We fit a simple model to this dataset using different thresholds on the number of ratings per movie and the number of ratings per user. These fits were performed on compute servers with generous amounts of memory (128 GiB/node) and numbers of compute cores (48/node). A sample fit is shown in <a href="#sec-lrgobsmemprint"><span>Section&nbsp;5.2.2</span></a>.</p>
+<p>We fit a simple model to this dataset using different thresholds on the number of ratings per movie and the number of ratings per user. These fits were performed on compute servers with generous amounts of memory (128 GiB/node) and numbers of compute cores (48/node). A sample fit is shown in <a href="#sec-lrgobsmemprint" class="quarto-xref"><span>Section 5.2.2</span></a>.</p>
 <p>The results are summarized in the following table</p>
-<div class="cell" data-execution_count="14">
-<details>
+<div id="e70e1c39" class="cell" data-execution_count="14">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sizespeed <span class="op">=</span> <span class="fu">Table</span>(<span class="fu">dataset</span>(<span class="op">:</span>sizespeed))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sizespeed <span class="op">=</span> <span class="fu">Table</span>(<span class="fu">dataset</span>(<span class="op">:</span>sizespeed))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="15">
 <pre><code>Table with 10 columns and 21 rows:
       mc  uc  nratings  nusers  nmvie  modelsz  L22sz    nv  fittime  evtime
     ┌────────────────────────────────────────────────────────────────────────
@@ -755,143 +804,130 @@ Seemingly inconsistent medians of “nrtngs” and “urtngs”
 </div>
 </div>
 <p>In this table, <code>mc</code> is the “movie cutoff” (i.e.&nbsp;the threshold on the number of ratings per movie); <code>uc</code> is the user cutoff (threshold on the number of ratings per user); <code>nratings</code>, <code>nusers</code> and <code>nmvie</code> are the number of ratings, users and movies in the resulting trimmed data set; <code>modelsz</code> is the size (in GiB) of the model fit; <code>L22sz</code> is the size of the [2,2] block of the <code>L</code> matrix in that model; <code>fittime</code> is the time (in seconds) required to fit the model; <code>nev</code> is the number of function evaluations until convergence; and <code>evtime</code> is the time (s) per function evaluation.</p>
-<p>The “[2,2] block of the <code>L</code> matrix” is described in <a href="#sec-lrgobsmemprint"><span>Section&nbsp;5.2.2</span></a>.</p>
+<p>The “[2,2] block of the <code>L</code> matrix” is described in <a href="#sec-lrgobsmemprint" class="quarto-xref"><span>Section 5.2.2</span></a>.</p>
 <section id="dimensions-of-the-model-versus-cut-off-values" class="level3" data-number="5.2.1">
 <h3 data-number="5.2.1" class="anchored" data-anchor-id="dimensions-of-the-model-versus-cut-off-values"><span class="header-section-number">5.2.1</span> Dimensions of the model versus cut-off values</h3>
-<p>First we consider the effects of the minimum number of ratings per user and per movie on the dimensions of the data set, as shown in <a href="#fig-dimsbarchart">Figure&nbsp;<span>5.3</span></a>.</p>
-<div class="cell" data-execution_count="16">
-<details>
+<p>First we consider the effects of the minimum number of ratings per user and per movie on the dimensions of the data set, as shown in <a href="#fig-dimsbarchart" class="quarto-xref">Figure&nbsp;<span>5.3</span></a>.</p>
+<div id="cell-fig-dimsbarchart" class="cell" data-execution_count="16">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">1000</span>))</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  xlabel <span class="op">=</span> <span class="st">"Minimum number of ratings per movie"</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  mc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.mc)</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="fu">string</span>.(<span class="fu">refpool</span>(sizespeed.mc)))</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  uc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.uc)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Legend</span>(</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    lelements,</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    llabels,</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    ltitle;</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    orientation<span class="op">=:</span>horizontal,</span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    tellwidth<span class="op">=</span><span class="cn">false</span>,</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    tellheight<span class="op">=</span><span class="cn">true</span>,</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">2</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Number of users"</span>),</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>    sizespeed.nusers;</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">3</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Number of movies"</span>),</span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>    sizespeed.nmvie;</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">4</span>, <span class="fl">1</span>]; xlabel, xticks, ylabel<span class="op">=</span><span class="st">"Number of observations"</span>),</span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>    sizespeed.nratings;</span>
-<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>  f</span>
-<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">1000</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  xlabel <span class="op">=</span> <span class="st">"Minimum number of ratings per movie"</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  mc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.mc)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="fu">string</span>.(<span class="fu">refpool</span>(sizespeed.mc)))</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  uc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.uc)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Legend</span>(</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    lelements,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    llabels,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    ltitle;</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    orientation<span class="op">=:</span>horizontal,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    tellwidth<span class="op">=</span><span class="cn">false</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    tellheight<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">2</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Number of users"</span>),</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    sizespeed.nusers;</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">3</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Number of movies"</span>),</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    sizespeed.nmvie;</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">4</span>, <span class="fl">1</span>]; xlabel, xticks, ylabel<span class="op">=</span><span class="st">"Number of observations"</span>),</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>    sizespeed.nratings;</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>  f</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="16">
-<div id="fig-dimsbarchart" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="largescaleobserved_files/figure-html/fig-dimsbarchart-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;5.3: Bar plot of data set dimensions by minimum number of ratings per user and per movie.</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div id="fig-dimsbarchart" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dimsbarchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="largescaleobserved_files/figure-html/fig-dimsbarchart-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dimsbarchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Bar plot of data set dimensions by minimum number of ratings per user and per movie.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>Unsurprisingly, <a href="#fig-dimsbarchart">Figure&nbsp;<span>5.3</span></a> shows that increasing the minimum number of ratings per user decreases the number of users, does not noticeably affect the number of movies, and results in small decreases in the total number of ratings. Conversely, increasing the minimum number of ratings per movie does not noticeably affect the number of users, causes dramatic reductions in the number of movies and has very little effect on the total number of ratings.</p>
+<p>Unsurprisingly, <a href="#fig-dimsbarchart" class="quarto-xref">Figure&nbsp;<span>5.3</span></a> shows that increasing the minimum number of ratings per user decreases the number of users, does not noticeably affect the number of movies, and results in small decreases in the total number of ratings. Conversely, increasing the minimum number of ratings per movie does not noticeably affect the number of users, causes dramatic reductions in the number of movies and has very little effect on the total number of ratings.</p>
 </section>
 <section id="sec-lrgobsmemprint" class="level3" data-number="5.2.2">
 <h3 data-number="5.2.2" class="anchored" data-anchor-id="sec-lrgobsmemprint"><span class="header-section-number">5.2.2</span> Memory footprint of the model representation</h3>
 <p>To explain what “the [2,2] block of the <code>L</code> matrix” is and why its size is important, we provide a brief overview of the evaluation of the “profiled” log-likelihood for a <code>LinearMixedModel</code> representation.</p>
 <p>To make the discussion concrete we consider one of the models represented in this table, with cut-offs of 20 ratings per user and 20 ratings per movie. This, and any of the models shown in the table, can be restored in a few minutes from the saved <code>optsum</code> values, as opposed to taking up to two hours to perform the fit.</p>
-<div class="cell" data-execution_count="17">
-<details>
+<div id="7bc714dc" class="cell" data-execution_count="17">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">ratingsoptsum</span>(</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  mcutoff<span class="op">::</span><span class="dt">Integer</span>,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  ucutoff<span class="op">::</span><span class="dt">Integer</span>;</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  data<span class="op">=</span><span class="fu">Table</span>(ratings),</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  form<span class="op">=</span><span class="pp">@formula</span>(rating <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> userId) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> movieId)),</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  contrasts<span class="op">=</span><span class="fu">Dict</span>(<span class="op">:</span>movieId <span class="op">=&gt;</span> <span class="fu">Grouping</span>(), <span class="op">:</span>userId <span class="op">=&gt;</span> <span class="fu">Grouping</span>()),</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  optsumfnm <span class="op">=</span> <span class="fu">optsumdir</span>(</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mvm</span><span class="sc">$</span>(<span class="fu">lpad</span>(mcutoff, <span class="fl">2</span>, <span class="ch">'0'</span>))<span class="st">u</span><span class="sc">$</span>(<span class="fu">lpad</span>(ucutoff, <span class="fl">2</span>, <span class="ch">'0'</span>))<span class="st">.json"</span>,</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">isfile</span>(optsumfnm) <span class="op">||</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">throw</span>(<span class="fu">ArgumentError</span>(<span class="st">"File </span><span class="sc">$</span>optsumfnm<span class="st"> is not available"</span>))</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">restoreoptsum!</span>(</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearMixedModel</span>(</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>      form,</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>        r <span class="op">-&gt;</span> (r.nrtngs <span class="op">≥</span> mcutoff) <span class="op">&amp;</span> (r.urtngs <span class="op">≥</span> ucutoff),</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>        data,</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>      );</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>      contrasts,</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>    optsumfnm,</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>mvm20u20 <span class="op">=</span> <span class="fu">ratingsoptsum</span>(<span class="fl">20</span>, <span class="fl">20</span>)</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a><span class="fu">println</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">ratingsoptsum</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  mcutoff<span class="op">::</span><span class="dt">Integer</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  ucutoff<span class="op">::</span><span class="dt">Integer</span>;</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  data<span class="op">=</span><span class="fu">Table</span>(ratings),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  form<span class="op">=</span><span class="pp">@formula</span>(rating <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> userId) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> movieId)),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  contrasts<span class="op">=</span><span class="fu">Dict</span>(<span class="op">:</span>movieId <span class="op">=&gt;</span> <span class="fu">Grouping</span>(), <span class="op">:</span>userId <span class="op">=&gt;</span> <span class="fu">Grouping</span>()),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  optsumfnm <span class="op">=</span> <span class="fu">optsumdir</span>(</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mvm</span><span class="sc">$</span>(<span class="fu">lpad</span>(mcutoff, <span class="fl">2</span>, <span class="ch">'0'</span>))<span class="st">u</span><span class="sc">$</span>(<span class="fu">lpad</span>(ucutoff, <span class="fl">2</span>, <span class="ch">'0'</span>))<span class="st">.json"</span>,</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">isfile</span>(optsumfnm) <span class="op">||</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">throw</span>(<span class="fu">ArgumentError</span>(<span class="st">"File </span><span class="sc">$</span>optsumfnm<span class="st"> is not available"</span>))</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">restoreoptsum!</span>(</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearMixedModel</span>(</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>      form,</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>        r <span class="op">-&gt;</span> (r.nrtngs <span class="op">≥</span> mcutoff) <span class="op">&amp;</span> (r.urtngs <span class="op">≥</span> ucutoff),</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>        data,</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>      );</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>      contrasts,</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>    optsumfnm,</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>mvm20u20 <span class="op">=</span> <span class="fu">ratingsoptsum</span>(<span class="fl">20</span>, <span class="fl">20</span>)</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by maximum likelihood
- </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>rating ~ 1 + (1 | userId) + (1 | movieId)</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>     logLik       -2 logLik         AIC           AICc            BIC      </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code> -33644689.0320  67289378.0639  67289386.0639  67289386.0639  67289446.4165
+ rating ~ 1 + (1 | userId) + (1 | movieId)
+     logLik       -2 logLik         AIC           AICc            BIC      
+ -33644689.0320  67289378.0639  67289386.0639  67289386.0639  67289446.4165
 
-Variance components:</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
+Variance components:
             Column   Variance Std.Dev. 
 userId   (Intercept)  0.184529 0.429568
 movieId  (Intercept)  0.242959 0.492909
 Residual              0.732964 0.856133
- Number of obs: 26380766; levels of grouping factors: </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>174605, 18366
+ Number of obs: 26380766; levels of grouping factors: 174605, 18366
 
-  Fixed-effects parameters:</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>──────────────────────────────────────────────────
+  Fixed-effects parameters:
+──────────────────────────────────────────────────
                Coef.  Std. Error       z  Pr(&gt;|z|)
-──────────────────────────────────────────────────</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>(Intercept)  3.43345   0.0038669  887.91    &lt;1e-99
+──────────────────────────────────────────────────
+(Intercept)  3.43345   0.0038669  887.91    &lt;1e-99
 ──────────────────────────────────────────────────</code></pre>
 </div>
 </div>
 <p>Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice — at the initial parameter values and at the final parameter values — during the call to <code>restoreoptsum!</code>.</p>
 <p>Each evaluation of the objective, which requires setting the value of the parameter <span class="math inline">\({\boldsymbol\theta}\)</span> in the numerical representation of the model, updating the blocked Cholesky factor, <span class="math inline">\(\mathbf{L}\)</span>, and evaluating the scalar objective value from this factor, takes a little over a minute (71 seconds) on a server node and probably longer on a laptop.</p>
 <p>The lower triangular <code>L</code> factor is large but sparse. It is stored in six blocks of dimensions and types as shown in</p>
-<div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div id="f37cd906" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="19">
 <table class="table table-sm table-striped small">
 <thead>
 <tr class="header">
@@ -926,24 +962,24 @@ Residual              0.732964 0.856133
 </div>
 <p>This display gives the types of two blocked matrices: <code>A</code> which is derived from the data and does not depend on the parameters, and <code>L</code>, which is derived from <code>A</code> and the <span class="math inline">\({\boldsymbol\theta}\)</span> parameter. The only difference in their structures is in the [2,2] block, which is diagonal in <code>A</code> and a dense, lower triangular matrix in <code>L</code>.</p>
 <p>The memory footprint (bytes) of each of the blocks is</p>
-<div class="cell" data-execution_count="19">
-<details>
+<div id="fcda4a5e" class="cell" data-execution_count="19">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  block <span class="op">=</span> <span class="dt">String</span>[]</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>i</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">push!</span>(block, <span class="st">"[</span><span class="sc">$</span>i<span class="st">,</span><span class="sc">$</span>j<span class="st">]"</span>)</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Table</span>((;</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    block,</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    Abytes<span class="op">=</span><span class="bu">Base</span>.<span class="fu">summarysize</span>.(mvm20u20.A),</span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    Lbytes<span class="op">=</span><span class="bu">Base</span>.<span class="fu">summarysize</span>.(mvm20u20.L),</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  block <span class="op">=</span> <span class="dt">String</span>[]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>i</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">push!</span>(block, <span class="st">"[</span><span class="sc">$</span>i<span class="st">,</span><span class="sc">$</span>j<span class="st">]"</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Table</span>((;</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    block,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    Abytes<span class="op">=</span><span class="bu">Base</span>.<span class="fu">summarysize</span>.(mvm20u20.A),</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    Lbytes<span class="op">=</span><span class="bu">Base</span>.<span class="fu">summarysize</span>.(mvm20u20.L),</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="19">
+<div class="cell-output cell-output-display" data-execution_count="20">
 <pre><code>Table with 3 columns and 6 rows:
      block  Abytes     Lbytes
    ┌─────────────────────────────
@@ -956,86 +992,90 @@ Residual              0.732964 0.856133
 </div>
 </div>
 <p>resulting in total memory footprints (GiB) of</p>
-<div class="cell" data-execution_count="20">
-<details>
+<div id="6715b672" class="cell" data-execution_count="20">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">NamedTuple</span><span class="dt">{(:A, :L)}</span>(</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Base</span>.<span class="fu">summarysize</span>.(<span class="fu">getproperty</span>.(<span class="fu">Ref</span>(mvm20u20), (<span class="op">:</span>A, <span class="op">:</span>L))) <span class="op">./</span> <span class="fl">2</span><span class="op">^</span><span class="fl">30</span>,</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">NamedTuple</span><span class="dt">{(:A, :L)}</span>(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="bu">Base</span>.<span class="fu">summarysize</span>.(<span class="fu">getproperty</span>.(<span class="fu">Ref</span>(mvm20u20), (<span class="op">:</span>A, <span class="op">:</span>L))) <span class="op">./</span> <span class="fl">2</span><span class="op">^</span><span class="fl">30</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="20">
+<div class="cell-output cell-output-display" data-execution_count="21">
 <pre><code>(A = 0.29979219287633896, L = 2.8128103613853455)</code></pre>
 </div>
 </div>
 <p>That is, <code>L</code> requires roughly 10 times the amount of storage as does <code>A</code>, and that difference is entirely due to the different structure of the [2,2] block.</p>
 <p>This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as <a href="https://en.wikipedia.org/wiki/Sparse_matrix">fill-in</a>.</p>
 <p>Note that although the dimensions of the [2,1] block are larger than those of the [2,2] block its memory footprint is smaller because it is a sparse matrix. The matrix is over 99% zeros or, equivalently, less than 1% nonzeros,</p>
-<div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  L21 <span class="op">=</span> mvm20u20.L[<span class="fl">2</span>]  <span class="co"># blocks are stored in a one-dimensional array</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nnz</span>(L21) <span class="op">/</span> <span class="fu">length</span>(L21)</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div id="96bfbef2" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  L21 <span class="op">=</span> mvm20u20.L[<span class="fl">2</span>]  <span class="co"># blocks are stored in a one-dimensional array</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nnz</span>(L21) <span class="op">/</span> <span class="fu">length</span>(L21)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
 <pre><code>0.008226519768989443</code></pre>
 </div>
 </div>
 <p>which makes the sparse representation much smaller than the dense representation.</p>
-<p>This fill-in of the [2,2] block leads to a somewhat unintuitive conclusion. The memory footprint of the model representation depends strongly on the number of movies, less strongly on the number of users and almost not at all on the number of ratings. The first two parts of this conclusion are illustrated in <a href="#fig-memoryfootprint">Figure&nbsp;<span>5.4</span></a>.</p>
-<div class="cell" data-execution_count="22">
-<details>
+<p>This fill-in of the [2,2] block leads to a somewhat unintuitive conclusion. The memory footprint of the model representation depends strongly on the number of movies, less strongly on the number of users and almost not at all on the number of ratings. The first two parts of this conclusion are illustrated in <a href="#fig-memoryfootprint" class="quarto-xref">Figure&nbsp;<span>5.4</span></a>.</p>
+<div id="cell-fig-memoryfootprint" class="cell" data-execution_count="22">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">1000</span>))</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  xlabel <span class="op">=</span> <span class="st">"Minimum number of ratings per movie"</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  mc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.mc)</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="fu">string</span>.(<span class="fu">refpool</span>(sizespeed.mc)))</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  uc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.uc)</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Legend</span>(</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>    lelements,</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    llabels,</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>    ltitle;</span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    orientation<span class="op">=:</span>horizontal,</span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    tellwidth<span class="op">=</span><span class="cn">false</span>,</span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    tellheight<span class="op">=</span><span class="cn">true</span>,</span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">2</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Memory requirement (GiB)"</span>),</span>
-<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a>    sizespeed.modelsz;</span>
-<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">3</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Size of L[2,2] (GiB)"</span>),</span>
-<span id="cb41-26"><a href="#cb41-26" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb41-27"><a href="#cb41-27" aria-hidden="true" tabindex="-1"></a>    sizespeed.L22sz;</span>
-<span id="cb41-28"><a href="#cb41-28" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb41-29"><a href="#cb41-29" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb41-30"><a href="#cb41-30" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb41-31"><a href="#cb41-31" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb41-32"><a href="#cb41-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb41-33"><a href="#cb41-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">4</span>, <span class="fl">1</span>]; xlabel, xticks, ylabel<span class="op">=</span><span class="st">"L[2,2] memory fraction"</span>),</span>
-<span id="cb41-34"><a href="#cb41-34" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb41-35"><a href="#cb41-35" aria-hidden="true" tabindex="-1"></a>    sizespeed.L22prop;</span>
-<span id="cb41-36"><a href="#cb41-36" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb41-37"><a href="#cb41-37" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb41-38"><a href="#cb41-38" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb41-39"><a href="#cb41-39" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb41-40"><a href="#cb41-40" aria-hidden="true" tabindex="-1"></a>  f</span>
-<span id="cb41-41"><a href="#cb41-41" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">1000</span>))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  xlabel <span class="op">=</span> <span class="st">"Minimum number of ratings per movie"</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  mc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.mc)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="fu">string</span>.(<span class="fu">refpool</span>(sizespeed.mc)))</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  uc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.uc)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Legend</span>(</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    lelements,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    llabels,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    ltitle;</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    orientation<span class="op">=:</span>horizontal,</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    tellwidth<span class="op">=</span><span class="cn">false</span>,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    tellheight<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">2</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Memory requirement (GiB)"</span>),</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    sizespeed.modelsz;</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">3</span>, <span class="fl">1</span>]; xticks, ylabel<span class="op">=</span><span class="st">"Size of L[2,2] (GiB)"</span>),</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>    sizespeed.L22sz;</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(f[<span class="fl">4</span>, <span class="fl">1</span>]; xlabel, xticks, ylabel<span class="op">=</span><span class="st">"L[2,2] memory fraction"</span>),</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>    sizespeed.L22prop;</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>  f</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="22">
-<div id="fig-memoryfootprint" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="largescaleobserved_files/figure-html/fig-memoryfootprint-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;5.4: Bar plot of memory footprint of the model representation by minimum number of ratings per user and per movie.</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div id="fig-memoryfootprint" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-memoryfootprint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="largescaleobserved_files/figure-html/fig-memoryfootprint-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-memoryfootprint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.4: Bar plot of memory footprint of the model representation by minimum number of ratings per user and per movie.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-memoryfootprint">Figure&nbsp;<span>5.4</span></a> shows that when all the movies are included in the data to which the model is fit (i.e.&nbsp;<code>mc == 1</code>) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the <code>[2,2]</code> block of <code>L</code>. Even when requiring a minimum of 50 ratings per movie, the <code>[2,2]</code> block of <code>L</code> is over 30% of the memory footprint.</p>
+<p><a href="#fig-memoryfootprint" class="quarto-xref">Figure&nbsp;<span>5.4</span></a> shows that when all the movies are included in the data to which the model is fit (i.e.&nbsp;<code>mc == 1</code>) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the <code>[2,2]</code> block of <code>L</code>. Even when requiring a minimum of 50 ratings per movie, the <code>[2,2]</code> block of <code>L</code> is over 30% of the memory footprint.</p>
 <p>In a sense this is good news because the amount of storage required for the <code>[2,2]</code> block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix. The <a href="https://netlib.org/lapack/lawnspdf/lawn199.pdf">rectangular full packed format</a> looks especially promising for this purpose.</p>
 <p>In general, for models with scalar random effects for two incompletely crossed grouping factors, the memory footprint depends strongly on the smaller of the number of levels of the grouping factors, less strongly on the larger number, and almost not at all on the number of observations.</p>
 </section>
@@ -1043,109 +1083,117 @@ Residual              0.732964 0.856133
 <h3 data-number="5.2.3" class="anchored" data-anchor-id="speed-of-log-likelihood-evaluation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evaluation</h3>
 <p>The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates. The time for one evaluation is given in the <code>evtime</code> column of <code>sizespeed</code>. Also given is the number of evaluations to convergence, <code>nev</code>, and the time to fit the model, <code>fittime</code> The reason for considering <code>evtime</code> in addition to <code>fittime</code> and <code>nev</code> is because the <code>evtime</code> for one model, relative to other models, is reasonably stable across computers whereas <code>nev</code>, and hence, <code>fittime</code>, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).</p>
 <p>That is, we can’t expect to reproduce <code>nev</code> exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in <code>evtime</code> with respect to <code>uc</code> and <code>mc</code> can be expected to reproducible.</p>
-<div class="cell" data-execution_count="23">
-<details>
+<div id="cell-fig-timetoconverge" class="cell" data-execution_count="23">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">1000</span>))</span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  xlabel <span class="op">=</span> <span class="st">"Minimum number of ratings per movie"</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  mc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.mc)</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="fu">string</span>.(<span class="fu">refpool</span>(sizespeed.mc)))</span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  uc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.uc)</span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Legend</span>(</span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    lelements,</span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>    llabels,</span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    ltitle;</span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    orientation<span class="op">=:</span>horizontal,</span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>    tellwidth<span class="op">=</span><span class="cn">false</span>,</span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    tellheight<span class="op">=</span><span class="cn">true</span>,</span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(</span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>      f[<span class="fl">2</span>, <span class="fl">1</span>];</span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>      xticks,</span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>      ylabel<span class="op">=</span><span class="st">"Log-likelihood evaluation time (m)"</span>,</span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a>    sizespeed.evtime <span class="op">./</span> <span class="fl">60</span>;</span>
-<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb42-25"><a href="#cb42-25" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb42-26"><a href="#cb42-26" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb42-27"><a href="#cb42-27" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb42-28"><a href="#cb42-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb42-29"><a href="#cb42-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(</span>
-<span id="cb42-30"><a href="#cb42-30" aria-hidden="true" tabindex="-1"></a>      f[<span class="fl">3</span>, <span class="fl">1</span>];</span>
-<span id="cb42-31"><a href="#cb42-31" aria-hidden="true" tabindex="-1"></a>      xticks,</span>
-<span id="cb42-32"><a href="#cb42-32" aria-hidden="true" tabindex="-1"></a>      ylabel<span class="op">=</span><span class="st">"Number of evaluations to convergence"</span>,</span>
-<span id="cb42-33"><a href="#cb42-33" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb42-34"><a href="#cb42-34" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb42-35"><a href="#cb42-35" aria-hidden="true" tabindex="-1"></a>    sizespeed.nv;</span>
-<span id="cb42-36"><a href="#cb42-36" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb42-37"><a href="#cb42-37" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb42-38"><a href="#cb42-38" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb42-39"><a href="#cb42-39" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb42-40"><a href="#cb42-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
-<span id="cb42-41"><a href="#cb42-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(</span>
-<span id="cb42-42"><a href="#cb42-42" aria-hidden="true" tabindex="-1"></a>      f[<span class="fl">4</span>, <span class="fl">1</span>];</span>
-<span id="cb42-43"><a href="#cb42-43" aria-hidden="true" tabindex="-1"></a>      xlabel,</span>
-<span id="cb42-44"><a href="#cb42-44" aria-hidden="true" tabindex="-1"></a>      xticks,</span>
-<span id="cb42-45"><a href="#cb42-45" aria-hidden="true" tabindex="-1"></a>      ylabel<span class="op">=</span><span class="st">"Time (hr) to fit the model"</span>,</span>
-<span id="cb42-46"><a href="#cb42-46" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb42-47"><a href="#cb42-47" aria-hidden="true" tabindex="-1"></a>    mc,</span>
-<span id="cb42-48"><a href="#cb42-48" aria-hidden="true" tabindex="-1"></a>    sizespeed.fittime <span class="op">./</span> <span class="fl">3600</span>;</span>
-<span id="cb42-49"><a href="#cb42-49" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
-<span id="cb42-50"><a href="#cb42-50" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
-<span id="cb42-51"><a href="#cb42-51" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
-<span id="cb42-52"><a href="#cb42-52" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb42-53"><a href="#cb42-53" aria-hidden="true" tabindex="-1"></a>  f</span>
-<span id="cb42-54"><a href="#cb42-54" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  f <span class="op">=</span> <span class="fu">Figure</span>(resolution<span class="op">=</span>(<span class="fl">800</span>, <span class="fl">1000</span>))</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  xlabel <span class="op">=</span> <span class="st">"Minimum number of ratings per movie"</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  mc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.mc)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  xticks <span class="op">=</span> (<span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="fu">string</span>.(<span class="fu">refpool</span>(sizespeed.mc)))</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  uc <span class="op">=</span> <span class="fu">refarray</span>(sizespeed.uc)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Legend</span>(</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    f[<span class="fl">1</span>, <span class="fl">1</span>],</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    lelements,</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    llabels,</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    ltitle;</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    orientation<span class="op">=:</span>horizontal,</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    tellwidth<span class="op">=</span><span class="cn">false</span>,</span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    tellheight<span class="op">=</span><span class="cn">true</span>,</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>      f[<span class="fl">2</span>, <span class="fl">1</span>];</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>      xticks,</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>      ylabel<span class="op">=</span><span class="st">"Log-likelihood evaluation time (m)"</span>,</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>    sizespeed.evtime <span class="op">./</span> <span class="fl">60</span>;</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(</span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>      f[<span class="fl">3</span>, <span class="fl">1</span>];</span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>      xticks,</span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>      ylabel<span class="op">=</span><span class="st">"Number of evaluations to convergence"</span>,</span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>    sizespeed.nv;</span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barplot!</span>(</span>
+<span id="cb36-41"><a href="#cb36-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Axis</span>(</span>
+<span id="cb36-42"><a href="#cb36-42" aria-hidden="true" tabindex="-1"></a>      f[<span class="fl">4</span>, <span class="fl">1</span>];</span>
+<span id="cb36-43"><a href="#cb36-43" aria-hidden="true" tabindex="-1"></a>      xlabel,</span>
+<span id="cb36-44"><a href="#cb36-44" aria-hidden="true" tabindex="-1"></a>      xticks,</span>
+<span id="cb36-45"><a href="#cb36-45" aria-hidden="true" tabindex="-1"></a>      ylabel<span class="op">=</span><span class="st">"Time (hr) to fit the model"</span>,</span>
+<span id="cb36-46"><a href="#cb36-46" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb36-47"><a href="#cb36-47" aria-hidden="true" tabindex="-1"></a>    mc,</span>
+<span id="cb36-48"><a href="#cb36-48" aria-hidden="true" tabindex="-1"></a>    sizespeed.fittime <span class="op">./</span> <span class="fl">3600</span>;</span>
+<span id="cb36-49"><a href="#cb36-49" aria-hidden="true" tabindex="-1"></a>    xticks,</span>
+<span id="cb36-50"><a href="#cb36-50" aria-hidden="true" tabindex="-1"></a>    dodge<span class="op">=</span>uc,</span>
+<span id="cb36-51"><a href="#cb36-51" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>uc,</span>
+<span id="cb36-52"><a href="#cb36-52" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb36-53"><a href="#cb36-53" aria-hidden="true" tabindex="-1"></a>  f</span>
+<span id="cb36-54"><a href="#cb36-54" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="23">
-<div id="fig-timetoconverge" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="largescaleobserved_files/figure-html/fig-timetoconverge-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;5.5: Bar plot of function log-likelihood evaluation time by minimum number of ratings per user and per movie.</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div id="fig-timetoconverge" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-timetoconverge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="largescaleobserved_files/figure-html/fig-timetoconverge-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-timetoconverge-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.5: Bar plot of function log-likelihood evaluation time by minimum number of ratings per user and per movie.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p><a href="#fig-timetoconverge">Figure&nbsp;<span>5.5</span></a> shows that the average evaluation time for the log-likelihood function depends strongly on the number of movies and less strongly on the number of users.</p>
+<p><a href="#fig-timetoconverge" class="quarto-xref">Figure&nbsp;<span>5.5</span></a> shows that the average evaluation time for the log-likelihood function depends strongly on the number of movies and less strongly on the number of users.</p>
 <p>However the middle panel shows that the number of iterations to convergence is highly variable. Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.</p>
-<p>The derivation of the log-likelihood for linear mixed-effects models is given in <a href="linalg.html#sec-lmmtheory"><span>Section&nbsp;B.7</span></a>, which provides a rather remarkable result: the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.</p>
+<p>The derivation of the log-likelihood for linear mixed-effects models is given in <a href="linalg.html#sec-lmmtheory" class="quarto-xref"><span>Section B.7</span></a>, which provides a rather remarkable result: the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.</p>
 <p>There are two blocked matrices, <code>A</code> and <code>L</code>, stored in the model representation and, for large models such as we are considering these are the largest fields in</p>
 </section>
 </section>
 <section id="model-size-and-speed-for-different-thresholds" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="model-size-and-speed-for-different-thresholds"><span class="header-section-number">5.3</span> Model size and speed for different thresholds</h2>
-<div class="cell" data-execution_count="24">
-<details>
+<div id="cell-fig-L22vsmodelsz" class="cell" data-execution_count="24">
+<details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(sizespeed) <span class="op">*</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>L22sz <span class="op">=&gt;</span> <span class="st">"Size (GiB) of 2,2 block of L"</span>,</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>modelsz <span class="op">=&gt;</span> <span class="st">"Size (GiB) of model representation"</span>;</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>uc,</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visual</span>(Scatter),</span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">draw</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data</span>(sizespeed) <span class="op">*</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapping</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>L22sz <span class="op">=&gt;</span> <span class="st">"Size (GiB) of 2,2 block of L"</span>,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>modelsz <span class="op">=&gt;</span> <span class="st">"Size (GiB) of model representation"</span>;</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=:</span>uc,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="op">*</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">visual</span>(Scatter),</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<div id="fig-l22vsmodelsz" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="largescaleobserved_files/figure-html/fig-l22vsmodelsz-output-1.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the entire model. Colors are determined by the minimum number of ratings per user in the data to which the model was fit.</figcaption>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div id="fig-l22vsmodelsz" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-l22vsmodelsz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="largescaleobserved_files/figure-html/fig-l22vsmodelsz-output-1.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-l22vsmodelsz-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the entire model. Colors are determined by the minimum number of ratings per user in the data to which the model was fit.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
 <p>Linear regression of the <code>modelsz</code> versus the number of users and <code>L22sz</code>.</p>
-<div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>sizemod <span class="op">=</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(<span class="pp">@formula</span>(<span class="fu">Float64</span>(modelsz) <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> nusers <span class="op">+</span> L22sz), sizespeed)</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftable</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="25">
+<div id="ddc93242" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>sizemod <span class="op">=</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(<span class="pp">@formula</span>(<span class="fu">Float64</span>(modelsz) <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> nusers <span class="op">+</span> L22sz), sizespeed)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftable</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display cell-output-markdown" data-execution_count="26">
 <table class="table table-sm table-striped small">
 <colgroup>
 <col style="width: 16%">
@@ -1200,18 +1248,18 @@ Residual              0.732964 0.856133
 </div>
 </div>
 <p>provides an <span class="math inline">\(r^2\)</span> value very close to one, indicating an almost perfect fit.</p>
-<div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r²</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="26">
+<div id="fe2b7a37" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r²</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
 <pre><code>0.9999981449902416</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/573bdf6
-">573bdf6
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/4cd5e78
+">4cd5e78
 </a>.</em></p>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-line-spacing="2" role="list" style="display: none">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list" style="display: none">
 <div id="ref-Balota_2007" class="csl-entry" role="listitem">
 Balota, D. A., Yap, M. J., Hutchison, K. A., Cortese, M. J., Kessler, B., Loftis, B., Neely, J. H., Nelson, D. L., Simpson, G. B., &amp; Treiman, R. (2007). The <span>E</span>nglish lexicon project. <em>Behavior Research Methods</em>, <em>39</em>(3), 445–459. <a href="https://doi.org/10.3758/bf03193014">https://doi.org/10.3758/bf03193014</a>
 </div>
@@ -1301,10 +1349,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1314,8 +1361,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1328,6 +1384,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1371,6 +1546,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1396,6 +1572,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1457,17 +1659,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./largescaledesigned.html" class="pagination-link">
+      <a href="./largescaledesigned.html" class="pagination-link  aria-label=" &lt;span="" large-scale="" designed="" experiment&lt;="" span&gt;"="">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">A large-scale designed experiment</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./glmmbernoulli.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized Linear Mixed Models for Binary Responses</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./glmmbernoulli.html" class="pagination-link" aria-label="<span class='chapter-number'>6</span>&nbsp; <span class='chapter-title'>Generalized linear mixed models for binary responses</span>">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized linear mixed models for binary responses</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
+
 
 
 
