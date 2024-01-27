@@ -1,8 +1,8 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
-# A Simple, Linear, Mixed-Effects Model {#sec-examlmm}
+# A simple, linear, mixed-effects model {#sec-examlmm}
 
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
@@ -102,20 +102,18 @@ To access these data within `Julia` we must first attach this package, and other
 ```{julia}
 #| code-fold: show
 #| output: false
+#| label: packages01
 using AlgebraOfGraphics # high-level graphics
 using CairoMakie        # graphics back-end
 using DataFrameMacros   # elegant DataFrame manipulation
 using DataFrames        # DataFrame implementation
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
-using ProgressMeter     # progress of optimizer iterations
 using Random            # random number generation
 using StatsBase         # basic statistical summaries
 
-using EmbraceUncertainty: dataset # `dataset` means this one
-
-CairoMakie.activate!(; type="svg")    # Scalable Vector Graphics
-ProgressMeter.ijulia_behavior(:clear) # suppress progress output
+CairoMakie.activate!(; type="svg") # set Scalable Vector Graphics output
+using EmbraceUncertainty: dataset  # `dataset` means this one
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -142,6 +140,7 @@ in examples and in tests of the `MixedModels` package.
 :::
 
 ```{julia}
+#| label: dyestuff_data
 dyestuff = dataset(:dyestuff)
 ```
 
@@ -152,12 +151,14 @@ This particular table, read from an `Arrow` file, will be read-only.
 Often it is convenient to convert the read-only table form to a `DataFrame` to be able to use the full power of the [DataFrames](https://github.com/JuliaData/DataFrames.jl) package.
 
 ```{julia}
+#| label: dyestuff_dataframe
 dyestuff = DataFrame(dyestuff)
 ```
 
 The `describe` method for a `DataFrame` provides a concise description of the structure of the data,
 
 ```{julia}
+#| label: describe_dyestuff
 describe(dyestuff)
 ```
 
@@ -194,6 +195,7 @@ last(dyestuff, 7)
 or we could tabulate the data using `groupby` and `combine` from [DataFrames](https://github.com/JuliaData/DataFrames.jl).
 
 ```{julia}
+#| label: dyestuff_summary
 combine(groupby(dyestuff, :batch), :yield => mean, nrow => :n)
 ```
 
@@ -203,6 +205,7 @@ Although this table does show us an important property of the data, namely that 
 #| fig-cap: Yield of dyestuff by batch.  The line joins the mean yields.
 #| label: fig-dyestuffdata
 #| code-fold: true
+#| warning: false
 let
   sumry = sort!(combine(groupby(dyestuff, :batch), :yield => mean => :yield), :yield)
   mp = mapping(
@@ -253,10 +256,12 @@ The data are simulated data presented in @box73:_bayes_infer_statis_analy [, Tab
 The structure and summary
 
 ```{julia}
+#| label: dyestuff2
 dyestuff2 = dataset(:dyestuff2)
 ```
 
 ```{julia}
+#| label: dyestuff2_dataframe
 dyestuff2 = DataFrame(dyestuff2)
 describe(dyestuff2)
 ```
@@ -269,6 +274,7 @@ A data plot (@fig-dyestuff2data)
 #| fig-cap: Artificial data of yield by batch.  The line joins the mean yields.
 #| label: fig-dyestuff2data
 #| code-fold: true
+#| warning: false
 let
   sumry = sort!(combine(groupby(dyestuff2, :batch), :yield => mean => :yield), :yield)
   mp = mapping(
@@ -302,9 +308,9 @@ We will explain the structure of the formula after we have considered an example
 We fit a model to the data allowing for an overall level of the `yield` and for an additive random effect for each level of `batch`.
 
 ```{julia}
-dsm01 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff)
+#| label: dsm01
+dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff; progress=false)
 end
 ```
 
@@ -312,10 +318,23 @@ By default, this compact display of mixed-effects model fits is used in [Jupyter
 To obtain more information we can `print` the model, as in
 
 ```{julia}
-println(dsm01)
+print(dsm01)
 ```
 
 The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) parameter estimates, assigns the results to the name `dsm01`, and displays a summary of the fitted model.
+
+:::{.callout-note collapse="true"}
+### The named argument, progress=false
+
+The estimates are determined via an iterative optimization algorithm.
+In an interactive session a progress bar showing the number of iterations, the current value of the objective and the average time per iteration is displayed during this optimization.
+For a static display of the results in a book we suppress this display with the optional, named argument `progress=false`.
+
+Note that the punctuation used to separate the positional arguments (the first three arguments) from the named argument is a semi-colon, not a comma.
+In this function call the semi-colon is optional -- a comma could be used instead.
+In @sec-stylistic we describe a form of argument passing for which the semi-colon is required.
+
+:::
 
 ### Details of the printed display {#sec-printeddetails}
 
@@ -377,11 +396,11 @@ An alternative measure of precision of the estimate - a coverage interval based 
 Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\sigma}_1=0$.
 
 ```{julia}
-dsm02 = let
-  form = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, form, dyestuff2)
+#| label: dsm02
+dsm02 = let f = @formula(yield ~ 1 + (1 | batch))
+  fit(MixedModel, f, dyestuff2; progress=false)
 end
-println(dsm02)
+print(dsm02)
 ```
 
 An estimate of $0$ for $\sigma_1$ does not mean that there is no variation between the groups.
@@ -560,10 +579,10 @@ The object returned by a call to `parametricbootstrap` has a somewhat complex in
 To examine the distribution of the parameter estimates we extract a table of all the estimated parameters and convert it to a `DataFrame`.
 
 ```{julia}
+#| label: dsm01samp
 #| warning: false
-const hide_progress = true # hide the progress bar when sampling
 Random.seed!(4321234)      # random number generator
-dsm01samp = parametricbootstrap(10_000, dsm01; hide_progress)
+dsm01samp = parametricbootstrap(10_000, dsm01; progress=false)
 dsm01pars = DataFrame(dsm01samp.allpars)
 first(dsm01pars, 7)
 ```
@@ -593,6 +612,7 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| code-fold: true
 #| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
+#| warning: false
 draw(
   data(@subset(dsm01pars, :type == "β")) *
   mapping(
@@ -617,6 +637,7 @@ The situation is different for the estimates of the standard deviation parameter
 #| code-fold: true
 #| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
+#| warning: false
 draw(
   data(@subset(dsm01pars, :type == "σ")) *
   mapping(
@@ -646,6 +667,7 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 #| code-fold: true
 #| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
 #| label: fig-dsm01_bs_sigma_hist
+#| warning: false
 draw(
   data(@subset(dsm01pars, :type == "σ")) *
   mapping(
@@ -657,10 +679,12 @@ draw(
 )
 ```
 
-Nearly 1000 of the 10,000 bootstrap fits are "singular" in that one (or more) of the estimated unconditional distribution(s) of the random effects are degenerate.
-For this model the only way singularity can occur is for $\sigma_1$ to be zero.
+Nearly 1000 of the 10,000 bootstrap fits are "singular" in that the estimated unconditional distribution of the random effects is degenerate.
+(A model with multiple grouping factors is singular if one or more of the unconditional distributions of the random effects is degenerate. 
+For this model the only way singularity can occur is for $\sigma_1$ to be zero.)
 
 ```{julia}
+#| label: dsm01samp_singular
 count(issingular(dsm01samp))
 ```
 
@@ -674,6 +698,7 @@ In many cases standard errors are quoted for estimates of the variance component
 #| code-fold: true
 #| fig-cap: Histogram of bootstrap variance-components from model dsm01
 #| label: fig-dsm01_bs_sigmasqr_hist
+#| warning: false
 draw(
   data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
   mapping(
@@ -715,11 +740,13 @@ The interval on the residual standard deviation, $\sigma$, is reasonable, given 
 The optional argument, `thin=1`, in a call to `fit` causes all the values of $\boldsymbol\theta$ and the corresponding value of objective from the iterative optimization to be stored in the `optsum` property.
 
 ```{julia}
+#| label: dsm01trace
 dsm01trace = fit(
   MixedModel,
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   thin=1,
+  progress=false,
 )
 DataFrame(dsm01trace.optsum.fitlog)
 ```
@@ -761,22 +788,23 @@ The variable or expression on the right of the `|` is the grouping factor for th
 If the expression on the left of the vertical bar is `1`, as it is here, we describe the term as a *simple, scalar, random-effects term*.
 The designation "scalar" means there will be exactly one random effect generated for each level of the grouping factor.
 A simple, scalar term generates a block of indicator columns --- the indicators for the grouping factor --- in $\bbZ$.
-Because there is only one random-effects term in this model and because that term is a simple, scalar term, the model matrix $\bbZ$ for this model is the indicator matrix for the levels of `batch`, as shown earlier in this section.
+Because there is only one random-effects term in this model and because that term is a simple, scalar term, the model matrix $\bbZ$ for this model is the indicator matrix for the levels of `batch`, as shown in @sec-modelformulation.
 
 In the next chapter we fit models with multiple simple, scalar terms and, in subsequent chapters, we extend random-effects terms beyond simple, scalar terms.
-When we have only simple, scalar terms in the model, each term has a unique grouping factor and the elements of the list returned by can be considered as associated with terms or with grouping factors.
+When we have only simple, scalar terms in the model, each term has a unique grouping factor and the elements of the vector returned as the `b` property can be considered as associated with terms or with grouping factors.
 In more complex models a particular grouping factor may occur in more than one term.
 In such cases the terms associated with the same grouping factor are internally amalgamated into a single term.
 Thus internally the random effects are associated with grouping factors, not the terms in the model formula.
 
 Given the data, $\bby$, and the parameter estimates, we can evaluate a measure of the dispersion of $(\mcB|\mcY=\bby)$.
 In the case of a linear mixed model, this is the conditional standard deviation, from which we can obtain a prediction interval.
-A plot of these prediction intervals is sometimes called a *caterpillar plot* because it can look like a fuzzy caterpillar when there are many levels of the grouping factor.
+A plot of these prediction intervals is sometimes called a *caterpillar plot* because it can look like a fuzzy caterpillar (e.g. @fig-iem01qqcaterpillard) when there are many levels of the grouping factor.
 
 ```{julia}
 #| code-fold: true
 #| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
+#| warning: false
 caterpillar!(
   Figure(resolution=(800, 250)),
   ranefinfo(dsm01, :batch),
@@ -791,6 +819,7 @@ An alternative, the `qqcaterpillar` function
 #| code-fold: true
 #| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
+#| warning: false
 qqcaterpillar!(
   Figure(resolution=(800, 250)),
   ranefinfo(dsm01, :batch),
@@ -805,15 +834,15 @@ When there are hundreds or thousands of random effects the `qqcaterpillar` form 
 ## Some stylistic conventions {#sec-stylistic}
 
 To make it easier to recognize the form of the many models that will be fit in this book, we will adopt certain conventions regarding the argument specifications.
-In particular we will establish the convention of specifying `contrasts` for any categorical covariates and the possibility of using certain transformations, such as centering and scaling, of numeric covariates.
+In particular we will establish the convention of specifying `contrasts` for categorical covariates not used as grouping factors, and the possibility of using certain transformations, such as centering and scaling, of numeric covariates.
 
 The name `contrasts` is used in a general sense here to specify certain transformations that are to take place during the process of converting a formula and the structure, or [schema](https://en.wikipedia.org/wiki/Database_schema), of the data into model matrices.
 
 The [StatsModels.jl package](https://github.com/JuliaStats/StatsModels.jl) allows for contrasts to be specified as a key-value dictionary where the keys are symbols and the values are of a type that specializes `StatsModels.AbstractContrasts`.
-The [MixedModels.jl package](https://github.com/JuliaStats/MixedModels.jl) provides for a `Grouping()` contrast and the [StandardizedPredictors.jl package](https://github.com/beacon-biosignals/StandardizedPredictors.jl) allows transformations to be expressed as contrasts.
+The [StandardizedPredictors.jl package](https://github.com/beacon-biosignals/StandardizedPredictors.jl) allows transformations to be coded as contrasts.
 
 For models `dsm01` and `dsm02` the only covariate in the model formula is `batch`, which is a grouping factor for the random effects.
-Thus the desired contrasts specification is
+In the past it was helpful to specify a `Grouping()` contrast for grouping factors as 
 
 ```{julia}
 #| code-fold: false
@@ -821,12 +850,14 @@ Thus the desired contrasts specification is
 contrasts = Dict(:batch => Grouping())
 ```
 
+but versions 4.21 of the `MixedModels` package or later do this automatically.
+
+:::{.callout-note}
+### Replace "current versions" by a specific version number
+:::
+
 (Symbols in Julia can be written as a colon followed by the name of the symbol.
 The colon creates an expression but, if the expression consists of a single name, then the expression is the symbol.)
-
-It is best to get into the habit of specifying `Grouping()` contrasts for any grouping factors in the data.
-Doing so is not terribly important when the number of levels of the grouping factor is small, as in the examples in this chapter.
-However, when the number of levels is large, as for some of the models in later chapters, failure to specify `Grouping()` contrasts can cause memory faults when constructing the numeric representation of the model.
 
 There is an advantage in assigning the contrasts dictionary to the name `contrasts` because a call to `fit` with the optional, named argument `contrasts`
 
@@ -838,6 +869,7 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts=contrasts,
+  progress=false,
 )
 ```
 
@@ -851,12 +883,15 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts,
+  progress=false
 )
 ```
 
 That is, if the name of the object to be passed as a named argument is the same as the name of the argument, like `contrasts=contrasts`, then the name does not need to be repeated.
 Note that the comma after the positional arguments must be changed to a semicolon in this convention.
 This is necessary because it indicates that arguments following the semicolon are named arguments, not positional.
+
+Similarly, we could (and will, in later chapters), bind the name `progress` to `false` in the Main environment and use `progress` as a named argument instead of `progress=false` to suppress output of the progress of the iterations.
 
 Another convention we will use is assigning the formula separately from the call to `fit` as part of a `let` block.
 Often the formula can become rather long, sometimes needing multiple lines in the call, and it becomes difficult to keep track of the other arguments.
@@ -871,7 +906,7 @@ Thus `dsm01` can be assigned as
 #| code-fold: false
 #| eval: false
 dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff; contrasts)
+  fit(MixedModel, f, dyestuff; contrasts, progress=false)
 end
 ```
 

@@ -1,17 +1,19 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # A large-scale designed experiment {#sec-largescaledesigned}
 
-Load the packages to be used.
+Load the packages to be used
 
 ```{julia}
 #| code-fold: true
 #| output: false
+#| label: packages04
 using AlgebraOfGraphics
 using Arrow
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using Chain
 using DataFrameMacros
 using DataFrames
@@ -20,14 +22,17 @@ using EmbraceUncertainty: dataset
 using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using StandardizedPredictors
 using StatsBase
+```
 
-const contrasts =
-  Dict{Symbol,Any}(:item => Grouping(), :subj => Grouping())
-CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear)
+and define some constants, if not already defined.
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants04
+@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
+@isdefined(progress) || const progress = false
 ```
 
 As with many techniques in data science, the place where "the rubber meets the road", as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.
@@ -145,6 +150,7 @@ A barchart of the word length counts, @fig-ldtwrdlenhist, shows that the majorit
 #| code-fold: true
 #| fig-cap: "Histogram of word lengths in the items used in the lexical decision task."
 #| label: fig-ldtwrdlenhist
+#| warning: false
 let wlen = 1:21
   draw(
     data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
@@ -162,6 +168,7 @@ but accuracy decreases with increasing word length for the nonwords.
 #| code-fold: true
 #| fig-cap: "Smoothed curves of accuracy versus word length in the lexical decision task."
 #| label: fig-ldtaccsmooth
+#| warning: false
 draw(
   data(filter(:acc => !ismissing, ldttrial)) *
   mapping(
@@ -187,6 +194,7 @@ If we restrict the smoother curves to this range, as in @fig-ldtaccsmoothrestric
 #| code-fold: true
 #| fig-cap: "Smoothed curves of accuracy versus word length in the range 4 to 13 characters in the lexical decision task."
 #| label: fig-ldtaccsmoothrestrict
+#| warning: false
 draw(
   data(@subset(ldttrial, !ismissing(:acc), 4 ≤ :wrdlen ≤ 13)) *
   mapping(
@@ -207,6 +215,7 @@ Another way to visualize these results is by plotting the proportion accurate ve
 #| code-fold: true
 #| fig-cap: "Proportion of accurate trials in the LDT versus word length separately for words and non-words.  The area of the marker is proportional to the number of observations represented."
 #| label: fig-propvswrdlen
+#| warning: false
 let
   itemsummry = combine(
     groupby(byitem, [:wrdlen, :isword]),
@@ -263,6 +272,7 @@ A plot of the median response time versus proportion accurate, @fig-ldtmedianrtv
 #| code-fold: true
 #| fig-cap: "Median response time versus proportion accurate by subject in the LDT."
 #| label: fig-ldtmedianrtvspropacc
+#| warning: false
 draw(
   data(bysubj) *
   mapping(
@@ -326,6 +336,7 @@ A density plot of the pruned response times, @fig-elpldtrtdens, shows they are s
 #| code-fold: true
 #| fig-cap: Kernel density plot of the pruned response times (ms.) in the LDT.
 #| label: fig-elpldtrtdens
+#| warning: false
 draw(
   data(pruned) *
   mapping(:rt => "Response time (ms.) for correct responses") *
@@ -342,6 +353,7 @@ The density of the response speed, in responses per second, is shown in @fig-elp
 #| code-fold: true
 #| fig-cap: Kernel density plot of the pruned response speed in the LDT.
 #| label: fig-elpldtspeeddens
+#| warning: false
 draw(
   data(pruned) *
   mapping(
@@ -374,6 +386,7 @@ For example, @fig-ldtrtvswrdlen shows the smoothed relationship between word len
 #| code-fold: true
 #| fig-cap: "Scatterplot smooths of response time versus word length in the LDT."
 #| label: fig-ldtrtvswrdlen
+#| warning: false
 draw(
   data(pruned) *
   mapping(
@@ -391,6 +404,7 @@ and @fig-ldtspeedvswrdlen shows the similar relationships for speed
 #| code-fold: true
 #| fig-cap: "Scatterplot smooths of response speed versus word length in the LDT."
 #| label: fig-ldtspeedvswrdlen
+#| warning: false
 draw(
   data(pruned) *
   mapping(
@@ -411,6 +425,7 @@ The small amount of curvature is associated with short word lengths, say less th
 #| code-fold: true
 #| fig-cap: "Empirical density of response speed versus word length by word/non-word status, with lines fit by linear regression to each group."
 #| label: fig-speedviolin
+#| warning: false
 let
   plt = data(@subset(pruned, :wrdlen > 3, :wrdlen < 14))
   plt *= mapping(
@@ -455,7 +470,7 @@ and fit a first model with simple, scalar, random effects for `subj` and `item`.
 ```{julia}
 elm01 = let f = @formula 1000/rt ~
     1 + isword * wrdlen + (1 | item) + (1 | subj)
-  fit(MixedModel, f, pruned; contrasts)
+  fit(MixedModel, f, pruned; contrasts, progress)
 end
 ```
 
@@ -471,7 +486,7 @@ If we restrict to only those subjects with 80% accuracy or greater the model bec
 elm02 = let f = @formula 1000 / rt ~
     1 + isword * wrdlen + (1 | item) + (1 | subj)
   dat = filter(:spropacc => >(0.8), pruned)
-  fit(MixedModel, f, dat; contrasts)
+  fit(MixedModel, f, dat; contrasts, progress)
 end
 ```
 
@@ -485,6 +500,7 @@ To compare the conditional means of the random effects for item in these two mod
 #| code-fold: true
 #| fig-cap: "Conditional means of scalar random effects for item in model elm01, fit to the pruned data, versus those for model elm02, fit to the pruned data with inaccurate subjects removed."
 #| label: fig-itemreelm01vselm02
+#| warning: false
 
 CairoMakie.activate!(; type="png")
 condmeans = leftjoin!(
@@ -563,6 +579,7 @@ A caterpillar plot, @fig-elm01caterpillarsubj,
 #| code-fold: true
 #| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm01.
 #| label: fig-elm01caterpillarsubj
+#| warning: false
 qqcaterpillar!(
   Figure(resolution=(800, 650)),
   ranefinfo(elm01, :subj),
@@ -578,6 +595,7 @@ Also, there is at least one outlier with a conditional mode over 1.0.
 #| code-fold: true
 #| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm02.
 #| label: fig-elm02caterpillarsubj
+#| warning: false
 qqcaterpillar!(
   Figure(resolution=(800, 650)),
   ranefinfo(elm02, :subj),

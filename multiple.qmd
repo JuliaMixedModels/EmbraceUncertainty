@@ -1,8 +1,8 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
-# Models With Multiple Random-effects Terms {#sec-Multiple}
+# Models with multiple random-effects terms {#sec-Multiple}
 
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
@@ -29,32 +29,29 @@ Attach the packages to be used in this chapter
 ```{julia}
 #| code-fold: true
 #| output: false
-const hide_progress = true
-
+#| label: packages02
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using Random
 using RCall
 using StatsBase
+```
 
-const contrasts = Dict{Symbol,Any}(
-  :sample => Grouping(),
-  :plate => Grouping(),
-  :s => Grouping(),
-  :batch => Grouping(),
-  :d => Grouping(),
-  :dept => Grouping(),
-)
+and define some constants, if not already defined,
 
-ProgressMeter.ijulia_behavior(:clear)
-CairoMakie.activate!(; type="svg")
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants02
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(progress) || const progress = false
 ```
 
 The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient.
@@ -109,6 +106,7 @@ of the data, then plot it
 #| code-fold: true
 #| fig-cap: "Diameter of inhibition zone by plate and sample. Plates are ordered by increasing mean response."
 #| label: fig-penicillindot
+#| warning: false
 """
     _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)
 
@@ -183,7 +181,7 @@ A model incorporating random effects for both the `plate` and the `sample` is st
 
 ```{julia}
 pnm01 = let f = @formula diameter ~ 1 + (1 | plate) + (1 | sample)
-  fit(MixedModel, f, penicillin; contrasts)
+  fit(MixedModel, f, penicillin; contrasts, progress)
 end
 ```
 
@@ -194,6 +192,7 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for plate in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01platepred
+#| warning: false
 caterpillar!(
   Figure(; resolution=(800, 480)),
   ranefinfo(pnm01, :plate),
@@ -204,13 +203,15 @@ caterpillar!(
 #| fig-cap: "Conditional modes and 95% prediction intervals of random effects for sample in model pnm01"
 #| code-fold: true
 #| label: fig-pnm01samplepred
+#| warning: false
 caterpillar!(
   Figure(; resolution=(800, 160)),
   ranefinfo(pnm01, :sample),
 )
 ```
 
-The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` much less variability than does the conditional distribution of the random effects for `sample`.  (Note that the horizontal scales on these two plots are different.)
+The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` displays much less variability than does the conditional distribution of the random effects for `sample`.
+(Note that the horizontal scales on these two plots are different.)
 However, the conditional distribution of the random effect for a particular sample, say sample `F`, has less variability than the conditional distribution of the random effect for a particular plate, say plate `m`.
 That is, the lines in @fig-pnm01samplepred are wider than the lines in @fig-pnm01platepred, even after taking the different axis scales into account.
 This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.
@@ -219,6 +220,8 @@ In @sec-examlmm we saw that a model with a single, simple, scalar random-effects
 When we have multiple, simple, scalar random-effects terms, as in model `pnm01`, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix $\bbZ$ whose transpose is
 
 ```{julia}
+#| lst-label: lst-pnm01sparsel
+#| lst-cap: Pattern of non-zeros in the transpose of the model matrix Z for model pnm01
 vcat(transpose.(sparse.(pnm01.reterms))...)
 ```
 
@@ -251,7 +254,7 @@ A parametric bootstrap sample of the parameter estimates
 ```{julia}
 #| code-fold: true
 bsrng = Random.seed!(9876789)
-pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; hide_progress)
+pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; progress)
 pnm01pars = DataFrame(pnm01samp.allpars);
 ```
 
@@ -267,6 +270,7 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| code-fold: true
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
+#| warning: false
 draw(
   data(@subset(pnm01pars, :type == "β")) *
   mapping(
@@ -291,6 +295,7 @@ The densities of the variance-components, on the scale of the standard deviation
 #| fig-cap: "Parametric bootstrap estimates of variance components in model pnm01"
 #| label: fig-pnm01bssigma
 #| code-fold: true
+#| warning: false
 draw(
   data(@subset(pnm01pars, :type == "σ")) *
   mapping(
@@ -377,7 +382,7 @@ For example, batches I and D, with low mean strength relative to the other batch
 Also, batches H and C, with comparatively high mean batch strength, contain samples H:a and C:a with comparatively low mean sample strength.
 In @sec-assessingfm04 we will examine the need for incorporating batch-to-batch variability, in addition to sample-to-sample variability, in the statistical model.
 
-### Nested Factors {#sec-nestedcrossed}
+### Nested factors {#sec-nestedcrossed}
 
 Because each level of `sample` occurs with one and only one level of `batch` we say that `sample` is *nested within* `batch`.
 Some presentations of mixed-effects models, especially those related to *multilevel modeling* [@MLwiNUser:2000] or *hierarchical linear models* [@Rauden:Bryk:2002], leave the impression that one can only define random effects with respect to factors that are nested.
@@ -411,7 +416,7 @@ We include random-effects terms for each factor, as in
 
 ```{julia}
 psm01 = let f = @formula strength ~ 1 + (1 | sample) + (1 | batch)
-  fit(MixedModel, f, pastes; contrasts)
+  fit(MixedModel, f, pastes; contrasts, progress)
 end
 ```
 
@@ -426,7 +431,7 @@ sparseL(psm01; full=true)
 BlockDescription(psm01)
 ```
 
-of `psm01` to that of `pnm01` shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
+of `psm01` to that of `pnm01` [@lst-pnm01sparsel] shows that models with nested factors produce simple repeated structures along the diagonal of the sparse Cholesky factor, $\bbL$.
 This type of structure has the desirable property that there is no "fill-in" during calculation of the Cholesky factor.
 In other words, the number of non-zeros in $\bbL$ is the same as the number of non-zeros in the lower triangle of the matrix being factored, $\bbLambda'\bbZ'\bbZ\bbLambda+\bbI$ (which, because $\bbLambda$ is diagonal, has the same structure as $\bbZ'\bbZ$).
 
@@ -435,7 +440,7 @@ It is an important issue when we have millions of random effects in complex conf
 
 ### Assessing parameter estimates in psm01 {#sec-assessingfm04}
 
-The parameter estimates are: $\widehat{\sigma_1}$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}$, the standard deviation of the residual noise term; and $\widehat{\beta_1}=$, the overall mean response, which is labeled `(Intercept)` in these models.
+The parameter estimates are: $\widehat{\sigma_1}$, the standard deviation of the random effects for `sample`; $\widehat{\sigma_2}$, the standard deviation of the random effects for `batch`; $\widehat{\sigma}$, the standard deviation of the residual noise term; and $\widehat{\beta_1}$, the overall mean response, which is labeled `(Intercept)` in these models.
 
 The estimated standard deviation for sample is nearly three times as large as that for batch, which confirms what we saw in @fig-pastesdot.
 Indeed our conclusion from @fig-pastesdot was that there may not be a significant batch-to-batch variability in addition to the sample-to-sample variability.
@@ -446,6 +451,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| code-fold: true
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
+#| warning: false
 caterpillar!(
   Figure(resolution=(800, 300)),
   ranefinfo(psm01, :batch),
@@ -458,7 +464,7 @@ Furthermore, kernel density estimates from a parametric bootstrap sample of the 
 
 ```{julia}
 Random.seed!(4567654)
-psm01samp = parametricbootstrap(10_000, psm01; hide_progress)
+psm01samp = parametricbootstrap(10_000, psm01; progress)
 psm01pars = DataFrame(psm01samp.allpars);
 ```
 
@@ -466,6 +472,7 @@ psm01pars = DataFrame(psm01samp.allpars);
 #| fig-cap: "Kernel density plots of bootstrap estimates of σ for model psm01"
 #| label: fig-psm01bssampdens
 #| code-fold: true
+#| warning: false
 draw(
   data(@subset(psm01pars, :type == "σ")) *
   mapping(
@@ -477,7 +484,7 @@ draw(
 )
 ```
 
-Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only, we perform a statistical test of this hypothesis.
+Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only `sample`, we perform a statistical test of this hypothesis.
 
 ### Testing $H_0:\sigma_2=0$ versus $H_a:\sigma_2>0$ {#sec-TestingSig2is0}
 
@@ -505,7 +512,7 @@ The restricted model fit
 
 ```{julia}
 psm02 = let f = @formula strength ~ 1 + (1 | sample)
-  fit(MixedModel, f, pastes; contrasts)
+  fit(MixedModel, f, pastes; contrasts, progress)
 end
 ```
 
@@ -538,7 +545,7 @@ psm02samp = parametricbootstrap(
   Random.seed!(9753579),
   10_000,
   psm02;
-  hide_progress,
+  progress,
 )
 DataFrame(shortestcovint(psm02samp))
 ```
@@ -585,6 +592,7 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| code-fold: true
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
+#| warning: false
 draw(
   data(Table(response=1:5, count=counts(insteval.y))) *
   mapping(:response => "Rating", :count => "Count") *
@@ -599,7 +607,7 @@ At this point we will fit models that have random effects for student, instructo
 
 ```{julia}
 iem01 = let f = @formula y ~ 1 + (1 | s) + (1 | d) + (1 | dept)
-  fit(MixedModel, f, insteval; contrasts)
+  fit(MixedModel, f, insteval; contrasts, progress)
 end
 ```
 
@@ -611,6 +619,7 @@ It is not surprising that zero is within most of the prediction intervals on the
 #| code-fold: true
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
+#| warning: false
 caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
 ```
 
@@ -618,7 +627,7 @@ However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
 
 ```{julia}
 iem02 = let f = @formula y ~ 1 + (1 | s) + (1 | d)
-  fit(MixedModel, f, insteval; contrasts)
+  fit(MixedModel, f, insteval; contrasts, progress)
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
@@ -660,7 +669,7 @@ The simplest approach is to add `service` to the fixed-effects specification
 ```{julia}
 iem03 =
   let f = @formula y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept)
-    fit(MixedModel, f, insteval; contrasts)
+    fit(MixedModel, f, insteval; contrasts, progress)
   end
 ```
 
@@ -679,6 +688,7 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| code-fold: true
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
 #| label: fig-iem01qqcaterpillard
+#| warning: false
 qqcaterpillar!(
   Figure(; resolution=(800, 650)),
   ranefinfo(iem01, :d),
@@ -691,6 +701,7 @@ shows the differences in precision due to different numbers of observations for 
 #| code-fold: true
 #| fig-cap: "Histogram of the number of observations per instructor in the insteval data"
 #| label: fig-iednobshist
+#| warning: false
 draw(
   data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
   mapping(:n => "Number of observations") *
@@ -714,23 +725,31 @@ but the conditional distribution of this random effect clearly overlaps signific
 
 ## Chapter summary {#sec-MultSummary}
 
-A simple, scalar random effects term in an model formula is of the form , where is an expression whose value is the *grouping factor* of the set of random effects generated by this term.
-Typically, `F` is simply the name of a factor, as in most of the examples in this chapter.
-However, the grouping factor can be the value of an expression, such as in the last example.
-
-Because simple, scalar random-effects terms can differ only in the description of the grouping factor we refer to configurations such as crossed or nested as applying to the terms or to the random effects, although it is more accurate to refer to the configuration as applying to the grouping factors.
+A simple, scalar random effects term in an model formula is of the form `(1|f)`, where `f` is an expression whose value is the *grouping factor* for the set of random effects generated by this term.
+Typically, `f` is simply the name of a factor, as in most of the examples in this chapter.
+However, the grouping factor can be the value of an expression.
 
 A model formula can include several such random effects terms.
 Because configurations such as nested or crossed or partially crossed grouping factors are a property of the data, the specification in the model formula does not depend on the configuration.
 We simply include multiple random effects terms in the formula specifying the model.
 
 One apparent exception to this rule occurs with implicitly nested factors, in which the levels of one factor are only meaningful within a particular level of the other factor.
-In the pastes data, levels of the factor cask are only meaningful within a particular level of the factor batch.
-A model formula of would result in a fitted model that did not appropriately reflect the sources of variability in the data.
+In the `pastes` data, levels of the factor `cask` are only meaningful within a particular level of the factor batch.
+A model formula of `strength ~ 1 + (1|batch) + (1|cask)` would result in a fitted model that did not appropriately reflect the sources of variability in the data.
 Following the simple rule that the factor should be defined so that distinct experimental or observational units correspond to distinct levels of the factor will avoid such ambiguity.
 
-For convenience, a model with multiple, nested random-effects terms can be specified as which internally is re-expressed as
-We will avoid terms of the form , preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
+For convenience, multiple, nested random-effects terms can be specified using a slash to separate grouping factors, e.g. `(1 | batch / cask)`, which internally is re-expressed as `(1 | batch & cask) + (1 | batch)`
+
+```{julia}
+#| label: psm01alt
+print(
+  let f = @formula(strength ~ 1 + (1 | batch / cask))
+    fit(MixedModel, f, pastes; progress)
+  end
+)
+```
+
+We will avoid terms of this form, preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
 
 The insteval data, described in @sec-insteval, illustrate some of the characteristics of the real data to which mixed-effects models are now fit.
 There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed.
@@ -739,8 +758,7 @@ Much of the literature on mixed-effects models leaves the impression that multip
 The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.
 
 The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter.
-That is, profile-based confidence intervals on the fixed-effects parameter, $\beta_0$, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution and the logarithm of the residual standard deviation, $\log(\sigma)$, has a good normal approximation.
-Profile-based confidence intervals for the standard deviations of random effects ($\sigma_1$, $\sigma_2$, etc.) are symmetric on a logarithmic scale except for those that could be zero.
+That is, profile-based confidence intervals on the fixed-effects parameter, $\beta_0$, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution.
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.
 

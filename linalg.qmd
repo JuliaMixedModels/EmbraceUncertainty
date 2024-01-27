@@ -1,8 +1,8 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
-# Linear Algebra for Linear Models {#sec-linalg}
+# Linear algebra for linear models {#sec-linalg}
 
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}

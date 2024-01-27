@@ -1,33 +1,41 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 \newcommand{\bbtheta}{{\boldsymbol\theta}}
 
 # A large-scale observational study {#sec-largescaleobserved}
 
-Load the packages to be used.
+Load the packages to be used,
 
 ```{julia}
 #| code-fold: true
 #| output: false
+#| label: packages05
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrames
 using EmbraceUncertainty: dataset
 using GLM                  # for the lm function
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using SparseArrays         # for the nnz function
 using Statistics           # for the mean function
 using TypedTables
+```
 
+and define some constants and a utility function
+
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants05
 optsumdir(paths::AbstractString...) =
   joinpath(@__DIR__, "optsums", paths...)
-CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear)
+@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
+@isdefined(progress) || const progress=false
 ```
 
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
@@ -124,6 +132,7 @@ Because the distribution of the number of ratings per movie or per user is so hi
 #| code-fold: true
 #| fig-cap: "Empirical distribution plots of the number of ratings per movie and per user.  The horizontal axes are on a logarithmic scale."
 #| label: fig-nrtngsecdf
+#| warning: false
 let
   f = Figure(; resolution=(1000, 400))
   xscale = log10
@@ -204,6 +213,7 @@ then create a bar chart of the two distributions
 #| code-fold: true
 #| fig-cap: "Distribution of ratings for movies with only one rating compared to movies with at least 5 ratings"
 #| label: fig-ratingsbarcharts
+#| warning: false
 let
   fiveplus = zeros(Int, 10)
   onlyone = zeros(Int, 10)
@@ -301,6 +311,7 @@ ltitle = "Minimum number of ratings per user"
 #| fig-cap: "Bar plot of data set dimensions by minimum number of ratings per user and per movie."
 #| code-fold: true
 #| label: fig-dimsbarchart
+#| warning: false
 let
   f = Figure(resolution=(800, 1000))
   xlabel = "Minimum number of ratings per movie"
@@ -380,7 +391,7 @@ function ratingsoptsum(
   )
 end
 mvm20u20 = ratingsoptsum(20, 20)
-println(mvm20u20)
+print(mvm20u20)
 ```
 
 Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
@@ -449,6 +460,7 @@ The first two parts of this conclusion are illustrated in @fig-memoryfootprint.
 #| fig-cap: "Bar plot of memory footprint of the model representation by minimum number of ratings per user and per movie."
 #| code-fold: true
 #| label: fig-memoryfootprint
+#| warning: false
 let
   f = Figure(resolution=(800, 1000))
   xlabel = "Minimum number of ratings per movie"
@@ -513,6 +525,7 @@ That is, we can't expect to reproduce `nev` exactly when fitting the same model 
 #| fig-cap: "Bar plot of function log-likelihood evaluation time by minimum number of ratings per user and per movie."
 #| code-fold: true
 #| label: fig-timetoconverge
+#| warning: false
 let
   f = Figure(resolution=(800, 1000))
   xlabel = "Minimum number of ratings per movie"
@@ -585,6 +598,7 @@ There are two blocked matrices, `A` and `L`, stored in the model representation 
 #| code-fold: true
 #| fig-cap: "Amount of storage for L[2,2] versus amount of storage for the entire model.  Colors are determined by the minimum number of ratings per user in the data to which the model was fit."
 #| label: fig-L22vsmodelsz
+#| warning: false
 draw(
   data(sizespeed) *
   mapping(

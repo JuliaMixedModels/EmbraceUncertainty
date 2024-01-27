@@ -1,8 +1,8 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
-# Models for Longitudinal Data {#sec-longitudinal}
+# Models for longitudinal data {#sec-longitudinal}
 
 \newcommand\bbA{{\mathbf{A}}}
 \newcommand\bbb{{\mathbf{b}}}
@@ -23,32 +23,33 @@ jupyter: julia-1.9
 \newcommand\mcB{{\mathcal{B}}}
 \newcommand\mcY{{\mathcal{Y}}}
 
-Load the packages to be used.
+Load the packages to be used,
 
 ```{julia}
 #| code-fold: true
 #| output: false
-
+#| label: packages03
 using AlgebraOfGraphics
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
 using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
-using ProgressMeter
 using Random
 using RCall
 using StandardizedPredictors
+```
 
-#using CairoMakie: scatter! # PA I have no idea why this is failing to resolve later since this exported
-
-if !isdefined(Main, :contrasts)
-  const contrasts = Dict{Symbol,Any}()
-end
-CairoMakie.activate!(; type="svg")
-ProgressMeter.ijulia_behavior(:clear)
+and declare some constants, if not already defined.
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constants03
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(progress) || const progress = false
 ```
 
 Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time.
@@ -60,7 +61,8 @@ In this chapter we introduce graphical and statistical techniques for the analys
 
 ## The elstongrizzle data
 
-Data from a dental study measuring the lengths of the ramus bone (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
+Data from a dental study measuring the lengths of the [ramus of the mandible](https://en.wikipedia.org/wiki/Mandible#Ramus) (mm) in 20 boys at 8, 8.5, 9, and 9.5 years of age were reported in @elstongrizzle1962 and in @davis2002.
+(Following the description in both of these references we will refer to these as measurements of the "ramus bone", even though this is somewhat inaccurate.)
 
 ```{julia}
 elstongrizzle = dataset(:elstongrizzle)
@@ -69,7 +71,7 @@ elstongrizzle = dataset(:elstongrizzle)
 Converting the table to a data frame provides the description
 
 ```{julia}
-#| echo: false
+#| code-fold: true
 egdf = DataFrame(elstongrizzle)
 describe(egdf)
 ```
@@ -80,6 +82,7 @@ A common way of plotting such longitudinal data is response versus time on a sin
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
+#| warning: false
 draw(
   data(egdf) *
   mapping(
@@ -128,11 +131,10 @@ Similarly, `S06` and `S11` have longer initial bone lengths and a low growth rat
 Although it seems that there isn't a strong correlation between initial bone length and growth rate in these data, a model with an overall linear trend and possibly correlated random effects for intercept and slope by subject estimates a strong negative correlation (-0.97) between these random effects.
 
 ```{julia}
-contrasts[:Subj] = Grouping()
 egm01 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts)
+  fit(MixedModel, f, egdf; contrasts, progress)
 end
-println(egm01)
+print(egm01)
 ```
 
 The reason for this seemingly unlikely result is that the `(Intercept)` term in the fixed effects and the random effects represents the bone length at age 0, which is not of interest here.
@@ -146,6 +148,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| code-fold: true
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
+#| warning: false
 caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
 ```
 
@@ -174,9 +177,9 @@ A model with `time` centered at 8 years of age can be fit as
 ```{julia}
 contrasts[:time] = Center(8)
 egm02 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts)
+  fit(MixedModel, f, egdf; contrasts, progress)
 end
-println(egm02)
+print(egm02)
 ```
 
 Comparing the parameter estimates from models `egm01` and `egm02`, we find that the only differences are in the estimates for the `(Intercept)` terms in the fixed-effects parameters and the variance component parameters and in the correlation of the random effects.
@@ -188,6 +191,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm02
 #| label: fig-egm02caterpillar
 #| code-fold: true
+#| warning: false
 caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
 ```
 
@@ -196,12 +200,12 @@ A third option is to center the `time` covariate at the mean of the original `ti
 ```{julia}
 contrasts[:time] = Center()
 egm03 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts)
+  fit(MixedModel, f, egdf; contrasts, progress)
 end
-println(egm03)
+print(egm03)
 ```
 
-Because the default for the `Center` contrast is to center about the mean, this `contrasts` argument can be written
+The default for the `Center` contrast is to center about the mean and we write this `contrasts` value as, simply, `Center()`.
 
 Notice that in this model the estimated correlation of the random effects for `Subj` is positive.
 
@@ -222,6 +226,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm02shrinkage
+#| warning: false
 shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
 ```
 
@@ -247,9 +252,9 @@ egm04 =
   let f = @formula resp ~
       1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
     dat = @transform(egdf, :ctime = :time - 8.75)
-    fit(MixedModel, f, dat; contrasts)
+    fit(MixedModel, f, dat; contrasts, progress)
   end
-println(egm04)
+print(egm04)
 ```
 
 We see that the estimate for the population quadratic coefficient, -0.04, is small, relative to its standard error, 0.20, indicating that it is not significantly different from zero.
@@ -261,6 +266,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm04shrinkage
+#| warning: false
 shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
 ```
 
@@ -317,6 +323,7 @@ Considering first the control group, whose trajectories can be plotted in a "spa
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the control group of bxdf versus time in trial (wk).
 #| label: fig-bxctrlspaghetti
+#| warning: false
 bxaxes =
   mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")
 bxgdf = groupby(bxdf, :Group)
@@ -334,6 +341,7 @@ or in separate panels ordered by initial weight, @fig-bxctrllayout.
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the control group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxctrllayout
+#| warning: false
 let df = bxgdf[("Control",)]
   draw(
     data(df) *
@@ -356,6 +364,7 @@ A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the Thioracil group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxthiolayout
+#| warning: false
 let
   df = bxgdf[("Thioracil",)]
   draw(
@@ -379,6 +388,7 @@ By contrast, in the Thyroxin group, @fig-bxthyrlayout,
 #| code-fold: true
 #| fig-cap: Weight (g) of rats in the Thyroxin group versus time in trial (wk). Panels are ordered by increasing initial weight.
 #| label: fig-bxthyrlayout
+#| warning: false
 let
   df = bxgdf[("Thyroxin",)]
   draw(
@@ -414,7 +424,7 @@ delete!(contrasts, :time)
 bxm01 =
   let f = @formula resp ~
       (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -424,7 +434,7 @@ but we expect that a model without the main effect for `Group`,
 bxm02 =
   let f = @formula resp ~
       1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -457,7 +467,7 @@ It would indicate that the groups are initially homogeneous both in weight and g
 bxm03 =
   let f = @formula resp ~
       1 + time + time^2 & Group + (1 + time + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -473,6 +483,7 @@ A caterpillar plot created from the conditional means and standard deviations of
 #| code-fold: true
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03
 #| label: fig-bxm03caterpillar
+#| warning: false
 caterpillar(bxm03)
 ```
 
@@ -482,6 +493,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 #| code-fold: true
 #| fig-cap: Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-bxm03shrinkage
+#| warning: false
 shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
 ```
 
@@ -512,6 +524,7 @@ can help to see that these points lie on a plane.
 #| code-fold: true
 #| fig-cap: Two views of the conditional means of the random effects from model bxm03. The lines from the origin are the principal axes of the unconditional distribution of the random effects.  The panel on the right is looking in along the negative of the second principle axis (red line in left panel).
 #| label: fig-bxm03plane
+#| warning: false
 let
   bpts = Point3f.(eachcol(only(bxm03.b)))
   Upts = Point3f.(eachcol(svd(only(bxm03.λ)).U))
@@ -565,7 +578,7 @@ bxm03samp = parametricbootstrap(
   Xoshiro(8642468),
   10_000,
   bxm03;
-  hide_progress=true,
+  progress=false,
 )
 bxm03pars = DataFrame(bxm03samp.allpars)
 DataFrame(shortestcovint(bxm03samp))
@@ -579,6 +592,7 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 #| code-fold: true
 #| fig-cap: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodens
+#| warning: false
 draw(
   data(@subset(bxm03pars, :type == "ρ")) *
   mapping(
@@ -595,6 +609,7 @@ Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/F
 #| code-fold: true
 #| fig-cap: Kernel density plots of Fisher's z transformation of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodensatanh
+#| warning: false
 let
   dat = @transform(
     @subset(bxm03pars, :type == "ρ"),
@@ -617,7 +632,7 @@ Because of these high correlations, trying to deal with the degenerate random ef
 bxm04 =
   let f =
       @formula resp ~ 1 + time + time^2 & Group + (1 + time | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -635,7 +650,7 @@ bxm05 =
       time^2 & Group +
       (1 + time | Subj) +
       (0 + time^2 | Subj)
-    fit(MixedModel, f, bxdf; contrasts)
+    fit(MixedModel, f, bxdf; contrasts, progress)
   end
 ```
 
@@ -657,6 +672,7 @@ The models give essentially the same predictions of weight versus time for a "ty
 #| code-fold: true
 #| fig-cap: Typical weight curves from models bxm03, bxm04, and bxm05 for each of the three treatment groups.
 #| label: fig-bxmodfitted
+#| warning: false
 let
   times = Float32.((0:256) / 64)
   times² = abs2.(times)

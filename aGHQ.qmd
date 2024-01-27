@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.9
+jupyter: julia-1.10
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
@@ -128,9 +128,11 @@ Load the packages to be used
 ```{julia}
 #| code-fold: true
 #| output: false
+#| label: packagesA03
 using AlgebraOfGraphics
 using BenchmarkTools
 using CairoMakie
+CairoMakie.activate!(; type="svg")
 using EmbraceUncertainty: dataset
 using FreqTables
 using LinearAlgebra
@@ -138,14 +140,17 @@ using MixedModels
 using MixedModelsMakie
 using NLopt
 using PooledArrays
-using ProgressMeter
 using StatsAPI
+```
 
-# showcompact prints a vector compactly
-showcompact(x) = show(IOContext(stdout, :compact => true), x)
+and define some constants
 
-ProgressMeter.ijulia_behavior(:clear)
-CairoMakie.activate!(; type="svg")
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: constantsA03
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(progress) || const progress = false
 ```
 
 ## Generalized linear models for binary data {#sec-BernoulliGLM}
@@ -233,18 +238,16 @@ We illustrate some of these computations using only the fixed-effects specificat
 ```{julia}
 #| code-fold: show
 #| output: false
+#| label: com05
 contra = let tbl = dataset(:contra)
   Table(tbl; ch=tbl.livch .≠ "0")
 end
-contrasts = Dict{Symbol,Any}(
-  :urban => HelmertCoding(),
-  :ch => HelmertCoding(),
-  :dist => Grouping(),
-)
+contrasts[:urban] = HelmertCoding()
+contrasts[:ch] = HelmertCoding()
 com05 =
   let f = @formula use ~
       1 + urban + ch * age + age & age + (1 | dist & urban)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ=9)
+    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ=9, progress)
   end
 ```
 
@@ -252,7 +255,6 @@ Extract the fixed-effects model matrix, $\bbX$, and initialize the coefficient v
 
 ```{julia}
 βm05 = copy(com05.β)
-showcompact(βm05)   # showcompact is defined in the first code block
 ```
 
 As stated above, the `meanunitdev` function can be applied to the vectors, ${\mathbf{y}}$ and ${\bbeta}$, via dot-vectorization to produce a `Vector{NamedTuple}`, which is the typical form of a row-table.
@@ -342,7 +344,6 @@ Create such a struct from `X` and `y` for model `com05`.
 ```{julia}
 com05fe = BernoulliGLM(com05.X, com05.y)
 β₀ = copy(com05fe.β)          # keep a copy of the initial values
-showcompact(β₀)
 ```
 
 These initial values of $\bbbeta$ are from a least squares fit of $\bby$, converted from `{0,1}` coding to `{-1,1}` coding, on the model matrix, $\bbX$.
@@ -946,22 +947,26 @@ fit!(m);
 
 ```{julia}
 #| code-fold: true
-println("Converged to θ = ", first(m.θβ), " and β =")
-showcompact(view(m.θβ, 2:lastindex(m.θβ)))
+print(
+  "Converged to θ = ",
+  first(m.θβ),
+  " and β =",
+  view(m.θβ, 2:lastindex(m.θβ)),
+)
 ```
 
 These estimates differ somewhat from those for model `com05`.
 
 ```{julia}
 #| code-fold: true
-println(
+print(
   "Estimates for com05: θ = ",
   only(com05.θ),
   ", fmin = ",
   deviance(com05),
   ", and β =",
+  com05.β
 )
-showcompact(com05.β)
 ```
 
 The discrepancy in the results is because the `com05` results are based on a more accurate approximation to the integral called *adaptive Gauss-Hermite Quadrature*, which is discussed in @sec-aGHQ.
@@ -1081,11 +1086,11 @@ sym5 = SymTridiagonal(zeros(5), sqrt.(1:4))
 
 ```{julia}
 ev = eigen(sym5);
-showcompact(ev.values)
+ev.values
 ```
 
 ```{julia}
-showcompact(abs2.(ev.vectors[1, :]))
+abs2.(ev.vectors[1, :])
 ```
 
 A function of `k` to evaluate the abscissae and weights is
@@ -1113,6 +1118,7 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| code-fold: true
 #| fig-cap: Weights and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghnine
+#| warning: false
 draw(
   data(gausshermitenorm(9)) *
   mapping(:abscissae => "Positions", :weights),
@@ -1125,6 +1131,7 @@ Notice that the magnitudes of the weights drop quite dramatically away from zero
 #| code-fold: true
 #| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghninelog
+#| warning: false
 draw(
   data(gausshermitenorm(9)) * mapping(
     :abscissae => "Positions",
@@ -1223,6 +1230,7 @@ We begin with plots of the difference in the penalized deviance from its value a
 #| code-fold: true
 #| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of u.
 #| label: fig-uscalepdev
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1246,6 +1254,7 @@ then shift and scale the horizontal axis to the $z$ scale for this difference in
 #| code-fold: true
 #| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of z.
 #| label: fig-zscalepdev
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1267,6 +1276,7 @@ The next stage is to plot, on the $z$ scale, the difference between the penalize
 #| code-fold: true
 #| fig-cap: The difference between the contribution to the penalized deviance and its quadratic approximation for each of first 5 groups in model com05 as a function of z.
 #| label: fig-zpdevdiff
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1290,6 +1300,7 @@ and, finally, the exponential of negative half of this difference in @fig-zexpne
 #| code-fold: true
 #| fig-cap: Exponential of half the difference between the quadratic approximation and the contribution to the penalized deviance, for each of first 5 groups in model com05 as a function of z.
 #| label: fig-zexpneghalfdiff
+#| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
   fig = Figure(; resolution=(800, 450)),
   ax = Axis(
@@ -1398,8 +1409,9 @@ end
 ```
 
 ```{julia}
+#| warning: false
 fitGHQ!(m)
-showcompact(m.θβ)
+m.θβ
 ```
 
 *This page was rendered from git revision {{< git-rev short=true >}}.*
