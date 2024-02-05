@@ -134,12 +134,10 @@ using BenchmarkTools
 using CairoMakie
 CairoMakie.activate!(; type="svg")
 using EmbraceUncertainty: dataset
-using FreqTables
 using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
-using NLopt
-using PooledArrays
+using PRIMA
 using StatsAPI
 ```
 
@@ -363,22 +361,16 @@ deviance(setβ!(com05fe, β₀))
 
 ### Fit the GLM using a general optimizer
 
-We can use a general optimizer like those available in [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl) to minimize the deviance.
-Following the instructions given at that package's repository, we create an `Opt` object specifying the algorithm to be used, BOBYQA (@powell2009bobyqa), and the dimension of the problem, then define and assign the objective function in the required form, and call `optimize`
+We can use a general optimizer like those available in [PRIMA.jl](https://github.com/libprima/PRIMA.jl) to minimize the deviance.
+In this case we use the `newuoa` optimizer [@powell2006newuoa], provided by `libprima` for unconstrained problems.
 
 ```{julia}
 function StatsAPI.fit!(m::BernoulliGLM{T}) where {T}
-  opt = Opt(:LN_BOBYQA, length(m.β))
-  function objective(x::Vector{T}, g::Vector{T}) where {T}
-    isempty(g) || throw(
-      ArgumentError("Gradient not available, g must be empty"),
-    )
-    return deviance(setβ!(m, x))
-  end
-  opt.min_objective = objective
-  minf, minx, ret = optimize(opt, copy(m.β))
-  @info (; code=ret, nevals=opt.numevals, minf)
-  return m
+  obj(x) = deviance(setβ!(m, x))  # objective function
+  x, info = newuoa(obj, m.β; scale=abs.(m.β))
+  issuccess(info) || throw(ArgumentError("newuoa returned $(info.status)"))
+  @info (; info.nf, info.fx)
+  return setβ!(m, x)
 end
 ```
 
@@ -386,8 +378,8 @@ end
 fit!(com05fe);
 ```
 
-The optimizer has determined a coefficient vector that reduces the deviance to 2409.38, at which point convergence was declared because changes in the objective are limited by round-off.
-This required about 500 evaluations of the deviance at candidate values of $\bbbeta$.
+The optimizer has determined a coefficient vector that reduces the deviance to 2409.38, at which point convergence was declared.
+This required about 150 evaluations of the deviance at candidate values of $\bbbeta$.
 
 Each evaluation of the deviance is fast, requiring only a fraction of a millisecond on a laptop computer,
 
@@ -622,7 +614,7 @@ end
 fit!(com05fe, β₀);
 ```
 
-The IRLS algorithm has converged in 4 iterations to essentially the same deviance as the general optimizer achieved after around 500 function evaluations.
+The IRLS algorithm has converged in 4 iterations to essentially the same deviance as the general optimizer achieved after more than 800 function evaluations.
 Each iteration of the IRLS algorithm takes more time than a deviance evaluation, but still only a fraction of a millisecond on a laptop computer.
 
 ```{julia}
@@ -741,7 +733,7 @@ end
 
 ### Why are θ and β stored in a single vector?
 
-The reason for storing both $\bbtheta$ and $\bbbeta$ in a single vector is to provide for their simultaneous optimization with an optimizer such as those in [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl).
+The reason for storing both $\bbtheta$ and $\bbbeta$ in a single vector is to provide for their simultaneous optimization with an optimizer such as those in [PRIMA.jl](https://github.com/libprima/PRIMA.jl).
 :::
 
 The `utbl` field in a `BernoulliPIRLS` struct contains vectors named `u0`, `pdev`, `pdev0`, and `aGHQ`, in addition to `u` and `Ldiag`.
@@ -784,22 +776,22 @@ At convergence of the PIRLS algorithm the elements of `Ldiag` are replaced by th
 #| output: false
 function updateu!(m::BernoulliPIRLS)
   (; u, u0, Ldiag) = m.utbl
-  copyto!(u0, u)              # keep a copy of u
-  θ = first(m.θβ)             # extract the scalar θ
+  copyto!(u0, u)                # keep a copy of u
+  θ = first(m.θβ)               # extract the scalar θ
   fill!(u, 0)
-  if iszero(θ)                # skip the update if θ == 0
-    fill!(Ldiag, 1)           # L is the identity if θ == 0
-    return updatetbl!(m)
+  if iszero(θ)                  # skip the update if θ == 0
+    fill!(Ldiag, 1)             # L is the identity if θ == 0
+  else
+    fill!(Ldiag, 0)
+    @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
+      rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ
+      Ldiag[ri] += abs2(rtWΛ)   # accumulate Λ'Z'WZΛ
+      u[ri] += rtWΛ * ti.wwresp # accumulate Λ'Z'Wỹ
+    end
+    Ldiag .+= 1                 # form diagonal of Λ'Z'WZΛ + I = LL'
+    u ./= Ldiag                 # solve for u with diagonal LL'
   end
-  fill!(Ldiag, 0)
-  @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
-    rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ
-    Ldiag[ri] += abs2(rtWΛ)   # accumulate Λ'Z'WZΛ
-    u[ri] += rtWΛ * ti.wwresp # accumulate Λ'Z'Wỹ
-  end
-  Ldiag .+= 1                 # form diagonal of Λ'Z'WZΛ + I = LL'
-  u ./= Ldiag                 # solve for u with diagonal LL'
-  return updatetbl!(m)        # and update η and rtbl
+  return updatetbl!(m)          # and update η and rtbl
 end
 ```
 
@@ -914,29 +906,24 @@ end
 laplaceapprox(pirls!(m))
 ```
 
-The remaining step is to optimize Laplace's approximation to the GLMM deviance with respect to $\theta$ and $\bbbeta$, which we do using the BOBYQA optimizer from [NLopt.jl](https://github.com/JuliaOpt/NLopt.jl)
+The remaining step is to optimize Laplace's approximation to the GLMM deviance with respect to $\theta$ and $\bbbeta$, which we do using the BOBYQA optimizer from [PRIMA.jl](https://github.com/libprima/PRIMA.jl)
 
 ```{julia}
 #| output: false
 function StatsAPI.fit!(m::BernoulliPIRLS)
   θβ = m.θβ
   pp1 = length(θβ)                # length(β) = p and length(θ) = 1
-  opt = Opt(:LN_BOBYQA, pp1)
   mβ = view(θβ, 2:pp1)
-  function obj(x, g)
-    if !isempty(g)
-      throw(ArgumentError("gradient not provided, g must be empty"))
-    end
+  function obj(x)
     copyto!(θβ, x)
     mul!(m.ytbl.offset, m.X, mβ)
     return laplaceapprox(pirls!(m))
   end
-  opt.min_objective = obj
-  lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
-  lb[1] = 0                       # scalar θ must be non-negative
-  NLopt.lower_bounds!(opt, lb)
-  minf, minx, ret = optimize(opt, copy(θβ))
-  @info (; ret, fevals=opt.numevals, minf)
+  xl = fill!(similar(θβ), -Inf)   # vector of lower bounds
+  xl[1] = 0                       # scalar θ must be non-negative
+  x, info = bobyqa(obj, θβ; xl, scale=abs.(θβ))
+  @info (; info.nf, info.fx)
+  copyto!(θβ, x)
   return m
 end
 ```
@@ -945,29 +932,10 @@ end
 fit!(m);
 ```
 
-```{julia}
-#| code-fold: true
-print(
-  "Converged to θ = ",
-  first(m.θβ),
-  " and β =",
-  view(m.θβ, 2:lastindex(m.θβ)),
-)
-```
+This converged to θ = `{julia} repr(first(m.θβ), context=:compact => true)` and β =
+`{julia} repr(view(m.θβ, 2:length(m.θβ)), context=:compact => true)`.
 
-These estimates differ somewhat from those for model `com05`.
-
-```{julia}
-#| code-fold: true
-print(
-  "Estimates for com05: θ = ",
-  only(com05.θ),
-  ", fmin = ",
-  deviance(com05),
-  ", and β =",
-  com05.β
-)
-```
+These estimates differ somewhat from those for model `com05` of fmin = `{julia} repr(deviance(com05), context=:compact => true)` at θ = `{julia} repr(only(com05.θ), context=:compact => true)` and β = `{julia} repr(com05.β, context=:compact => true)`.
 
 The discrepancy in the results is because the `com05` results are based on a more accurate approximation to the integral called *adaptive Gauss-Hermite Quadrature*, which is discussed in @sec-aGHQ.
 
@@ -1224,11 +1192,11 @@ end
 m05pdevdiff = pdevdiff(m);
 ```
 
-We begin with plots of the difference in the penalized deviance from its value at the conditional mode, $\tilde{d}_j(u_j)-\tilde{d_j}(\tilde{u}_j)$, for $j=1,\dots,5$ in @fig-uscalepdev
+We begin with plots of the difference in the penalized deviance from its value at the conditional mode, $\tilde{d}_j(u_j)-\tilde{d_j}(\tilde{u}_j)$, for $j=1,\dots,5$ (@fig-uscalepdev).
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of u.
+#| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups in model com05, as a function of u.
 #| label: fig-uscalepdev
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
@@ -1248,11 +1216,11 @@ let (; zvals, inds, uvals, exact) = m05pdevdiff,
 end
 ```
 
-then shift and scale the horizontal axis to the $z$ scale for this difference in the penalized deviance (from that at the conditional mode) in @fig-zscalepdev.
+then shift and scale the horizontal axis to the $z$ scale for this difference in the penalized deviance (from that at the conditional mode) (@fig-zscalepdev).
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups, in model com05, as a function of z.
+#| fig-cap: Change in the penalized deviance contribution from that at the conditional mode, for each of the first 5 groups in model com05, as a function of z.
 #| label: fig-zscalepdev
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
@@ -1270,11 +1238,11 @@ let (; zvals, inds, uvals, exact) = m05pdevdiff,
 end
 ```
 
-The next stage is to plot, on the $z$ scale, the difference between the penalized deviance and its quadratic approximation at $z=0$ in @fig-zpdevdiff
+The next stage is to plot, on the $z$ scale, the difference between the penalized deviance and its quadratic approximation at $z=0$ (@fig-zpdevdiff)
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: The difference between the contribution to the penalized deviance and its quadratic approximation for each of first 5 groups in model com05 as a function of z.
+#| fig-cap: The difference between the contribution to the penalized deviance and its quadratic approximation for each of first 5 groups in model com05, as a function of z.
 #| label: fig-zpdevdiff
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
@@ -1294,7 +1262,7 @@ let (; zvals, inds, uvals, exact) = m05pdevdiff,
 end
 ```
 
-and, finally, the exponential of negative half of this difference in @fig-zexpneghalfdiff
+and, finally, the exponential of negative half of this difference (@fig-zexpneghalfdiff)
 
 ```{julia}
 #| code-fold: true
@@ -1387,31 +1355,26 @@ function fitGHQ!(m::BernoulliPIRLS; nGHQ::Integer=9)
   (; Ldiag, pdev0, aGHQ) = m.utbl
   θβ = m.θβ
   pp1 = length(θβ)                # length(β) = p and length(θ) = 1
-  opt = Opt(:LN_BOBYQA, pp1)
   mβ = view(θβ, 2:pp1)
-  function obj(x, g)
-    if !isempty(g)
-      throw(ArgumentError("gradient not provided, g must be empty"))
-    end
+  function obj(x)
     copyto!(θβ, x)
     mul!(m.ytbl.offset, m.X, mβ)
     evalGHQ!(m; nGHQ)
     return sum(pdev0) + sum(aGHQ) + 2 * sum(log, Ldiag)
   end
-  opt.min_objective = obj
-  lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
-  lb[1] = 0                       # scalar θ must be non-negative
-  NLopt.lower_bounds!(opt, lb)
-  minf, minx, ret = optimize(opt, copy(θβ))
-  @info (; ret, fevals=opt.numevals, minf)
+  xl = fill!(similar(θβ), -Inf)   # vector of lower bounds
+  xl[1] = 0                       # scalar θ must be non-negative
+  x, info = bobyqa(obj, θβ; xl, scale=abs.(θβ))
+  @info (; info.nf, info.fx)
   return m
 end
 ```
 
 ```{julia}
-#| warning: false
-fitGHQ!(m)
-m.θβ
+fitGHQ!(m);
 ```
+
+This converged to θ = `{julia} repr(first(m.θβ), context=:compact => true)` and β =
+`{julia} repr(view(m.θβ, 2:length(m.θβ)), context=:compact => true)`.
 
 *This page was rendered from git revision {{< git-rev short=true >}}.*
