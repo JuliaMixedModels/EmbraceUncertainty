@@ -505,7 +505,7 @@ However, this is not the case for a GLM where we must deal with the effects of t
 We define a `BernoulliIRLS` struct with three additional elements in the `tbl` field: the square roots of the working weights, `rtwwt`, the weighted working residuals, `wwres`, and the weighted working response, `wwresp`.
 In the discussion above, `rtwwt` is the diagonal of $\bbW^{1/2}$, `wwres` is $\bbW^{1/2}\tilde{\bbr}$ and `wwresp` is $\bbW^{1/2}\tilde{\bby}$.
 
-We also add fields `Xqr`, in which the weighted model matrix, $\bbW^{1/2}\bbX$, is formed and decomposed to a QR decomposition, `βcp`, which holds a copy of the previous coefficient vector, and `Whalf` which is a diagonal matrix for which the diagonal is `tbl.rtwwt`.
+We also add fields `Xqr`, in which the weighted model matrix, $\bbW^{1/2}\bbX$, is formed and decomposed to a QR factorization, `βcp`, which holds a copy of the previous coefficient vector, and `Whalf` which is a diagonal matrix for which the diagonal is `tbl.rtwwt`.
 
 ```{julia}
 #| output: false
