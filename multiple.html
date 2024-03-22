@@ -366,7 +366,7 @@ window.Quarto = {
 <p>assess the variability between samples of penicillin by the <em>B.&nbsp;subtilis</em> method. In this test method a bulk-inoculated nutrient agar medium is poured into a Petri dish of approximately 90 mm. diameter, known as a plate. When the medium has set, six small hollow cylinders or pots (about 4 mm. in diameter) are cemented onto the surface at equally spaced intervals. A few drops of the penicillin solutions to be compared are placed in the respective cylinders, and the whole plate is placed in an incubator for a given time. Penicillin diffuses from the pots into the agar, and this produces a clear circular zone of inhibition of growth of the organisms, which can be readily measured. The diameter of the zone is related in a known way to the concentration of penicillin in the solution.</p>
 </blockquote>
 <p>As with the <code>dyestuff</code> data, we examine the structure</p>
-<div id="46fac2b4" class="cell" data-execution_count="3">
+<div id="996c4291" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>penicillin <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>penicillin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>Arrow.Table with 144 rows, 3 columns, and schema:
@@ -376,7 +376,7 @@ window.Quarto = {
 </div>
 </div>
 <p>and a summary</p>
-<div id="4760f526" class="cell" data-execution_count="4">
+<div id="a156fc82" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>penicillin <span class="op">=</span> <span class="fu">DataFrame</span>(penicillin)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(penicillin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -508,7 +508,7 @@ Figure&nbsp;2.1: Diameter of inhibition zone by plate and sample. Plates are ord
 <section id="sec-PenicillinModel" class="level3" data-number="2.1.2">
 <h3 data-number="2.1.2" class="anchored" data-anchor-id="sec-PenicillinModel"><span class="header-section-number">2.1.2</span> A model for the penicillin data</h3>
 <p>A model incorporating random effects for both the <code>plate</code> and the <code>sample</code> is straightforward to specify — we include simple, scalar random effects terms for both these factors.</p>
-<div id="315d1924" class="cell" data-execution_count="6">
+<div id="81e19cac" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pnm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> diameter <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> plate) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, penicillin; contrasts, progress)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -593,7 +593,7 @@ Figure&nbsp;2.3: Conditional modes and 95% prediction intervals of random effect
 </div>
 <p>The prediction intervals on the random effects (<a href="#fig-pnm01platepred" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> and <a href="#fig-pnm01samplepred" class="quarto-xref">Figure&nbsp;<span>2.3</span></a>) confirm that the conditional distribution of the random effects for <code>plate</code> displays much less variability than does the conditional distribution of the random effects for <code>sample</code>. (Note that the horizontal scales on these two plots are different.) However, the conditional distribution of the random effect for a particular sample, say sample <code>F</code>, has less variability than the conditional distribution of the random effect for a particular plate, say plate <code>m</code>. That is, the lines in <a href="#fig-pnm01samplepred" class="quarto-xref">Figure&nbsp;<span>2.3</span></a> are wider than the lines in <a href="#fig-pnm01platepred" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>, even after taking the different axis scales into account. This is because the conditional distribution of the random effect for a particular sample depends on 24 responses while the conditional distribution of the random effect for a particular plate depends on only 6 responses.</p>
 <p>In <a href="intro.html" class="quarto-xref"><span>Chapter 1</span></a> we saw that a model with a single, simple, scalar random-effects term generated a random-effects model matrix, <span class="math inline">\({\mathbf{Z}}\)</span>, that is the matrix of indicators of the levels of the grouping factor. When we have multiple, simple, scalar random-effects terms, as in model <code>pnm01</code>, each term generates a matrix of indicator columns and these sets of indicators are concatenated to form the model matrix <span class="math inline">\({\mathbf{Z}}\)</span> whose transpose is</p>
-<div id="be5a6aaa" class="cell" data-execution_count="9">
+<div id="ecf20f2a" class="cell" data-execution_count="9">
 <div id="lst-pnm01sparsel" class="julia cell-code listing quarto-float">
 <figure class="quarto-float quarto-float-lst figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-lst" id="lst-pnm01sparsel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -613,7 +613,7 @@ Listing&nbsp;2.1: Pattern of non-zeros in the transpose of the model matrix Z fo
 </div>
 </div>
 <p>The relative covariance factor, <span class="math inline">\({\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}\)</span>, for this model is block diagonal, with two blocks, one of size 24 and one of size 6, each of which is a multiple of the identity. The diagonal elements of the two blocks are <span class="math inline">\(\theta_1\)</span> and <span class="math inline">\(\theta_2\)</span>, respectively. The numeric values of these parameters can be obtained as</p>
-<div id="561f7f2c" class="cell" data-execution_count="10">
+<div id="bd20a525" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pnm01.θ<span class="ch">'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>1×2 adjoint(::Vector{Float64}) with eltype Float64:
@@ -622,7 +622,7 @@ Listing&nbsp;2.1: Pattern of non-zeros in the transpose of the model matrix Z fo
 </div>
 <p>The first parameter is the relative standard deviation of the random effects for plate, which has the value <span class="math inline">\(0.845565/0.549933=1.53758\)</span> at convergence, and the second is the relative standard deviation of the sample random effects (<span class="math inline">\(1.770648/0.549933=3.21975\)</span>).</p>
 <p>Because <span class="math inline">\({\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}\)</span> is diagonal, the pattern of non-zeros in <span class="math inline">\({\boldsymbol{\Lambda}}_{\boldsymbol{\theta}}'{\mathbf{Z}}'{\mathbf{Z}}{\boldsymbol{\Lambda}}_{\boldsymbol{\theta}}+{\mathbf{I}}\)</span> will be the same as that in <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span>. The sparse Cholesky factor, <span class="math inline">\({\mathbf{L}}\)</span>, is lower triangular and has non-zero elements in the lower right hand corner in positions where <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span> has systematic zeros.</p>
-<div id="0b2388be" class="cell" data-execution_count="11">
+<div id="0a704681" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sparseL</span>(pnm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>30×30 SparseArrays.SparseMatrixCSC{Float64, Int32} with 189 stored entries:
@@ -641,7 +641,7 @@ Listing&nbsp;2.1: Pattern of non-zeros in the transpose of the model matrix Z fo
 <section id="sec-Penicillinprecision" class="level3" data-number="2.1.3">
 <h3 data-number="2.1.3" class="anchored" data-anchor-id="sec-Penicillinprecision"><span class="header-section-number">2.1.3</span> Precision of parameter estimates in the Pencillin model</h3>
 <p>A parametric bootstrap sample of the parameter estimates</p>
-<div id="fd980be0" class="cell" data-execution_count="12">
+<div id="27cfa0c8" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>bsrng <span class="op">=</span> <span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">9876789</span>)</span>
@@ -650,7 +650,7 @@ Listing&nbsp;2.1: Pattern of non-zeros in the transpose of the model matrix Z fo
 </details>
 </div>
 <p>can be used to create shortest 95% coverage intervals for the parameters in the model.</p>
-<div id="86b08a5d" class="cell" data-execution_count="13">
+<div id="8beec45d" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(pnm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div><div style="float: left;"><span>4×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -739,13 +739,13 @@ Figure&nbsp;2.4: Parametric bootstrap estimates of fixed-effects parameters in m
 </div>
 </div>
 <p>and the shortest coverage interval on this parameter is close to the Wald interval</p>
-<div id="1c4113a1" class="cell" data-execution_count="15">
+<div id="3cd15127" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">only</span>(pnm01.beta) <span class="op">.+</span> [<span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>] <span class="op">*</span> <span class="fu">only</span>(pnm01.stderror))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[21.483030339365666, 24.461414105078195]</code></pre>
+<pre><code>[21.483030356780876, 24.461414087669024]</code></pre>
 </div>
 </div>
 <p>The densities of the variance-components, on the scale of the standard deviation parameters, are diffuse but do not exhibit point masses at zero.</p>
@@ -788,7 +788,7 @@ Figure&nbsp;2.5: Parametric bootstrap estimates of variance components in model 
 <p>deliveries of a chemical paste product contained in casks where, in addition to sampling and testing errors, there are variations in quality between deliveries …As a routine, three casks selected at random from each delivery were sampled and the samples were kept for reference. …Ten of the delivery batches were sampled at random and two analytical tests carried out on each of the 30 samples.</p>
 </blockquote>
 <p>The structure and summary of the data object are</p>
-<div id="6cab6b4a" class="cell" data-execution_count="17">
+<div id="de9ed6ac" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>pastes <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>pastes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>Arrow.Table with 60 rows, 3 columns, and schema:
@@ -797,7 +797,7 @@ Figure&nbsp;2.5: Parametric bootstrap estimates of variance components in model 
  :strength  Float64</code></pre>
 </div>
 </div>
-<div id="789c7669" class="cell" data-execution_count="18">
+<div id="7f904e3f" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pastes <span class="op">=</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@transform</span>(<span class="fu">DataFrame</span>(pastes), <span class="op">:</span>sample <span class="op">=</span> <span class="fu">string</span>(<span class="op">:</span>batch, <span class="op">:</span>cask))</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(pastes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -919,7 +919,7 @@ Figure&nbsp;2.6: Strength of paste preparations according to sample within batch
 <section id="sec-fittingPastes" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="sec-fittingPastes"><span class="header-section-number">2.2.3</span> Fitting a model with nested random effects</h3>
 <p>Fitting a model with simple, scalar random effects for nested factors is done in exactly the same way as fitting a model with random effects for crossed grouping factors. We include random-effects terms for each factor, as in</p>
-<div id="b8dba779" class="cell" data-execution_count="20">
+<div id="28dd42ff" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>psm01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> batch)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pastes; contrasts, progress)</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -960,7 +960,7 @@ Figure&nbsp;2.6: Strength of paste preparations according to sample within batch
 </div>
 </div>
 <p>Not only is the model specification similar for nested and crossed factors, the internal calculations are performed according to the methods described in for each model type. Comparing the patterns in the matrices <span class="math inline">\({\boldsymbol{\Lambda}}\)</span>, <span class="math inline">\({\mathbf{Z}}'{\mathbf{Z}}\)</span> and <span class="math inline">\({\mathbf{L}}\)</span> and the block structure</p>
-<div id="c75d6f0d" class="cell" data-execution_count="21">
+<div id="af3d7930" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sparseL</span>(psm01; full<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
 <pre><code>42×42 SparseArrays.SparseMatrixCSC{Float64, Int32} with 153 stored entries:
@@ -977,7 +977,7 @@ Figure&nbsp;2.6: Strength of paste preparations according to sample within batch
 ⎣⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠛⠓⎦</code></pre>
 </div>
 </div>
-<div id="1e9c35a9" class="cell" data-execution_count="22">
+<div id="3b7ec7b5" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(psm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="23">
 <table class="table table-sm table-striped small">
@@ -1043,7 +1043,7 @@ Figure&nbsp;2.7: Plot of <em>batch</em> prediction intervals from <em>psm01</em>
 </div>
 <p>confirm this impression in that all the prediction intervals for the random effects for contain zero.</p>
 <p>Furthermore, kernel density estimates from a parametric bootstrap sample of the estimated standard deviations of the random effects and residuals</p>
-<div id="b3cd854f" class="cell" data-execution_count="24">
+<div id="585716a3" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">Random</span>.<span class="fu">seed!</span>(<span class="fl">4567654</span>)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>psm01samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(<span class="fl">10_000</span>, psm01; progress)</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>psm01pars <span class="op">=</span> <span class="fu">DataFrame</span>(psm01samp.allpars);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1082,7 +1082,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 <p>These are the general principles of statistical hypothesis tests. To perform a test in practice we must specify the criterion for comparing the model fits, the method for calculating the p-value from an observed value of the criterion, and the standard by which we will determine if the p-value is “small” or not. The criterion is called the <em>test statistic</em>, the p-value is calculated from a <em>reference distribution</em> for the test statistic, and the standard for small p-values is called the <em>level</em> of the test.</p>
 <p>In <a href="intro.html#sec-printeddetails" class="quarto-xref"><span>Section 1.3.2</span></a> we referred to likelihood ratio tests (LRTs) for which the test statistic is the difference in the deviance. That is, the LRT statistic is <span class="math inline">\(d_0-d_a\)</span> where <span class="math inline">\(d_a\)</span> is the deviance in the more general (<span class="math inline">\(H_a\)</span>) model fit and <span class="math inline">\(d_0\)</span> is the deviance in the constrained (<span class="math inline">\(H_0\)</span>) model. An approximate reference distribution for an LRT statistic is the <span class="math inline">\(\chi^2_\nu\)</span> distribution where <span class="math inline">\(\nu\)</span>, the degrees of freedom, is determined by the number of constraints imposed on the parameters of <span class="math inline">\(H_a\)</span> to produce <span class="math inline">\(H_0\)</span>.</p>
 <p>The restricted model fit</p>
-<div id="77caf1e7" class="cell" data-execution_count="26">
+<div id="94905676" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>psm02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> strength <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> sample)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, pastes; contrasts, progress)</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1120,7 +1120,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 </div>
 </div>
 <p>is compared to model <code>psm01</code> as</p>
-<div id="a7d8da78" class="cell" data-execution_count="27">
+<div id="f9d701a4" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>MixedModels.<span class="fu">likelihoodratiotest</span>(psm02, psm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="28">
 <table class="table table-sm table-striped small">
@@ -1169,7 +1169,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 <section id="sec-assessReduced" class="level3" data-number="2.2.6">
 <h3 data-number="2.2.6" class="anchored" data-anchor-id="sec-assessReduced"><span class="header-section-number">2.2.6</span> Assessing the reduced model, psm02</h3>
 <p>Comparing the coverage intervals for models <code>psm01</code> and <code>psm02</code></p>
-<div id="8a4a9c96" class="cell" data-execution_count="28">
+<div id="c1df0e37" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(psm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1209,7 +1209,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 <td style="text-align: left;">σ</td>
 <td style="text-align: left;">sample</td>
 <td style="text-align: left;">(Intercept)</td>
-<td style="text-align: right;">1.93501</td>
+<td style="text-align: right;">1.93499</td>
 <td style="text-align: right;">3.61949</td>
 </tr>
 <tr class="odd">
@@ -1225,7 +1225,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 <td style="text-align: left;">σ</td>
 <td style="text-align: left;">residual</td>
 <td style="text-align: left; font-style: italic;">missing</td>
-<td style="text-align: right;">0.608905</td>
+<td style="text-align: right;">0.608904</td>
 <td style="text-align: right;">1.02399</td>
 </tr>
 </tbody>
@@ -1233,7 +1233,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 </div>
 </div>
 </div>
-<div id="21a82886" class="cell" data-execution_count="29">
+<div id="c0f14c67" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>psm02samp <span class="op">=</span> <span class="fu">parametricbootstrap</span>(</span>
@@ -1307,7 +1307,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="sec-insteval"><span class="header-section-number">2.3.1</span> The insteval data</h3>
 <p>The data are from a special evaluation of lecturers by students at the Swiss Federal Institute for Technology–Zürich (ETH–Zürich), to determine who should receive the “best-liked professor” award. These data have been slightly simplified and identifying labels have been removed, so as to preserve anonymity.</p>
 <p>The variables</p>
-<div id="b41eb30c" class="cell" data-execution_count="30">
+<div id="f79c516a" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>insteval <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>insteval)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <pre><code>Arrow.Table with 73421 rows, 7 columns, and schema:
@@ -1320,7 +1320,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
  :y        Int8</code></pre>
 </div>
 </div>
-<div id="6e735063" class="cell" data-execution_count="31">
+<div id="8fd096a2" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(insteval))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="32">
 <div><div style="float: left;"><span>7×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -1450,7 +1450,7 @@ Figure&nbsp;2.9: Histogram of instructor ratings in the <em>insteval</em> data
 </div>
 <p>it is sufficiently diffuse to warrant treating it as if it were a continuous response.</p>
 <p>At this point we will fit models that have random effects for student, instructor, and department (or the combination of department and service) to these data.</p>
-<div id="9aade711" class="cell" data-execution_count="33">
+<div id="f08e39e3" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>iem01 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dept)</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, insteval; contrasts, progress)</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1483,7 +1483,7 @@ Figure&nbsp;2.9: Histogram of instructor ratings in the <em>insteval</em> data
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: right;">3.2519</td>
 <td style="text-align: right;">0.0279</td>
-<td style="text-align: right;">116.69</td>
+<td style="text-align: right;">116.70</td>
 <td style="text-align: right;">&lt;1e-99</td>
 <td style="text-align: right;">0.3264</td>
 <td style="text-align: right;">0.5173</td>
@@ -1524,7 +1524,7 @@ Figure&nbsp;2.10: Prediction intervals on random effects for department in model
 </div>
 </div>
 <p>However, the p-value for the LRT of <span class="math inline">\(H_0:\sigma_3=0\)</span> versus <span class="math inline">\(H_a:\sigma_3&gt;0\)</span></p>
-<div id="248048a0" class="cell" data-execution_count="35">
+<div id="956c4ae5" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>iem02 <span class="op">=</span> <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, insteval; contrasts, progress)</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
@@ -1577,7 +1577,7 @@ Figure&nbsp;2.10: Prediction intervals on random effects for department in model
 <section id="sec-iem01L" class="level3" data-number="2.3.2">
 <h3 data-number="2.3.2" class="anchored" data-anchor-id="sec-iem01L"><span class="header-section-number">2.3.2</span> Structure of L for model iem01</h3>
 <p>Before leaving this model we examine the sparse Cholesky factor, <span class="math inline">\({\mathbf{L}}\)</span>, which is of size <span class="math inline">\(4116\times4116\)</span>.</p>
-<div id="939269a3" class="cell" data-execution_count="36">
+<div id="48053c2f" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> <span class="fu">sparseL</span>(iem01; full<span class="op">=</span><span class="cn">true</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="37">
 <pre><code>4116×4116 SparseArrays.SparseMatrixCSC{Float64, Int32} with 741328 stored entries:
@@ -1604,7 +1604,7 @@ Figure&nbsp;2.10: Prediction intervals on random effects for department in model
 </div>
 </div>
 <p>Even as a sparse matrix <code>L</code> requires a considerable amount of memory, about 9 MB,</p>
-<div id="45da61a9" class="cell" data-execution_count="37">
+<div id="80780c7f" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>(<span class="bu">Base</span>.<span class="fu">summarysize</span>(L), <span class="bu">Base</span>.<span class="fu">summarysize</span>(<span class="fu">collect</span>(L)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>(8912564, 135531688)</code></pre>
@@ -1616,7 +1616,7 @@ Figure&nbsp;2.10: Prediction intervals on random effects for department in model
 <h3 data-number="2.3.3" class="anchored" data-anchor-id="effect-of-service-courses"><span class="header-section-number">2.3.3</span> Effect of service courses</h3>
 <p>It is sometimes felt that it is more difficult to achieve favorable ratings from students in a service course (i.e.&nbsp;a course taught to students majoring in another program) as opposed to students taking a course in their major.</p>
 <p>There are several ways in which <code>service</code> can be incorporated in a model like this. The simplest approach is to add <code>service</code> to the fixed-effects specification</p>
-<div id="1001b97d" class="cell" data-execution_count="38">
+<div id="c8486d5a" class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>iem03 <span class="op">=</span></span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> y <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> service <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> s) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> d) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> dept)</span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(MixedModel, f, insteval; contrasts, progress)</span>
@@ -1733,7 +1733,7 @@ Figure&nbsp;2.12: Histogram of the number of observations per instructor in the 
 </div>
 <p>The precision of the conditional distributions of the random effects, as measured by the width of the intervals, varies considerably between instructors.</p>
 <p>We can determine that instructor <code>I1258</code> has the largest mean of the conditional distributions of the random effects</p>
-<div id="c977e82e" class="cell" data-execution_count="41">
+<div id="3d80c14d" class="cell" data-execution_count="41">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(</span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sort</span>(<span class="fu">DataFrame</span>(<span class="fu">ranefinfotable</span>(<span class="fu">ranefinfo</span>(iem01, <span class="op">:</span>d))), <span class="op">:</span>cmode),</span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fl">5</span>,</span>
@@ -1763,7 +1763,7 @@ Figure&nbsp;2.12: Histogram of the number of observations per instructor in the 
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I0066</td>
 <td style="text-align: right;">1.03151</td>
-<td style="text-align: right;">0.105473</td>
+<td style="text-align: right;">0.105472</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -1784,7 +1784,7 @@ Figure&nbsp;2.12: Histogram of the number of observations per instructor in the 
 <td style="text-align: left;">(Intercept)</td>
 <td style="text-align: left;">I1866</td>
 <td style="text-align: right;">1.06625</td>
-<td style="text-align: right;">0.123322</td>
+<td style="text-align: right;">0.123321</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
@@ -1821,7 +1821,7 @@ Figure&nbsp;2.12: Histogram of the number of observations per instructor in the 
 
 Variance components:
                 Column   Variance Std.Dev. 
-batch &amp; cask (Intercept)  8.433616 2.904069
+batch &amp; cask (Intercept)  8.433617 2.904069
 batch        (Intercept)  1.199180 1.095071
 Residual                  0.678002 0.823409
  Number of obs: 60; levels of grouping factors: 30, 10
@@ -1838,8 +1838,8 @@ Residual                  0.678002 0.823409
 <p>The insteval data, described in <a href="#sec-insteval" class="quarto-xref"><span>Section 2.3.1</span></a>, illustrate some of the characteristics of the real data to which mixed-effects models are now fit. There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed. Such data are common in sociological and educational studies but until recently it has been very difficult to fit models that appropriately reflect such a structure. Much of the literature on mixed-effects models leaves the impression that multiple random effects terms can only be associated with nested grouping factors. The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.</p>
 <p>The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter. That is, profile-based confidence intervals on the fixed-effects parameter, <span class="math inline">\(\beta_0\)</span>, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution.</p>
 <p>Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be “statistically significant” even when its practical significance is questionable.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/4cd5e78
-">4cd5e78
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/9743fed
+">9743fed
 </a>.</em></p>
 
 

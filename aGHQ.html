@@ -433,7 +433,7 @@ d(y_i, \eta_i)&amp;=-2\left[y_i\log(\mu_i)+(1-y_i)\log(1-\mu_i)\right]\\
 \quad i=1,\dots,n
 \]</span></p>
 <p>A Julia function to evaluate both the mean and the unit deviance can be written as</p>
-<div id="5b46dcb0" class="cell" data-execution_count="3">
+<div id="e7aff80b" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">meanunitdev</span>(y<span class="op">::</span><span class="dt">T</span>, η<span class="op">::</span><span class="dt">T</span>) <span class="kw">where</span> {T<span class="op">&lt;:</span><span class="dt">AbstractFloat</span>}</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  expmη <span class="op">=</span> <span class="fu">exp</span>(<span class="op">-</span>η)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (; μ<span class="op">=</span><span class="fu">inv</span>(<span class="fl">1</span> <span class="op">+</span> expmη), dev<span class="op">=</span><span class="fl">2</span> <span class="op">*</span> ((<span class="fl">1</span> <span class="op">-</span> y) <span class="op">*</span> η <span class="op">+</span> <span class="fu">log1p</span>(expmη)))</span>
@@ -452,7 +452,7 @@ log1p
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Mathematically <code>log1p</code>, read <em>log of 1 plus</em>, is defined as <span class="math inline">\(\mathrm{log1p}(x)=\log(1+x)\)</span> but it is implemented in such a way as to provide greater accuracy when <span class="math inline">\(x\)</span> is small. For example,</p>
-<div id="fabea084" class="cell" data-execution_count="4">
+<div id="2766f38f" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> small <span class="op">=</span> <span class="fu">eps</span>() <span class="op">/</span> <span class="fl">10</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@show</span> small</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@show</span> <span class="fl">1</span> <span class="op">+</span> small</span>
@@ -471,7 +471,7 @@ log1p(small) = 2.2204460492503132e-17</code></pre>
 </div>
 </div>
 <p>This function returns a <code>NamedTuple</code> of values from scalar arguments. For example,</p>
-<div id="b1291567" class="cell" data-execution_count="5">
+<div id="b8b2511a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">meanunitdev</span>(<span class="fl">0.0</span>, <span class="fl">0.21</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>(μ = 0.5523079095743253, dev = 1.6072991620435673)</code></pre>
@@ -497,20 +497,20 @@ log1p(small) = 2.2204460492503132e-17</code></pre>
 </details>
 </div>
 <p>Extract the fixed-effects model matrix, <span class="math inline">\({\mathbf{X}}\)</span>, and initialize the coefficient vector, <span class="math inline">\({\boldsymbol{\beta}}\)</span>, to a copy (in case we modify it) of the estimated fixed-effects.</p>
-<div id="5e0b48cd" class="cell" data-execution_count="7">
+<div id="e85acb9e" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>βm05 <span class="op">=</span> <span class="fu">copy</span>(com05.β)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>6-element Vector{Float64}:
- -0.34146981024676226
-  0.39360633834880304
-  0.6064511890632197
- -0.012910810607815223
-  0.03321078230709955
- -0.005624627460981553</code></pre>
+ -0.3414511775952209
+  0.3936022112386835
+  0.6064401757134296
+ -0.012909532359085995
+  0.03321000321414715
+ -0.005624664724561386</code></pre>
 </div>
 </div>
 <p>As stated above, the <code>meanunitdev</code> function can be applied to the vectors, <span class="math inline">\({\mathbf{y}}\)</span> and <span class="math inline">\({{\boldsymbol{\eta}}}\)</span>, via dot-vectorization to produce a <code>Vector{NamedTuple}</code>, which is the typical form of a row-table.</p>
-<div id="aa767b6c" class="cell" data-execution_count="8">
+<div id="daeedf8e" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>rowtbl <span class="op">=</span> <span class="fu">meanunitdev</span>.(com05.y, com05.X <span class="op">*</span> βm05)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(rowtbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -520,50 +520,50 @@ log1p(small) = 2.2204460492503132e-17</code></pre>
 </div>
 </div>
 <p>For display we convert the row-table to a column-table and prepend another column-table consisting of <span class="math inline">\({\mathbf{y}}\)</span> and <span class="math inline">\({\boldsymbol{\eta}}\)</span>.</p>
-<div id="c72af80b" class="cell" data-execution_count="9">
+<div id="39a5e0c9" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Table</span>((; y<span class="op">=</span>com05.y, η<span class="op">=</span>com05.X <span class="op">*</span> βm05), rowtbl)  <span class="co"># display as a Table</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>Table with 4 columns and 1934 rows:
       y    η          μ         dev
     ┌───────────────────────────────────
  1  │ 0.0  -0.879643  0.293252  0.694161
- 2  │ 0.0  -0.471756  0.384201  0.969668
- 3  │ 0.0  0.676156   0.66288   2.17463
- 4  │ 0.0  0.429257   0.605696  1.86127
- 5  │ 0.0  -0.963126  0.276253  0.646626
- 6  │ 0.0  -0.772788  0.315876  0.759233
+ 2  │ 0.0  -0.471743  0.384204  0.969678
+ 3  │ 0.0  0.676161   0.662881  2.17464
+ 4  │ 0.0  0.429262   0.605697  1.86127
+ 5  │ 0.0  -0.963136  0.276251  0.646621
+ 6  │ 0.0  -0.772792  0.315876  0.759231
  7  │ 0.0  -0.879643  0.293252  0.694161
- 8  │ 0.0  0.515036   0.625986  1.96693
+ 8  │ 0.0  0.515037   0.625986  1.96693
  9  │ 0.0  0.371842   0.591904  1.79251
- 10 │ 0.0  0.676156   0.66288   2.17463
- 11 │ 1.0  -0.772788  0.315876  2.30481
- 12 │ 0.0  -0.473105  0.383882  0.968632
- 13 │ 0.0  0.449064   0.610417  1.88535
- 14 │ 0.0  0.602567   0.646243  2.07829
- 15 │ 0.0  0.645456   0.655986  2.13414
- 16 │ 1.0  0.637838   0.654265  0.848487
- 17 │ 0.0  -0.471756  0.384201  0.969668
- 18 │ 1.0  0.645456   0.655986  0.843233
- 19 │ 1.0  0.283372   0.570373  1.12293
- 20 │ 0.0  0.515036   0.625986  1.96693
- 21 │ 0.0  -0.460956  0.386759  0.977994
- 22 │ 0.0  -0.627447  0.34809   0.855696
- 23 │ 0.0  0.674633   0.66254   2.17262
+ 10 │ 0.0  0.676161   0.662881  2.17464
+ 11 │ 1.0  -0.772792  0.315876  2.30481
+ 12 │ 0.0  -0.473085  0.383886  0.968648
+ 13 │ 0.0  0.449064   0.610417  1.88536
+ 14 │ 0.0  0.602572   0.646244  2.0783
+ 15 │ 0.0  0.645459   0.655986  2.13415
+ 16 │ 1.0  0.637843   0.654266  0.848484
+ 17 │ 0.0  -0.471743  0.384204  0.969678
+ 18 │ 1.0  0.645459   0.655986  0.84323
+ 19 │ 1.0  0.283371   0.570372  1.12293
+ 20 │ 0.0  0.515037   0.625986  1.96693
+ 21 │ 0.0  -0.460941  0.386763  0.978006
+ 22 │ 0.0  -0.627445  0.34809   0.855698
+ 23 │ 0.0  0.674637   0.662541  2.17262
  ⋮  │  ⋮       ⋮         ⋮         ⋮</code></pre>
 </div>
 </div>
 <p>The deviance for this value of <span class="math inline">\({{\boldsymbol{\beta}}}\)</span> in this model is the sum of the unit deviances, which we write as <code>sum</code> applied to a <a href="https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions">generator expression</a>. (In general we extract columns of a row-table with generator expressions that produce <a href="https://docs.julialang.org/en/v1/base/collections/#lib-collections-iteration">iterators</a>.)</p>
-<div id="0a62eb2e" class="cell" data-execution_count="10">
+<div id="87266f8c" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(r.dev <span class="cf">for</span> r <span class="kw">in</span> rowtbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
-<pre><code>2411.1933792711147</code></pre>
+<pre><code>2411.193011221526</code></pre>
 </div>
 </div>
 </section>
 <section id="encapsulating-the-model-in-a-struct" class="level3" data-number="C.2.2">
 <h3 data-number="C.2.2" class="anchored" data-anchor-id="encapsulating-the-model-in-a-struct"><span class="header-section-number">C.2.2</span> Encapsulating the model in a struct</h3>
 <p>When minimizing the deviance it is convenient to have the different components of the model encapsulated in a user-created <code>struct</code> type so we can update the parameter values and evaluate the deviance without needing to keep track of all the pieces of the model.</p>
-<div id="c1011807" class="cell" data-execution_count="11">
+<div id="150307fd" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> BernoulliGLM{T<span class="op">&lt;:</span><span class="dt">AbstractFloat</span>}</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  X<span class="op">::</span><span class="dt">Matrix{T}</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  β<span class="op">::</span><span class="dt">Vector{T}</span></span>
@@ -572,7 +572,7 @@ log1p(small) = 2.2204460492503132e-17</code></pre>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We also create an <em>external constructor</em>, which is a function defined outside the struct and of the same name as the struct, that constructs and returns an object of that type. In this case the external constructor creates a <code>BernoulliGLM</code> from the model matrix and the response vector, after some consistency checks on the arguments passed to it.</p>
-<div id="424063a5" class="cell" data-execution_count="12">
+<div id="e26a8e00" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">BernoulliGLM</span>(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  X<span class="op">::</span><span class="dt">Matrix{T}</span>,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  y<span class="op">::</span><span class="dt">Vector{T}</span>,</span>
@@ -592,7 +592,7 @@ log1p(small) = 2.2204460492503132e-17</code></pre>
 <span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To optimize the deviance we define an <em>extractor</em> method that returns the deviance</p>
-<div id="4da522c2" class="cell" data-execution_count="13">
+<div id="b9926f3f" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>StatsAPI.<span class="fu">deviance</span>(m<span class="op">::</span><span class="dt">BernoulliGLM</span>) <span class="op">=</span> <span class="fu">sum</span>(r.dev <span class="cf">for</span> r <span class="kw">in</span> m.rtbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -612,7 +612,7 @@ Why StatsAPI.deviance and not just deviance?
 </div>
 </div>
 <p>We also define a mutating function, <code>setβ!</code>, that installs a new value of <code>β</code> then updates <code>η</code> and <code>rtbl</code> in place.</p>
-<div id="14d1cb2f" class="cell" data-execution_count="14">
+<div id="7ded4527" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">setβ!</span>(m<span class="op">::</span><span class="dt">BernoulliGLM</span>, newβ)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  (; y, η) <span class="op">=</span> m.ytbl                <span class="co"># destructure ytbl</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mul!</span>(η, m.X, <span class="fu">copyto!</span>(m.β, newβ)) <span class="co"># η = X * newβ in place</span></span>
@@ -621,39 +621,39 @@ Why StatsAPI.deviance and not just deviance?
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Create such a struct from <code>X</code> and <code>y</code> for model <code>com05</code>.</p>
-<div id="7d317092" class="cell" data-execution_count="15">
+<div id="a2724152" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>com05fe <span class="op">=</span> <span class="fu">BernoulliGLM</span>(com05.X, com05.y)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>β₀ <span class="op">=</span> <span class="fu">copy</span>(com05fe.β)          <span class="co"># keep a copy of the initial values</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="16">
 <pre><code>6-element Vector{Float64}:
  -0.10753340611835722
-  0.17596632075206523
-  0.21944824496978527
- -0.0028547435517882087
-  0.01013992183478437
- -0.002161831532409505</code></pre>
+  0.17596632075206525
+  0.21944824496978524
+ -0.0028547435517881996
+  0.010139921834784385
+ -0.002161831532409504</code></pre>
 </div>
 </div>
 <p>These initial values of <span class="math inline">\({\boldsymbol{\beta}}\)</span> are from a least squares fit of <span class="math inline">\({\mathbf{y}}\)</span>, converted from <code>{0,1}</code> coding to <code>{-1,1}</code> coding, on the model matrix, <span class="math inline">\({\mathbf{X}}\)</span>.</p>
 <p>As a simple test of the <code>setβ!</code> and <code>deviance</code> methods we can check that <code>com05fe</code> produces the same deviance value for <code>βm05</code> as was evaluated above.</p>
-<div id="794ea8c7" class="cell" data-execution_count="16">
+<div id="4a922326" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">deviance</span>(<span class="fu">setβ!</span>(com05fe, βm05))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
-<pre><code>2411.1933792711147</code></pre>
+<pre><code>2411.193011221526</code></pre>
 </div>
 </div>
 <p>For fairness in later comparisons we restore the initial values <code>β₀</code> to the model. These are rough starting estimates with a deviance that is considerably greater than that at <code>βm05</code>.</p>
-<div id="aa7220b1" class="cell" data-execution_count="17">
+<div id="0fa13531" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">deviance</span>(<span class="fu">setβ!</span>(com05fe, β₀))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
-<pre><code>2491.151439053725</code></pre>
+<pre><code>2491.1514390537254</code></pre>
 </div>
 </div>
 </section>
 <section id="fit-the-glm-using-a-general-optimizer" class="level3" data-number="C.2.3">
 <h3 data-number="C.2.3" class="anchored" data-anchor-id="fit-the-glm-using-a-general-optimizer"><span class="header-section-number">C.2.3</span> Fit the GLM using a general optimizer</h3>
 <p>We can use a general optimizer like those available in <a href="https://github.com/JuliaOpt/NLopt.jl">NLopt.jl</a> to minimize the deviance. Following the instructions given at that package’s repository, we create an <code>Opt</code> object specifying the algorithm to be used, BOBYQA (<span class="citation" data-cites="powell2009bobyqa">Powell (<a href="references.html#ref-powell2009bobyqa" role="doc-biblioref">2009</a>)</span>), and the dimension of the problem, then define and assign the objective function in the required form, and call <code>optimize</code></p>
-<div id="335321de" class="cell" data-execution_count="18">
+<div id="a8fad330" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> StatsAPI.<span class="fu">fit!</span>(m<span class="op">::</span><span class="dt">BernoulliGLM{T}</span>) <span class="kw">where</span> {T}</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  opt <span class="op">=</span> <span class="fu">Opt</span>(<span class="op">:</span>LN_BOBYQA, <span class="fu">length</span>(m.β))</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">function</span> <span class="fu">objective</span>(x<span class="op">::</span><span class="dt">Vector{T}</span>, g<span class="op">::</span><span class="dt">Vector{T}</span>) <span class="kw">where</span> {T}</span>
@@ -668,27 +668,27 @@ Why StatsAPI.deviance and not just deviance?
 <span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> m</span>
 <span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="7144ed79" class="cell" data-execution_count="19">
+<div id="a4e99767" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit!</span>(com05fe);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[ Info: (code = :ROUNDOFF_LIMITED, nevals = 522, minf = 2409.377428160011)</code></pre>
+<pre><code>[ Info: (code = :ROUNDOFF_LIMITED, nevals = 558, minf = 2409.377428160017)</code></pre>
 </div>
 </div>
 <p>The optimizer has determined a coefficient vector that reduces the deviance to 2409.38, at which point convergence was declared because changes in the objective are limited by round-off. This required about 500 evaluations of the deviance at candidate values of <span class="math inline">\({\boldsymbol{\beta}}\)</span>.</p>
 <p>Each evaluation of the deviance is fast, requiring only a fraction of a millisecond on a laptop computer,</p>
-<div id="e211c460" class="cell" data-execution_count="20">
+<div id="6f7ff9e2" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>βopt <span class="op">=</span> <span class="fu">copy</span>(com05fe.β)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">deviance</span>(<span class="fu">setβ!</span>(m, β)) seconds <span class="op">=</span> <span class="fl">1</span> setup <span class="op">=</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  (m <span class="op">=</span> com05fe; β <span class="op">=</span> βopt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="21">
 <div class="ansi-escaped-output">
 <pre>BenchmarkTools.Trial: 10000 samples with 1 evaluation.
- Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">24.916 μs</span> … <span class="ansi-magenta-fg">61.958 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">25.084 μs              </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">25.587 μs</span> ± <span class="ansi-green-fg"> 1.958 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.00% ± 0.00%
-  █<span class="ansi-blue-fg">▄</span>▆<span class="ansi-green-fg">▅</span>▃▁ ▁▂▂                                                  ▁
-  █<span class="ansi-blue-fg">█</span>█<span class="ansi-green-fg">█</span>████████▇▇█▅▅▅▅▅▅▄▄▄▁▄▄▆▄▅▅▅▆▅▄▅▅▁▄▄▅▄▃▁▅▄▅▅▃▄▆▃▅▅▅▄▅▃▅ █
-  24.9 μs<span class="ansi-bright-black-fg">      </span><span class="ansi-bright-black-fg">Histogram: </span><span class="ansi-bright-black-fg ansi-bold">log(</span><span class="ansi-bright-black-fg">frequency</span><span class="ansi-bright-black-fg ansi-bold">)</span><span class="ansi-bright-black-fg"> by time</span>      37.3 μs <span class="ansi-bold">&lt;</span>
+ Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">35.048 μs</span> … <span class="ansi-magenta-fg">244.035 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">42.730 μs               </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">42.965 μs</span> ± <span class="ansi-green-fg">  4.278 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.00% ± 0.00%
+       ▁  ▂▁ ▂▂ ▁▄▂ ▁▂  ▆█<span class="ansi-blue-fg">▆</span>▂▁▆▅▁                               ▂
+  ▄▁▄▃▆█▇▆██▇██████▇███▆██<span class="ansi-blue-fg">█</span>█████▇▇▇█████▇▆▇▇▅▅▅▅▅▅▆▅▅▃▄▅▅▅▅▃▆▄ █
+  35 μs<span class="ansi-bright-black-fg">         </span><span class="ansi-bright-black-fg">Histogram: </span><span class="ansi-bright-black-fg ansi-bold">log(</span><span class="ansi-bright-black-fg">frequency</span><span class="ansi-bright-black-fg ansi-bold">)</span><span class="ansi-bright-black-fg"> by time</span>      54.6 μs <span class="ansi-bold">&lt;</span>
  Memory estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">16 bytes</span>, allocs estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">1</span>.</pre>
 </div>
 </div>
@@ -746,7 +746,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <h3 data-number="C.3.1" class="anchored" data-anchor-id="implementation-of-irls-for-bernoulli-logit"><span class="header-section-number">C.3.1</span> Implementation of IRLS for Bernoulli-Logit</h3>
 <p>We define a <code>BernoulliIRLS</code> struct with three additional elements in the rowtable: the square roots of the working weights, <code>rtwwt</code>, the weighted working residuals, <code>wwres</code>, and the weighted working response, <code>wwresp</code>. In the discussion above, <code>rtwwt</code> is the diagonal of <span class="math inline">\({\mathbf{W}}^{1/2}\)</span>, <code>wwres</code> is <span class="math inline">\({\mathbf{W}}^{1/2}\tilde{{\mathbf{r}}}\)</span> and <code>wwresp</code> is <span class="math inline">\({\mathbf{W}}^{1/2}\tilde{{\mathbf{y}}}\)</span>.</p>
 <p>We also add fields <code>Xqr</code>, in which the weighted model matrix, <span class="math inline">\({\mathbf{W}}^{1/2}{\mathbf{X}}\)</span>, is formed followed by its QR decomposition, and <code>βcp</code>, which holds a copy of the previous coefficient vector.</p>
-<div id="1764fe86" class="cell" data-execution_count="21">
+<div id="50b36261" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> BernoulliIRLS{T<span class="op">&lt;:</span><span class="dt">AbstractFloat</span>}</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  X<span class="op">::</span><span class="dt">Matrix{T}</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  Xqr<span class="op">::</span><span class="dt">Matrix{T}                </span><span class="co"># copy of X used in the QR decomp</span></span>
@@ -760,7 +760,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>with constructor</p>
-<div id="b199f990" class="cell" data-execution_count="22">
+<div id="71813598" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">BernoulliIRLS</span>(</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  X<span class="op">::</span><span class="dt">Matrix{T}</span>,</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  y<span class="op">::</span><span class="dt">Vector{T}</span>,</span>
@@ -780,7 +780,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>tblrow</code> function evaluates the mean, unit deviance, square root of the weight, and the weighted, working residual and weighted, working response for scalar <span class="math inline">\(y\)</span> and <span class="math inline">\(\eta\)</span>. The <code>offset</code> argument, which defaults to zero, is not used in calls for <code>BernoulliIRLS</code> models, but will be used in <a href="#sec-PIRLS" class="quarto-xref"><span>Section C.4</span></a> when we discuss the PIRLS algorithm.</p>
-<div id="0f3a5726" class="cell" data-execution_count="23">
+<div id="9d1ea6e4" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">tblrow</span>(</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  y<span class="op">::</span><span class="dt">T</span>,</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  η<span class="op">::</span><span class="dt">T</span>,</span>
@@ -797,11 +797,11 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (; μ, dev, rtwwt, wwres, wwresp)</span>
 <span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="a7f9d3c1" class="cell" data-execution_count="24">
+<div id="cfcf546c" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>StatsAPI.<span class="fu">deviance</span>(m<span class="op">::</span><span class="dt">BernoulliIRLS</span>) <span class="op">=</span> <span class="fu">sum</span>(r.dev <span class="cf">for</span> r <span class="kw">in</span> m.rtbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Next we define a mutating function, <code>updateβ!</code>, that evaluates <span class="math inline">\({\boldsymbol{\beta}}^{(k)}\)</span>, the updated coefficient vector at iteration <span class="math inline">\(k\)</span>, in place by weighted least squares then updates the response table.</p>
-<div id="e6ae517c" class="cell" data-execution_count="25">
+<div id="1ff017ca" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">updateβ!</span>(m<span class="op">::</span><span class="dt">BernoulliIRLS</span>)</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  (; X, Xqr, β, βcp, Whalf, ytbl, rtbl) <span class="op">=</span> m  <span class="co"># destructure m &amp; ytbl</span></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  (; y, η) <span class="op">=</span> ytbl</span>
@@ -815,15 +815,15 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>For our example, we start at the same coefficient vector as we did with the general optimizer.</p>
-<div id="dc9ddc90" class="cell" data-execution_count="26">
+<div id="eb59d11e" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>com05fe <span class="op">=</span> <span class="fu">BernoulliIRLS</span>(com05.X, com05.y)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">deviance</span>(com05fe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="27">
-<pre><code>2491.1514390537245</code></pre>
+<pre><code>2491.1514390537254</code></pre>
 </div>
 </div>
 <p>The first IRLS iteration</p>
-<div id="1b061cd6" class="cell" data-execution_count="27">
+<div id="ce67a929" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">deviance</span>(<span class="fu">updateβ!</span>(com05fe))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="28">
 <pre><code>2411.165742459929</code></pre>
@@ -831,7 +831,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 </div>
 <p>reduces the deviance substantially.</p>
 <p>We create a <code>fit!</code> method to iterate to convergence.</p>
-<div id="cf71f809" class="cell" data-execution_count="28">
+<div id="3e7e6532" class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> StatsAPI.<span class="fu">fit!</span>(m<span class="op">::</span><span class="dt">BernoulliIRLS</span>, β₀<span class="op">=</span>m.β; verbose<span class="op">::</span><span class="dt">Bool</span>=<span class="cn">true</span>)</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  (; X, β, βcp, ytbl, rtbl) <span class="op">=</span> m</span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  (; y, η) <span class="op">=</span> ytbl</span>
@@ -855,28 +855,28 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> m</span>
 <span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="009a1359" class="cell" data-execution_count="29">
+<div id="05a87472" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit!</span>(com05fe, β₀);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>[ Info: (0, 2491.1514390537254)
-[ Info: (1, 2411.1657424599293)
+[ Info: (1, 2411.165742459929)
 [ Info: (2, 2409.382451337132)
-[ Info: (3, 2409.377428283585)
-[ Info: (4, 2409.3774281600395)</code></pre>
+[ Info: (3, 2409.3774282835857)
+[ Info: (4, 2409.3774281600413)</code></pre>
 </div>
 </div>
 <p>The IRLS algorithm has converged in 4 iterations to essentially the same deviance as the general optimizer achieved after around 500 function evaluations. Each iteration of the IRLS algorithm takes more time than a deviance evaluation, but still only a fraction of a millisecond on a laptop computer.</p>
-<div id="324b6580" class="cell" data-execution_count="30">
+<div id="3a273f43" class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">deviance</span>(<span class="fu">updateβ!</span>(m)) seconds <span class="op">=</span> <span class="fl">1</span> setup <span class="op">=</span> (m <span class="op">=</span> com05fe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="31">
 <div class="ansi-escaped-output">
-<pre>BenchmarkTools.Trial: 10000 samples with 1 evaluation.
- Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">89.250 μs</span> … <span class="ansi-magenta-fg"> 2.595 ms</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 95.52%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">94.334 μs              </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">95.329 μs</span> ± <span class="ansi-green-fg">40.237 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.72% ±  1.65%
-                        ▅█▇<span class="ansi-blue-fg">▆</span>▃▁ <span class="ansi-green-fg"> </span>                               
-  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▇█▅▅▅▇███<span class="ansi-blue-fg">█</span>██▇<span class="ansi-green-fg">▅</span>▄▄▃▃▃▃▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ ▂
-  89.2 μs<span class="ansi-bright-black-fg">         Histogram: frequency by time</span>         101 μs <span class="ansi-bold">&lt;</span>
+<pre>BenchmarkTools.Trial: 9910 samples with 1 evaluation.
+ Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">83.960 μs</span> … <span class="ansi-magenta-fg"> 1.763 ms</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 90.61%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">88.178 μs              </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">98.705 μs</span> ± <span class="ansi-green-fg">40.965 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.41% ±  1.56%
+  █▅█<span class="ansi-blue-fg">▇</span>▆▅▄▃▂▂▂<span class="ansi-green-fg">▁</span>▁▁                       ▁▁▁ ▁▁   ▁▂▁ ▁▁        ▂
+  ███<span class="ansi-blue-fg">█</span>███████<span class="ansi-green-fg">█</span>██▇██▇▇█▇▆▇█▇▇▇██████████████████████████▇▆▅▅▄▄ █
+  84 μs<span class="ansi-bright-black-fg">        </span><span class="ansi-bright-black-fg">Histogram: </span><span class="ansi-bright-black-fg ansi-bold">log(</span><span class="ansi-bright-black-fg">frequency</span><span class="ansi-bright-black-fg ansi-bold">)</span><span class="ansi-bright-black-fg"> by time</span>       165 μs <span class="ansi-bold">&lt;</span>
  Memory estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">16.12 KiB</span>, allocs estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">6</span>.</pre>
 </div>
 </div>
@@ -905,7 +905,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <section id="pirls-for-com05" class="level3" data-number="C.4.1">
 <h3 data-number="C.4.1" class="anchored" data-anchor-id="pirls-for-com05"><span class="header-section-number">C.4.1</span> PIRLS for com05</h3>
 <p>To illustrate the calculations we again use the <code>com05</code> model, which has a single, scalar random-effects term, <code>(1 | dist &amp; urban)</code>, in its formula. The matrix <span class="math inline">\({\mathbf{Z}}\)</span> is displayed as</p>
-<div id="09baf95a" class="cell" data-execution_count="31">
+<div id="cf896f76" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>com05re <span class="op">=</span> <span class="fu">only</span>(com05.reterms)</span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Int</span>.(<span class="fu">collect</span>(com05re))  <span class="co"># Int values for compact printing</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="32">
@@ -939,7 +939,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 </div>
 </div>
 <p>but internally it is stored much more compactly because it is an <em>indicator matrix</em> (also called <em>one-hot</em> encoding), which means that all <span class="math inline">\(Z_{i,j}\in\{0,1\}\)</span> and in each row there is exactly one value that is one (and all the others are zero). The column in which the non-zero element of each row occurs is given as an integer vector in the <code>refs</code> property of <code>com05re</code>.</p>
-<div id="81ec4189" class="cell" data-execution_count="32">
+<div id="064e0fd9" class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>com05re.refs<span class="op">'</span>      <span class="co"># transpose for compact printing</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="33">
 <pre><code>1×1934 adjoint(::Vector{Int32}) with eltype Int32:
@@ -947,7 +947,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 </div>
 </div>
 <p>We define a struct</p>
-<div id="c98ce240" class="cell" data-execution_count="33">
+<div id="909be420" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> BernoulliPIRLS{T<span class="op">&lt;:</span><span class="dt">AbstractFloat</span>,S<span class="op">&lt;:</span><span class="dt">Integer</span>}</span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  X<span class="op">::</span><span class="dt">Matrix{T}</span></span>
 <span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  θβ<span class="op">::</span><span class="dt">Vector{T}</span></span>
@@ -965,7 +965,7 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>with an external constructor</p>
-<div id="7a3dc5e3" class="cell" data-execution_count="34">
+<div id="bb1f2ac9" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">BernoulliPIRLS</span>(</span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  X<span class="op">::</span><span class="dt">Matrix{T}</span>,</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  y<span class="op">::</span><span class="dt">Vector{T}</span>,</span>
@@ -1013,7 +1013,7 @@ Why are θ and β stored in a single vector?
 </div>
 <p>The <code>utbl</code> field in a <code>BernoulliPIRLS</code> struct contains vectors named <code>u0</code>, <code>pdev</code>, <code>pdev0</code>, and <code>aGHQ</code>, in addition to <code>u</code> and <code>Ldiag</code>. These are not used in the PIRLS algorithm (other than for keeping a copy of the previous <span class="math inline">\({\mathbf{u}}\)</span>) or for optimizing Laplace’s approximation to the objective. However, they will be used in adaptive Gauss-Hermite quadrature evaluation of the objective (<a href="#sec-aGHQ" class="quarto-xref"><span>Section C.6</span></a>), so we keep them in the struct throughout.</p>
 <p>The <code>updatetbl!</code> method for this type first evaluates <span class="math inline">\({\boldsymbol{\eta}}\)</span> via a “virtual” multiplication that forms <span class="math inline">\({\mathbf{Z}}{\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}{\mathbf{u}}\)</span> plus the stored <code>offset</code>, which is <span class="math inline">\({\mathbf{X}}{\boldsymbol{\beta}}\)</span>, then updates the rowtable from <span class="math inline">\({\mathbf{y}}\)</span>, <span class="math inline">\({\boldsymbol{\eta}}\)</span>, and the offset. For this model <span class="math inline">\({\boldsymbol{\theta}}\)</span> is one-dimensional and <span class="math inline">\({\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}\)</span> is a scalar multiple of <span class="math inline">\({\mathbf{I}}_q\)</span>, the identity matrix of size <span class="math inline">\(q\)</span>, and thus the matrix multiplication by <span class="math inline">\({\boldsymbol{\Lambda}}_{{\boldsymbol{\theta}}}\)</span> can be expressed as scalar products.</p>
-<div id="c051fe90" class="cell" data-execution_count="35">
+<div id="e0cacc3a" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">updatetbl!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>)</span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  (; refs, y, η, offset) <span class="op">=</span> m.ytbl</span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  u <span class="op">=</span> m.utbl.u</span>
@@ -1028,13 +1028,13 @@ Why are θ and β stored in a single vector?
 <span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>pdeviance</code> method returns the deviance for the GLM model plus the penalty on the squared length of <code>u</code>.</p>
-<div id="552bb741" class="cell" data-execution_count="36">
+<div id="06261277" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pdeviance</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>)</span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">sum</span>(r.dev <span class="cf">for</span> r <span class="kw">in</span> m.rtbl) <span class="op">+</span> <span class="fu">sum</span>(abs2, m.utbl.u)</span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>updateu!</code> method is similar to <code>updateβ!</code> for the <code>BernoulliIRLS</code> type except that it is based on the diagonal matrix <span class="math inline">\({\boldsymbol{\Lambda}}'{\mathbf{Z}}'{\mathbf{W}}{\mathbf{Z}}{\boldsymbol{\Lambda}}+ {\mathbf{I}}\)</span>. Only the diagonal elements of this matrix are constructed and used to solve for the updated <span class="math inline">\({\mathbf{u}}\)</span> vector. At convergence of the PIRLS algorithm the elements of <code>Ldiag</code> are replaced by their square roots.</p>
-<div id="410a668e" class="cell" data-execution_count="37">
+<div id="315ddc58" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">updateu!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>)</span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  (; u, u0, Ldiag) <span class="op">=</span> m.utbl</span>
 <span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copyto!</span>(u0, u)              <span class="co"># keep a copy of u</span></span>
@@ -1056,22 +1056,22 @@ Why are θ and β stored in a single vector?
 <span id="cb51-19"><a href="#cb51-19" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Create a <code>BernoulliPIRLS</code> struct for the <code>com05</code> model and check the penalized deviance at the initial values</p>
-<div id="c164b18b" class="cell" data-execution_count="38">
+<div id="815a8635" class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> <span class="fu">BernoulliPIRLS</span>(com05.X, com05.y, <span class="fu">only</span>(com05.reterms).refs)</span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pdeviance</span>(m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="39">
-<pre><code>2409.3774281600377</code></pre>
+<pre><code>2409.377428160041</code></pre>
 </div>
 </div>
 <p>As with IRLS, the first iteration of PIRLS reduces the objective, which is the penalized deviance in this case, substantially.</p>
-<div id="3b4ee398" class="cell" data-execution_count="39">
+<div id="928aad2a" class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pdeviance</span>(<span class="fu">updateu!</span>(m))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="40">
 <pre><code>2233.1209476357844</code></pre>
 </div>
 </div>
 <p>Create a <code>pirls!</code> method for this struct.</p>
-<div id="5762a2e1" class="cell" data-execution_count="40">
+<div id="27ce5f44" class="cell" data-execution_count="40">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pirls!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>; verbose<span class="op">::</span><span class="dt">Bool</span>=<span class="cn">false</span>)</span>
 <span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  (; u, u0, Ldiag) <span class="op">=</span> m.utbl</span>
 <span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill!</span>(u, <span class="fl">0</span>)                  <span class="co"># start from u == 0</span></span>
@@ -1099,28 +1099,28 @@ Why are θ and β stored in a single vector?
 <span id="cb56-25"><a href="#cb56-25" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The PIRLS iterations always start from <span class="math inline">\({\mathbf{u}}=\mathbf{0}\)</span> so that the converged value of the penalized deviance is reproducible for given values of <span class="math inline">\(\theta\)</span> and <span class="math inline">\({\boldsymbol{\beta}}\)</span>. If we allowed the algorithm to start at whatever values are currently stored in <span class="math inline">\({\mathbf{u}}\)</span> then there could be slight differences in the value of the penalized deviance at convergence of PIRLS, which can cause problems when trying to optimize with respect to <span class="math inline">\(\theta\)</span> and <span class="math inline">\({\boldsymbol{\beta}}\)</span>.</p>
-<div id="7378dfab" class="cell" data-execution_count="41">
+<div id="361b2e8b" class="cell" data-execution_count="41">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pirls!</span>(m; verbose<span class="op">=</span><span class="cn">true</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[ Info: (0, 2409.3774281600377)
+<pre><code>[ Info: (0, 2409.377428160041)
 [ Info: (1, 2233.1209476357844)
-[ Info: (2, 2231.6059352797056)
-[ Info: (3, 2231.600219832158)
-[ Info: (4, 2231.6002194065613)</code></pre>
+[ Info: (2, 2231.605935279706)
+[ Info: (3, 2231.6002198321576)
+[ Info: (4, 2231.600219406561)</code></pre>
 </div>
 </div>
 <p>As with IRLS, PIRLS is a fast and stable algorithm for determining the mode of the conditional distribution <span class="math inline">\(({\mathcal{U}}|{\mathcal{Y}}={\mathbf{y}})\)</span> with <span class="math inline">\({\boldsymbol{\theta}}\)</span> and <span class="math inline">\({\boldsymbol{\beta}}\)</span> held fixed.</p>
-<div id="9591b9ce" class="cell" data-execution_count="42">
+<div id="0157c2f5" class="cell" data-execution_count="42">
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">pirls!</span>(mm) seconds <span class="op">=</span> <span class="fl">1</span> setup <span class="op">=</span> (mm <span class="op">=</span> m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="43">
 <div class="ansi-escaped-output">
-<pre>BenchmarkTools.Trial: 4876 samples with 1 evaluation.
- Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">196.292 μs</span> … <span class="ansi-magenta-fg">458.541 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">202.584 μs               </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
- Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">203.915 μs</span> ± <span class="ansi-green-fg">  8.468 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.00% ± 0.00%
-  ▁▄▅▅▇█▆▆▆▇<span class="ansi-blue-fg">█</span>█<span class="ansi-green-fg">▆</span>▄▄▅▄▃▂▂▁▁▁▁▂▁▁▁    ▁                             ▃
-  ██████████<span class="ansi-blue-fg">█</span>█<span class="ansi-green-fg">█</span>█████████████████▇▇██████▇▇▇▅▇▇▆▆▅▆▇▄▅▇▄▆▆▅▁▆▄▆▅ █
-  196 μs<span class="ansi-bright-black-fg">        </span><span class="ansi-bright-black-fg">Histogram: </span><span class="ansi-bright-black-fg ansi-bold">log(</span><span class="ansi-bright-black-fg">frequency</span><span class="ansi-bright-black-fg ansi-bold">)</span><span class="ansi-bright-black-fg"> by time</span>        235 μs <span class="ansi-bold">&lt;</span>
+<pre>BenchmarkTools.Trial: 4323 samples with 1 evaluation.
+ Range <span class="ansi-bright-black-fg">(</span><span class="ansi-cyan-fg ansi-bold">min</span> … <span class="ansi-magenta-fg">max</span><span class="ansi-bright-black-fg">):  </span><span class="ansi-cyan-fg ansi-bold">199.062 μs</span> … <span class="ansi-magenta-fg">476.278 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>min … max<span class="ansi-bright-black-fg">): </span>0.00% … 0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-blue-fg ansi-bold">median</span><span class="ansi-bright-black-fg">):     </span><span class="ansi-blue-fg ansi-bold">226.911 μs               </span><span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>median<span class="ansi-bright-black-fg">):    </span>0.00%
+ Time  <span class="ansi-bright-black-fg">(</span><span class="ansi-green-fg ansi-bold">mean</span> ± <span class="ansi-green-fg">σ</span><span class="ansi-bright-black-fg">):   </span><span class="ansi-green-fg ansi-bold">229.978 μs</span> ± <span class="ansi-green-fg"> 16.838 μs</span>  <span class="ansi-bright-black-fg">┊</span> GC <span class="ansi-bright-black-fg">(</span>mean ± σ<span class="ansi-bright-black-fg">):  </span>0.00% ± 0.00%
+           ▅▂▅<span class="ansi-blue-fg">█</span>▄<span class="ansi-green-fg">▄</span>▃▁                                             ▁
+  ▇▃▇▄▆▆▄▃▃███<span class="ansi-blue-fg">█</span>█<span class="ansi-green-fg">█</span>███▇▇▅▇▅▅▇▆▅▆▆▅▅▄▄▄▅▅▄▄▄▄▄▄▄▄▃▅▄▃▄▄▁▃▃▄▃▄▄▃▃▄▄ █
+  199 μs<span class="ansi-bright-black-fg">        </span><span class="ansi-bright-black-fg">Histogram: </span><span class="ansi-bright-black-fg ansi-bold">log(</span><span class="ansi-bright-black-fg">frequency</span><span class="ansi-bright-black-fg ansi-bold">)</span><span class="ansi-bright-black-fg"> by time</span>        337 μs <span class="ansi-bold">&lt;</span>
  Memory estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">112 bytes</span>, allocs estimate<span class="ansi-bright-black-fg">: </span><span class="ansi-yellow-fg">1</span>.</pre>
 </div>
 </div>
@@ -1158,19 +1158,19 @@ Why are θ and β stored in a single vector?
 &amp;=\tilde{d}({\mathbf{y}},\tilde{{\mathbf{u}}})+\log\left(|{\mathbf{L}}|^2\right)
 \end{aligned}
 \]</span></p>
-<div id="e2005b3f" class="cell" data-execution_count="43">
+<div id="7f42a57f" class="cell" data-execution_count="43">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">laplaceapprox</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>)</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">pdeviance</span>(m) <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">sum</span>(log, m.utbl.Ldiag)</span>
 <span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="c3a2d330" class="cell" data-execution_count="44">
+<div id="74a1af1c" class="cell" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb61"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">laplaceapprox</span>(<span class="fu">pirls!</span>(m))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="45">
-<pre><code>2373.5180527521643</code></pre>
+<pre><code>2373.518052752164</code></pre>
 </div>
 </div>
 <p>The remaining step is to optimize Laplace’s approximation to the GLMM deviance with respect to <span class="math inline">\(\theta\)</span> and <span class="math inline">\({\boldsymbol{\beta}}\)</span>, which we do using the BOBYQA optimizer from <a href="https://github.com/JuliaOpt/NLopt.jl">NLopt.jl</a></p>
-<div id="f652c25e" class="cell" data-execution_count="45">
+<div id="affaa283" class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> StatsAPI.<span class="fu">fit!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>)</span>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  θβ <span class="op">=</span> m.θβ</span>
 <span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>  pp1 <span class="op">=</span> <span class="fu">length</span>(θβ)                <span class="co"># length(β) = p and length(θ) = 1</span></span>
@@ -1193,13 +1193,13 @@ Why are θ and β stored in a single vector?
 <span id="cb63-20"><a href="#cb63-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> m</span>
 <span id="cb63-21"><a href="#cb63-21" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="6bf469fc" class="cell" data-execution_count="46">
+<div id="1b017a70" class="cell" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb64"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fit!</span>(m);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[ Info: (ret = :ROUNDOFF_LIMITED, fevals = 537, minf = 2354.474481568811)</code></pre>
+<pre><code>[ Info: (ret = :ROUNDOFF_LIMITED, fevals = 550, minf = 2354.4744815688055)</code></pre>
 </div>
 </div>
-<div id="c2a9d9b8" class="cell" data-execution_count="47">
+<div id="193441d0" class="cell" data-execution_count="47">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(</span>
@@ -1210,11 +1210,11 @@ Why are θ and β stored in a single vector?
 <span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Converged to θ = 0.5683043669055537 and β =[-0.3409772247356467, 0.3933797066131946, 0.6064854671608072, -0.012926141180128366, 0.03323475624714217, -0.005626185594805796]</code></pre>
+<pre><code>Converged to θ = 0.5683043594028967 and β =[-0.3409777149845993, 0.3933796201906975, 0.6064857599227369, -0.012926172564277872, 0.03323478854784157, -0.005626184982660486]</code></pre>
 </div>
 </div>
 <p>These estimates differ somewhat from those for model <code>com05</code>.</p>
-<div id="7acd6c21" class="cell" data-execution_count="48">
+<div id="7d9a3e5b" class="cell" data-execution_count="48">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb68"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(</span>
@@ -1227,7 +1227,7 @@ Why are θ and β stored in a single vector?
 <span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Estimates for com05: θ = 0.5761360669040289, fmin = 2353.824197573429, and β =[-0.34146981024676226, 0.39360633834880304, 0.6064511890632197, -0.012910810607815223, 0.03321078230709955, -0.005624627460981553]</code></pre>
+<pre><code>Estimates for com05: θ = 0.5761320511126606, fmin = 2353.8241975712126, and β =[-0.3414511775952209, 0.3936022112386835, 0.6064401757134296, -0.012909532359085995, 0.03321000321414715, -0.005624664724561386]</code></pre>
 </div>
 </div>
 <p>The discrepancy in the results is because the <code>com05</code> results are based on a more accurate approximation to the integral called <em>adaptive Gauss-Hermite Quadrature</em>, which is discussed in <a href="#sec-aGHQ" class="quarto-xref"><span>Section C.6</span></a>.</p>
@@ -1296,7 +1296,7 @@ g(z) = \phi(z) = \frac{e^{-z^2/2}}{\sqrt{2\pi}} .
 <section id="evaluating-the-weights-and-abscissae" class="level4" data-number="C.6.1.1">
 <h4 data-number="C.6.1.1" class="anchored" data-anchor-id="evaluating-the-weights-and-abscissae"><span class="header-section-number">C.6.1.1</span> Evaluating the weights and abscissae</h4>
 <p>In the <a href="https://en.wikipedia.org/wiki/Gaussian_quadrature#The_Golub-Welsch_algorithm"><em>Golub-Welsch algorithm</em></a> the abscissae for a particular Gaussian quadrature rule are determined as the eigenvalues of a symmetric tri-diagonal matrix and the weights are derived from the squares of the first row of the matrix of eigenvectors. For a <span class="math inline">\(K\)</span>th order normalized Gauss-Hermite rule the tridiagonal matrix has zeros on the diagonal and the square roots of <code>1:k-1</code> on the super- and sub-diagonal, e.g.</p>
-<div id="8c534f7f" class="cell" data-execution_count="49">
+<div id="bf0c4fc2" class="cell" data-execution_count="49">
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>sym5 <span class="op">=</span> <span class="fu">SymTridiagonal</span>(<span class="fu">zeros</span>(<span class="fl">5</span>), <span class="fu">sqrt</span>.(<span class="fl">1</span><span class="op">:</span><span class="fl">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="50">
 <pre><code>5×5 SymTridiagonal{Float64, Vector{Float64}}:
@@ -1307,31 +1307,31 @@ g(z) = \phi(z) = \frac{e^{-z^2/2}}{\sqrt{2\pi}} .
   ⋅    ⋅        ⋅       2.0      0.0</code></pre>
 </div>
 </div>
-<div id="01272ef6" class="cell" data-execution_count="50">
+<div id="ca115a55" class="cell" data-execution_count="50">
 <div class="sourceCode cell-code" id="cb72"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>ev <span class="op">=</span> <span class="fu">eigen</span>(sym5);</span>
 <span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>ev.values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="51">
 <pre><code>5-element Vector{Float64}:
- -2.8569700138728016
- -1.3556261799742617
-  8.881784197001252e-16
-  1.3556261799742675
+ -2.8569700138728
+ -1.3556261799742608
+  1.3322676295501878e-15
+  1.3556261799742677
   2.8569700138728056</code></pre>
 </div>
 </div>
-<div id="103bd123" class="cell" data-execution_count="51">
+<div id="48708a5d" class="cell" data-execution_count="51">
 <div class="sourceCode cell-code" id="cb74"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">abs2</span>.(ev.vectors[<span class="fl">1</span>, <span class="op">:</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="52">
 <pre><code>5-element Vector{Float64}:
- 0.01125741132772062
- 0.22207592200561319
+ 0.011257411327720667
+ 0.2220759220056134
  0.5333333333333334
  0.222075922005612
  0.011257411327720648</code></pre>
 </div>
 </div>
 <p>A function of <code>k</code> to evaluate the abscissae and weights is</p>
-<div id="2a5c5d07" class="cell" data-execution_count="52">
+<div id="f1e227fd" class="cell" data-execution_count="52">
 <div class="sourceCode cell-code" id="cb76"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">gausshermitenorm</span>(k)</span>
 <span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>  ev <span class="op">=</span> <span class="fu">eigen</span>(<span class="fu">SymTridiagonal</span>(<span class="fu">zeros</span>(k), <span class="fu">sqrt</span>.(<span class="fl">1</span><span class="op">:</span>(k <span class="op">-</span> <span class="fl">1</span>))))</span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fu">Table</span>((;</span>
@@ -1341,7 +1341,7 @@ g(z) = \phi(z) = \frac{e^{-z^2/2}}{\sqrt{2\pi}} .
 <span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>providing</p>
-<div id="2a8564af" class="cell" data-execution_count="53">
+<div id="a46d09bb" class="cell" data-execution_count="53">
 <div class="sourceCode cell-code" id="cb77"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gausshermitenorm</span>(<span class="fl">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="54">
 <pre><code>Table with 2 columns and 5 rows:
@@ -1349,7 +1349,7 @@ g(z) = \phi(z) = \frac{e^{-z^2/2}}{\sqrt{2\pi}} .
    ┌───────────────────────
  1 │ -2.85697     0.0112574
  2 │ -1.35563     0.222076
- 3 │ 8.88178e-16  0.533333
+ 3 │ 1.33227e-15  0.533333
  4 │ 1.35563      0.222076
  5 │ 2.85697      0.0112574</code></pre>
 </div>
@@ -1401,7 +1401,7 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
 </div>
 </div>
 <p>The definition of <code>MixedModels.GHnorm</code> is similar to the <code>gausshermitenorm</code> function with some extra provisions for ensuring symmetry of the abscissae and of the weights and for caching values once they have been calculated.</p>
-<div id="16003951" class="cell" data-execution_count="56">
+<div id="fa992c36" class="cell" data-execution_count="56">
 <div class="sourceCode cell-code" id="cb81"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> tbl <span class="op">=</span> <span class="fu">GHnorm</span>(<span class="fl">9</span>)</span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Table</span>(abscissae<span class="op">=</span>tbl.z, weights<span class="op">=</span>tbl.w)</span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1425,7 +1425,7 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
 \mathbb{E}[g(x)] \approx \sum_{i=1}^k g(\mu + \sigma z_i)\,w_i
 \]</span> where <span class="math inline">\(\mathcal{X}\sim\mathscr{N}(\mu, \sigma^2)\)</span>.</p>
 <p>For example, <span class="math inline">\(\mathbb{E}[\mathcal{X}^2]\)</span> where <span class="math inline">\(\mathcal{X}\sim\mathcal{N}(2, 3^2)\)</span> is</p>
-<div id="82bcb1b3" class="cell" data-execution_count="57">
+<div id="8b95551a" class="cell" data-execution_count="57">
 <div class="sourceCode cell-code" id="cb83"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> μ <span class="op">=</span> <span class="fl">2</span>, σ <span class="op">=</span> <span class="fl">3</span>, ghn3 <span class="op">=</span> <span class="fu">GHnorm</span>(<span class="fl">3</span>)</span>
 <span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(@. ghn3.w <span class="op">*</span> <span class="fu">abs2</span>(μ <span class="op">+</span> σ <span class="op">*</span> ghn3.z))  <span class="co"># should be μ² + σ² = 13</span></span>
 <span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1439,7 +1439,7 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
 <section id="illustration-of-contributions-to-the-objective" class="level3" data-number="C.6.2">
 <h3 data-number="C.6.2" class="anchored" data-anchor-id="illustration-of-contributions-to-the-objective"><span class="header-section-number">C.6.2</span> Illustration of contributions to the objective</h3>
 <p>We have provided a <code>pdev</code> vector in the <code>utbl</code> field of a <code>BernoulliPIRLS</code> object to allow for accumulation of the penalized deviance contributions for each component of <span class="math inline">\({\mathbf{u}}\)</span> in the model.</p>
-<div id="69262722" class="cell" data-execution_count="58">
+<div id="b57b86ea" class="cell" data-execution_count="58">
 <div class="sourceCode cell-code" id="cb85"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pdevcomps!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>)</span>
 <span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>  (; u, pdev) <span class="op">=</span> m.utbl</span>
 <span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a>  pdev <span class="op">.=</span> <span class="fu">abs2</span>.(u)        <span class="co"># initialize pdevj to square of uj</span></span>
@@ -1450,7 +1450,7 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
 <span id="cb85-8"><a href="#cb85-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>After PIRLS has converged, we evaluate <code>pdevcomps!</code> and copy the <code>pdev</code> column of the <code>utbl</code> field to its <code>pdev0</code> column, which will be the baseline evaluation of the penalized deviance at the conditional modes. Other evaluations of the penalized deviance components are plotted as differences from <code>pdev0</code>.</p>
-<div id="b502ef68" class="cell" data-execution_count="59">
+<div id="a73ef476" class="cell" data-execution_count="59">
 <div class="sourceCode cell-code" id="cb86"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pdevcomps!</span>(<span class="fu">pirls!</span>(m))</span>
 <span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">copyto!</span>(m.utbl.pdev0, m.utbl.pdev)</span>
 <span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Table</span>(m.utbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1458,9 +1458,9 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
 <pre><code>Table with 6 columns and 102 rows:
       u           u0          Ldiag    pdev     pdev0    aGHQ
     ┌────────────────────────────────────────────────────────
- 1  │ -1.02425    -1.02425    2.3596   78.2322  78.2322  0.0
+ 1  │ -1.02424    -1.02424    2.3596   78.2322  78.2322  0.0
  2  │ -1.6554     -1.6554     1.87894  41.917   41.917   0.0
- 3  │ -0.0432086  -0.0432086  1.54253  21.8681  21.8681  0.0
+ 3  │ -0.0432085  -0.0432085  1.54253  21.8681  21.8681  0.0
  4  │ 0.500796    0.500796    1.07154  2.68642  2.68642  0.0
  5  │ 1.10928     1.10928     1.29471  8.58305  8.58305  0.0
  6  │ -0.415844   -0.415844   1.49343  18.6901  18.6901  0.0
@@ -1471,12 +1471,12 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
  11 │ -0.328134   -0.328134   1.47521  23.5301  23.5301  0.0
  12 │ 0.499976    0.499976    1.06882  2.74129  2.74129  0.0
  13 │ 0.139717    0.139717    1.82727  43.6776  43.6776  0.0
- 14 │ 0.176548    0.176548    1.10663  2.77502  2.77502  0.0
+ 14 │ 0.176548    0.176548    1.10663  2.77503  2.77503  0.0
  15 │ -0.471723   -0.471723   1.51184  21.2797  21.2797  0.0
  16 │ -0.757145   -0.757145   1.25035  7.09335  7.09335  0.0
  17 │ -1.59799    -1.59799    1.32299  8.74912  8.74912  0.0
- 18 │ -0.287301   -0.287301   1.19599  8.65057  8.65057  0.0
- 19 │ -0.0959612  -0.0959612  1.61545  34.1614  34.1614  0.0
+ 18 │ -0.2873     -0.2873     1.19599  8.65057  8.65057  0.0
+ 19 │ -0.0959611  -0.0959611  1.61545  34.1614  34.1614  0.0
  20 │ -0.227454   -0.227454   1.26232  8.98806  8.98806  0.0
  21 │ 0.447541    0.447541    1.44906  17.716   17.716   0.0
  22 │ 1.22259     1.22259     2.80768  128.155  128.155  0.0
@@ -1485,7 +1485,7 @@ Figure&nbsp;C.2: Weights (logarithm base 2) and positions for the 9th order norm
 </div>
 </div>
 <p>Consider the change in the penalized deviance from that at the conditional mode for a selection of groups, which, by default, we choose to be the first 5 groups.</p>
-<div id="c570cdbf" class="cell" data-execution_count="60">
+<div id="0803c6c6" class="cell" data-execution_count="60">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb88"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">pdevdiff</span>(</span>
@@ -1659,7 +1659,7 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
 \end{multline*}
 \tag{C.14}\]</span></span></p>
 <p>A <span class="math inline">\(K\)</span>th-order adaptive Gauss-Hermite quadrature approximation to the objective, negative twice the log-likelihood, for the GLMM model is Laplace’s approximation minus twice the logarithm of the <span class="math inline">\(K\)</span>th order normalized Gauss-Hermite quadrature rule applied to <span class="math inline">\(f_j(z_j)\)</span>. We use the <code>aGHQ</code> column of <code>m.utbl</code> to accumulate these contributions and to take the logarithm then multiply the result by -2.</p>
-<div id="df25ead2" class="cell" data-execution_count="65">
+<div id="03f3c4e1" class="cell" data-execution_count="65">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb93"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">evalGHQ!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>; nGHQ<span class="op">::</span><span class="dt">Integer</span>=<span class="fl">9</span>)</span>
@@ -1684,18 +1684,18 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
 <span id="cb93-20"><a href="#cb93-20" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="6ea4fc93" class="cell" data-execution_count="66">
+<div id="6aafb995" class="cell" data-execution_count="66">
 <div class="sourceCode cell-code" id="cb94"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">evalGHQ!</span>(m)</span>
 <span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Table</span>(m.utbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="67">
 <pre><code>Table with 6 columns and 102 rows:
       u         u0          Ldiag    pdev     pdev0    aGHQ
     ┌─────────────────────────────────────────────────────────────
- 1  │ 0.88826   -1.02425    2.3596   98.9905  78.2322  -0.00503286
+ 1  │ 0.888261  -1.02424    2.3596   98.9905  78.2322  -0.00503286
  2  │ 0.746346  -1.6554     1.87894  65.9282  41.917   -0.00602822
- 3  │ 2.88235   -0.0432086  1.54253  42.7156  21.8681  -0.0077699
+ 3  │ 2.88235   -0.0432085  1.54253  42.7156  21.8681  -0.0077699
  4  │ 4.71226   0.500796    1.07154  22.5154  2.68642  -0.00332321
- 5  │ 4.5948    1.10928     1.29471  26.5466  8.58305  -0.00560787
+ 5  │ 4.5948    1.10928     1.29471  26.5466  8.58305  -0.00560788
  6  │ 2.60588   -0.415844   1.49343  40.3098  18.6901  -0.00726535
  7  │ 4.26289   0.030515    1.06624  21.5982  1.46897  -0.00232427
  8  │ 2.62803   0.216409    1.87125  67.5008  46.1746  -0.00639679
@@ -1704,12 +1704,12 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
  11 │ 2.73092   -0.328134   1.47521  44.9692  23.5301  -0.00736271
  12 │ 4.72216   0.499976    1.06882  22.6241  2.74129  -0.00283963
  13 │ 2.60939   0.139717    1.82727  64.9152  43.6776  -0.00681333
- 14 │ 4.25447   0.176548    1.10663  22.371   2.77502  -0.00457801
+ 14 │ 4.25447   0.176548    1.10663  22.371   2.77503  -0.00457801
  15 │ 2.51322   -0.471723   1.51184  43.0725  21.2797  -0.00742932
  16 │ 2.85204   -0.757145   1.25035  29.6883  7.09335  -0.00309483
  17 │ 1.81302   -1.59799    1.32299  32.9677  8.74912  -0.00213836
- 18 │ 3.48593   -0.287301   1.19599  28.7773  8.65057  -0.00590273
- 19 │ 2.69754   -0.0959612  1.61545  55.085   34.1614  -0.00779244
+ 18 │ 3.48593   -0.2873     1.19599  28.7773  8.65057  -0.00590273
+ 19 │ 2.69754   -0.0959611  1.61545  55.085   34.1614  -0.00779244
  20 │ 3.34752   -0.227454   1.26232  29.0427  8.98806  -0.0072417
  21 │ 3.56181   0.447541    1.44906  37.9855  17.716   -0.00763473
  22 │ 2.82988   1.22259     2.80768  146.8    128.155  -0.00360118
@@ -1717,10 +1717,10 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
  ⋮  │    ⋮          ⋮          ⋮        ⋮        ⋮          ⋮</code></pre>
 </div>
 </div>
-<div id="05bc72c2" class="cell" data-execution_count="67">
+<div id="0d00d128" class="cell" data-execution_count="67">
 <div class="sourceCode cell-code" id="cb96"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(m.utbl.aGHQ)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="68">
-<pre><code>(-0.008514109098354365, -0.00041326969060381)</code></pre>
+<pre><code>(-0.008514108854172236, -0.0004132698576107887)</code></pre>
 </div>
 </div>
 <p>As we see, these “correction terms” relative to Laplace’s approximation are relatively small, compared to the contributions to the objective from each component of <span class="math inline">\({\mathbf{u}}\)</span>. Also, the corrections are all negative, in this case. Close examination of the individual curves in <a href="#fig-zpdevdiff" class="quarto-xref">Figure&nbsp;<span>C.5</span></a> shows that these curves, which are <span class="math inline">\(-2\log(f_j(z))\)</span>, are more-or-less <a href="https://en.wikipedia.org/wiki/Even_and_odd_functions">odd functions</a>, in the sense that the value at <span class="math inline">\(-z\)</span> is approximately the negative of the value at <span class="math inline">\(z\)</span>. If we were integrating <span class="math inline">\(\log(f_j(z_j))\phi(z_j)\)</span> with a normalized Gauss-Hermite rule the negative and positive values would cancel out, for the most part, and some of the integrals would be positive while others would be negative.</p>
@@ -1729,7 +1729,7 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
 </section>
 <section id="optimization-of-the-aghq-objective" class="level2" data-number="C.7">
 <h2 data-number="C.7" class="anchored" data-anchor-id="optimization-of-the-aghq-objective"><span class="header-section-number">C.7</span> Optimization of the aGHQ objective</h2>
-<div id="5fd461ce" class="cell" data-execution_count="68">
+<div id="2f6bf55b" class="cell" data-execution_count="68">
 <div class="sourceCode cell-code" id="cb98"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">fitGHQ!</span>(m<span class="op">::</span><span class="dt">BernoulliPIRLS</span>; nGHQ<span class="op">::</span><span class="dt">Integer</span>=<span class="fl">9</span>)</span>
 <span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  (; Ldiag, pdev0, aGHQ) <span class="op">=</span> m.utbl</span>
 <span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  θβ <span class="op">=</span> m.θβ</span>
@@ -1754,22 +1754,22 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
 <span id="cb98-22"><a href="#cb98-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> m</span>
 <span id="cb98-23"><a href="#cb98-23" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="c611fead" class="cell" data-execution_count="69">
+<div id="e5e3082d" class="cell" data-execution_count="69">
 <div class="sourceCode cell-code" id="cb99"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fitGHQ!</span>(m)</span>
 <span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>m.θβ</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="70">
 <pre><code>7-element Vector{Float64}:
-  0.5761321475310667
- -0.3414655508996376
-  0.3935993711861091
-  0.6064447398927146
- -0.01290967861341213
-  0.03320994589450654
- -0.005624606276012505</code></pre>
+  0.5761321679271924
+ -0.3414655990254175
+  0.39359939391066806
+  0.6064447618771712
+ -0.012909685721680265
+  0.03320994962034241
+ -0.005624606329593786</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/4cd5e78
-">4cd5e78
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/9743fed
+">9743fed
 </a>.</em></p>
 
 

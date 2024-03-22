@@ -361,7 +361,7 @@ window.Quarto = {
 <p>One of the purposes of this chapter is to study which dimensions of the data have the greatest effect on the amount of memory used to represent the model and the time required to fit a model.</p>
 <p>The two datasets examined in <a href="largescaledesigned.html" class="quarto-xref"><span>Chapter 4</span></a>, from the English Lexicon Project <span class="citation" data-cites="Balota_2007">(<a href="references.html#ref-Balota_2007" role="doc-biblioref">Balota et al., 2007</a>)</span>, consist of <code>trials</code> or <code>instances</code> associated with <code>subject</code> and <code>item</code> factors. The <code>subject</code> and <code>item</code> factors are “incompletely crossed” in that each item occurred in trials with several subjects, but not all subjects, and each subject responded to several different items, but not to all items.</p>
 <p>Similarly in the movie ratings, each instance of a rating is associated with a user and with a movie, and these factors are incompletely crossed.</p>
-<div id="252cc35f" class="cell" data-execution_count="3">
+<div id="0f20563a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>ratings)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>Arrow.Table with 27753444 rows, 4 columns, and schema:
@@ -375,7 +375,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>Convert this Arrow table to a <code>Table</code> and drop the <code>timestamp</code> column, which we won’t be using. (For small data sets dropping such columns is not important but with over 27 million ratings it does help to drop unnecessary columns to save some memory space.)</p>
-<div id="050dc54d" class="cell" data-execution_count="4">
+<div id="b1635ee0" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Table</span>(<span class="fu">getproperties</span>(ratings, (<span class="op">:</span>userId, <span class="op">:</span>movieId, <span class="op">:</span>rating)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -409,7 +409,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>Information on the movies is available in the <code>movies</code> dataset, which we supplement with the mean rating for each movie in the <code>ratings</code> table.</p>
-<div id="53c213c3" class="cell" data-execution_count="5">
+<div id="21aaf5f3" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>movies <span class="op">=</span> <span class="fu">Table</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disallowmissing!</span>(</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin!</span>(</span>
@@ -454,14 +454,14 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
 </div>
 </div>
 <p>In contrast to data from a designed experiment, like the English Lexicon Project, the data from this observational study are extremely unbalanced with respect to the observational grouping factors, <code>userId</code> and <code>movieId</code>. The <code>movies</code> table includes an <code>nrtngs</code> column that gives the number of ratings for each movie, which varies from 1 to nearly 100,000.</p>
-<div id="5e0a59bc" class="cell" data-execution_count="6">
+<div id="f34482be" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(movies.nrtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>(1, 97999)</code></pre>
 </div>
 </div>
 <p>The number of ratings per user is also highly skewed</p>
-<div id="aeb30829" class="cell" data-execution_count="7">
+<div id="8a6231f1" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>users <span class="op">=</span> <span class="fu">Table</span>(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">combine</span>(</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">groupby</span>(<span class="fu">DataFrame</span>(ratings), <span class="op">:</span>userId),</span>
@@ -499,7 +499,7 @@ with metadata given by a Base.ImmutableDict{String, String} with 1 entry:
  ⋮  │   ⋮       ⋮        ⋮</code></pre>
 </div>
 </div>
-<div id="541734f5" class="cell" data-execution_count="8">
+<div id="93ad1e75" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">extrema</span>(users.urtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>(1, 23715)</code></pre>
@@ -563,7 +563,7 @@ Figure&nbsp;5.1: Empirical distribution plots of the number of ratings per movie
 </div>
 </div>
 <p>In this collection of over 27 million ratings, nearly 20% of the movies are rated only once and nearly half of the movies were rated 6 or fewer times.</p>
-<div id="2950a096" class="cell" data-execution_count="10">
+<div id="072f6881" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(<span class="fu">≤</span>(<span class="fl">6</span>), movies.nrtngs) <span class="op">/</span> <span class="fu">length</span>(movies.nrtngs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>0.4967989756722151</code></pre>
@@ -574,7 +574,7 @@ Figure&nbsp;5.1: Empirical distribution plots of the number of ratings per movie
 <p>Movies with very few ratings provide little information about overall trends or even about the movie being rated. We can imagine that the “shrinkage” of random effects for movies with just a few ratings pulls their adjusted rating strongly towards the overall average.</p>
 <p>Furthermore, the distribution of ratings for movies with only one rating is systematically lower than the distribution of ratings for movies rated at least five times.</p>
 <p>First, add <code>nrtngs</code> and <code>urtngs</code> as columns of the <code>ratings</code> table.</p>
-<div id="69800ed1" class="cell" data-execution_count="11">
+<div id="b2706856" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> <span class="fu">Table</span>(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">disallowmissing!</span>(</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">leftjoin!</span>(</span>
@@ -667,7 +667,7 @@ Figure&nbsp;5.2: Distribution of ratings for movies with only one rating compare
 <p>Similarly, users who rate very few movies add little information, even about the movies that they rated, because there isn’t sufficient information to contrast a specific rating with a typical rating for the user.</p>
 <p>One way of dealing with the extreme imbalance in the number of observations per user or per movie is to set a threshold on the number of observations for a user or a movie to be included in the data used to fit the model. For example, a companion data set on grouplens.org, available in the <a href="https://files.grouplens.org/datasets/movielens/ml-25n.zip">ml-25m.zip</a> archive, included only users who had rated at least 20 movies.</p>
 <p>To be able to select ratings according to the number of ratings per user and the number of ratings per movie, we left-joined the <code>movies.nrtngs</code> and <code>users.urtngs</code> columns into the <code>ratings</code> data frame.</p>
-<div id="3fd09d1b" class="cell" data-execution_count="13">
+<div id="ff45213c" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(ratings))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div><div style="float: left;"><span>5×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -771,7 +771,7 @@ Seemingly inconsistent medians of “nrtngs” and “urtngs”
 <h2 data-number="5.2" class="anchored" data-anchor-id="sec-lrgobsmods"><span class="header-section-number">5.2</span> Models fit with lower bounds on ratings per user and per movie</h2>
 <p>We fit a simple model to this dataset using different thresholds on the number of ratings per movie and the number of ratings per user. These fits were performed on compute servers with generous amounts of memory (128 GiB/node) and numbers of compute cores (48/node). A sample fit is shown in <a href="#sec-lrgobsmemprint" class="quarto-xref"><span>Section 5.2.2</span></a>.</p>
 <p>The results are summarized in the following table</p>
-<div id="e70e1c39" class="cell" data-execution_count="14">
+<div id="a7d56886" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sizespeed <span class="op">=</span> <span class="fu">Table</span>(<span class="fu">dataset</span>(<span class="op">:</span>sizespeed))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -871,7 +871,7 @@ Figure&nbsp;5.3: Bar plot of data set dimensions by minimum number of ratings pe
 <h3 data-number="5.2.2" class="anchored" data-anchor-id="sec-lrgobsmemprint"><span class="header-section-number">5.2.2</span> Memory footprint of the model representation</h3>
 <p>To explain what “the [2,2] block of the <code>L</code> matrix” is and why its size is important, we provide a brief overview of the evaluation of the “profiled” log-likelihood for a <code>LinearMixedModel</code> representation.</p>
 <p>To make the discussion concrete we consider one of the models represented in this table, with cut-offs of 20 ratings per user and 20 ratings per movie. This, and any of the models shown in the table, can be restored in a few minutes from the saved <code>optsum</code> values, as opposed to taking up to two hours to perform the fit.</p>
-<div id="7bc714dc" class="cell" data-execution_count="17">
+<div id="82e2a81e" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">ratingsoptsum</span>(</span>
@@ -925,7 +925,7 @@ Residual              0.732964 0.856133
 <p>Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice — at the initial parameter values and at the final parameter values — during the call to <code>restoreoptsum!</code>.</p>
 <p>Each evaluation of the objective, which requires setting the value of the parameter <span class="math inline">\({\boldsymbol\theta}\)</span> in the numerical representation of the model, updating the blocked Cholesky factor, <span class="math inline">\(\mathbf{L}\)</span>, and evaluating the scalar objective value from this factor, takes a little over a minute (71 seconds) on a server node and probably longer on a laptop.</p>
 <p>The lower triangular <code>L</code> factor is large but sparse. It is stored in six blocks of dimensions and types as shown in</p>
-<div id="f37cd906" class="cell" data-execution_count="18">
+<div id="9ce64a05" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="19">
 <table class="table table-sm table-striped small">
@@ -962,7 +962,7 @@ Residual              0.732964 0.856133
 </div>
 <p>This display gives the types of two blocked matrices: <code>A</code> which is derived from the data and does not depend on the parameters, and <code>L</code>, which is derived from <code>A</code> and the <span class="math inline">\({\boldsymbol\theta}\)</span> parameter. The only difference in their structures is in the [2,2] block, which is diagonal in <code>A</code> and a dense, lower triangular matrix in <code>L</code>.</p>
 <p>The memory footprint (bytes) of each of the blocks is</p>
-<div id="fcda4a5e" class="cell" data-execution_count="19">
+<div id="45cb06b0" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
@@ -992,7 +992,7 @@ Residual              0.732964 0.856133
 </div>
 </div>
 <p>resulting in total memory footprints (GiB) of</p>
-<div id="6715b672" class="cell" data-execution_count="20">
+<div id="f928385a" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">NamedTuple</span><span class="dt">{(:A, :L)}</span>(</span>
@@ -1006,7 +1006,7 @@ Residual              0.732964 0.856133
 <p>That is, <code>L</code> requires roughly 10 times the amount of storage as does <code>A</code>, and that difference is entirely due to the different structure of the [2,2] block.</p>
 <p>This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as <a href="https://en.wikipedia.org/wiki/Sparse_matrix">fill-in</a>.</p>
 <p>Note that although the dimensions of the [2,1] block are larger than those of the [2,2] block its memory footprint is smaller because it is a sparse matrix. The matrix is over 99% zeros or, equivalently, less than 1% nonzeros,</p>
-<div id="96bfbef2" class="cell" data-execution_count="21">
+<div id="f280ff47" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span></span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  L21 <span class="op">=</span> mvm20u20.L[<span class="fl">2</span>]  <span class="co"># blocks are stored in a one-dimensional array</span></span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nnz</span>(L21) <span class="op">/</span> <span class="fu">length</span>(L21)</span>
@@ -1189,7 +1189,7 @@ Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the e
 </div>
 </div>
 <p>Linear regression of the <code>modelsz</code> versus the number of users and <code>L22sz</code>.</p>
-<div id="ddc93242" class="cell" data-execution_count="25">
+<div id="78702eee" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>sizemod <span class="op">=</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(<span class="pp">@formula</span>(<span class="fu">Float64</span>(modelsz) <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> nusers <span class="op">+</span> L22sz), sizespeed)</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftable</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1248,14 +1248,14 @@ Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the e
 </div>
 </div>
 <p>provides an <span class="math inline">\(r^2\)</span> value very close to one, indicating an almost perfect fit.</p>
-<div id="fe2b7a37" class="cell" data-execution_count="26">
+<div id="4af5b566" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">r²</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="27">
 <pre><code>0.9999981449902416</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/4cd5e78
-">4cd5e78
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/9743fed
+">9743fed
 </a>.</em></p>
 
 
