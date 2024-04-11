@@ -65,7 +65,7 @@ format:
     # also overrides code-bg in the SCSS file
     # monobackgroundcolor: '#fafafa'
 
-jupyter: julia-1.10
+engine: julia
 execute:
   cache: false    # inline results conflict with cache use
   freeze: auto

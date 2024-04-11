@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.10
+engine: julia
 ---
 
 # Models with multiple random-effects terms {#sec-Multiple}
