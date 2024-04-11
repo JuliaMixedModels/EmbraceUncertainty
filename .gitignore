@@ -2,6 +2,7 @@ _build/
 _gen/
 *.log
 Manifest.toml
+Manifest-*.toml
 .vscode/
 .DS_Store
 
