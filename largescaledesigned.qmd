@@ -1,5 +1,11 @@
 ---
+fig-width: 4
+fig-height: 3
+fig-dpi: 150
+fig-format: png
 engine: julia
+julia:
+  exeflags: ["--project"]
 ---
 
 # A large-scale designed experiment {#sec-largescaledesigned}
@@ -13,7 +19,6 @@ Load the packages to be used
 using AlgebraOfGraphics
 using Arrow
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using Chain
 using DataFrameMacros
 using DataFrames
@@ -155,7 +160,8 @@ let wlen = 1:21
   draw(
     data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
     mapping(:wrdlen => "Length of word", :count) *
-    visual(BarPlot),
+    visual(BarPlot);
+    figure=(; size=(600, 450))
   )
 end
 ```
@@ -177,7 +183,7 @@ draw(
     color=:isword,
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -203,7 +209,7 @@ draw(
     color=:isword,
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -235,7 +241,7 @@ let
       color=:isword,
       markersize=:msz,
     );
-    figure=(; resolution=(800, 450)),
+    figure=(; size=(600, 340)),
   )
 end
 ```
@@ -280,6 +286,7 @@ draw(
     :smedianrt => "Median response time (ms)",
   ) *
   (smooth() + visual(Scatter));
+  figure=(; size=(600,450))
 )
 ```
 
@@ -341,7 +348,7 @@ draw(
   data(pruned) *
   mapping(:rt => "Response time (ms.) for correct responses") *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -363,7 +370,7 @@ draw(
       ) => "Response speed (s⁻¹) for correct responses",
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -395,6 +402,7 @@ draw(
     :color => :isword,
   ) *
   smooth();
+  figure=(; size=(600, 450))
 )
 ```
 
@@ -413,6 +421,7 @@ draw(
     :color => :isword,
   ) *
   smooth();
+  figure=(; size=(600, 450))
 )
 ```
 
@@ -435,7 +444,7 @@ let
     side=:isword,
   )
   plt *= (visual(Violin) + linear(; interval=:confidence))
-  draw(plt, axis=(; limits=(nothing, (0.0, 2.8))))
+  draw(plt, axis=(; limits=(nothing, (0.0, 2.8))); figure=(; size=(600, 450)))
 end
 ```
 
@@ -518,7 +527,7 @@ draw(
     :elm02 => "Conditional means of item random effects for model elm02";
     color=:isword,
   );
-  axis=(; width=600, height=600),
+  figure=(; size=(600, 400))
 )
 ```
 
@@ -531,12 +540,6 @@ The correlation of the two sets of conditional means is about 96%.
 
 ```{julia}
 cor(Matrix(select(condmeans, :elm01, :elm02)))
-```
-
-```{julia}
-#| echo: false
-#| output: false
-CairoMakie.activate!(; type="png")
 ```
 
 These models take only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.
@@ -581,7 +584,7 @@ A caterpillar plot, @fig-elm01caterpillarsubj,
 #| label: fig-elm01caterpillarsubj
 #| warning: false
 qqcaterpillar!(
-  Figure(resolution=(800, 650)),
+  Figure(; size=(600, 450)),
   ranefinfo(elm01, :subj),
 )
 ```
@@ -597,7 +600,7 @@ Also, there is at least one outlier with a conditional mode over 1.0.
 #| label: fig-elm02caterpillarsubj
 #| warning: false
 qqcaterpillar!(
-  Figure(resolution=(800, 650)),
+  Figure(; size=(600, 450)),
   ranefinfo(elm02, :subj),
 )
 ```

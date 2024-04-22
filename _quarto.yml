@@ -29,7 +29,7 @@ book:
           state: WI
           url: https://www.wisc.edu
           department: Statistics
-  date: today
+  date: last-modified
   chapters:
     - index.qmd
     - intro.qmd
@@ -66,6 +66,10 @@ format:
     # monobackgroundcolor: '#fafafa'
 
 engine: julia
+
+julia:
+  exeflags: ["--project"]
+
 execute:
   cache: false    # inline results conflict with cache use
   freeze: auto
