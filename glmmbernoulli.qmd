@@ -146,10 +146,13 @@ Establishing the contrasts and fitting a preliminary model with random effects f
 contrasts[:livch] = EffectsCoding(; base="0")
 contrasts[:urban] = HelmertCoding()
 
-com01 = let
-  f = @formula use ~
-    1 + livch + (age + abs2(age)) * urban + (1 | dist)
-  fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+com01 =
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(use ~
+      1 + livch + (age + abs2(age)) * urban + (1 | dist))
+
+  fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
 end
 ```
 
@@ -199,8 +202,11 @@ we fit a reduced model.
 
 ```{julia}
 com02 =
-  let f = @formula use ~ 1 + ch + age * age * urban + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(use ~ 1 + ch + age * age * urban + (1 | dist))
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -216,8 +222,11 @@ Apparently neither the second-order interaction `age & urban` nor the third-orde
 
 ```{julia}
 com03 =
-  let f = @formula use ~ 1 + urban + ch + age * age + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+  let f = @formula(use ~ 1 + urban + ch + age * age + (1 | dist)),
+    d = contra,
+    ds = Bernoulli()
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -255,8 +264,11 @@ Incorporating an interaction of `age` and `ch` allows for such a shift.
 ```{julia}
 com04 =
   let f =
-      @formula use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+      @formula(use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)),
+    d = contra,
+    ds = Bernoulli()
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -272,9 +284,12 @@ A series of such model fits led to a model with random effects for the combinati
 
 ```{julia}
 com05 =
-  let f = @formula use ~
-      1 + urban + ch * age + abs2(age) + (1 | dist & urban)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+  let f = @formula(use ~
+      1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
+    d = contra,
+    ds = Bernoulli()
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -490,7 +505,7 @@ A normal probability plot of the conditional modes of the random effects for mod
 #| fig-cap: Caterpillar plot of the conditional modes of the random-effects for model `com05`
 #| label: fig-com05qqcaterpillar
 #| warning: false
-qqcaterpillar!(Figure(; size=(650,450)), com05)
+qqcaterpillar!(Figure(; size=(650, 450)), com05)
 ```
 
 shows that the smallest random effects are approximately -1 and the largest are approximately 1.
