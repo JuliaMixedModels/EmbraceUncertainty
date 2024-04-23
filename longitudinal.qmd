@@ -1,5 +1,11 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 120
+fig-format: png
+engine: julia
+julia:
+  exeflags: ["--project"]
 ---
 
 # Models for longitudinal data {#sec-longitudinal}
@@ -31,7 +37,6 @@ Load the packages to be used,
 #| label: packages03
 using AlgebraOfGraphics
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
@@ -90,7 +95,8 @@ draw(
     :resp => "Ramus bone length (mm)",
     color=:Subj,
   ) *
-  (visual(Scatter) + visual(Lines)),
+  (visual(Scatter) + visual(Lines));
+  figure=(; size=(600,450)),
 )
 ```
 
@@ -98,13 +104,11 @@ Unfortunately, unless there are very few subjects, such figures, sometimes calle
 
 A preferred alternative is to plot response versus time with each subject's data in a separate panel (@fig-eglayout).
 
-```{julia}
+```{r}
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
 #| label: fig-eglayout
-RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=7)
-R"""
-print(
+plot(
   lattice::xyplot(
     resp ~ time|Subj,
     $egdf,
@@ -113,9 +117,9 @@ print(
     index.cond=function(x,y) coef(lm(y ~ x)) %*% c(1,8),
     xlab="Age (yr)",
     ylab="Ramus bone length (mm)",
-    ),
   )
-""";
+)
+NULL
 ```
 
 To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
@@ -149,7 +153,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
 #| warning: false
-caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
+caterpillar!(Figure(size=(600, 320)), ranefinfo(egm01, :Subj))
 ```
 
 ### Centering the time values
@@ -192,7 +196,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| label: fig-egm02caterpillar
 #| code-fold: true
 #| warning: false
-caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
+caterpillar!(Figure(size=(600, 380)), ranefinfo(egm02, :Subj))
 ```
 
 A third option is to center the `time` covariate at the mean of the original `time` values.
@@ -227,7 +231,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 #| fig-cap: Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm02shrinkage
 #| warning: false
-shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
+shrinkageplot!(Figure(; size=(600, 600)), egm02)
 ```
 
 @fig-egm02shrinkage reinforces some of the conclusions from @fig-egm02caterpillar.
@@ -267,7 +271,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 #| fig-cap: Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm04shrinkage
 #| warning: false
-shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
+shrinkageplot!(Figure(; size=(600, 600)), egm04)
 ```
 
 Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.
@@ -331,7 +335,8 @@ draw(
   data(bxgdf[("Control",)]) *
   bxaxes *
   mapping(; color=:Subj) *
-  (visual(Scatter) + visual(Lines)),
+  (visual(Scatter) + visual(Lines));
+  figure=(; size=(600, 450))
 )
 ```
 
@@ -351,7 +356,7 @@ let df = bxgdf[("Control",)]
         sorter(sort!(filter(:time => iszero, df), :resp).Subj),
     ) *
     visual(ScatterLines);
-    axis=(height=250, width=150),
+    axis=(height=180, width=108),
   )
 end
 ```
@@ -375,7 +380,7 @@ let
         sorter(sort!(filter(:time => iszero, df), :resp).Subj),
     ) *
     visual(ScatterLines);
-    axis=(height=250, width=150),
+    axis=(height=180, width=108),
   )
 end
 ```
@@ -399,7 +404,7 @@ let
         sorter(sort!(filter(:time => iszero, df), :resp).Subj),
     ) *
     visual(ScatterLines);
-    axis=(height=250, width=150),
+    axis=(height=180, width=108),
   )
 end
 ```
@@ -484,7 +489,7 @@ A caterpillar plot created from the conditional means and standard deviations of
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03
 #| label: fig-bxm03caterpillar
 #| warning: false
-caterpillar(bxm03)
+caterpillar!(Figure(; size=(600, 720)), bxm03)
 ```
 
 A shrinkage plot, @fig-bxm03shrinkage
@@ -494,7 +499,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 #| fig-cap: Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-bxm03shrinkage
 #| warning: false
-shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
+shrinkageplot!(Figure(; size=(600, 600)), bxm03)
 ```
 
 shows that the random effects are considerably shrunk towards the origin, relative to the "unconstrained" values from within-subject fits, but none of the panels shows them collapsing to a line.
@@ -533,7 +538,7 @@ let
   zlabel = "time²"
   perspectiveness = 0.5
   aspect = :data
-  f = Figure(; resolution=(1200, 500))
+  f = Figure(; size=(600, 250))
   u, v, w = -Upts[2]    # second principle direction flipped to get positive w
   elevation = asin(w)
   azimuth = atan(v, u)
@@ -600,6 +605,7 @@ draw(
     color=(:names => "Variables"),
   ) *
   AlgebraOfGraphics.density();
+  figure=(; size=(600,400))
 )
 ```
 
@@ -621,7 +627,7 @@ let
   )
   draw(
     data(dat) * mp * AlgebraOfGraphics.density();
-    figure=(; resolution=(800, 450)),
+    figure=(; size=(600, 400)),
   )
 end
 ```
@@ -717,7 +723,7 @@ let
       col=:model,
     ) *
     visual(Lines);
-    axis=(width=350, height=350),
+    axis=(width=120, height=130),
   )
 end
 ```

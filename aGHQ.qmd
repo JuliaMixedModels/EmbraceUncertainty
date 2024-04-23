@@ -1,5 +1,11 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 150
+fig-format: png
+engine: julia
+julia:
+  exeflags: ["--project"]
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
@@ -132,7 +138,6 @@ Load the packages to be used
 using AlgebraOfGraphics
 using BenchmarkTools
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using EmbraceUncertainty: dataset
 using FreqTables
 using LinearAlgebra
@@ -1121,7 +1126,8 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| warning: false
 draw(
   data(gausshermitenorm(9)) *
-  mapping(:abscissae => "Positions", :weights),
+  mapping(:abscissae => "Positions", :weights);
+  figure=(; size=(600,450)),
 )
 ```
 
@@ -1136,7 +1142,8 @@ draw(
   data(gausshermitenorm(9)) * mapping(
     :abscissae => "Positions",
     :weights => log2 => "log₂(weight)",
-  ),
+  );
+  figure=(; size=(600,450)),
 )
 ```
 
@@ -1232,7 +1239,7 @@ We begin with plots of the difference in the penalized deviance from its value a
 #| label: fig-uscalepdev
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; resolution=(800, 450)),
+  fig = Figure(; size=(600, 375)),
   ax = Axis(
     fig[1, 1];
     xlabel="u",
@@ -1256,7 +1263,7 @@ then shift and scale the horizontal axis to the $z$ scale for this difference in
 #| label: fig-zscalepdev
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; resolution=(800, 450)),
+  fig = Figure(; size=(600, 375)),
   ax = Axis(
     fig[1, 1];
     xlabel="z",
@@ -1278,7 +1285,7 @@ The next stage is to plot, on the $z$ scale, the difference between the penalize
 #| label: fig-zpdevdiff
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; resolution=(800, 450)),
+  fig = Figure(; size=(600, 375)),
   ax = Axis(
     fig[1, 1];
     xlabel="z",
@@ -1302,7 +1309,7 @@ and, finally, the exponential of negative half of this difference in @fig-zexpne
 #| label: fig-zexpneghalfdiff
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; resolution=(800, 450)),
+  fig = Figure(; size=(600, 375)),
   ax = Axis(
     fig[1, 1];
     xlabel="z",

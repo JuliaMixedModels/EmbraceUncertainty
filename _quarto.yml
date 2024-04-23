@@ -29,7 +29,7 @@ book:
           state: WI
           url: https://www.wisc.edu
           department: Statistics
-  date: today
+  date: last-modified
   chapters:
     - index.qmd
     - intro.qmd
@@ -65,7 +65,11 @@ format:
     # also overrides code-bg in the SCSS file
     # monobackgroundcolor: '#fafafa'
 
-jupyter: julia-1.10
+engine: julia
+
+julia:
+  exeflags: ["--project"]
+
 execute:
   cache: false    # inline results conflict with cache use
   freeze: auto

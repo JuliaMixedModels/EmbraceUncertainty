@@ -1,5 +1,11 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 150
+fig-format: png
+engine: julia
+julia:
+  exeflags: ["--project"]
 ---
 
 # Models with multiple random-effects terms {#sec-Multiple}
@@ -32,7 +38,6 @@ Attach the packages to be used in this chapter
 #| label: packages02
 using AlgebraOfGraphics
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
@@ -146,7 +151,8 @@ let
     color=:sample,
   )
   draw(
-    data(df) * mp * visual(ScatterLines; marker='○', markersize=12),
+    data(df) * mp * visual(ScatterLines; marker='○', markersize=12);
+    figure=(; size=(600,450))
   )
 end
 ```
@@ -194,7 +200,7 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| label: fig-pnm01platepred
 #| warning: false
 caterpillar!(
-  Figure(; resolution=(800, 480)),
+  Figure(; size=(600, 340)),
   ranefinfo(pnm01, :plate),
 )
 ```
@@ -205,7 +211,7 @@ caterpillar!(
 #| label: fig-pnm01samplepred
 #| warning: false
 caterpillar!(
-  Figure(; resolution=(800, 160)),
+  Figure(; size=(600, 180)),
   ranefinfo(pnm01, :sample),
 )
 ```
@@ -278,7 +284,7 @@ draw(
     color=(:names => "Names"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -303,7 +309,7 @@ draw(
     color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -334,8 +340,10 @@ pastes = dataset(:pastes)
 ```
 
 ```{julia}
-pastes =
-  @transform(DataFrame(pastes), :sample = string(:batch, :cask))
+pastes = transform(
+  DataFrame(pastes),
+  [:batch, :cask] => ByRow((x, y) -> string(x, y)) => :sample,
+)
 describe(pastes)
 ```
 
@@ -348,24 +356,19 @@ It would be fine to do this within a batch but the plot would be misleading if w
 There is no relationship between cask 'a' in batch 'A' and cask 'a' in batch 'B'.
 The labels 'a', 'b' and 'c' are used only to distinguish the three samples within a batch; they do not have a meaning across batches.
 
-```{julia}
+```{r}
 #| code-fold: true
 #| fig-cap: "Strength of paste preparations according to sample within batch"
 #| label: fig-pastesdot
-
-RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=8)
-R"""
-require("lattice", quietly=TRUE)
-pp <- $pastes
-pp <- within(pp, bb <- reorder(batch, strength))
-print(
-  dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
+pp <- within($pastes, bb <- reorder(batch, strength))
+plot(
+  lattice::dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
     strip.left = TRUE, layout = c(1, 10),
     scales = list(y = list(relation = "free")),
     ylab = "Sample within batch", type = c("p", "a"),
     xlab = "Paste strength", jitter.y = TRUE)
 )
-""";
+NULL
 ```
 
 In @fig-pastesdot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
@@ -453,7 +456,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| label: fig-psm01batchcaterpillar
 #| warning: false
 caterpillar!(
-  Figure(resolution=(800, 300)),
+  Figure(size=(600, 240)),
   ranefinfo(psm01, :batch),
 )
 ```
@@ -480,7 +483,7 @@ draw(
     color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -597,7 +600,7 @@ draw(
   data(Table(response=1:5, count=counts(insteval.y))) *
   mapping(:response => "Rating", :count => "Count") *
   visual(BarPlot);
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -620,7 +623,7 @@ It is not surprising that zero is within most of the prediction intervals on the
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
 #| warning: false
-caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
+caterpillar!(Figure(size=(600, 300)), ranefinfo(iem01, :dept))
 ```
 
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
@@ -690,7 +693,7 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| label: fig-iem01qqcaterpillard
 #| warning: false
 qqcaterpillar!(
-  Figure(; resolution=(800, 650)),
+  Figure(; size=(600, 480)),
   ranefinfo(iem01, :d),
 )
 ```
@@ -706,7 +709,7 @@ draw(
   data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
   mapping(:n => "Number of observations") *
   AlgebraOfGraphics.histogram(; bins=410);
-  figure=(; resolution=(800, 600)),
+  figure=(; size=(600, 450)),
 )
 ```
 

@@ -1,5 +1,11 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 150
+fig-format: png
+engine: julia
+julia:
+  exeflags: ["--project"]
 ---
 
 \newcommand{\bbtheta}{{\boldsymbol\theta}}
@@ -14,7 +20,6 @@ Load the packages to be used,
 #| label: packages05
 using AlgebraOfGraphics
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrames
 using EmbraceUncertainty: dataset
@@ -134,7 +139,7 @@ Because the distribution of the number of ratings per movie or per user is so hi
 #| label: fig-nrtngsecdf
 #| warning: false
 let
-  f = Figure(; resolution=(1000, 400))
+  f = Figure(; size=(700, 350))
   xscale = log10
   xminorticksvisible = true
   xminorgridvisible = true
@@ -239,7 +244,8 @@ let
       color=:nratings => "Ratings/movie",
       dodge=:nratings,
     ) *
-    visual(BarPlot),
+    visual(BarPlot);
+    figure=(; size=(600, 400))
   )
 end
 ```
@@ -313,7 +319,7 @@ ltitle = "Minimum number of ratings per user"
 #| label: fig-dimsbarchart
 #| warning: false
 let
-  f = Figure(resolution=(800, 1000))
+  f = Figure(size=(600, 800))
   xlabel = "Minimum number of ratings per movie"
   mc = refarray(sizespeed.mc)
   xticks = (1:7, string.(refpool(sizespeed.mc)))
@@ -462,7 +468,7 @@ The first two parts of this conclusion are illustrated in @fig-memoryfootprint.
 #| label: fig-memoryfootprint
 #| warning: false
 let
-  f = Figure(resolution=(800, 1000))
+  f = Figure(; size=(600, 800))
   xlabel = "Minimum number of ratings per movie"
   mc = refarray(sizespeed.mc)
   xticks = (1:7, string.(refpool(sizespeed.mc)))
@@ -527,7 +533,7 @@ That is, we can't expect to reproduce `nev` exactly when fitting the same model 
 #| label: fig-timetoconverge
 #| warning: false
 let
-  f = Figure(resolution=(800, 1000))
+  f = Figure(size=(600, 800))
   xlabel = "Minimum number of ratings per movie"
   mc = refarray(sizespeed.mc)
   xticks = (1:7, string.(refpool(sizespeed.mc)))
@@ -606,7 +612,8 @@ draw(
     :modelsz => "Size (GiB) of model representation";
     color=:uc,
   ) *
-  visual(Scatter),
+  visual(Scatter);
+  figure=(; size=(600,500))
 )
 ```
 
