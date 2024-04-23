@@ -250,9 +250,13 @@ end
 contrasts[:urban] = HelmertCoding()
 contrasts[:ch] = HelmertCoding()
 com05 =
-  let f = @formula use ~
-      1 + urban + ch * age + age & age + (1 | dist & urban)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ=9, progress)
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(
+      use ~ 1 + urban + ch * age + age & age + (1 | dist & urban)
+    )
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ=9, progress)
   end
 ```
 
@@ -970,7 +974,7 @@ print(
   ", fmin = ",
   deviance(com05),
   ", and β =",
-  com05.β
+  com05.β,
 )
 ```
 
@@ -1127,7 +1131,7 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 draw(
   data(gausshermitenorm(9)) *
   mapping(:abscissae => "Positions", :weights);
-  figure=(; size=(600,450)),
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -1143,7 +1147,7 @@ draw(
     :abscissae => "Positions",
     :weights => log2 => "log₂(weight)",
   );
-  figure=(; size=(600,450)),
+  figure=(; size=(600, 450)),
 )
 ```
 
