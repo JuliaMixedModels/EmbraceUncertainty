@@ -5,7 +5,7 @@ fig-dpi: 150
 fig-format: png
 engine: julia
 julia:
-  exeflags: ["--project"]
+  exeflags: ["-tauto", "--project"]
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
@@ -138,6 +138,7 @@ Load the packages to be used
 using AlgebraOfGraphics
 using BenchmarkTools
 using CairoMakie
+using DataFrames
 using EmbraceUncertainty: dataset
 using FreqTables
 using LinearAlgebra
@@ -146,6 +147,7 @@ using MixedModelsMakie
 using NLopt
 using PooledArrays
 using StatsAPI
+using TidierPlots
 ```
 
 and define some constants
@@ -1123,12 +1125,14 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| code-fold: true
 #| fig-cap: Weights and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghnine
-#| warning: false
-draw(
-  data(gausshermitenorm(9)) *
-  mapping(:abscissae => "Positions", :weights);
-  figure=(; size=(600,450)),
-)
+df9 = DataFrame(gausshermitenorm(9))
+ggplot(df9, aes(; x=:abscissae, y=:weights)) +
+geom_point() + labs(; x="Positions", y="Weights")
+# draw(
+#   data(gausshermitenorm(9)) *
+#   mapping(:abscissae => "Positions", :weights);
+#   figure=(; size=(600,450)),
+# )
 ```
 
 Notice that the magnitudes of the weights drop quite dramatically away from zero, even on a logarithmic scale (@fig-ghninelog)
@@ -1137,14 +1141,16 @@ Notice that the magnitudes of the weights drop quite dramatically away from zero
 #| code-fold: true
 #| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghninelog
-#| warning: false
-draw(
-  data(gausshermitenorm(9)) * mapping(
-    :abscissae => "Positions",
-    :weights => log2 => "log₂(weight)",
-  );
-  figure=(; size=(600,450)),
-)
+ggplot(df9, aes(; x=:abscissae, y=:weights)) +
+geom_point() + labs(; x="Positions", y="Weights") +
+scale_y_log2()
+# draw(
+#   data(gausshermitenorm(9)) * mapping(
+#     :abscissae => "Positions",
+#     :weights => log2 => "log₂(weight)",
+#   );
+#   figure=(; size=(600,450)),
+# )
 ```
 
 The definition of `MixedModels.GHnorm` is similar to the `gausshermitenorm` function with some extra provisions for ensuring symmetry of the abscissae and of the weights and for caching values once they have been calculated.

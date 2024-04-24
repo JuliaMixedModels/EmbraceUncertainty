@@ -5,7 +5,7 @@ fig-dpi: 150
 fig-format: png
 engine: julia
 julia:
-  exeflags: ["--project"]
+  exeflags: ["-tauto", "--project"]
 ---
 
 # Models with multiple random-effects terms {#sec-Multiple}
@@ -47,6 +47,7 @@ using MixedModelsMakie
 using Random
 using RCall
 using StatsBase
+using TidierPlots
 ```
 
 and define some constants, if not already defined,
@@ -111,48 +112,24 @@ of the data, then plot it
 #| code-fold: true
 #| fig-cap: "Diameter of inhibition zone by plate and sample. Plates are ordered by increasing mean response."
 #| label: fig-penicillindot
-#| warning: false
-"""
-    _meanrespfrm(df, :resp::Symbol, :grps::Symbol; sumryf::Function=mean)
-
-Returns a `DataFrame` created from df with the levels of `grps` reordered according to
-`combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
-levels of `grps` reordered.
-"""
-function _meanrespfrm(
-  df,
-  resp::Symbol,
-  grps::Symbol;
-  sumryf::Function=mean,
-)
-  # ensure the relevant columns are types that Makie can deal with 
-  df = transform(
-    df,
-    resp => Array,
-    grps => CategoricalArray;
-    renamecols=false,
+let sumry = sort!(
+    combine(groupby(penicillin, :plate), :diameter => mean => :meandia),
+    :meandia,
+  ),
+  df = sort(
+    transform(penicillin, :plate => ByRow(sorter(sumry.plate)); renamecols=false),
+    :plate
   )
-  # create a summary table by mean resp
-  sumry =
-    sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
-  glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
-  levels!(df[!, grps], glevs)
-  levels!(sumry[!, grps], glevs)
-  return df, sumry
-end
-
-let
-  df, _ = _meanrespfrm(penicillin, :diameter, :plate)
-  sort!(df, [:plate, :sample])
-
   mp = mapping(
     :diameter => "Diameter of inhibition zone [mm]",
-    :plate => "Plate";
+    :plate => "Plate",
     color=:sample,
   )
+
   draw(
-    data(df) * mp * visual(ScatterLines; marker='○', markersize=12);
-    figure=(; size=(600,450))
+    data(df) * mp * 
+    visual(ScatterLines; marker='○', markersize=12);
+    figure=(; size=(600, 450))
   )
 end
 ```
@@ -277,15 +254,8 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
 #| warning: false
-draw(
-  data(@subset(pnm01pars, :type == "β")) *
-  mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(DataFrame(pnm01samp.tbl), aes(x=:β1)) +
+geom_density() + labs(x="Bootstrap samples of β₁")
 ```
 
 and the shortest coverage interval on this parameter is close to the Wald interval
@@ -596,12 +566,7 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
 #| warning: false
-draw(
-  data(Table(response=1:5, count=counts(insteval.y))) *
-  mapping(:response => "Rating", :count => "Count") *
-  visual(BarPlot);
-  figure=(; size=(600, 340)),
-)
+ggplot(DataFrame(insteval), aes(x=:y)) + geom_bar() + labs(x="Rating")
 ```
 
 it is sufficiently diffuse to warrant treating it as if it were a continuous response.

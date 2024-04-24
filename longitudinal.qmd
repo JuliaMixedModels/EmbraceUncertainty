@@ -46,6 +46,7 @@ using MixedModelsMakie
 using Random
 using RCall
 using StandardizedPredictors
+using TidierPlots
 ```
 
 and declare some constants, if not already defined.
@@ -87,7 +88,8 @@ A common way of plotting such longitudinal data is response versus time on a sin
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
-#| warning: false
+# ggplot(egdf, aes(; x=:time, y=:resp, color=:Subj)) +  # need to figure out colormap
+# geom_point(; size=10)# + geom_line()
 draw(
   data(egdf) *
   mapping(
