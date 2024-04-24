@@ -68,7 +68,7 @@ format:
 engine: julia
 
 julia:
-  exeflags: ["--project"]
+  exeflags: ["-tauto", "--project"]
 
 execute:
   cache: false    # inline results conflict with cache use
