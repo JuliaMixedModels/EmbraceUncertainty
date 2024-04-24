@@ -252,9 +252,13 @@ end
 contrasts[:urban] = HelmertCoding()
 contrasts[:ch] = HelmertCoding()
 com05 =
-  let f = @formula use ~
-      1 + urban + ch * age + age & age + (1 | dist & urban)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ=9, progress)
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(
+      use ~ 1 + urban + ch * age + age & age + (1 | dist & urban)
+    )
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ=9, progress)
   end
 ```
 
@@ -972,7 +976,7 @@ print(
   ", fmin = ",
   deviance(com05),
   ", and β =",
-  com05.β
+  com05.β,
 )
 ```
 

@@ -50,6 +50,7 @@ using TidierPlots
 ```
 
 and declare some constants, if not already defined.
+
 ```{julia}
 #| code-fold: true
 #| output: false
@@ -98,7 +99,7 @@ draw(
     color=:Subj,
   ) *
   (visual(Scatter) + visual(Lines));
-  figure=(; size=(600,450)),
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -338,7 +339,7 @@ draw(
   bxaxes *
   mapping(; color=:Subj) *
   (visual(Scatter) + visual(Lines));
-  figure=(; size=(600, 450))
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -607,7 +608,7 @@ draw(
     color=(:names => "Variables"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; size=(600,400))
+  figure=(; size=(600, 400)),
 )
 ```
 

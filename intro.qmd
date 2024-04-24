@@ -213,14 +213,21 @@ Although this table does show us an important property of the data, namely that 
 #| code-fold: true
 #| warning: false
 let
-  sumry = sort!(combine(groupby(dyestuff, :batch), :yield => mean => :yield), :yield)
+  sumry = sort!(
+    combine(groupby(dyestuff, :batch), :yield => mean => :yield),
+    :yield,
+  )
   mp = mapping(
     :yield => "Yield of dyestuff [g]",
-    :batch => sorter(sumry.batch) => "Batch of intermediate product",
+    :batch =>
+      sorter(sumry.batch) => "Batch of intermediate product",
   )
   draw(
-    (data(dyestuff) * mp * visual(Scatter; marker='○', markersize=12)) +
-    (data(sumry) * mp * visual(Lines));
+    (
+      data(dyestuff) *
+      mp *
+      visual(Scatter; marker='○', markersize=12)
+    ) + (data(sumry) * mp * visual(Lines));
     figure=(; size=(600, 300)),
   )
 end
@@ -282,14 +289,20 @@ A data plot (@fig-dyestuff2data)
 #| code-fold: true
 #| warning: false
 let
-  sumry = sort!(combine(groupby(dyestuff2, :batch), :yield => mean => :yield), :yield)
+  sumry = sort!(
+    combine(groupby(dyestuff2, :batch), :yield => mean => :yield),
+    :yield,
+  )
   mp = mapping(
     :yield => "Simulated yield",
     :batch => sorter(sumry.batch) => "Batch",
   )
   draw(
-    (data(dyestuff2) * mp * visual(Scatter; marker='○', markersize=12)) +
-    (data(sumry) * mp * visual(Lines));
+    (
+      data(dyestuff2) *
+      mp *
+      visual(Scatter; marker='○', markersize=12)
+    ) + (data(sumry) * mp * visual(Lines));
     figure=(; size=(600, 300)),
   )
 end
@@ -330,6 +343,7 @@ print(dsm01)
 The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum likelihood](https://en.wikipedia.org/wiki/Maximum_likelihood_estimation) parameter estimates, assigns the results to the name `dsm01`, and displays a summary of the fitted model.
 
 :::{.callout-note collapse="true"}
+
 ### The named argument, progress=false
 
 The estimates are determined via an iterative optimization algorithm.
@@ -683,7 +697,7 @@ draw(
 ```
 
 Nearly 1000 of the 10,000 bootstrap fits are "singular" in that the estimated unconditional distribution of the random effects is degenerate.
-(A model with multiple grouping factors is singular if one or more of the unconditional distributions of the random effects is degenerate. 
+(A model with multiple grouping factors is singular if one or more of the unconditional distributions of the random effects is degenerate.
 For this model the only way singularity can occur is for $\sigma_1$ to be zero.)
 
 ```{julia}
@@ -808,10 +822,7 @@ A plot of these prediction intervals is sometimes called a *caterpillar plot* be
 #| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
 #| warning: false
-caterpillar!(
-  Figure(size=(600, 200)),
-  ranefinfo(dsm01, :batch),
-)
+caterpillar!(Figure(size=(600, 200)), ranefinfo(dsm01, :batch))
 ```
 
 The `caterpillar` function returns a plot with linear spacing of the
@@ -823,10 +834,7 @@ An alternative, the `qqcaterpillar` function
 #| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
 #| warning: false
-qqcaterpillar!(
-  Figure(size=(600, 200)),
-  ranefinfo(dsm01, :batch),
-)
+qqcaterpillar!(Figure(size=(600, 200)), ranefinfo(dsm01, :batch))
 ```
 
 returns a plot like @fig-qqcaterpillar_dsm01 where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.
@@ -845,7 +853,7 @@ The [StatsModels.jl package](https://github.com/JuliaStats/StatsModels.jl) allow
 The [StandardizedPredictors.jl package](https://github.com/beacon-biosignals/StandardizedPredictors.jl) allows transformations to be coded as contrasts.
 
 For models `dsm01` and `dsm02` the only covariate in the model formula is `batch`, which is a grouping factor for the random effects.
-In the past it was helpful to specify a `Grouping()` contrast for grouping factors as 
+In the past it was helpful to specify a `Grouping()` contrast for grouping factors as
 
 ```{julia}
 #| code-fold: false
@@ -854,10 +862,6 @@ contrasts = Dict(:batch => Grouping())
 ```
 
 but versions 4.21 of the `MixedModels` package or later do this automatically.
-
-:::{.callout-note}
-### Replace "current versions" by a specific version number
-:::
 
 (Symbols in Julia can be written as a colon followed by the name of the symbol.
 The colon creates an expression but, if the expression consists of a single name, then the expression is the symbol.)
@@ -886,7 +890,7 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts,
-  progress=false
+  progress=false,
 )
 ```
 

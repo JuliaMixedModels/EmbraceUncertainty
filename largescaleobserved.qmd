@@ -39,8 +39,8 @@ and define some constants and a utility function
 #| label: constants05
 optsumdir(paths::AbstractString...) =
   joinpath(@__DIR__, "optsums", paths...)
-@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
-@isdefined(progress) || const progress=false
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
+@isdefined(progress) || const progress = false
 ```
 
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
@@ -103,7 +103,7 @@ movies = Table(
       on=:movieId,
     );
     error=false,
-  )
+  ),
 )
 ```
 
@@ -245,7 +245,7 @@ let
       dodge=:nratings,
     ) *
     visual(BarPlot);
-    figure=(; size=(600, 400))
+    figure=(; size=(600, 400)),
   )
 end
 ```
@@ -613,7 +613,7 @@ draw(
     color=:uc,
   ) *
   visual(Scatter);
-  figure=(; size=(600,500))
+  figure=(; size=(600, 500)),
 )
 ```
 

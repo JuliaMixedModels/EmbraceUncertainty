@@ -176,10 +176,7 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| code-fold: true
 #| label: fig-pnm01platepred
 #| warning: false
-caterpillar!(
-  Figure(; size=(600, 340)),
-  ranefinfo(pnm01, :plate),
-)
+caterpillar!(Figure(; size=(600, 340)), ranefinfo(pnm01, :plate))
 ```
 
 ```{julia}
@@ -187,10 +184,7 @@ caterpillar!(
 #| code-fold: true
 #| label: fig-pnm01samplepred
 #| warning: false
-caterpillar!(
-  Figure(; size=(600, 180)),
-  ranefinfo(pnm01, :sample),
-)
+caterpillar!(Figure(; size=(600, 180)), ranefinfo(pnm01, :sample))
 ```
 
 The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` displays much less variability than does the conditional distribution of the random effects for `sample`.
@@ -425,10 +419,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
 #| warning: false
-caterpillar!(
-  Figure(size=(600, 240)),
-  ranefinfo(psm01, :batch),
-)
+caterpillar!(Figure(size=(600, 240)), ranefinfo(psm01, :batch))
 ```
 
 confirm this impression in that all the prediction intervals for the random effects for contain zero.
@@ -657,10 +648,7 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
 #| label: fig-iem01qqcaterpillard
 #| warning: false
-qqcaterpillar!(
-  Figure(; size=(600, 480)),
-  ranefinfo(iem01, :d),
-)
+qqcaterpillar!(Figure(; size=(600, 480)), ranefinfo(iem01, :d))
 ```
 
 shows the differences in precision due to different numbers of observations for different instructors.
@@ -710,11 +698,9 @@ For convenience, multiple, nested random-effects terms can be specified using a 
 
 ```{julia}
 #| label: psm01alt
-print(
-  let f = @formula(strength ~ 1 + (1 | batch / cask))
-    fit(MixedModel, f, pastes; progress)
-  end
-)
+print(let f = @formula(strength ~ 1 + (1 | batch / cask))
+  fit(MixedModel, f, pastes; progress)
+end)
 ```
 
 We will avoid terms of this form, preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
