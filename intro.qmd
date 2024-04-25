@@ -635,10 +635,10 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| warning: false
 ggplot(
   filter(==("β") ∘ getproperty(:type), dsm01pars),
-  aes(x = :value),
-) + 
+  aes(; x=:value),
+) +
 geom_density() +
-labs(x = "Bootstrap samples of β₁")
+labs(; x="Bootstrap samples of β₁")
 ```
 
 The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `{julia} repr(mean(βdf.value), context=:compact=>true)`  which is close to the estimated `β₁` of `{julia} repr(only(dsm01.β), context=:compact=>true)`.

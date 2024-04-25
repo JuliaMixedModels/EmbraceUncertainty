@@ -113,13 +113,21 @@ of the data, then plot it
 #| fig-cap: "Diameter of inhibition zone by plate and sample. Plates are ordered by increasing mean response."
 #| label: fig-penicillindot
 let sumry = sort!(
-    combine(groupby(penicillin, :plate), :diameter => mean => :meandia),
+    combine(
+      groupby(penicillin, :plate),
+      :diameter => mean => :meandia,
+    ),
     :meandia,
   ),
   df = sort(
-    transform(penicillin, :plate => ByRow(sorter(sumry.plate)); renamecols=false),
-    :plate
+    transform(
+      penicillin,
+      :plate => ByRow(sorter(sumry.plate));
+      renamecols=false,
+    ),
+    :plate,
   )
+
   mp = mapping(
     :diameter => "Diameter of inhibition zone [mm]",
     :plate => "Plate",
@@ -127,9 +135,8 @@ let sumry = sort!(
   )
 
   draw(
-    data(df) * mp * 
-    visual(ScatterLines; marker='○', markersize=12);
-    figure=(; size=(600, 450))
+    data(df) * mp * visual(ScatterLines; marker='○', markersize=12);
+    figure=(; size=(600, 450)),
   )
 end
 ```
@@ -249,7 +256,8 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| label: fig-pnm01bsbeta
 #| warning: false
 ggplot(DataFrame(pnm01samp.tbl), aes(x=:β1)) +
-geom_density() + labs(x="Bootstrap samples of β₁")
+geom_density() +
+labs(; x="Bootstrap samples of β₁")
 ```
 
 and the shortest coverage interval on this parameter is close to the Wald interval
@@ -557,7 +565,9 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
 #| warning: false
-ggplot(DataFrame(insteval), aes(x=:y)) + geom_bar() + labs(x="Rating")
+ggplot(DataFrame(insteval), aes(x=:y)) +
+geom_bar() +
+labs(; x="Rating")
 ```
 
 it is sufficiently diffuse to warrant treating it as if it were a continuous response.

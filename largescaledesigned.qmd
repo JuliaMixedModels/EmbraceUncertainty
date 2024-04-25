@@ -156,7 +156,9 @@ A bar plot of the word length counts, @fig-ldtwrdlenhist, shows that the majorit
 #| code-fold: true
 #| fig-cap: "Bar plot of word lengths in the items used in the lexical decision task."
 #| label: fig-ldtwrdlenhist
-ggplot(ldttrial, aes(; x=:wrdlen)) + geom_bar() + labs(; x="Word length")
+ggplot(ldttrial, aes(; x=:wrdlen)) +
+geom_bar() +
+labs(; x="Word length")
 # #| warning: false
 # let wlen = 1:21
 #   draw(
@@ -281,7 +283,8 @@ A plot of the median response time versus proportion accurate, @fig-ldtmedianrtv
 #| fig-cap: "Median response time versus proportion accurate by subject in the LDT."
 #| label: fig-ldtmedianrtvspropacc
 ggplot(bysubj, aes(; x=:spropacc, y=:smedianrt)) +
-geom_point() + geom_smooth(; method="smooth") +
+geom_point() +
+geom_smooth(; method="smooth") +
 labs(; x="Proportion accurate", y="Median response time (ms)")
 ```
 
@@ -338,8 +341,9 @@ A density plot of the pruned response times, @fig-elpldtrtdens, shows they are s
 #| code-fold: true
 #| fig-cap: Kernel density plot of the pruned response times (ms.) in the LDT.
 #| label: fig-elpldtrtdens
-ggplot(pruned, aes(; x=:rt)) + geom_density() +
-labs(; x = "Response time (ms.) for correct responses")
+ggplot(pruned, aes(; x=:rt)) +
+geom_density() +
+labs(; x="Response time (ms.) for correct responses")
 # draw(
 #   data(pruned) *
 #   mapping(:rt => "Response time (ms.) for correct responses") *
@@ -540,8 +544,7 @@ condmeans = leftjoin!(
   on=:item,
 )
 draw(
-  data(condmeans) *
-   mapping(
+  data(condmeans) * mapping(
     :elm01 => "Conditional means of item random effects for model elm01",
     :elm02 => "Conditional means of item random effects for model elm02";
     color=:isword,
