@@ -34,7 +34,7 @@ The memory format also defines a file format for storing and exchanging data tab
 Because the memory format is essentially the same as the file format, Arrow files can be [memory-mapped](https://en.wikipedia.org/wiki/Memory-mapped_file) providing very fast read speeds.
 
 Furthermore, the Arrow Project provides a reference implementation of the Arrow format and tools for manipulating data in that format as a C++ library, which is used by implementations in several other languages, including C, C#, Go, Java, JavaScript, MATLAB, Python, R, and Ruby.
-The Julia implementation in [Arrow.jl](https://github.com/apache/julia-arrow) does not call functions in the C++ library.
+The Julia implementation in [Arrow.jl](https://github.com/apache/arrow-julia) does not call functions in the C++ library.
 Instead it implements the format in Julia code in such a way that Arrow vectors behave like native Julia vectors.
 That is, Arrow vectors are a subtype of `AbstractVector`.
 A similar approach is taken in the implementations of the Arrow format for the [Rust](https://rustlang.org) language.
