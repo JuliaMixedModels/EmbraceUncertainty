@@ -158,6 +158,8 @@ and define some constants
 #| label: constantsA03
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
+TidierPlots_set("plot_show", false)
+TidierPlots_set("plot_log", false)
 ```
 
 ## Generalized linear models for binary data {#sec-BernoulliGLM}
@@ -404,7 +406,7 @@ Each evaluation of the deviance is fast, requiring only a fraction of a millisec
 
 ```{julia}
 βopt = copy(com05fe.β)
-@b deviance(setβ!($com05fe, $βopt))
+@be deviance(setβ!($com05fe, $βopt))
 ```
 
 but the already large number of evaluations for these six coefficients would not scale well as this dimension increases.
@@ -636,7 +638,7 @@ The IRLS algorithm has converged in 4 iterations to essentially the same devianc
 Each iteration of the IRLS algorithm takes more time than a deviance evaluation, but still only a fraction of a millisecond on a laptop computer.
 
 ```{julia}
-@b deviance(updateβ!($com05fe))
+@be deviance(updateβ!($com05fe))
 ```
 
 ## GLMMs and the PIRLS algorithm {#sec-PIRLS}
@@ -867,7 +869,7 @@ pirls!(m; verbose=true);
 As with IRLS, PIRLS is a fast and stable algorithm for determining the mode of the conditional distribution $(\mcU|\mcY=\bby)$ with $\bbtheta$ and $\bbbeta$ held fixed.
 
 ```{julia}
-@b pirls!($m)
+@be pirls!($m)
 ```
 
 The time taken for the four iterations to determine the conditional mode of $\bbu$ is comparable to the time taken for a single call to `updateβ!`.
@@ -1143,7 +1145,7 @@ Notice that the magnitudes of the weights drop quite dramatically as the positio
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
+#| fig-cap: Weights (logarithm base 10) and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghninelog
 ggplot(df9, aes(; x=:abscissae, y=:weights)) +
 geom_point() +

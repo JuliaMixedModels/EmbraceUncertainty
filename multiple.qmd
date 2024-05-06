@@ -58,6 +58,8 @@ and define some constants, if not already defined,
 #| label: constants02
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
+TidierPlots_set("plot_show", false)
+TidierPlots_set("plot_log", false)
 ```
 
 The mixed models considered in the previous chapter had only one random-effects term, which was a simple, scalar random-effects term, and a single fixed-effects coefficient.
@@ -239,6 +241,7 @@ A parametric bootstrap sample of the parameter estimates
 #| code-fold: true
 bsrng = Random.seed!(9876789)
 pnm01samp = parametricbootstrap(bsrng, 10_000, pnm01; progress)
+tbl = DataFrame(pnm01samp.tbl)
 pnm01pars = DataFrame(pnm01samp.allpars);
 ```
 
@@ -255,7 +258,7 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
 #| warning: false
-ggplot(DataFrame(pnm01samp.tbl), aes(x=:β1)) +
+ggplot(tbl, aes(x=:β1)) +
 geom_density() +
 labs(; x="Bootstrap samples of β₁")
 ```
@@ -273,16 +276,18 @@ The densities of the variance-components, on the scale of the standard deviation
 #| fig-cap: "Parametric bootstrap estimates of variance components in model pnm01"
 #| label: fig-pnm01bssigma
 #| code-fold: true
-#| warning: false
-draw(
-  data(@subset(pnm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(stack(tbl, [:σ, :σ1, :σ2]), aes(; x=:value, color=:variable)) +
+  geom_density() +
+  labs(; x="Bootstrap samples of σ")
+# draw(
+#   data(@subset(pnm01pars, :type == "σ")) *
+#   mapping(
+#     :value => "Bootstrap samples of σ";
+#     color=(:group => "Group"),
+#   ) *
+#   AlgebraOfGraphics.density();
+#   figure=(; size=(600, 340)),
+# )
 ```
 
 The lack of precision in the estimate of $\sigma_2$, the standard deviation of the random effects for `sample`, is a consequence of only having 6 distinct levels of the `sample` factor.
@@ -437,6 +442,7 @@ Furthermore, kernel density estimates from a parametric bootstrap sample of the 
 ```{julia}
 Random.seed!(4567654)
 psm01samp = parametricbootstrap(10_000, psm01; progress)
+tbl = DataFrame(psm01samp.tbl)
 psm01pars = DataFrame(psm01samp.allpars);
 ```
 
@@ -444,16 +450,18 @@ psm01pars = DataFrame(psm01samp.allpars);
 #| fig-cap: "Kernel density plots of bootstrap estimates of σ for model psm01"
 #| label: fig-psm01bssampdens
 #| code-fold: true
-#| warning: false
-draw(
-  data(@subset(psm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(stack(tbl, [:σ, :σ1, :σ2]), aes(; x=:value, color=:variable)) +
+  geom_density() +
+  labs(; x="Bootstrap samples of σ")
+# draw(
+#   data(@subset(psm01pars, :type == "σ")) *
+#   mapping(
+#     :value => "Bootstrap samples of σ";
+#     color=(:group => "Group"),
+#   ) *
+#   AlgebraOfGraphics.density();
+#   figure=(; size=(600, 340)),
+# )
 ```
 
 Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only `sample`, we perform a statistical test of this hypothesis.
