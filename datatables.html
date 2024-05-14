@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.31">
+<meta name="generator" content="quarto-1.5.33">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -132,13 +132,13 @@ div.csl-indent {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./datatables.html">Appendices</a></li><li class="breadcrumb-item"><a href="./datatables.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Working with data tables</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -210,9 +210,9 @@ div.csl-indent {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
  <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
@@ -299,7 +299,7 @@ div.csl-indent {
 <h2 data-number="A.1" class="anchored" data-anchor-id="the-arrow-format-for-data-tables"><span class="header-section-number">A.1</span> The Arrow format for data tables</h2>
 <p>An increasing popular representation of data frames is as <a href="https://arrow.apache.org">Arrow</a> tables. <a href="https://pola.rs">Polars</a> uses the Arrow format internally as does the <a href="https://duckdb.org">DuckDB</a> database. Recently it was announced that the 2.0 release of <a href="https://pandas.pydata.org">pandas</a> will allow for Arrow tables.</p>
 <p>Arrow specifies a language-independent tabular memory format that provides many desirable properties, such as provision for missing data and compact representation of categorical data vectors, for data science. The memory format also defines a file format for storing and exchanging data tables. Because the memory format is essentially the same as the file format, Arrow files can be <a href="https://en.wikipedia.org/wiki/Memory-mapped_file">memory-mapped</a> providing very fast read speeds.</p>
-<p>Furthermore, the Arrow Project provides a reference implementation of the Arrow format and tools for manipulating data in that format as a C++ library, which is used by implementations in several other languages, including C, C#, Go, Java, JavaScript, MATLAB, Python, R, and Ruby. The Julia implementation in <a href="https://github.com/apache/julia-arrow">Arrow.jl</a> does not call functions in the C++ library. Instead it implements the format in Julia code in such a way that Arrow vectors behave like native Julia vectors. That is, Arrow vectors are a subtype of <code>AbstractVector</code>. A similar approach is taken in the implementations of the Arrow format for the <a href="https://rustlang.org">Rust</a> language.</p>
+<p>Furthermore, the Arrow Project provides a reference implementation of the Arrow format and tools for manipulating data in that format as a C++ library, which is used by implementations in several other languages, including C, C#, Go, Java, JavaScript, MATLAB, Python, R, and Ruby. The Julia implementation in <a href="https://github.com/apache/arrow-julia">Arrow.jl</a> does not call functions in the C++ library. Instead it implements the format in Julia code in such a way that Arrow vectors behave like native Julia vectors. That is, Arrow vectors are a subtype of <code>AbstractVector</code>. A similar approach is taken in the implementations of the Arrow format for the <a href="https://rustlang.org">Rust</a> language.</p>
 <p>The data sets in the <code>MixedModels</code> package and the auxiliary data sets used in this book are stored in the Arrow file format and retrieved as <code>Arrow.Table</code>s. There are many examples throughout this book of loading such data sets.</p>
 <div id="4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>contra <span class="op">=</span> <span class="fu">dataset</span>(<span class="op">:</span>contra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -718,8 +718,8 @@ Expression for creating a NamedTuple
 <p>The <a href="https://github.com/JuliaData">JuliaData</a> organization manages the development of several packages related to data science and data management, including <a href="https://github.com/JuliaData/DataFrames.jl">DataFrames.jl</a>, a comprehensive system for working with column-oriented data tables in Julia. <span class="citation" data-cites="Kaminski2023">Kamiński (<a href="references.html#ref-Kaminski2023" role="doc-biblioref">2023</a>)</span>, written by the primary author of that package, provides an in-depth introduction to data science facilities, in particular the <code>DataFrames</code> package, in Julia.</p>
 <p>This package is particularly well-suited to more advanced data manipulation such as the <code>split-apply-combine</code> strategy <span class="citation" data-cites="Wickham2011">(<a href="references.html#ref-Wickham2011" role="doc-biblioref">Wickham, 2011</a>)</span> and “joins” of data tables.</p>
 <p><span class="citation" data-cites="JSSv107i04">Bouchet-Valat &amp; Kamiński (<a href="references.html#ref-JSSv107i04" role="doc-biblioref">2023</a>)</span> compares the performance of DataFrames.jl to other data frame implementations in R and Python.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/6547de1
-">6547de1
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/ba35e20
+">ba35e20
 </a>.</em></p>
 
 
