@@ -58,8 +58,21 @@ Several covariates, some relating to the subject and some relating to the target
 Initially we consider only the trial-level data.
 
 ```{julia}
-ldttrial = dataset(:ELP_ldt_trial)
+ldttrial = DataFrame(dataset(:ELP_ldt_trial))
 ```
+
+Subject identifiers are coded in integers from 1 to 816. We prefer them as strings of the same length. 
+We prefix the subject number with 'S' and leftpad the number with zeros to three digits.
+
+```{julia}
+ldttrial =
+  transform!(ldttrial, :subj => (s -> string.('S', lpad.(s, 3, '0'))) => :subj)
+describe(ldttrial)
+```
+
+There is one trial-level covariate, `seq`, the sequence number of the trial within subj.
+Each subject participated in two sessions on different days, with 2000 trials recorded on the first day.
+We add the `s2` column to the data frame using `@transform!`. The new variable `s2` is a Boolean value indicating if the trial is in the second session.
 
 ```{julia}
 ldttrial =
@@ -67,10 +80,8 @@ ldttrial =
 describe(ldttrial)
 ```
 
-The two response variables are `acc` - the accuracy of the response - and `rt`, the response time in milliseconds.
-There is one trial-level covariate, `seq`, the sequence number of the trial within subj.
-Each subject participated in two sessions on different days, with 2000 trials recorded on the first day.
-The `s2` column, added to the data frame using `@transform!`, is a Boolean value indicating if the trial is in the second session.
+The two response variables are `acc` - the accuracy of the response - and `rt`, the response time in milliseconds. The target stimuli to be judged as word or nonword are stored in variable `item`.
+
 
 ## Initial data exploration {#sec-ldtinitialexplore}
 
@@ -189,7 +200,7 @@ draw(
 ```
 
 @fig-ldtaccsmooth may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few.
-Over 95% of the words are between 4 and 13 characters in length
+Over 96% of the words are between 4 and 13 characters in length
 
 ```{julia}
 count(x -> 4 ≤ x ≤ 13, byitem.wrdlen) / nrow(byitem)
@@ -304,7 +315,7 @@ count(<(0.8), bysubj.spropacc) / nrow(bysubj)
 ```
 
 and there is some association of faster response times with low accuracy.
-The majority of the subjects whose median response time is less than 500 ms. are accurate on less than 75% of their trials.
+The majority of the subjects whose median response time is less than 500 ms are accurate on less than 75% of their trials.
 Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.
 
 ```{julia}
@@ -431,6 +442,10 @@ The small amount of curvature is associated with short word lengths, say less th
 
 @fig-speedviolin shows a "violin plot" - the empirical density of the response speed by word length separately for words and nonwords.  The lines on the plot are fit by linear regression.
 
+::: {.callout-note}
+RK: In the next chunk `linear(; interval=:confidence)` throws an error for me. I commented it out.
+:::
+
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Empirical density of response speed versus word length by word/non-word status, with lines fit by linear regression to each group."
@@ -444,7 +459,7 @@ let
     color=:isword,
     side=:isword,
   )
-  plt *= (visual(Violin) + linear(; interval=:confidence))
+  plt *= (visual(Violin) ) #rk: + linear(; interval=:confidence))
   draw(
     plt,
     axis=(; limits=(nothing, (0.0, 2.8)));
@@ -579,6 +594,9 @@ and those associated with the subject are
 
 ```{julia}
 elpldtsubj = DataFrame(dataset(:ELP_ldt_subj))
+elpldtsubj =
+  transform!(elpldtsubj, :subj => (s -> string.('S', lpad.(s, 3, '0'))) => :subj)
+
 describe(elpldtsubj)
 ```
 
