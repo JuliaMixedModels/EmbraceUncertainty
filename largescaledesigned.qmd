@@ -58,7 +58,7 @@ Several covariates, some relating to the subject and some relating to the target
 Initially we consider only the trial-level data.
 
 ```{julia}
-ldttrial = DataFrame(dataset(:ELP_ldt_trial))
+ldttrial = dataset(:ELP_ldt_trial)
 ```
 
 Subject identifiers are coded in integers from 1 to 816. We prefer them as strings of the same length. 
@@ -66,7 +66,7 @@ We prefix the subject number with 'S' and leftpad the number with zeros to three
 
 ```{julia}
 ldttrial =
-  transform!(ldttrial, :subj => (s -> string.('S', lpad.(s, 3, '0'))) => :subj)
+  transform!(DataFrame(ldttrial), :subj => (s -> string.('S', lpad.(s, 3, '0'))) => :subj)
 describe(ldttrial)
 ```
 
@@ -76,7 +76,7 @@ We add the `s2` column to the data frame using `@transform!`. The new variable `
 
 ```{julia}
 ldttrial =
-  transform!(DataFrame(ldttrial), :seq => (x -> x .> 2000) => :s2)
+  transform!(ldttrial, :seq => (x -> x .> 2000) => :s2)
 describe(ldttrial)
 ```
 
@@ -442,9 +442,6 @@ The small amount of curvature is associated with short word lengths, say less th
 
 @fig-speedviolin shows a "violin plot" - the empirical density of the response speed by word length separately for words and nonwords.  The lines on the plot are fit by linear regression.
 
-::: {.callout-note}
-RK: In the next chunk `linear(; interval=:confidence)` throws an error for me. I commented it out.
-:::
 
 ```{julia}
 #| code-fold: true
@@ -459,7 +456,7 @@ let
     color=:isword,
     side=:isword,
   )
-  plt *= (visual(Violin) ) #rk: + linear(; interval=:confidence))
+  plt *= (visual(Violin) + linear(; interval=:confidence))
   draw(
     plt,
     axis=(; limits=(nothing, (0.0, 2.8)));
