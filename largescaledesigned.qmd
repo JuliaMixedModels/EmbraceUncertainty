@@ -76,7 +76,7 @@ We add the `s2` column to the data frame using `@transform!`. The new variable `
 
 ```{julia}
 ldttrial =
-  transform!(ldttrial, :seq => (x -> x .> 2000) => :s2)
+  transform!(ldttrial, :seq => ByRow(>(2000)) => :s2)
 describe(ldttrial)
 ```
 
