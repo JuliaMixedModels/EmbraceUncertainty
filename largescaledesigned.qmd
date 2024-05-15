@@ -66,7 +66,7 @@ We prefix the subject number with 'S' and leftpad the number with zeros to three
 
 ```{julia}
 ldttrial =
-  transform!(DataFrame(ldttrial), :subj => (s -> string.('S', lpad.(s, 3, '0'))) => :subj)
+  transform!(DataFrame(ldttrial), :subj => ByRow(s -> string('S', lpad(s, 3, '0'))) => :subj)
 describe(ldttrial)
 ```
 
