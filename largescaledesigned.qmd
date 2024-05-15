@@ -592,7 +592,7 @@ and those associated with the subject are
 ```{julia}
 elpldtsubj = DataFrame(dataset(:ELP_ldt_subj))
 elpldtsubj =
-  transform!(elpldtsubj, :subj => (s -> string.('S', lpad.(s, 3, '0'))) => :subj)
+  transform!(elpldtsubj, :subj => ByRow(s -> string('S', lpad(s, 3, '0'))) => :subj)
 
 describe(elpldtsubj)
 ```
