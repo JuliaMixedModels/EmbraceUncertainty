@@ -67,8 +67,7 @@ We prefix the subject number with 'S' and leftpad the number with zeros to three
 ```{julia}
 ldttrial = transform!(
   DataFrame(ldttrial),
-  :subj =>
-    (s -> string.('S', lpad.(s, maximum(ndigits, s), '0'))),
+  :subj => ByRow(s -> string('S', lpad(s, 3, '0'))) => :subj,
   :seq => ByRow(>(2000)) => :s2;
   renamecols=false,
 )
