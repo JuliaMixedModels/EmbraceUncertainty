@@ -561,9 +561,9 @@ end
 
 A major purpose of the English Lexicon Project is to characterize the items (words or nonwords) according to the observed accuracy of identification and to response latency, taking into account subject-to-subject variability, and to relate these to characteristics of the items.
 
-In @Balota_2007 the item response latency is characterized by the average  response latency from the correct trials after outlier removal.
+In @Balota_2007, as in almost all LDT research, analysis focus on correct response latencies to word items, allowing for some outlier removal. Thus, all nonword trials and wrongly judged word trials are excluded. Here we also remove error trials and outliers, but analyze correct responses to words and nonwords. One reason is that nonword responses are bound to stabilize estimates of subject-related variance components and correlation parameters , simply due to having twice as much information for every subject. The precisely operationalzed derivation of nonwords for every word also allows to determine how lexical properties interact with the word-nonword factor. 
 
-Mixed-effects models allow us greater flexibility and, we hope, precision in characterizing the items by controlling for subject-to-subject variability and for item characteristics such as word/nonword and item length.
+Mixed-effects models allow us greater flexibility and, we hope, precision in characterizing the items by controlling for subject-to-subject variability and for item characteristics such as word/nonword and item length. 
 
 We begin with a model that has scalar random effects for item and for subject and incorporates fixed-effects for word/nonword and for quadratic trends of item length and for the interaction of these terms.
 
@@ -680,7 +680,13 @@ Both `isword` and `wrdlen` vary within subjects and between items. We can estima
 
 We stay with the subset of accurate subjects. 
 
+The amount of time to fit  complex models will be much greater so we may want to move those fits to more powerful server computers.
+We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the `MixedModel` object followed by restoring the `optsum` object.
+
+Fitting the model is skipped here. 
+
 ```{julia}
+#| eval: false
 elm03 =
   let f = @formula 1000 / rt ~
       1 + isword * (wrdlen + wrdlen^2) + (1 | item) + (1 + isword*wrdlen | subj)
@@ -692,20 +698,14 @@ issingular(elm03)
 VarCorr(elm03)
 ```
 
-The complex random-effect structure is supported by the data ...
+Saving the fitted object is skipped here. 
 
 ```{julia}
-MixedModels.likelihoodratiotest(elm02,elm03)
-```
-
-... and significantly increases the goodness of fit. Fixed-effect estimates do not change substantially, but the associated standard errors are much wider (i.e., z-values are much smaller).
-
-The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers.
-We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the `MixedModel` object followed by restoring the `optsum` object.
-
-```{julia}
+#| eval: false
 saveoptsum("./optsums/elm03.json", elm03);
 ```
+
+Restore the fitted object.
 
 ```{julia}
 elm03a = restoreoptsum!(
@@ -718,10 +718,22 @@ elm03a = restoreoptsum!(
 )
 ```
 
+The complex random-effect structure is supported by the data ...
+
+```{julia}
+MixedModels.likelihoodratiotest(elm02,elm03a)
+```
+
+... and significantly increases the goodness of fit. Fixed-effect estimates do not change substantially, but the associated standard errors are much wider (i.e., z-values are much smaller).
       
 ### Models for subject and item pair {#sec-ldtmodel_subj_pair}
 
+Each nonword is derived from a word by changing one or two letters. This aspect warrants the use of word-nonword *pair* rather than *item* as grouping variable (random factor). The difference between word and nonword as captured by the `isword` fixed within-pair factor. Thus, in this specification the number of levels of this grouping factor is cut in half. The random-effect structure is more complex because it is possible to include both a subject- and a pair-related VC (and associated CPs) for `isword`.
+
+We start with a complex LMM. 
+
 ```{julia}
+#| eval: false
 elp01 =
   let f = @formula 1000 / rt ~
       1 + isword * (wrdlen + wrdlen^2) + (1 + isword | pair) + (1 + isword*wrdlen | subj)
@@ -738,6 +750,7 @@ This LMM takes roughly 34 minutes to fit. The model is supported by the data.
 We save the fitted object `elp01`.
 
 ```{julia}
+#| eval: false
 saveoptsum("./optsums/elp01.json", elp01);
 ```
 
@@ -762,6 +775,7 @@ The subject-related VC or the interaction term and its associated CPs are quite 
 We check their significance for the goodness of fit. 
 
 ```{julia}
+#| eval: false
 elp02 =
   let f = @formula 1000 / rt ~
       1 + isword * (wrdlen + wrdlen^2) + (1 + isword | pair) + (1 + isword + wrdlen | subj) 
@@ -775,6 +789,7 @@ VarCorr(elp02)
 Save the fitted object `elp02`.
 
 ```{julia}
+#| eval: false
 saveoptsum("./optsums/elp02.json", elp02);
 ```
 
@@ -812,10 +827,14 @@ gof_summary = let
       end
 ```
 
-
 ```{julia}
 effects(Dict(:isword => [false, true], :wrdlen => 4:2:12), elp01)
 ```
 
+And as a graph
+
+```{julia}
+
+```
 
 *This page was rendered from git revision {{< git-rev short=true >}}.*
