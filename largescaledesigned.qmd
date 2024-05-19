@@ -676,7 +676,7 @@ Also, there is at least one outlier with a conditional mode over 1.0.
 qqcaterpillar!(Figure(; size=(600, 450)), ranefinfo(elm02, :subj))
 ```
 
-Both `isword` and `wrdlen` vary within subjects and between items. We can estimate variance components (VCs) and correlation paramters (CPs) for this complex LMM and check whether they are supported by the data and increase the goodness of fit of the model. 
+Both `isword` and `wrdlen` vary within subjects and between items. We can estimate variance components (VCs) and correlation parameters (CPs) for this complex LMM and check whether they are supported by the data and increase the goodness of fit of the model. 
 
 We stay with the subset of accurate subjects. 
 
