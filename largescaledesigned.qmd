@@ -152,7 +152,7 @@ It can be seen that the items, coded in `item` and `itemno`, occur in word/nonwo
 
 The other variables are covariates that have been shown to affect LDT accuracy and reaction times. Available are:
 
-+ Ortho_N: numer of orthographic neighbors
++ Ortho_N: number of orthographic neighbors
 + BG_Sum:  summed bigram frequencies
 + BG_Mean: average bigram frequencies
 + BG_Freq_By_Pos: summed bigram frequency by position
