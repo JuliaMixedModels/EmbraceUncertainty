@@ -176,7 +176,7 @@ elpldtitem = transform!(
 describe(elpldtitem)
 ```
 
-We incoporate `item`,  `pair`, `isword`, and `wrdlen` into `ldttrial` using `item` as the key variable. 
+We incorporate `item`,  `pair`, `isword`, and `wrdlen` into `ldttrial` using `item` as the key variable. 
 
 ```{julia}
 leftjoin!(
