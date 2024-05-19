@@ -159,7 +159,7 @@ The other variables are covariates that have been shown to affect LDT accuracy a
 + wrdlen: word length
 
 ::: {.callout-note}
-RK: I think we will also need some of the other covariates listed in Table 2 of @Balota_2007, at least one of the word frequencies, `Freq_HAL` (or its log value `Log_Freq_HAL`) and the number of syllables :ELP_ldt_item. Are there  arguments againts including all available variables and select here?
+RK: I think we will also need some of the other covariates listed in Table 2 of @Balota_2007, at least one of the word frequencies, `Freq_HAL` (or its log value `Log_Freq_HAL`) and the number of syllables :ELP_ldt_item. Are there  arguments against including all available variables and select here?
 
 We may also want to include word frequency in LMMs of word-nonword pairs. For these models, I would assign word frequency to the respective paired nonword, that is treat word frequency and number of syllables, as between-pair covariates. 
 :::
