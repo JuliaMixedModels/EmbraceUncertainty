@@ -3,9 +3,11 @@ module EmbraceUncertainty
 using Arrow
 using CSV
 using DataFrames
+using Dates
 using Downloads
 using Markdown
 using MixedModels
+using PooledArrays
 using Scratch
 using ZipFile
 
@@ -110,6 +112,11 @@ function osf_io_dataset(name::AbstractString)
     return false
 end        
 
+"""
+    dataset(name::Union(Symbol, AbstractString))
+
+Return as an `Arrow.Table` the dataset named `name`.
+"""
 dataset(name::Symbol) = dataset(string(name))
 function dataset(name::AbstractString)
     name in MMDS && return MixedModels.dataset(name)
@@ -123,7 +130,45 @@ function readme()
     return Markdown.parse_file(joinpath(CACHE[], "README.txt"))
 end
 
-export GENRES
+"""
+    tagpad(v::AbstractVector{<:Integer}, tag::String="S"; pool::Bool=true)
+
+Convert `v` to a vector of strings prepended with `tag` and padded to a constant string length.
+If `pool` is `true`, the default, the resulting vector of strings is converted to a `PooledArray`.
+
+The reason for padding the numeric strings is so that the strings sort lexicographically in the
+same order as the original numeric values.
+
+The single-argument version, e.g. `tagpad(:I)`, returns a partially-applied function that can be used
+in a `transform` or `select` call.
+
+```@example
+show(tagpad(repeat(1:10, inner=2)))
+```
+"""
+function tagpad(v::AbstractVector{<:Integer}, tag::String="S"; pool::Bool=true)
+    tagged = string.(tag, lpad.(v, maximum(ndigits, v), '0'))
+    return pool ? PooledArray(tagged; signed=true, compress=true) : tagged
+end
+
+tagpad(v::AbstractVector{<:Integer}, tag; pool::Bool=true) = tagpad(v, string(tag); pool)
+
+tagpad(tag) = Base.Fix2(tagpad, string(tag))
+
+"""
+    age_at_event(edate::Dates.TimeType, dob::Dates.TimeType)
+
+Return the age in years at `edate` for a person born on `dob`.
+"""
+function age_at_event(edate::TimeType, dob::TimeType)
+    (ey, em, ed) = yearmonthday(edate)
+    (by, bm, bd) = yearmonthday(dob)
+    return (ey - by) - (em < bm | (em == bm & ed < bd))
+end
+
+export GENRES,
+    age_at_event,
+    tagpad
 
 
 end # module EmbraceUncertainty
