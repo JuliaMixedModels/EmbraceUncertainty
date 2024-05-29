@@ -113,16 +113,21 @@ function osf_io_dataset(name::AbstractString)
 end        
 
 """
-    dataset(name::Union(Symbol, AbstractString))
+    dataset(name::Union(Symbol, AbstractString); reload::Bool=false)
 
 Return as an `Arrow.Table` the dataset named `name`.
+
+If `reload` is `true` the dataset will first be downloaded from the osf.io site, even if a current copy exists.
 """
-dataset(name::Symbol) = dataset(string(name))
-function dataset(name::AbstractString)
+dataset(name::Symbol; reload::Bool=false) = dataset(string(name); reload)
+function dataset(name::AbstractString; reload::Bool=false)
     name in MMDS && return MixedModels.dataset(name)
     f = _file(name)
-    isfile(f) || osf_io_dataset(name) ||
-        throw(ArgumentError("$(name) is not a dataset "))
+    if reload | !isfile(f)
+        if !osf_io_dataset(name)
+            throw(ArgumentError("$(name) is not a dataset "))
+        end
+    end
     return Arrow.Table(f)
 end
 
@@ -131,9 +136,12 @@ function readme()
 end
 
 """
+    tagpad(v::AbstractVector{<:Integer}, ndig::Integer, tag::String="S"; pool::Bool=true)
     tagpad(v::AbstractVector{<:Integer}, tag::String="S"; pool::Bool=true)
 
-Convert `v` to a vector of strings prepended with `tag` and padded to a constant string length.
+Convert `v` to a vector of strings prepended with `tag` and padded to a constant string length of `ndig`,
+which is evaluated as `maximum(ndigits, v)`, if not provided.
+
 If `pool` is `true`, the default, the resulting vector of strings is converted to a `PooledArray`.
 
 The reason for padding the numeric strings is so that the strings sort lexicographically in the
@@ -146,9 +154,13 @@ in a `transform` or `select` call.
 show(tagpad(repeat(1:10, inner=2)))
 ```
 """
-function tagpad(v::AbstractVector{<:Integer}, tag::String="S"; pool::Bool=true)
-    tagged = string.(tag, lpad.(v, maximum(ndigits, v), '0'))
+function tagpad(v::AbstractVector{<:Integer}, ndig::Integer, tag::AbstractString="S"; pool::Bool=true)
+    tagged = string.(tag, lpad.(v, ndig, '0'))
     return pool ? PooledArray(tagged; signed=true, compress=true) : tagged
+end
+
+function tagpad(v::AbstractVector{<:Integer}, tag::AbstractString="S"; pool::Bool=true)
+    return tagpad(v, maximum(ndigits, v), tag; pool)
 end
 
 tagpad(v::AbstractVector{<:Integer}, tag; pool::Bool=true) = tagpad(v, string(tag); pool)
