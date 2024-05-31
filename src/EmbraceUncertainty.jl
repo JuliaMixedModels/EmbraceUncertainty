@@ -129,7 +129,7 @@ function osf_io_dataset(name::AbstractString)
 end        
 
 """
-    dataset(name::Union(Symbol, AbstractString); reload::Bool=true)
+    dataset(name::Union(Symbol, AbstractString); reload::Bool=false)
 
 Return as an `Arrow.Table` the dataset named `name`.
 
