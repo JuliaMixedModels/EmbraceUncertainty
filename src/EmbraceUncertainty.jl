@@ -9,6 +9,8 @@ using Markdown
 using MixedModels
 using PooledArrays
 using Scratch
+using SHA
+using TypedTables
 using ZipFile
 
 const CACHE = Ref("")
@@ -89,31 +91,45 @@ function load_quiver()
     return quiver
 end
 
-const OSF_IO_URIs = Dict{String,String}(
-    "box" => "tkxnh",
-    "elstongrizzle" => "5vrbw",
-    "oxboys" => "cz6g3",
-    "sizespeed" => "kazgm",
-    "ELP_ldt_item" => "c6gxd",
-    "ELP_ldt_subj" => "rqenu",
-    "ELP_ldt_trial" => "3evhy",
-    "movies" => "kvdch",
-    "ratings" => "v73ym",
-)
+const OSF_IO_URIs = 
+    CSV.read(
+        IOBuffer(
+"""
+dsname,filename,version,sha2
+box,tkxnh,1,4ac2038735c5286ca0d6a706b4feef5b34bd93560bc4cabc7223addf2366e4c0
+elstongrizzle,5vrbw,1,f33e08ad5a91ab5dd9889953dbb97cc52a299fdac9db8b37ec4f87ad2dacadbd
+oxboys,cz6g3,1,079f46e404e43c1848a65d3a4e5b6a14b2cb17565c77819d7ee3effe72f5ebd0
+sizespeed,kazgm,1,d8eddc7f26928def4bff0e2c3637a90ff45fe589e3ffd5ab4818c8c1f52cf87e
+ELP_ldt_item,c6gxd,1,f851910e1435659ca662ad49cfb8deb6b7cf287e4ce4969103dba11b32ab2e6c
+ELP_ldt_subj,rgenu,2,d9c88915681b64fc9db975f9bb2d6f402058fee5cb35887f9de7d07776efdd56
+ELP_ldt_trial,3evhy,2,57a83679f8f458b1d9bb56e05099a556ffdaf15af67464e9ee608c844fc4fa9c
+movies,kvdch,1,c8fa488be74c368530f38de3c1d3511d2182e3fa07f357d2fa09121adc1cc964
+ratings,v73ym,1,1d6466b8fd8da2942881c83941077cd2b6c9f7a03fa2d71072a5cd7aaa4ef560
+fggk21,vwecy,1,0fa959f095f8b92135496b6f8c8a8b5a3e896e8875f0ba6928bd074559d8a796
+fggk21_Child,c2fmn,1,61c91e00336e6f804e9f6b86986ebb4a14561cc4908b3a21cb27c113d2b51a5c
+fggk21_Score,7fqx3,1,99d73ee705aaf5f4ee696eadbba992d0113ba6f467ce337a62a63853e4617400
+kkl15,p8cea,2,90d7bb137c8613d7a15c8597c461aee7c7cb0f0989a07c80fc93e1fbe2e5c156
+kwdyz11,4cv52,3,2fa23aa8aa25e1adb10183c8d29646ae0d19d6baef9d711c9906f7fa1b225571
+"""
+        ),
+        Table,
+    )
 
 function osf_io_dataset(name::AbstractString)
-    if haskey(OSF_IO_URIs, name)
-        Downloads.download(
-            string("https://osf.io/", OSF_IO_URIs[name], "/download"),
-            _file(name),
-        )
-        return true
+    r = only(filter(==(name) ∘ getproperty(:dsname), OSF_IO_URIs))
+    fn = _file(name)
+    Downloads.download(
+        string("https://osf.io/", r.filename, "/download?version=", r.version),
+        fn,
+    )
+    if bytes2hex(open(sha2_256, fn)) ≠ r.sha2
+        @error("sha2 of downloaded file doesn't match entry in table")
     end
-    return false
+    return true
 end        
 
 """
-    dataset(name::Union(Symbol, AbstractString); reload::Bool=false)
+    dataset(name::Union(Symbol, AbstractString); reload::Bool=true)
 
 Return as an `Arrow.Table` the dataset named `name`.
 
@@ -130,6 +146,8 @@ function dataset(name::AbstractString; reload::Bool=false)
     end
     return Arrow.Table(f)
 end
+
+datasets() = OSF_IO_URIs
 
 function readme()
     return Markdown.parse_file(joinpath(CACHE[], "README.txt"))
@@ -181,6 +199,5 @@ end
 export GENRES,
     age_at_event,
     tagpad
-
-
+    
 end # module EmbraceUncertainty
