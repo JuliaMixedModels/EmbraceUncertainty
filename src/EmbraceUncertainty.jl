@@ -101,7 +101,7 @@ elstongrizzle,5vrbw,1,f33e08ad5a91ab5dd9889953dbb97cc52a299fdac9db8b37ec4f87ad2d
 oxboys,cz6g3,1,079f46e404e43c1848a65d3a4e5b6a14b2cb17565c77819d7ee3effe72f5ebd0
 sizespeed,kazgm,1,d8eddc7f26928def4bff0e2c3637a90ff45fe589e3ffd5ab4818c8c1f52cf87e
 ELP_ldt_item,c6gxd,1,f851910e1435659ca662ad49cfb8deb6b7cf287e4ce4969103dba11b32ab2e6c
-ELP_ldt_subj,rgenu,2,d9c88915681b64fc9db975f9bb2d6f402058fee5cb35887f9de7d07776efdd56
+ELP_ldt_subj,rqenu,2,d9c88915681b64fc9db975f9bb2d6f402058fee5cb35887f9de7d07776efdd56
 ELP_ldt_trial,3evhy,2,57a83679f8f458b1d9bb56e05099a556ffdaf15af67464e9ee608c844fc4fa9c
 movies,kvdch,1,c8fa488be74c368530f38de3c1d3511d2182e3fa07f357d2fa09121adc1cc964
 ratings,v73ym,1,1d6466b8fd8da2942881c83941077cd2b6c9f7a03fa2d71072a5cd7aaa4ef560
@@ -133,17 +133,23 @@ end
 
 Return as an `Arrow.Table` the dataset named `name`.
 
-If `reload` is `true` the dataset will first be downloaded from the osf.io site, even if a current copy exists.
+Available dataset names, their versions, the filenames on the osf.io site and an SHA2 checksum of their contents
+are in the table OSF_IO_URIs.
+
+The files are cached in the scratchspace for this package.  The name of this directory is the value of `CACHE[]`.
+If `reload` is `true` the dataset will first be downloaded from the osf.io site, even if a cached copy exists.
 """
 dataset(name::Symbol; reload::Bool=false) = dataset(string(name); reload)
+
 function dataset(name::AbstractString; reload::Bool=false)
     name in MMDS && return MixedModels.dataset(name)
+    rows = filter(==(name) ∘ getproperty(:dsname), OSF_IO_URIs)
+    isempty(rows) && throw(ArgumentError(name, " is not an available dataset."))
+    length(rows) > 1 && throw(error("the OSF_IO_URIs table is corrupt"))
+    r = only(rows)
     f = _file(name)
-    if reload | !isfile(f)
-        if !osf_io_dataset(name)
-            throw(ArgumentError("$(name) is not a dataset "))
-        end
-    end
+    !reload && isfile(f) && r.sha2 == bytes2hex(open(sha2_256, f)) && return Arrow.Table(f)
+    osf_io_dataset(name) || throw(ArgumentError("Unable to download dataset"))
     return Arrow.Table(f)
 end
 
