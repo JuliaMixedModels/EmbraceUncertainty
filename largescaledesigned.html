@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.33">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -333,14 +333,18 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
   "source"    =&gt; "https://osf.io/n63s2"</code></pre>
 </div>
 </div>
+<p>Subject identifiers are coded in integers from 1 to 816. We prefer them as strings of the same length. We prefix the subject number with ‘S’ and leftpad the number with zeros to three digits.</p>
 <div id="8" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ldttrial <span class="op">=</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transform!</span>(<span class="fu">DataFrame</span>(ldttrial), <span class="op">:</span>seq <span class="op">=&gt;</span> (x <span class="op">-&gt;</span> x <span class="op">.&gt;</span> <span class="fl">2000</span>) <span class="op">=&gt;</span> <span class="op">:</span>s2)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(ldttrial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ldttrial <span class="op">=</span> <span class="fu">transform!</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">DataFrame</span>(ldttrial),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>subj <span class="op">=&gt;</span> <span class="fu">ByRow</span>(s <span class="op">-&gt;</span> <span class="fu">string</span>(<span class="ch">'S'</span>, <span class="fu">lpad</span>(s, <span class="fl">3</span>, <span class="ch">'0'</span>))) <span class="op">=&gt;</span> <span class="op">:</span>subj,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>seq <span class="op">=&gt;</span> <span class="fu">ByRow</span>(<span class="fu">&gt;</span>(<span class="fl">2000</span>)) <span class="op">=&gt;</span> <span class="op">:</span>s2;</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  renamecols<span class="op">=</span><span class="cn">false</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(ldttrial)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>6×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -367,12 +371,12 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">subj</td>
-<td style="text-align: left;">409.31</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">409.0</td>
-<td style="text-align: left;">816</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">Int16</td>
+<td style="text-align: left;">String</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -429,8 +433,8 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 </div>
-</div>
-<p>The two response variables are <code>acc</code> - the accuracy of the response - and <code>rt</code>, the response time in milliseconds. There is one trial-level covariate, <code>seq</code>, the sequence number of the trial within subj. Each subject participated in two sessions on different days, with 2000 trials recorded on the first day. The <code>s2</code> column, added to the data frame using <code>@transform!</code>, is a Boolean value indicating if the trial is in the second session.</p>
+<p>There is one trial-level covariate, <code>seq</code>, the sequence number of the trial within subj. Each subject participated in two sessions on different days, with 2000 trials recorded on the first day. We add the <code>s2</code> column to the data frame using <code>@transform!</code>. The new variable <code>s2</code> is a Boolean value indicating if the trial is in the second session.</p>
+<p>The two response variables are <code>acc</code> - the accuracy of the response - and <code>rt</code>, the response time in milliseconds. The target stimuli to be judged as word or nonword are stored in variable <code>item</code>.</p>
 </section>
 <section id="sec-ldtinitialexplore" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="sec-ldtinitialexplore"><span class="header-section-number">4.2</span> Initial data exploration</h2>
@@ -454,9 +458,8 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>80962×7 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">80937 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -745,15 +748,13 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 </div>
-</div>
 <p>It can be seen that the items occur in word/nonword pairs and the pairs are sorted alphabetically by the word in the pair (ignoring case). We can add the word/nonword status for the items as</p>
 <div id="12" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>byitem.isword <span class="op">=</span> <span class="fu">isodd</span>.(<span class="fu">eachindex</span>(byitem.item))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>8×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -862,14 +863,12 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 </div>
-</div>
 <p>This table shows that some of the items were never identified correctly. These are</p>
 <div id="14" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(<span class="op">:</span>iacc <span class="op">=&gt;</span> iszero, byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>9×8 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -999,7 +998,6 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 </div>
-</div>
 <p>Notice that these are all words but somewhat obscure words such that none of the subjects exposed to the word identified it correctly.</p>
 <p>We can incorporate characteristics like <code>wrdlen</code> and <code>isword</code> back into the original trial table with a “left join”. This operation joins two tables by values in a common column. It is called a <em>left</em> join because the left (or first) table takes precedence, in the sense that every row in the left table is present in the result. If there is no matching row in the second table then missing values are inserted for the columns from the right table in the result.</p>
 <div id="16" class="cell" data-execution_count="1">
@@ -1011,9 +1009,8 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>8×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1040,12 +1037,12 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">subj</td>
-<td style="text-align: left;">409.31</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">409.0</td>
-<td style="text-align: left;">816</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">Int16</td>
+<td style="text-align: left;">String</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -1122,15 +1119,13 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 </div>
-</div>
 <p>Notice that the <code>wrdlen</code> and <code>isword</code> variables in this table allow for missing values, because they are derived from the second argument, but there are no missing values for these variables. If there is no need to allow for missing values, there is a slight advantage in disallowing them in the element type, because the code to check for and handle missing values is not needed.</p>
 <p>This could be done separately for each column or for the whole data frame, as in</p>
 <div id="18" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">disallowmissing!</span>(ldttrial; error<span class="op">=</span><span class="cn">false</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>8×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1157,12 +1152,12 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">subj</td>
-<td style="text-align: left;">409.31</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">409.0</td>
-<td style="text-align: left;">816</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">Int16</td>
+<td style="text-align: left;">String</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -1239,7 +1234,6 @@ with metadata given by a Base.ImmutableDict{String, String} with 3 entries:
 </div>
 </div>
 </div>
-</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1306,7 +1300,7 @@ Figure&nbsp;4.2: Smoothed curves of accuracy versus word length in the lexical d
 </figure>
 </div>
 </div>
-<p><a href="#fig-ldtaccsmooth" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few. Over 95% of the words are between 4 and 13 characters in length</p>
+<p><a href="#fig-ldtaccsmooth" class="quarto-xref">Figure&nbsp;<span>4.2</span></a> may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few. Over 96% of the words are between 4 and 13 characters in length</p>
 <div id="24" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(x <span class="op">-&gt;</span> <span class="fl">4</span> <span class="op">≤</span> x <span class="op">≤</span> <span class="fl">13</span>, byitem.wrdlen) <span class="op">/</span> <span class="fu">nrow</span>(byitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -1395,9 +1389,8 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@transform</span>!(<span class="op">:</span>spropacc <span class="op">=</span> <span class="op">:</span>sacc <span class="op">/</span> <span class="op">:</span>ns)</span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>814×6 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">789 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1410,7 +1403,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd subheader headerLastRow">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Int16">Int16</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="String">String</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
@@ -1421,7 +1414,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 <tbody>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
-<td style="text-align: right;">1</td>
+<td style="text-align: left;">S001</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">3158</td>
@@ -1430,7 +1423,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
-<td style="text-align: right;">2</td>
+<td style="text-align: left;">S002</td>
 <td style="text-align: right;">3372</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">3031</td>
@@ -1439,7 +1432,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
-<td style="text-align: right;">3</td>
+<td style="text-align: left;">S003</td>
 <td style="text-align: right;">3372</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">3006</td>
@@ -1448,7 +1441,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
-<td style="text-align: right;">4</td>
+<td style="text-align: left;">S004</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">3062</td>
@@ -1457,7 +1450,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
-<td style="text-align: right;">5</td>
+<td style="text-align: left;">S005</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2574</td>
@@ -1466,7 +1459,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
-<td style="text-align: right;">6</td>
+<td style="text-align: left;">S006</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2927</td>
@@ -1475,7 +1468,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
-<td style="text-align: right;">7</td>
+<td style="text-align: left;">S007</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">2877</td>
@@ -1484,7 +1477,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
-<td style="text-align: right;">8</td>
+<td style="text-align: left;">S008</td>
 <td style="text-align: right;">3372</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">2731</td>
@@ -1493,7 +1486,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
-<td style="text-align: right;">9</td>
+<td style="text-align: left;">S009</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">2669</td>
@@ -1502,7 +1495,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
-<td style="text-align: right;">10</td>
+<td style="text-align: left;">S010</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2722</td>
@@ -1511,7 +1504,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
-<td style="text-align: right;">11</td>
+<td style="text-align: left;">S011</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2894</td>
@@ -1520,7 +1513,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
-<td style="text-align: right;">12</td>
+<td style="text-align: left;">S012</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">2979</td>
@@ -1529,7 +1522,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
-<td style="text-align: right;">13</td>
+<td style="text-align: left;">S013</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">2980</td>
@@ -1547,7 +1540,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">803</td>
-<td style="text-align: right;">805</td>
+<td style="text-align: left;">S805</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">2881</td>
@@ -1556,7 +1549,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">804</td>
-<td style="text-align: right;">806</td>
+<td style="text-align: left;">S806</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">3097</td>
@@ -1565,7 +1558,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">805</td>
-<td style="text-align: right;">807</td>
+<td style="text-align: left;">S807</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">3</td>
 <td style="text-align: right;">2994</td>
@@ -1574,7 +1567,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">806</td>
-<td style="text-align: right;">808</td>
+<td style="text-align: left;">S808</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">2751</td>
@@ -1583,7 +1576,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">807</td>
-<td style="text-align: right;">809</td>
+<td style="text-align: left;">S809</td>
 <td style="text-align: right;">3372</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">2603</td>
@@ -1592,7 +1585,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">808</td>
-<td style="text-align: right;">810</td>
+<td style="text-align: left;">S810</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">3242</td>
@@ -1601,7 +1594,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">809</td>
-<td style="text-align: right;">811</td>
+<td style="text-align: left;">S811</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">2861</td>
@@ -1610,7 +1603,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">810</td>
-<td style="text-align: right;">812</td>
+<td style="text-align: left;">S812</td>
 <td style="text-align: right;">3372</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">3012</td>
@@ -1619,7 +1612,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">811</td>
-<td style="text-align: right;">813</td>
+<td style="text-align: left;">S813</td>
 <td style="text-align: right;">3372</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">2932</td>
@@ -1628,7 +1621,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">812</td>
-<td style="text-align: right;">814</td>
+<td style="text-align: left;">S814</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">3070</td>
@@ -1637,7 +1630,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">813</td>
-<td style="text-align: right;">815</td>
+<td style="text-align: left;">S815</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">3024</td>
@@ -1646,7 +1639,7 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">814</td>
-<td style="text-align: right;">816</td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">2950</td>
@@ -1658,14 +1651,12 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 </div>
 </div>
 </div>
-</div>
 <p>shows some anomalies</p>
 <div id="32" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(bysubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>6×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1680,10 +1671,10 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 <tr class="odd subheader headerLastRow">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Symbol">Symbol</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Real">Real</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Float64">Float64</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th" title="Real">Real</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Float64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Any">Any</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Union{Nothing, Float64}">Union…</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th" title="Any">Any</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="Int64">Int64</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th" title="DataType">DataType</th>
 </tr>
@@ -1692,66 +1683,65 @@ Figure&nbsp;4.4: Proportion of accurate trials in the LDT versus word length sep
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">subj</td>
-<td style="text-align: right;">409.311</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">409.5</td>
-<td style="text-align: right;">816</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">Int16</td>
+<td style="text-align: left;">String</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
 <td style="text-align: left;">ns</td>
-<td style="text-align: right;">3373.41</td>
-<td style="text-align: right;">3370</td>
-<td style="text-align: right;">3374.0</td>
-<td style="text-align: right;">3374</td>
+<td style="text-align: left;">3373.41</td>
+<td style="text-align: left;">3370</td>
+<td style="text-align: left;">3374.0</td>
+<td style="text-align: left;">3374</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: left;">Int64</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
 <td style="text-align: left;">smiss</td>
-<td style="text-align: right;">1.68305</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1.0</td>
-<td style="text-align: right;">22</td>
+<td style="text-align: left;">1.68305</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1.0</td>
+<td style="text-align: left;">22</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: left;">Int64</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
 <td style="text-align: left;">sacc</td>
-<td style="text-align: right;">2886.33</td>
-<td style="text-align: right;">1727</td>
-<td style="text-align: right;">2928.0</td>
-<td style="text-align: right;">3286</td>
+<td style="text-align: left;">2886.33</td>
+<td style="text-align: left;">1727</td>
+<td style="text-align: left;">2928.0</td>
+<td style="text-align: left;">3286</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: left;">Int64</td>
 </tr>
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
 <td style="text-align: left;">smedianrt</td>
-<td style="text-align: right;">760.992</td>
-<td style="text-align: right;">205.0</td>
-<td style="text-align: right;">735.0</td>
-<td style="text-align: right;">1804.0</td>
+<td style="text-align: left;">760.992</td>
+<td style="text-align: left;">205.0</td>
+<td style="text-align: left;">735.0</td>
+<td style="text-align: left;">1804.0</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: left;">Float64</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
 <td style="text-align: left;">spropacc</td>
-<td style="text-align: right;">0.855613</td>
-<td style="text-align: right;">0.511855</td>
-<td style="text-align: right;">0.868031</td>
-<td style="text-align: right;">0.973918</td>
+<td style="text-align: left;">0.855613</td>
+<td style="text-align: left;">0.511855</td>
+<td style="text-align: left;">0.868031</td>
+<td style="text-align: left;">0.973918</td>
 <td style="text-align: right;">0</td>
 <td style="text-align: left;">Float64</td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -1788,7 +1778,7 @@ Figure&nbsp;4.5: Median response time versus proportion accurate by subject in t
 <pre><code>0.15233415233415235</code></pre>
 </div>
 </div>
-<p>and there is some association of faster response times with low accuracy. The majority of the subjects whose median response time is less than 500 ms. are accurate on less than 75% of their trials. Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.</p>
+<p>and there is some association of faster response times with low accuracy. The majority of the subjects whose median response time is less than 500 ms are accurate on less than 75% of their trials. Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.</p>
 <div id="38" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">minimum</span>(<span class="fu">filter</span>(<span class="op">:</span>spropacc <span class="op">=&gt;</span> <span class="fu">&gt;</span>(<span class="fl">0.9</span>), bysubj).smedianrt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
@@ -1812,9 +1802,8 @@ Figure&nbsp;4.5: Median response time versus proportion accurate by subject in t
 <div id="42" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(pruned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>9×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1841,12 +1830,12 @@ Figure&nbsp;4.5: Median response time versus proportion accurate by subject in t
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">subj</td>
-<td style="text-align: left;">409.802</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">410.0</td>
-<td style="text-align: left;">816</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">Int16</td>
+<td style="text-align: left;">String</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -1930,7 +1919,6 @@ Figure&nbsp;4.5: Median response time versus proportion accurate by subject in t
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -2108,8 +2096,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(MixedModel, f, pruned; contrasts, progress)</span>
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <tbody>
 <tr class="odd">
 <td style="text-align: left;" data-quarto-table-cell-role="th"></td>
@@ -2169,14 +2156,12 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 </table>
 </div>
 </div>
-</div>
 <p>The predicted response speed by word length and word/nonword status can be summarized as</p>
 <div id="60" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">effects</span>(<span class="fu">Dict</span>(<span class="op">:</span>isword <span class="op">=&gt;</span> [<span class="cn">false</span>, <span class="cn">true</span>], <span class="op">:</span>wrdlen <span class="op">=&gt;</span> <span class="fl">4</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="fl">12</span>), elm01)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>10×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -2293,7 +2278,6 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 </div>
 </div>
 </div>
-</div>
 <p>If we restrict to only those subjects with 80% accuracy or greater the model becomes</p>
 <div id="62" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>elm02 <span class="op">=</span></span>
@@ -2303,8 +2287,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(MixedModel, f, dat; contrasts, progress)</span>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <tbody>
 <tr class="odd">
 <td style="text-align: left;" data-quarto-table-cell-role="th"></td>
@@ -2364,13 +2347,11 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 </table>
 </div>
 </div>
-</div>
 <div id="64" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">effects</span>(<span class="fu">Dict</span>(<span class="op">:</span>isword <span class="op">=&gt;</span> [<span class="cn">false</span>, <span class="cn">true</span>], <span class="op">:</span>wrdlen <span class="op">=&gt;</span> <span class="fl">4</span><span class="op">:</span><span class="fl">2</span><span class="op">:</span><span class="fl">12</span>), elm02)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>10×6 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -2397,7 +2378,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.45036</td>
-<td style="text-align: right;">0.00892466</td>
+<td style="text-align: right;">0.00892467</td>
 <td style="text-align: right;">1.44144</td>
 <td style="text-align: right;">1.45929</td>
 </tr>
@@ -2406,7 +2387,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.37297</td>
-<td style="text-align: right;">0.008871</td>
+<td style="text-align: right;">0.00887101</td>
 <td style="text-align: right;">1.3641</td>
 <td style="text-align: right;">1.38184</td>
 </tr>
@@ -2415,7 +2396,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.29557</td>
-<td style="text-align: right;">0.00885308</td>
+<td style="text-align: right;">0.00885309</td>
 <td style="text-align: right;">1.28672</td>
 <td style="text-align: right;">1.30443</td>
 </tr>
@@ -2424,7 +2405,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.21818</td>
-<td style="text-align: right;">0.0088711</td>
+<td style="text-align: right;">0.00887111</td>
 <td style="text-align: right;">1.20931</td>
 <td style="text-align: right;">1.22705</td>
 </tr>
@@ -2433,7 +2414,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">false</td>
 <td style="text-align: right;">1.14078</td>
-<td style="text-align: right;">0.00892485</td>
+<td style="text-align: right;">0.00892487</td>
 <td style="text-align: right;">1.13186</td>
 <td style="text-align: right;">1.14971</td>
 </tr>
@@ -2442,7 +2423,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.62735</td>
-<td style="text-align: right;">0.00892465</td>
+<td style="text-align: right;">0.00892466</td>
 <td style="text-align: right;">1.61842</td>
 <td style="text-align: right;">1.63627</td>
 </tr>
@@ -2451,7 +2432,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.52702</td>
-<td style="text-align: right;">0.008871</td>
+<td style="text-align: right;">0.00887101</td>
 <td style="text-align: right;">1.51815</td>
 <td style="text-align: right;">1.53589</td>
 </tr>
@@ -2460,7 +2441,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.4267</td>
-<td style="text-align: right;">0.00885307</td>
+<td style="text-align: right;">0.00885309</td>
 <td style="text-align: right;">1.41784</td>
 <td style="text-align: right;">1.43555</td>
 </tr>
@@ -2469,7 +2450,7 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.32637</td>
-<td style="text-align: right;">0.00887109</td>
+<td style="text-align: right;">0.0088711</td>
 <td style="text-align: right;">1.3175</td>
 <td style="text-align: right;">1.33524</td>
 </tr>
@@ -2478,13 +2459,12 @@ Figure&nbsp;4.10: Empirical density of response speed versus word length by word
 <td style="text-align: right;">12</td>
 <td style="text-align: right;">true</td>
 <td style="text-align: right;">1.22605</td>
-<td style="text-align: right;">0.00892483</td>
+<td style="text-align: right;">0.00892484</td>
 <td style="text-align: right;">1.21712</td>
 <td style="text-align: right;">1.23497</td>
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -2558,8 +2538,7 @@ Note
 <span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"./optsums/elm01.json"</span>,</span>
 <span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <tbody>
 <tr class="odd">
 <td style="text-align: left;" data-quarto-table-cell-role="th"></td>
@@ -2619,15 +2598,13 @@ Note
 </table>
 </div>
 </div>
-</div>
 <p>Other covariates associated with the item are available as</p>
 <div id="74" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>elpldtitem <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_item))</span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>9×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -2746,15 +2723,18 @@ Note
 </div>
 </div>
 </div>
-</div>
 <p>and those associated with the subject are</p>
 <div id="76" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>elpldtsubj <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_subj))</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtsubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>elpldtsubj <span class="op">=</span> <span class="fu">transform!</span>(</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  elpldtsubj,</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">:</span>subj <span class="op">=&gt;</span> <span class="fu">ByRow</span>(s <span class="op">-&gt;</span> <span class="fu">string</span>(<span class="ch">'S'</span>, <span class="fu">lpad</span>(s, <span class="fl">3</span>, <span class="ch">'0'</span>))) <span class="op">=&gt;</span> <span class="op">:</span>subj,</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtsubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>20×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -2781,12 +2761,12 @@ Note
 <tr class="odd">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
 <td style="text-align: left;">subj</td>
-<td style="text-align: left;">409.311</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">409.5</td>
-<td style="text-align: left;">816</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left; font-style: italic;"></td>
+<td style="text-align: left;">S816</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: left;">Int16</td>
+<td style="text-align: left;">String</td>
 </tr>
 <tr class="even">
 <td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
@@ -2983,7 +2963,6 @@ Note
 </div>
 </div>
 </div>
-</div>
 <p>For the simple model <code>elm01</code> the estimated standard deviation of the random effects for subject is greater than that of the random effects for item, a common occurrence. A caterpillar plot, <a href="#fig-elm01caterpillarsubj" class="quarto-xref">Figure&nbsp;<span>4.12</span></a>,</p>
 <div id="cell-fig-elm01caterpillarsubj" class="cell" data-execution_count="1">
 <details class="code-fold">
@@ -3019,8 +2998,8 @@ Figure&nbsp;4.13: Conditional means and 95% prediction intervals for subject ran
 </figure>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/ba35e20
-">ba35e20
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/91a3552
+">91a3552
 </a>.</em></p>
 
 

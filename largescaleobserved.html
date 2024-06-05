@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.33">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -639,9 +639,8 @@ Figure&nbsp;5.2: Distribution of ratings for movies with only one rating compare
 <div id="26" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(ratings))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>5×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -717,7 +716,6 @@ Figure&nbsp;5.2: Distribution of ratings for movies with only one rating compare
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -894,8 +892,7 @@ Residual              0.732964 0.856133
 <div id="36" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BlockDescription</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <tbody>
 <tr class="odd">
 <td style="text-align: left;" data-quarto-table-cell-role="th">rows</td>
@@ -923,7 +920,6 @@ Residual              0.732964 0.856133
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 <p>This display gives the types of two blocked matrices: <code>A</code> which is derived from the data and does not depend on the parameters, and <code>L</code>, which is derived from <code>A</code> and the <span class="math inline">\({\boldsymbol\theta}\)</span> parameter. The only difference in their structures is in the [2,2] block, which is diagonal in <code>A</code> and a dense, lower triangular matrix in <code>L</code>.</p>
@@ -1155,7 +1151,7 @@ Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the e
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lm</span>(<span class="pp">@formula</span>(<span class="fu">Float64</span>(modelsz) <span class="op">~</span> <span class="fl">1</span> <span class="op">+</span> nusers <span class="op">+</span> L22sz), sizespeed)</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">coeftable</span>(sizemod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display cell-output-markdown" data-execution_count="1">
-<table class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small">
 <colgroup>
 <col style="width: 16%">
 <col style="width: 13%">
@@ -1215,8 +1211,8 @@ Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the e
 <pre><code>0.9999981449902416</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/ba35e20
-">ba35e20
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/91a3552
+">91a3552
 </a>.</em></p>
 
 

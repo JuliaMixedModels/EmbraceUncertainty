@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.33">
+<meta name="generator" content="quarto-1.5.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -395,9 +395,8 @@ Add metadata to Arrow files for datasets
 <div id="cell-dyestuff_dataframe" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dyestuff <span class="op">=</span> <span class="fu">DataFrame</span>(dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="dyestuff_dataframe" class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>30×2 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">5 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -546,14 +545,12 @@ Add metadata to Arrow files for datasets
 </div>
 </div>
 </div>
-</div>
 <p>The <code>describe</code> method for a <code>DataFrame</code> provides a concise description of the structure of the data,</p>
 <div id="cell-describe_dyestuff" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(dyestuff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="describe_dyestuff" class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>2×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -602,7 +599,6 @@ Add metadata to Arrow files for datasets
 </div>
 </div>
 </div>
-</div>
 <p>Combining this information with the initial description of the <code>Table</code> we see that the data frame consists of 30 observations of the <code>yield</code>, the response variable, and of the covariate, <code>batch</code>, which is a categorical variable whose levels are character strings.</p>
 <div id="10" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(dyestuff.batch)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -623,9 +619,8 @@ Add metadata to Arrow files for datasets
 <div id="14" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(dyestuff, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>7×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -679,13 +674,11 @@ Add metadata to Arrow files for datasets
 </div>
 </div>
 </div>
-</div>
 <div id="16" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(dyestuff, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>7×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -739,14 +732,12 @@ Add metadata to Arrow files for datasets
 </div>
 </div>
 </div>
-</div>
 <p>or we could tabulate the data using <code>groupby</code> and <code>combine</code> from <a href="https://github.com/JuliaData/DataFrames.jl">DataFrames</a>.</p>
 <div id="cell-dyestuff_summary" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">combine</span>(<span class="fu">groupby</span>(dyestuff, <span class="op">:</span>batch), <span class="op">:</span>yield <span class="op">=&gt;</span> mean, nrow <span class="op">=&gt;</span> <span class="op">:</span>n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="dyestuff_summary" class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>6×3 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -800,7 +791,6 @@ Add metadata to Arrow files for datasets
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -878,9 +868,8 @@ Jittering has not yet been added.
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dyestuff2 <span class="op">=</span> <span class="fu">DataFrame</span>(dyestuff2)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(dyestuff2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="dyestuff2_dataframe" class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>2×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -926,7 +915,6 @@ Jittering has not yet been added.
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -982,8 +970,7 @@ Figure&nbsp;1.2: Artificial data of yield by batch. The line joins the mean yiel
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MixedModel, f, dyestuff; progress<span class="op">=</span><span class="cn">false</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="dsm01" class="cell-output cell-output-display" data-execution_count="1">
-<div>
-<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <tbody>
 <tr class="odd">
 <td style="text-align: left;" data-quarto-table-cell-role="th"></td>
@@ -1011,7 +998,6 @@ Figure&nbsp;1.2: Artificial data of yield by batch. The line joins the mean yiel
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 <p>By default, this compact display of mixed-effects model fits is used in <a href="https://jupyter.org">Jupyter</a> notebooks, which are the evaluation engine for <a href="https://quarto.org/docs/books/">quarto books</a> with Julia code chunks. To obtain more information we can <code>print</code> the model, as in</p>
@@ -1309,9 +1295,8 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 └ @ MixedModels ~/.julia/packages/MixedModels/4cTPJ/src/optsummary.jl:180</code></pre>
 </div>
 <div id="dsm01samp" class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>7×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1392,7 +1377,6 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 </div>
 </div>
 </div>
-</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1409,9 +1393,8 @@ Switch to Table(dsm01samp.tbl) formulation
 <div id="56" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">last</span>(dsm01pars, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>7×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1492,14 +1475,12 @@ Switch to Table(dsm01samp.tbl) formulation
 </div>
 </div>
 </div>
-</div>
 <p>Plots of the bootstrap estimates for individual parameters are obtained by extracting subsets of the rows of this dataframe using <code>subset</code> methods from the <code>DataFrames</code> package or the <code>@subset</code> macro from the <code>DataFramesMacros</code> package. For example,</p>
 <div id="58" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>βdf <span class="op">=</span> <span class="pp">@subset</span>(dsm01pars, <span class="op">:</span><span class="kw">type</span> <span class="op">==</span> <span class="st">"β"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>10000×5 DataFrame</span></div><div style="float: right;"><span style="font-style: italic;">9975 rows omitted</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1732,7 +1713,6 @@ Switch to Table(dsm01samp.tbl) formulation
 </div>
 </div>
 </div>
-</div>
 <p>We begin by examining density plots constructed using the <a href="https://github.com/JuliaGraphics/AlgebraOfGraphics.jl">AlgebraOfGraphics</a> package. (In general we “fold” the code used to generate plots as it tends to have considerable detail that may distract from the plot itself. You can check the details by clicking on the “Code” button in the HTML version of the plot or in the quarto files on the <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty">github repository</a> for this book.)</p>
 <div id="cell-fig-dsm01_bs_beta_density" class="cell" data-execution_count="1">
 <details class="code-fold">
@@ -1871,9 +1851,8 @@ Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01
 <div id="70" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(<span class="fu">shortestcovint</span>(dsm01samp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>3×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -1922,7 +1901,6 @@ Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01
 </div>
 </div>
 </div>
-</div>
 <p>For the <code>(Intercept)</code> fixed-effects parameter the interval is similar to an “asymptotic” or Wald interval constructed as the estimate plus or minus two standard errors.</p>
 <div id="72" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(<span class="fu">only</span>(dsm01.β) <span class="op">.+</span> [<span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>] <span class="op">*</span> <span class="fu">only</span>(dsm01.stderror))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1945,9 +1923,8 @@ Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01
 <span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(dsm01trace.optsum.fitlog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="dsm01trace" class="cell-output cell-output-display" data-execution_count="1">
-<div>
 <div><div style="float: left;"><span>18×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame table table-sm table-striped small" data-quarto-postprocess="true">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
@@ -2053,7 +2030,6 @@ Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01
 </tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -2167,8 +2143,8 @@ Figure&nbsp;1.8: Quantile caterpillar plot of prediction intervals for dsm01 ran
 <p>The maximum likelihood estimates of the parameters are obtained by minimizing the deviance. For linear mixed models we can minimize the profiled deviance, which is a function of <span class="math inline">\({\boldsymbol{\theta}}\)</span> only, thereby considerably simplifying the optimization problem.</p>
 <p>To assess the precision of the parameter estimates we use a parametric bootstrap sample, when feasible. Re-fitting a simple model, such as those shown in this chapter, to a randomly generated response vector is quite fast and it is reasonable to work with bootstrap samples of tens of thousands of replicates. With larger data sets and more complex models, large bootstrap samples of parameter estimates could take much longer.</p>
 <p>Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/ba35e20
-">ba35e20
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/91a3552
+">91a3552
 </a>.</em></p>
 
 
