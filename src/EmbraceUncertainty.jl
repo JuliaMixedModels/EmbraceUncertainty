@@ -18,12 +18,13 @@ const MMDS = String[]
 
 function __init__()
     CACHE[] = @get_scratch!("data")
+    mkpath(CACHE[])
     append!(MMDS, MixedModelsDatasets.datasets())
 end
 
 include("datasets.jl")
-include("movielens.jl")
 include("tagpad.jl")
+include("movielens.jl")
 
 """
     age_at_event(edate::Dates.TimeType, dob::Dates.TimeType)

@@ -14,8 +14,8 @@ sizespeed,kazgm,1,d8eddc7f26928def4bff0e2c3637a90ff45fe589e3ffd5ab4818c8c1f52cf8
 ELP_ldt_item,c6gxd,1,f851910e1435659ca662ad49cfb8deb6b7cf287e4ce4969103dba11b32ab2e6c
 ELP_ldt_subj,rqenu,2,d9c88915681b64fc9db975f9bb2d6f402058fee5cb35887f9de7d07776efdd56
 ELP_ldt_trial,3evhy,2,57a83679f8f458b1d9bb56e05099a556ffdaf15af67464e9ee608c844fc4fa9c
-movies,kvdch,1,c8fa488be74c368530f38de3c1d3511d2182e3fa07f357d2fa09121adc1cc964
-ratings,v73ym,1,1d6466b8fd8da2942881c83941077cd2b6c9f7a03fa2d71072a5cd7aaa4ef560
+movies,,1,0bdd5e9565328f07bbcfd83c634951ab2933fc160cc07e9bad8200b4c84d90ee
+ratings,,1,a2187528c1c6b2a87b1cc09845c0a5591a2fb01088ed7173c187be4a9bee83e2
 fggk21,vwecy,1,0fa959f095f8b92135496b6f8c8a8b5a3e896e8875f0ba6928bd074559d8a796
 fggk21_Child,c2fmn,1,61c91e00336e6f804e9f6b86986ebb4a14561cc4908b3a21cb27c113d2b51a5c
 fggk21_Score,7fqx3,1,99d73ee705aaf5f4ee696eadbba992d0113ba6f467ce337a62a63853e4617400
@@ -55,10 +55,14 @@ function dataset(nm::AbstractString)
             row = only(rows)       # check that there is only one matching row and extract it
             fnm = _file(nm)
             if !isfile(fnm) || row.sha2 ≠ bytes2hex(open(sha2_256, fnm))
-                Downloads.download(
-                    string("https://osf.io/", row.filename, "/download?version=", row.version),
-                    fnm,
-                )
+                if ismissing(row.filename)
+                    load_quiver()  # special-case `ratings` and `movies`
+                else
+                    Downloads.download(
+                        string("https://osf.io/", row.filename, "/download?version=", row.version),
+                        fnm,
+                    )
+                end
             end
             if row.sha2 ≠ bytes2hex(open(sha2_256, fnm))
                 throw(error("Invalid checksum on downloaded $nm dataset, version $(row.version)"))

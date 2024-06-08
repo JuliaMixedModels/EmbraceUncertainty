@@ -1,6 +1,6 @@
-const ML_LATEST_URL = "https://files.grouplens.org/datasets/movielens/ml-latest.zip"
+const ML_25M_URL = "https://files.grouplens.org/datasets/movielens/ml-25m.zip"
 
-const metadata = Dict{String,String}("url" => ML_LATEST_URL)
+const metadata = Dict{String,String}("url" => ML_25M_URL)
 
 function create_arrow(fname, df)
     arrowfile = _file(splitext(basename(fname))[1])
@@ -28,22 +28,32 @@ const GENRES = ["Action", "Adventure", "Animation",
 function load_quiver()
     @info "Downloading data"
     quiver = String[]
-    open(Downloads.download(ML_LATEST_URL), "r") do io
+    open(Downloads.download(ML_25M_URL), "r") do io
         zipfile = ZipFile.Reader(io)
         @info "Extracting and saving ratings"
-        ratings = extract_csv(zipfile, "ratings.csv";
-            types=[Int32, Int32, Float32, Int32],
-            pool=[false, false, true, false],
+        ratings = DataFrame(
+            extract_csv(
+                zipfile,
+                "ratings.csv";
+                types=[Int32, Int32, Float32, Int32],
+                pool=[true, true, true, false],
+            )
         )
+        ratings.movieId = tagpad(ratings.movieId, "M")
+        ratings.userId = tagpad(ratings.userId, "U")
         push!(quiver, create_arrow("ratings.csv", ratings))
         @info "Extracting movies that are in the ratings table"
+        movies = extract_csv(zipfile, "movies.csv"; types=[Int32,String,String], pool=false)
+        movies.movieId = tagpad(movies.movieId, "M")
+        links = extract_csv(zipfile, "links.csv"; types=[Int32,Int32,Int32])
+        links.movieId = tagpad(links.movieId, "M")
         movies = leftjoin!(
             leftjoin!(
-                sort!(combine(groupby(ratings, :movieId), nrow => :nrtngs), :nrtngs),
-                extract_csv(zipfile, "movies.csv"; types=[Int32,String,String], pool=false);
+                sort!(combine(groupby(ratings, :movieId), nrow => :nrtngs), :nrtngs; rev=true),
+                movies,
                 on=:movieId,
             ),
-            extract_csv(zipfile, "links.csv"; types=[Int32,Int32,Int32]);
+            links;
             on=:movieId,
         )
         disallowmissing!(movies; error=false)
