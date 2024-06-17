@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.41">
+<meta name="generator" content="quarto-1.5.45">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Embrace Uncertainty – Appendix B — Linear algebra for linear models</title>
+<title>Appendix B — Linear algebra for linear models – Embrace Uncertainty</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -543,7 +543,7 @@ r^2({\boldsymbol{\beta}})&amp;=\|{\mathbf{y}}-{\mathbf{X}}{\boldsymbol{\beta}}\|
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 3 columns and 10 rows:
       subj  days  reaction
-    ┌───────────��─────────
+    ┌─────────────────────
  1  │ S372  0     269.412
  2  │ S372  1     273.474
  3  │ S372  2     297.597
@@ -599,7 +599,7 @@ U factor:
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.04479999999995
-  11.298073333333345</code></pre>
+  11.298073333333344</code></pre>
 </div>
 </div>
 <p>Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for <span class="math inline">\(\mathbf{r}_{Xy}\)</span></p>
@@ -608,7 +608,7 @@ U factor:
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  1005.244207376381
-  102.61984718485859</code></pre>
+  102.61984718485854</code></pre>
 </div>
 </div>
 <p>then solving in-place to obtain <span class="math inline">\(\widehat{{\boldsymbol{\beta}}}\)</span></p>
@@ -617,7 +617,7 @@ U factor:
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.0447999999998
-  11.298073333333367</code></pre>
+  11.298073333333361</code></pre>
 </div>
 </div>
 <p>The residual vector, <span class="math inline">\({\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}}\)</span>, is</p>
