@@ -382,19 +382,20 @@ function ratingsoptsum(
   optsumfnm = optsumdir(
     "mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json",
   )
-  isfile(optsumfnm) ||
-    throw(ArgumentError("File $optsumfnm is not available"))
-  return restoreoptsum!(
-    LinearMixedModel(
+  model = LinearMixedModel(
       form,
       filter(
         r -> (r.nrtngs ≥ mcutoff) & (r.urtngs ≥ ucutoff),
         data,
       );
       contrasts,
-    ),
-    optsumfnm,
-  )
+    )
+  isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
+
+  @warn "File $optsumfnm is not available, fitting model."
+  fit!(model)
+  saveoptsum(optsumfnm, model)
+  return model
 end
 mvm20u20 = ratingsoptsum(20, 20)
 print(mvm20u20)
