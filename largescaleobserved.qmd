@@ -337,7 +337,6 @@ let
     Axis(f[2, 1]; xticks, ylabel="Number of users"),
     mc,
     sizespeed.nusers;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -345,7 +344,6 @@ let
     Axis(f[3, 1]; xticks, ylabel="Number of movies"),
     mc,
     sizespeed.nmvie;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -487,7 +485,6 @@ let
     Axis(f[2, 1]; xticks, ylabel="Memory requirement (GiB)"),
     mc,
     sizespeed.modelsz;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -495,7 +492,6 @@ let
     Axis(f[3, 1]; xticks, ylabel="Size of L[2,2] (GiB)"),
     mc,
     sizespeed.L22sz;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -503,7 +499,6 @@ let
     Axis(f[4, 1]; xlabel, xticks, ylabel="L[2,2] memory fraction"),
     mc,
     sizespeed.L22prop;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -556,7 +551,6 @@ let
     ),
     mc,
     sizespeed.evtime ./ 60;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -568,7 +562,6 @@ let
     ),
     mc,
     sizespeed.nv;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -581,7 +574,6 @@ let
     ),
     mc,
     sizespeed.fittime ./ 3600;
-    xticks,
     dodge=uc,
     color=uc,
   )
