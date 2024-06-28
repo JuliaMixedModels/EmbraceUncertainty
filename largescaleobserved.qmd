@@ -337,7 +337,6 @@ let
     Axis(f[2, 1]; xticks, ylabel="Number of users"),
     mc,
     sizespeed.nusers;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -345,7 +344,6 @@ let
     Axis(f[3, 1]; xticks, ylabel="Number of movies"),
     mc,
     sizespeed.nmvie;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -382,19 +380,21 @@ function ratingsoptsum(
   optsumfnm = optsumdir(
     "mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json",
   )
-  isfile(optsumfnm) ||
-    throw(ArgumentError("File $optsumfnm is not available"))
-  return restoreoptsum!(
-    LinearMixedModel(
+  model = LinearMixedModel(
       form,
       filter(
         r -> (r.nrtngs ≥ mcutoff) & (r.urtngs ≥ ucutoff),
         data,
       );
       contrasts,
-    ),
-    optsumfnm,
-  )
+    )
+  isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
+
+  @warn "File $optsumfnm is not available, fitting model."
+  model.optsum.initial .= 0.5
+  fit!(model; thin=1)
+  saveoptsum(optsumfnm, model)
+  return model
 end
 mvm20u20 = ratingsoptsum(20, 20)
 print(mvm20u20)
@@ -486,7 +486,6 @@ let
     Axis(f[2, 1]; xticks, ylabel="Memory requirement (GiB)"),
     mc,
     sizespeed.modelsz;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -494,7 +493,6 @@ let
     Axis(f[3, 1]; xticks, ylabel="Size of L[2,2] (GiB)"),
     mc,
     sizespeed.L22sz;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -502,7 +500,6 @@ let
     Axis(f[4, 1]; xlabel, xticks, ylabel="L[2,2] memory fraction"),
     mc,
     sizespeed.L22prop;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -555,7 +552,6 @@ let
     ),
     mc,
     sizespeed.evtime ./ 60;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -567,7 +563,6 @@ let
     ),
     mc,
     sizespeed.nv;
-    xticks,
     dodge=uc,
     color=uc,
   )
@@ -580,7 +575,6 @@ let
     ),
     mc,
     sizespeed.fittime ./ 3600;
-    xticks,
     dodge=uc,
     color=uc,
   )
