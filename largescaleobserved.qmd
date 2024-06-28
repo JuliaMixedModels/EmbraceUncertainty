@@ -391,7 +391,8 @@ function ratingsoptsum(
   isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
 
   @warn "File $optsumfnm is not available, fitting model."
-  fit!(model)
+  model.optsum.initial .= 0.5
+  fit!(model; thin=1)
   saveoptsum(optsumfnm, model)
   return model
 end
