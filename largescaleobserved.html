@@ -860,23 +860,97 @@ Figure&nbsp;5.3: Bar plot of data set dimensions by minimum number of ratings pe
 <span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">isfile</span>(optsumfnm) <span class="op">&amp;&amp;</span> <span class="cf">return</span> <span class="fu">restoreoptsum!</span>(model, optsumfnm)</span>
 <span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>  <span class="pp">@warn</span> <span class="st">"File </span><span class="sc">$</span>optsumfnm<span class="st"> is not available, fitting model."</span></span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit!</span>(model)</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveoptsum</span>(optsumfnm, model)</span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> model</span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>mvm20u20 <span class="op">=</span> <span class="fu">ratingsoptsum</span>(<span class="fl">20</span>, <span class="fl">20</span>)</span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  model.optsum.initial <span class="op">.=</span> <span class="fl">0.5</span></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit!</span>(model; thin<span class="op">=</span><span class="fl">1</span>)</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveoptsum</span>(optsumfnm, model)</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> model</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>mvm20u20 <span class="op">=</span> <span class="fu">ratingsoptsum</span>(<span class="fl">20</span>, <span class="fl">20</span>)</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mvm20u20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Linear mixed model fit by maximum likelihood
+<pre><code>┌ Warning: File /home/phillip/Work/EmbraceUncertainty/optsums/mvm20u20.json is not available, fitting model.
+└ @ Main.Notebook ~/Work/EmbraceUncertainty/largescaleobserved.qmd:513
+Minimizing 2    Time: 0:02:05 (62.93  s/it)
+  objective:  6.322954557607882e7
+Minimizing 3    Time: 0:03:12 (64.02  s/it)
+  objective:  6.316913320602252e7
+Minimizing 4    Time: 0:04:16 (64.04  s/it)
+  objective:  6.410873470354471e7
+Minimizing 5    Time: 0:05:21 (64.30  s/it)
+  objective:  6.33606659029251e7
+Minimizing 6    Time: 0:06:25 (64.27  s/it)
+  objective:  6.318319335457119e7
+Minimizing 7    Time: 0:07:29 (64.24  s/it)
+  objective:  6.3187467516192004e7
+Minimizing 8    Time: 0:08:33 (64.22  s/it)
+  objective:  6.3169213677075095e7
+Minimizing 9    Time: 0:09:37 (64.21  s/it)
+  objective:  6.316601652015813e7
+Minimizing 10    Time: 0:10:40 (64.07  s/it)
+  objective:  6.31646172256465e7
+Minimizing 11    Time: 0:11:43 (63.96  s/it)
+  objective:  6.316449218400457e7
+Minimizing 12    Time: 0:12:46 (63.85  s/it)
+  objective:  6.316452675653587e7
+Minimizing 13    Time: 0:13:49 (63.77  s/it)
+  objective:  6.316443299849403e7
+Minimizing 14    Time: 0:14:51 (63.70  s/it)
+  objective:  6.3164385737438306e7
+Minimizing 15    Time: 0:15:54 (63.64  s/it)
+  objective:  6.3164314560685754e7
+Minimizing 16    Time: 0:16:57 (63.59  s/it)
+  objective:  6.316422985822061e7
+Minimizing 17    Time: 0:18:00 (63.55  s/it)
+  objective:  6.316420557470707e7
+Minimizing 18    Time: 0:19:03 (63.51  s/it)
+  objective:  6.3164257918555476e7
+Minimizing 19    Time: 0:20:06 (63.48  s/it)
+  objective:  6.3164183984945565e7
+Minimizing 20    Time: 0:21:09 (63.46  s/it)
+  objective:  6.3164181534264974e7
+Minimizing 21    Time: 0:22:12 (63.47  s/it)
+  objective:  6.316418186819889e7
+Minimizing 22    Time: 0:23:16 (63.48  s/it)
+  objective:  6.31641867326268e7
+Minimizing 23    Time: 0:24:20 (63.49  s/it)
+  objective:  6.316418117839193e7
+Minimizing 24    Time: 0:25:23 (63.50  s/it)
+  objective:  6.316417987761053e7
+Minimizing 25    Time: 0:26:27 (63.50  s/it)
+  objective:  6.3164179971063234e7
+Minimizing 26    Time: 0:27:30 (63.47  s/it)
+  objective:  6.3164179865766324e7
+Minimizing 27    Time: 0:28:33 (63.46  s/it)
+  objective:  6.31641798497886e7
+Minimizing 28    Time: 0:29:36 (63.44  s/it)
+  objective:  6.316417984633828e7
+Minimizing 29    Time: 0:30:39 (63.42  s/it)
+  objective:  6.316417984609512e7
+Minimizing 30    Time: 0:31:42 (63.41  s/it)
+  objective:  6.31641798460028e7
+Minimizing 31    Time: 0:32:45 (63.40  s/it)
+  objective:  6.3164179847123586e7
+Minimizing 32    Time: 0:33:48 (63.39  s/it)
+  objective:  6.3164179845929414e7
+Minimizing 33    Time: 0:34:52 (63.42  s/it)
+  objective:  6.316417984746464e7
+Minimizing 34    Time: 0:35:58 (63.50  s/it)
+  objective:  6.316417984593183e7
+Minimizing 35    Time: 0:37:05 (63.59  s/it)
+  objective:  6.31641798459467e7
+Minimizing 36    Time: 0:38:09 (63.61  s/it)
+  objective:  6.316417984592761e7
+Minimizing 36    Time: 0:38:09 (63.61  s/it)
+Linear mixed model fit by maximum likelihood
  rating ~ 1 + (1 | userId) + (1 | movieId)
      logLik       -2 logLik         AIC           AICc            BIC      
  -31582089.9230  63164179.8459  63164187.8459  63164187.8459  63164247.9530
 
 Variance components:
             Column   Variance Std.Dev. 
-userId   (Intercept)  0.186624 0.431999
-movieId  (Intercept)  0.238138 0.487994
+userId   (Intercept)  0.186625 0.432001
+movieId  (Intercept)  0.238136 0.487991
 Residual              0.729364 0.854028
  Number of obs: 24810483; levels of grouping factors: 162541, 18430
 
@@ -884,7 +958,7 @@ Residual              0.729364 0.854028
 ──────────────────────────────────────────────────
                Coef.  Std. Error       z  Pr(&gt;|z|)
 ──────────────────────────────────────────────────
-(Intercept)  3.43937  0.00384026  895.61    &lt;1e-99
+(Intercept)  3.43937  0.00384025  895.61    &lt;1e-99
 ──────────────────────────────────────────────────</code></pre>
 </div>
 </div>
@@ -1207,8 +1281,8 @@ Figure&nbsp;5.6: Amount of storage for L[2,2] versus amount of storage for the e
 <pre><code>0.9999877714004126</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/9709cae
-">9709cae
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/f887723
+">f887723
 </a>.</em></p>
 
 
