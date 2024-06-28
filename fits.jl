@@ -71,4 +71,8 @@ function ratingsoptsum(
   saveoptsum(optsumfnm, model)
   return model
 end
-mvm20u20 = ratingsoptsum(20, 20)
+
+for m in [1, 2, 5, 10, 15, 20, 50], u in [5, 10, 20]
+    @info "" m u
+    ratingsoptsum(m, u)
+end
