@@ -68,8 +68,9 @@ format:
 engine: julia
 
 julia:
-  exeflags: ["--project"]
+  exeflags: 
+    - --project
+    - -tauto
 
 execute:
-  cache: false    # inline results conflict with cache use
   freeze: auto
