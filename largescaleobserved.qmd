@@ -180,7 +180,7 @@ ratings = Table(
         select!(DataFrame(movies), :movieId, :nrtngs);
         on=:movieId,
       ),
-      select(DataFrame(users), :userId, :urtngs);
+      select!(DataFrame(users), :userId, :urtngs);
       on=:userId,
     ),
   ),
