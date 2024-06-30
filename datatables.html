@@ -333,7 +333,9 @@ div.csl-indent {
 <div id="8" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Tables.RowTable</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>AbstractVector{T} where T&lt;:NamedTuple (alias for AbstractArray{T, 1} where T&lt;:NamedTuple)</code></pre>
+<div class="ansi-escaped-output">
+<pre>AbstractVector{T} where T&lt;:NamedTuple<span class="ansi-bright-black-fg"> (alias for </span><span class="ansi-bright-black-fg">AbstractArray{T, 1} where T&lt;:NamedTuple</span><span class="ansi-bright-black-fg">)</span></pre>
+</div>
 </div>
 </div>
 <p>The actual implementation of a row-table or column-table type may be different from these prototypes but it must provide access methods as if it were one of these types. <code>Tables.jl</code> provides the “glue” to treat a particular data table type as if it were row-oriented, by calling <code>Tables.rows</code> or <code>Tables.rowtable</code> on it, or column-oriented, by calling <code>Tables.columntable</code> on it.</p>
@@ -343,7 +345,7 @@ div.csl-indent {
 <p><a href="https://github.com/JuliaData/TypedTables.jl">TypedTables.jl</a> is a lightweight package (about 1500 lines of source code) that provides a concrete implementation of column-tables, called simply <code>Table</code>, as a <code>NamedTuple</code> of vectors.</p>
 <p>A <code>Table</code> that is constructed from another type of column-table, such as an <code>Arrow.Table</code> or a <code>DataFrame</code> or an explicit <code>NamedTuple</code> of vectors, is simply a wrapper around the original table’s contents. On the other hand, constructing a <code>Table</code> from a row table first creates a <code>ColumnTable</code>, then wraps it.</p>
 <div id="10" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>contratbl <span class="op">=</span> <span class="fu">Table</span>(contra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>contratbl <span class="op">=</span> <span class="fu">Table</span>(contra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 1934 rows:
       dist  urban  livch  age     use
@@ -369,7 +371,7 @@ div.csl-indent {
 </div>
 </div>
 <div id="12" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table{@NamedTuple{dist::String, urban::String, livch::String, age::Float64, use::String}, 1, @NamedTuple{dist::Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}, urban::Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}, livch::Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}, age::Arrow.DictEncoded{Float64, Int8, Arrow.Primitive{Float64, Vector{Float64}}}, use::Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}}}</code></pre>
 </div>
@@ -381,7 +383,7 @@ div.csl-indent {
 <p>The methods for accessing columns or rows in a <code>Table</code> are simple.</p>
 <p>A column is accessed by its name as a “property”, either using the <code>getproperty</code> extractor function or, more commonly, with the dot (<code>.</code>) operator, returning a vector.</p>
 <div id="14" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>contratbl.urban</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>contratbl.urban</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>1934-element Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}:
  "Y"
@@ -408,14 +410,14 @@ div.csl-indent {
 </div>
 <p>The column names are <a href="https://docs.julialang.org/en/v1/base/base/#Core.Symbol">Symbols</a>, not strings, usually typed as a <code>:</code> followed by the name, as shown in</p>
 <div id="16" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">columnnames</span>(contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">columnnames</span>(contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(:dist, :urban, :livch, :age, :use)</code></pre>
 </div>
 </div>
 <p>The <code>:</code> form for creating the Symbol requires that the column name be a valid variable name in Julia. If, for example, a column name contains a blank, the <code>:</code> form must be replaced by an expression like <code>var"&lt;name&gt;"</code>, which invokes what is called a “string macro”.</p>
 <div id="18" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>contratbl.var<span class="st">"urban"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>contratbl.var<span class="st">"urban"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>1934-element Arrow.DictEncoded{String, Int8, Arrow.List{String, Int32, Vector{UInt8}}}:
  "Y"
@@ -442,13 +444,13 @@ div.csl-indent {
 </div>
 <p>A row is accessed by its index, either using the <code>getindex</code> function or, more commonly, with the index in square brackets, returning a <code>NamedTuple</code> for a singleton index or another <code>Table</code> for a vector-valued index.</p>
 <div id="20" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>contratbl[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>contratbl[<span class="fl">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>(dist = "D01", urban = "Y", livch = "3+", age = 18.44, use = "N")</code></pre>
 </div>
 </div>
 <div id="22" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>contratbl[<span class="fl">2</span><span class="op">:</span><span class="fl">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>contratbl[<span class="fl">2</span><span class="op">:</span><span class="fl">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 4 rows:
      dist  urban  livch  age     use
@@ -466,7 +468,7 @@ div.csl-indent {
 <h3 data-number="A.3.2" class="anchored" data-anchor-id="a-trivial-example-done-several-ways"><span class="header-section-number">A.3.2</span> A trivial example done several ways</h3>
 <p>Suppose we wish to select the rows from district <code>D49</code> as a table. We could create a Boolean vector and use it to index into <code>contratbl</code></p>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>contratbl[contratbl.dist <span class="op">.==</span> <span class="st">"D49"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>contratbl[contratbl.dist <span class="op">.==</span> <span class="st">"D49"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 4 rows:
      dist  urban  livch  age     use
@@ -495,8 +497,8 @@ div.csl-indent {
 </div>
 <p>Or we could <code>filter</code> the rows of the table by applying a function to each row to determine if the <code>dist</code> field has the value <code>"D49"</code>.</p>
 <div id="26" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">isD49dist</span>(row) <span class="op">=</span> row.dist <span class="op">==</span> <span class="st">"D49"</span> <span class="co"># a 'one-liner' function definition</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(isD49dist, contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">isD49dist</span>(row) <span class="op">=</span> row.dist <span class="op">==</span> <span class="st">"D49"</span> <span class="co"># a 'one-liner' function definition</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(isD49dist, contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 4 rows:
      dist  urban  livch  age     use
@@ -509,7 +511,7 @@ div.csl-indent {
 </div>
 <p>Or we could write the filter function as an anonymous function</p>
 <div id="28" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(r <span class="op">-&gt;</span> r.dist <span class="op">==</span> <span class="st">"D49"</span>, contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(r <span class="op">-&gt;</span> r.dist <span class="op">==</span> <span class="st">"D49"</span>, contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 4 rows:
      dist  urban  livch  age     use
@@ -522,7 +524,7 @@ div.csl-indent {
 </div>
 <p>Or we could write the filter function as the composition of a function that extracts the first value from the row, which is the <code>dist</code> value, and a function that compares that value to <code>"D49"</code>.</p>
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(<span class="op">==</span>(<span class="st">"D49"</span>) <span class="op">∘</span> first, contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(<span class="op">==</span>(<span class="st">"D49"</span>) <span class="op">∘</span> first, contratbl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 4 rows:
      dist  urban  livch  age     use
@@ -551,7 +553,7 @@ The function composition operator
 </div>
 <p>Or we could write a <a href="https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions">generator expression</a></p>
 <div id="32" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Table</span>(r <span class="cf">for</span> r <span class="kw">in</span> contratbl <span class="cf">if</span> r.dist <span class="op">==</span> <span class="st">"D49"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Table</span>(r <span class="cf">for</span> r <span class="kw">in</span> contratbl <span class="cf">if</span> r.dist <span class="op">==</span> <span class="st">"D49"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 4 rows:
      dist  urban  livch  age     use
@@ -565,10 +567,10 @@ The function composition operator
 <p>The point is that all of these variations are from the base Julia language and simply rely on the fact that <code>contratbl</code> can be treated as an <em>iterator</em> over the rows of the table.</p>
 <p>As shown in the last code block, the process of iterating over the rows of a <code>Table</code> can be applied in reverse, constructing a <code>Table</code> from an iterator or a generator expression that returns <code>NamedTuple</code>s. In <a href="glmmbernoulli.html" class="quarto-xref"><span>Chapter 6</span></a> a <code>newdata</code> table is constructed from the Cartesian product of vectors of covariates as the <code>newdata</code> table.</p>
 <div id="34" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  (; age<span class="op">=</span>a, ch<span class="op">=</span>c, urban<span class="op">=</span>u)  <span class="co"># NamedTuple from iterator product</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> a <span class="kw">in</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">20</span>, c <span class="kw">in</span> [<span class="cn">false</span>, <span class="cn">true</span>], u <span class="kw">in</span> [<span class="st">"N"</span>, <span class="st">"Y"</span>]</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  (; age<span class="op">=</span>a, ch<span class="op">=</span>c, urban<span class="op">=</span>u)  <span class="co"># NamedTuple from iterator product</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> a <span class="kw">in</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">20</span>, c <span class="kw">in</span> [<span class="cn">false</span>, <span class="cn">true</span>], u <span class="kw">in</span> [<span class="st">"N"</span>, <span class="st">"Y"</span>]</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 3 columns and 44 rows:
       age  ch     urban
@@ -607,7 +609,7 @@ Expression for creating a NamedTuple
 <div class="callout-body-container callout-body">
 <p>In general a <code>Tuple</code> is written as a comma-separated set of values within parentheses.</p>
 <div id="36" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>((<span class="fl">1</span>, <span class="cn">true</span>, <span class="ch">'R'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>((<span class="fl">1</span>, <span class="cn">true</span>, <span class="ch">'R'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Tuple{Int64, Bool, Char}</code></pre>
 </div>
@@ -616,10 +618,10 @@ Expression for creating a NamedTuple
 <p>In this expression the <code>;</code> is not necessary but there is another form where we just give the name of the variable, like simply specifying <code>contrasts</code> in the function call like <code>fit(MixedModel, form, data; contrasts)</code>, where the <code>;</code> indicates that the following arguments are named arguments so that <code>contrasts</code> by itself is equivalent to <code>contrasts=contrasts</code> specifying both the name and the value.</p>
 <p>Thus the <code>newdata</code> table could be constructed as</p>
 <div id="38" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  (; age, ch, urban) <span class="cf">for</span> age <span class="kw">in</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">20</span>, ch <span class="kw">in</span> [<span class="cn">false</span>, <span class="cn">true</span>],</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  urban <span class="kw">in</span> [<span class="st">"N"</span>, <span class="st">"Y"</span>]</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  (; age, ch, urban) <span class="cf">for</span> age <span class="kw">in</span> <span class="op">-</span><span class="fl">10</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">20</span>, ch <span class="kw">in</span> [<span class="cn">false</span>, <span class="cn">true</span>],</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  urban <span class="kw">in</span> [<span class="st">"N"</span>, <span class="st">"Y"</span>]</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 3 columns and 44 rows:
       age  ch     urban
@@ -655,7 +657,7 @@ Expression for creating a NamedTuple
 <p>During the creation of a new <code>Table</code> columns can be added or removed.</p>
 <p>For example, in <a href="glmmbernoulli.html" class="quarto-xref"><span>Chapter 6</span></a> we added a Boolean column, <code>ch</code>, indicating if <code>livch</code> is not <code>"0"</code>, to the <code>contra</code> table using an expression like</p>
 <div id="40" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>contratbl <span class="op">=</span> <span class="fu">Table</span>(contratbl; ch<span class="op">=</span>contratbl.livch <span class="op">.==</span> <span class="st">"0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>contratbl <span class="op">=</span> <span class="fu">Table</span>(contratbl; ch<span class="op">=</span>contratbl.livch <span class="op">.==</span> <span class="st">"0"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 6 columns and 1934 rows:
       dist  urban  livch  age     use  ch
@@ -682,9 +684,9 @@ Expression for creating a NamedTuple
 </div>
 <p>If later we decide that we can do without this column we can drop it using <code>getproperties</code> whose second argument should be a <code>Tuple</code> of <code>Symbol</code>s of the names of the columns to retain.</p>
 <div id="42" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>contratbl <span class="op">=</span> <span class="fu">Table</span>(</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getproperties</span>(contratbl, (<span class="op">:</span>dist, <span class="op">:</span>urban, <span class="op">:</span>livch, <span class="op">:</span>age, <span class="op">:</span>use)),</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>contratbl <span class="op">=</span> <span class="fu">Table</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">getproperties</span>(contratbl, (<span class="op">:</span>dist, <span class="op">:</span>urban, <span class="op">:</span>livch, <span class="op">:</span>age, <span class="op">:</span>use)),</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 5 columns and 1934 rows:
       dist  urban  livch  age     use
@@ -716,8 +718,8 @@ Expression for creating a NamedTuple
 <p>The <a href="https://github.com/JuliaData">JuliaData</a> organization manages the development of several packages related to data science and data management, including <a href="https://github.com/JuliaData/DataFrames.jl">DataFrames.jl</a>, a comprehensive system for working with column-oriented data tables in Julia. <span class="citation" data-cites="Kaminski2023">Kamiński (<a href="references.html#ref-Kaminski2023" role="doc-biblioref">2023</a>)</span>, written by the primary author of that package, provides an in-depth introduction to data science facilities, in particular the <code>DataFrames</code> package, in Julia.</p>
 <p>This package is particularly well-suited to more advanced data manipulation such as the <code>split-apply-combine</code> strategy <span class="citation" data-cites="Wickham2011">(<a href="references.html#ref-Wickham2011" role="doc-biblioref">Wickham, 2011</a>)</span> and “joins” of data tables.</p>
 <p><span class="citation" data-cites="JSSv107i04">Bouchet-Valat &amp; Kamiński (<a href="references.html#ref-JSSv107i04" role="doc-biblioref">2023</a>)</span> compares the performance of DataFrames.jl to other data frame implementations in R and Python.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/31e9b61
-">31e9b61
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/5657dd7
+">5657dd7
 </a>.</em></p>
 
 
