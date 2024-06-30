@@ -5,7 +5,8 @@ fig-dpi: 150
 fig-format: png
 engine: julia
 julia:
-  exeflags: ["--project"]
+  exeflags: 
+    - --project
 ---
 
 \newcommand{\bbtheta}{{\boldsymbol\theta}}
@@ -17,7 +18,6 @@ Load the packages to be used,
 ```{julia}
 #| code-fold: true
 #| output: false
-#| label: packages05
 using AlgebraOfGraphics
 using CairoMakie
 using CategoricalArrays
@@ -28,6 +28,7 @@ using MixedModels
 using MixedModelsMakie
 using SparseArrays         # for the nnz function
 using Statistics           # for the mean function
+using TidierPlots
 using TypedTables
 ```
 
@@ -46,27 +47,11 @@ optsumdir(paths::AbstractString...) =
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
 Here we consider an observational study - ratings of movies by users of [movielens.org](https://movielens.org) made available at the [grouplens.org download site](https://grouplens.org/datasets/movielens) [@Harper2016].
 
-The version of the data that we analyze is the full movielens data set in the `ml-latest.zip` archive
-at that site, consisting of over 27,000,000 ratings of movies by 280,000 users.
-The total number of movies rated is over 58,000.
+We analyze the *MovieLens 25M Dataset* of roughly 25 million ratings of movies by over 162,000 users of about 59,000 movies.
 
-As the name `ml-latest.zip` could become ambiguous, we provide the table of contents of this zip file to help identify the dataset being used.
+Because of constraints on the redistribution of these data, the first time that `dataset(:ratings)` or `dataset(:movies)` is executed, the 250 Mb zip file is downloaded from the grouplens data site, expanded, and the tables created as Arrow files.
 
-```
-Archive:  /home/bates/Downloads/ml-latest.zip
-  Length      Date    Time    Name
----------  ---------- -----   ----
-        0  2018-09-26 16:46   ml-latest/
-  1267039  2018-09-26 16:37   ml-latest/links.csv
- 39744990  2018-09-26 16:11   ml-latest/tags.csv
-    18103  2018-09-26 16:44   ml-latest/genome-tags.csv
-759200511  2018-09-26 16:31   ml-latest/ratings.csv
-     9784  2018-09-26 16:46   ml-latest/README.txt
-414851573  2018-09-26 16:44   ml-latest/genome-scores.csv
-  2858223  2018-09-26 16:35   ml-latest/movies.csv
----------                     -------
-1217950223                     8 files
-```
+This operation can take a couple of minutes.
 
 ## Structure of the data
 
@@ -82,33 +67,21 @@ ratings = dataset(:ratings)
 ```
 
 Convert this Arrow table to a `Table` and drop the `timestamp` column, which we won't be using.
-(For small data sets dropping such columns is not important but with over 27 million ratings it does help to drop unnecessary columns to save some memory space.)
+(For small data sets dropping such columns is not important but with over 25 million ratings it does help to drop unnecessary columns to save some memory space.)
 
 ```{julia}
 ratings =
   Table(getproperties(ratings, (:userId, :movieId, :rating)))
 ```
 
-Information on the movies is available in the `movies` dataset, which we supplement with the mean rating for each movie in the `ratings` table.
+Information on the movies is available in the `movies` dataset.
 
 ```{julia}
-movies = Table(
-  disallowmissing!(
-    leftjoin!(
-      combine(
-        groupby(DataFrame(ratings), :movieId),
-        :rating => mean => :mnrtng,
-      ),
-      DataFrame(dataset(:movies));
-      on=:movieId,
-    );
-    error=false,
-  ),
-)
+movies = Table(dataset(:movies))
 ```
 
 In contrast to data from a designed experiment, like the English Lexicon Project, the data from this observational study are extremely unbalanced with respect to the observational grouping factors, `userId` and `movieId`.
-The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from 1 to nearly 100,000.
+The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from 1 to over 80,000.
 
 ```{julia}
 extrema(movies.nrtngs)
@@ -129,6 +102,8 @@ users = Table(
 ```{julia}
 extrema(users.urtngs)
 ```
+
+This selection of ratings was limited to users who had provided at least 20 ratings.
 
 One way of visualizing the imbalance in the number of ratings per movie or per user is as an [empirical cumulative distribution function](https://en.wikipedia.org/wiki/Empirical_distribution_function) (ecdf) plot, which is a "stair-step" plot where the vertical axis is the proportion of observations less than or equal to the corresponding value on the horizontal axis.
 Because the distribution of the number of ratings per movie or per user is so highly skewed in the low range we use a logarithmic horizontal axis in @fig-nrtngsecdf.
@@ -179,7 +154,7 @@ let
 end
 ```
 
-In this collection of over 27 million ratings, nearly 20% of the movies are rated only once and nearly half of the movies were rated 6 or fewer times.
+In this collection of about 25 million ratings, nearly 20% of the movies are rated only once and over half of the movies were rated 6 or fewer times.
 
 ```{julia}
 count(≤(6), movies.nrtngs) / length(movies.nrtngs)
@@ -187,7 +162,7 @@ count(≤(6), movies.nrtngs) / length(movies.nrtngs)
 
 The ecdf plot of the number of ratings per user shows a similar pattern to that of the movies --- a few users with a very large number of ratings and many users with just a few ratings.
 
-For example, about 20% of the users rated 10 movies or fewer; the median number of movies rated is around 30; but the maximum is close to 24,000 (which is a lot of movies - over 20 years of 3 movies per day every day - if this user actually watched all of them).
+For example, the minimum number or movies rated is 20 (due to the inclusion constraint); the median number of movies rated is around 70; but the maximum is over 32,000 (which is a lot of movies - over 30 years of 3 movies per day every day - if this user actually watched all of them).
 
 Movies with very few ratings provide little information about overall trends or even about the movie being rated.
 We can imagine that the "shrinkage" of random effects for movies with just a few ratings pulls their adjusted rating strongly towards the overall average.
@@ -202,10 +177,10 @@ ratings = Table(
     leftjoin!(
       leftjoin!(
         DataFrame(ratings),
-        DataFrame(getproperties(movies, (:movieId, :nrtngs)));
+        select!(DataFrame(movies), :movieId, :nrtngs);
         on=:movieId,
       ),
-      DataFrame(getproperties(users, (:userId, :urtngs)));
+      select!(DataFrame(users), :userId, :urtngs);
       on=:userId,
     ),
   ),
@@ -253,12 +228,11 @@ end
 Similarly, users who rate very few movies add little information, even about the movies that they rated, because there isn't sufficient information to contrast a specific rating with a typical rating for the user.
 
 One way of dealing with the extreme imbalance in the number of observations per user or per movie is to set a threshold on the number of observations for a user or a movie to be included in the data used to fit the model.
-For example, a companion data set on grouplens.org, available in the [ml-25m.zip](https://files.grouplens.org/datasets/movielens/ml-25n.zip) archive, included only users who had rated at least 20 movies.
 
 To be able to select ratings according to the number of ratings per user and the number of ratings per movie, we left-joined the `movies.nrtngs` and `users.urtngs` columns into the `ratings` data frame.
 
 ```{julia}
-describe(DataFrame(ratings))
+describe(DataFrame(ratings), :mean, :min, :median, :max, :nunique, :nmissing, :eltype)
 ```
 
 ::: {.callout-note collapse="true"}
@@ -278,7 +252,9 @@ The results are summarized in the following table
 
 ```{julia}
 #| code-fold: true
-sizespeed = Table(dataset(:sizespeed))
+sizespeed = DataFrame(dataset(:sizespeed))
+sizespeed.ucutoff = collect(sizespeed.ucutoff)  # temporary fix to get TidierPlots to work
+sizespeed
 ```
 
 In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nev` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.
@@ -287,85 +263,44 @@ The "[2,2] block of the `L` matrix" is described in @sec-lrgobsmemprint.
 
 ### Dimensions of the model versus cut-off values
 
-First we consider the effects of the minimum number of ratings per user and per movie on the dimensions of the data set, as shown in @fig-dimsbarchart.
+As shown if @fig-nratingsbycutoff, the number of ratings varies from a little over 21 million to 25 million, and is mostly associated with the user cutoff.
 
 ```{julia}
-#| label: legend-setup
-#| echo: false
-#| output: false
-sizespeed = let
-  ord(x) = categorical(x; ordered=true)  # replace this with sorter
-  transform!(
-    DataFrame(sizespeed),
-    :mc => ord => :mc,
-    :uc => ord => :uc,
-    [:L22sz, :modelsz] => ((x, y) -> x ./ y) => :L22prop,
-  )
-end
-llabels = string.(refpool(sizespeed.uc))
-lelements = [
-  PolyElement(polycolor=c) for c in
-  get.(
-    Ref(Makie.colorschemes[:viridis]),
-    range(0, 1, length(llabels)),
-  )
-]
-ltitle = "Minimum number of ratings per user"
-```
-
-```{julia}
-#| fig-cap: "Bar plot of data set dimensions by minimum number of ratings per user and per movie."
 #| code-fold: true
-#| label: fig-dimsbarchart
-#| warning: false
-let
-  f = Figure(size=(600, 800))
-  xlabel = "Minimum number of ratings per movie"
-  mc = refarray(sizespeed.mc)
-  xticks = (1:7, string.(refpool(sizespeed.mc)))
-  uc = refarray(sizespeed.uc)
-  Legend(
-    f[1, 1],
-    lelements,
-    llabels,
-    ltitle;
-    orientation=:horizontal,
-    tellwidth=false,
-    tellheight=true,
-  )
-  barplot!(
-    Axis(f[2, 1]; xticks, ylabel="Number of users"),
-    mc,
-    sizespeed.nusers;
-    dodge=uc,
-    color=uc,
-  )
-  barplot!(
-    Axis(f[3, 1]; xticks, ylabel="Number of movies"),
-    mc,
-    sizespeed.nmvie;
-    dodge=uc,
-    color=uc,
-  )
-  barplot!(
-    Axis(f[4, 1]; xlabel, xticks, ylabel="Number of observations"),
-    mc,
-    sizespeed.nratings;
-    dodge=uc,
-    color=uc,
-  )
-  f
-end
+#| label: fig-nratingsbycutoff
+#| fig-cap: "Number of ratings in reduced table by movie cutoff value"
+ggplot(sizespeed, aes(; x=:mc, y=:nratings, color=:ucutoff)) +
+    geom_point() +
+    geom_line() +
+    labs(x="Minimum number of ratings per movie", y="Number of ratings")
 ```
 
-Unsurprisingly, @fig-dimsbarchart shows that increasing the minimum number of ratings per user decreases the number of users, does not noticeably affect the number of movies, and results in small decreases in the total number of ratings.
-Conversely, increasing the minimum number of ratings per movie does not noticeably affect the number of users, causes dramatic reductions in the number of movies and has very little effect on the total number of ratings.
+For this range of choices of cutoffs, the user cutoff has more impact on the number of ratings in the reduced dataset than does the movie cutoff.
+
+A glance at the table shows that the number of users, `nusers`, is essentially a function of only the user cutoff, `uc` (the one exception being at `mc = 50` and `uc=20`).
+
+@fig-nusersbycutoff shows the similarly unsurprising result that the number of movies in the reduced table is essentially determined by the movie cutoff.
+
+```{julia}
+#| code-fold: true
+#| label: fig-nusersbycutoff
+#| fig-cap: "Number of users in reduced table by movie cutoff value"
+ggplot(sizespeed, aes(; x=:mc, y=:nmvie, color=:ucutoff)) +
+    geom_point() +
+    geom_line() +
+    labs(x="Minimum number of ratings per movie", y="Number of movies in table")
+```
+
+```{julia}
+#| code-fold: true
+describe(DataFrame(sizespeed), :mean, :min, :median, :max, :nunique, :eltype)
+```
 
 ### Memory footprint of the model representation {#sec-lrgobsmemprint}
 
 To explain what "the [2,2] block of the `L` matrix" is and why its size is important, we provide a brief overview of the evaluation of the "profiled" log-likelihood for a `LinearMixedModel` representation.
 
-To make the discussion concrete we consider one of the models represented in this table, with cut-offs of 20 ratings per user and 20 ratings per movie.
+To make the discussion concrete we consider one of the models represented in this table, with cut-offs of 80 ratings per user and 50 ratings per movie.
 This, and any of the models shown in the table, can be restored in a few minutes from the saved `optsum` values, as opposed to taking up to two hours to perform the fit.
 
 ```{julia}
@@ -375,7 +310,7 @@ function ratingsoptsum(
   ucutoff::Integer;
   data=Table(ratings),
   form=@formula(rating ~ 1 + (1 | userId) + (1 | movieId)),
-  contrasts=Dict(:movieId => Grouping(), :userId => Grouping()),
+  contrasts=contrasts,
 )
   optsumfnm = optsumdir(
     "mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json",
@@ -396,8 +331,8 @@ function ratingsoptsum(
   saveoptsum(optsumfnm, model)
   return model
 end
-mvm20u20 = ratingsoptsum(20, 20)
-print(mvm20u20)
+mvm50u80 = ratingsoptsum(50, 80)
+print(mvm50u80)
 ```
 
 Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
@@ -408,7 +343,7 @@ The lower triangular `L` factor is large but sparse.
 It is stored in six blocks of dimensions and types as shown in
 
 ```{julia}
-BlockDescription(mvm20u20)
+BlockDescription(mvm50u80)
 ```
 
 This display gives the types of two blocked matrices: `A` which is derived from the data and does not depend on the parameters, and `L`, which is derived from `A` and the $\bbtheta$ parameter.
@@ -427,8 +362,8 @@ let
   end
   Table((;
     block,
-    Abytes=Base.summarysize.(mvm20u20.A),
-    Lbytes=Base.summarysize.(mvm20u20.L),
+    Abytes=Base.summarysize.(mvm50u80.A),
+    Lbytes=Base.summarysize.(mvm50u80.L),
   ))
 end
 ```
@@ -438,7 +373,7 @@ resulting in total memory footprints (GiB) of
 ```{julia}
 #| code-fold: true
 NamedTuple{(:A, :L)}(
-  Base.summarysize.(getproperty.(Ref(mvm20u20), (:A, :L))) ./ 2^30,
+  Base.summarysize.(getproperty.(Ref(mvm50u80), (:A, :L))) ./ 2^30,
 )
 ```
 
@@ -447,11 +382,11 @@ That is, `L` requires roughly 10 times the amount of storage as does `A`, and th
 This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as [fill-in](https://en.wikipedia.org/wiki/Sparse_matrix).
 
 Note that although the dimensions of the [2,1] block are larger than those of the [2,2] block its memory footprint is smaller because it is a sparse matrix.
-The matrix is over 99% zeros or, equivalently, less than 1% nonzeros,
+The matrix is about 98% zeros or, equivalently, a little over 2% nonzeros,
 
 ```{julia}
 let
-  L21 = mvm20u20.L[2]  # blocks are stored in a one-dimensional array
+  L21 = mvm50u80.L[2]  # blocks are stored in a one-dimensional array
   nnz(L21) / length(L21)
 end
 ```
@@ -459,52 +394,28 @@ end
 which makes the sparse representation much smaller than the dense representation.
 
 This fill-in of the [2,2] block leads to a somewhat unintuitive conclusion.
-The memory footprint of the model representation depends strongly on the number of movies, less strongly on the number of users and almost not at all on the number of ratings.
-The first two parts of this conclusion are illustrated in @fig-memoryfootprint.
+The memory footprint of the model representation depends strongly on the number of movies, less strongly on the number of users and almost not at all on the number of ratings [@fig-memoryfootprint].
 
 ```{julia}
-#| fig-cap: "Bar plot of memory footprint of the model representation by minimum number of ratings per user and per movie."
 #| code-fold: true
+#| fig-cap: Memory footprint of the model representation by minimum number of ratings per user and per movie."
 #| label: fig-memoryfootprint
-#| warning: false
-let
-  f = Figure(; size=(600, 800))
-  xlabel = "Minimum number of ratings per movie"
-  mc = refarray(sizespeed.mc)
-  xticks = (1:7, string.(refpool(sizespeed.mc)))
-  uc = refarray(sizespeed.uc)
-  Legend(
-    f[1, 1],
-    lelements,
-    llabels,
-    ltitle;
-    orientation=:horizontal,
-    tellwidth=false,
-    tellheight=true,
-  )
-  barplot!(
-    Axis(f[2, 1]; xticks, ylabel="Memory requirement (GiB)"),
-    mc,
-    sizespeed.modelsz;
-    dodge=uc,
-    color=uc,
-  )
-  barplot!(
-    Axis(f[3, 1]; xticks, ylabel="Size of L[2,2] (GiB)"),
-    mc,
-    sizespeed.L22sz;
-    dodge=uc,
-    color=uc,
-  )
-  barplot!(
-    Axis(f[4, 1]; xlabel, xticks, ylabel="L[2,2] memory fraction"),
-    mc,
-    sizespeed.L22prop;
-    dodge=uc,
-    color=uc,
-  )
-  f
-end
+ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
+    geom_point() +
+    geom_line() +
+    labs(x="Minimum number of ratings per movie", y="Size of model (GiB)")
+```
+
+@fig-memoryvsL22 shows the dominance of the `[2, 2]` block of `L` in the overall memory footprint of the model
+
+```{julia}
+#| code-fold: true
+#| fig-cap: Memory footprint of the model representation (GiB) versus the size of the [2, 2] block of L (GiB)
+#| label: fig-memoryvsL22
+ggplot(sizespeed, aes(; x=:L22sz, y=:modelsz, color=:ucutoff)) +
+    geom_point() +
+    geom_line() +
+    labs(y="Size of model representation (GiB)", x="Size of [2,2] block of L (GiB)")
 ```
 
 @fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
@@ -519,110 +430,27 @@ In general, for models with scalar random effects for two incompletely crossed g
 
 The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates.
 The time for one evaluation is given in the `evtime` column of `sizespeed`.
-Also given is the number of evaluations to convergence, `nev`, and the time to fit the model, `fittime`
+Also given is the number of evaluations to convergence, `nv`, and the time to fit the model, `fittime`
 The reason for considering `evtime` in addition to `fittime` and `nev` is because the `evtime` for one model, relative to other models, is reasonably stable across computers whereas `nev`, and hence, `fittime`, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).
 
-That is, we can't expect to reproduce `nev` exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in `evtime` with respect to `uc` and `mc` can be expected to reproducible.
+That is, we can't expect to reproduce `nv` exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in `evtime` with respect to `uc` and `mc` can be expected to reproducible.
+
+As shown in @fig-evtimevsL22 the evaluation time for the objective is predominantly a function of the size of the `[2, 2]` block of `L`.
 
 ```{julia}
-#| fig-cap: "Bar plot of function log-likelihood evaluation time by minimum number of ratings per user and per movie."
 #| code-fold: true
-#| label: fig-timetoconverge
-#| warning: false
-let
-  f = Figure(size=(600, 800))
-  xlabel = "Minimum number of ratings per movie"
-  mc = refarray(sizespeed.mc)
-  xticks = (1:7, string.(refpool(sizespeed.mc)))
-  uc = refarray(sizespeed.uc)
-  Legend(
-    f[1, 1],
-    lelements,
-    llabels,
-    ltitle;
-    orientation=:horizontal,
-    tellwidth=false,
-    tellheight=true,
-  )
-  barplot!(
-    Axis(
-      f[2, 1];
-      xticks,
-      ylabel="Log-likelihood evaluation time (m)",
-    ),
-    mc,
-    sizespeed.evtime ./ 60;
-    dodge=uc,
-    color=uc,
-  )
-  barplot!(
-    Axis(
-      f[3, 1];
-      xticks,
-      ylabel="Number of evaluations to convergence",
-    ),
-    mc,
-    sizespeed.nv;
-    dodge=uc,
-    color=uc,
-  )
-  barplot!(
-    Axis(
-      f[4, 1];
-      xlabel,
-      xticks,
-      ylabel="Time (hr) to fit the model",
-    ),
-    mc,
-    sizespeed.fittime ./ 3600;
-    dodge=uc,
-    color=uc,
-  )
-  f
-end
+#| fig-cap: "Evaluation time for the objective (s) versus size of the [2, 2] block of L (GiB)"
+#| label: fig-evtimevsL22
+ggplot(sizespeed, aes(x=:L22sz, y=:evtime, color=:ucutoff)) +
+    geom_point() +
+    geom_line() +
+    labs(x="Size of [2,2] block of L (GiB)", y="Time for one evaluation of objective (s)")
 ```
-
-@fig-timetoconverge shows that the average evaluation time for the log-likelihood function depends strongly on the number of movies and less strongly on the number of users.
 
 However the middle panel shows that the number of iterations to convergence is highly variable.
 Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.
 
 The derivation of the log-likelihood for linear mixed-effects models is given in @sec-lmmtheory, which provides a rather remarkable result:
 the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.
-
-There are two blocked matrices, `A` and `L`, stored in the model representation and, for large models such as we are considering these are the largest fields in
-
-## Model size and speed for different thresholds
-
-```{julia}
-#| code-fold: true
-#| fig-cap: "Amount of storage for L[2,2] versus amount of storage for the entire model.  Colors are determined by the minimum number of ratings per user in the data to which the model was fit."
-#| label: fig-L22vsmodelsz
-#| warning: false
-draw(
-  data(sizespeed) *
-  mapping(
-    :L22sz => "Size (GiB) of 2,2 block of L",
-    :modelsz => "Size (GiB) of model representation";
-    color=:uc,
-  ) *
-  visual(Scatter);
-  figure=(; size=(600, 500)),
-)
-```
-
-Linear regression of the `modelsz` versus the number of users and `L22sz`.
-
-```{julia}
-sizemod =
-  lm(@formula(Float64(modelsz) ~ 1 + nusers + L22sz), sizespeed)
-coeftable(sizemod)
-```
-
-provides an $r^2$ value very close to one, indicating an almost perfect fit.
-
-```{julia}
-r²(sizemod)
-```
 
 *This page was rendered from git revision {{< git-rev short=true >}}.*
