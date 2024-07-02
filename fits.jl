@@ -48,7 +48,7 @@ ratings = Table(
 function ratingsoptsum(
   mcutoff::Integer,
   ucutoff::Integer;
-  data=Table(ratings),
+  data=ratings,
   form=@formula(rating ~ 1 + (1 | userId) + (1 | movieId)),
   contrasts=Dict(:movieId => Grouping(), :userId => Grouping()),
 )
@@ -72,7 +72,10 @@ function ratingsoptsum(
   return model
 end
 
-for m in [1, 2, 5, 10, 15, 20, 50], u in [5, 10, 20]
+for m in [5, 10, 15, 20, 50], u in [5, 10, 20]
     @info "" m u
+    GC.gc()
+    GC.gc()
+    GC.gc()
     ratingsoptsum(m, u)
 end
