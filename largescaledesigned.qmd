@@ -733,7 +733,7 @@ Each nonword is derived from a word by changing one or two letters. This aspect 
 We start with a complex LMM. 
 
 ```{julia}
-#| eval: false
+#| eval: true
 elp01 =
   let f = @formula 1000 / rt ~
       1 + isword * (wrdlen + wrdlen^2) + (1 + isword | pair) + (1 + isword*wrdlen | subj)
