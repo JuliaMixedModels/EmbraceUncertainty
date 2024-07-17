@@ -27,19 +27,23 @@ and define some constants
 ```{julia}
 #| code-fold: true
 #| output: false
-@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
 ```
 
 ## Create the dataset
 
-
 ```{julia}
 #| output: false
 trials = innerjoin(
-    DataFrame(dataset(:ELP_ldt_trial)),
-    select(DataFrame(dataset(:ELP_ldt_item)), :item, :isword, :wrdlen),
-    on = :item
+  DataFrame(dataset(:ELP_ldt_trial)),
+  select(
+    DataFrame(dataset(:ELP_ldt_item)),
+    :item,
+    :isword,
+    :wrdlen,
+  ),
+  on=:item,
 )
 ```
 
@@ -54,20 +58,28 @@ This takes about ten to fifteen minutes on a recent laptop
 ```{julia}
 contrasts[:isword] = EffectsCoding()
 contrasts[:wrdlen] = Center(8)
-@time gm1 = let f = @formula(acc ~ 1 + isword * wrdlen + (1|item) + (1|subj))
-    fit(MixedModel, f, trials, Bernoulli(); contrasts, progress, init_from_lmm=(:β, :θ))
-end
+@time gm1 =
+  let f =
+      @formula(acc ~ 1 + isword * wrdlen + (1 | item) + (1 | subj))
+    fit(
+      MixedModel,
+      f,
+      trials,
+      Bernoulli();
+      contrasts,
+      progress,
+      init_from_lmm=(:β, :θ),
+    )
+  end
 ```
-
 
 ```{julia}
 print(gm1)
 ```
 
-
 ```{julia}
 #| fig-cap: Conditional modes and 95% prediction intervals on random effects for subject in model gm1
 #| label: fig-gm1condmodesubj
 #| code-fold: true
-qqcaterpillar!(Figure(; size=(800,800)), gm1, :subj)
+qqcaterpillar!(Figure(; size=(800, 800)), gm1, :subj)
 ```
