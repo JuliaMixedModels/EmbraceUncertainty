@@ -309,7 +309,7 @@ end
 
 shows that the batch-to-batch variability in these data is small compared to the within-batch variability.
 
-In some approaches to mixed models it can be difficult to fit models to such data.
+In some approaches to mixed models, it can be difficult to fit models to such data.
 Paradoxically, small "variance components" can be more difficult to estimate than large variance components.
 
 The methods we will present are not compromised when estimating small variance components.
@@ -332,7 +332,7 @@ dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
 end
 ```
 
-By default, this compact display of mixed-effects model fits is used in [Jupyter](https://jupyter.org) notebooks, which are the evaluation engine for [quarto books](https://quarto.org/docs/books/) with Julia code chunks.
+By default, this compact display of mixed-effects model fits is used in HTML or LaTeX output with Julia code chunks.
 To obtain more information we can `print` the model, as in
 
 ```{julia}
@@ -385,7 +385,7 @@ Some of the variability in the response is associated with the fixed-effects ter
 In this model there is only one such term, labeled as the `(Intercept)`.
 The name "intercept", which is better suited to models based on straight lines written in a slope/intercept form, should be understood to represent an overall "typical" or mean level of the response in this case.
 (In case you are wondering about the parentheses around the name `(Intercept)`, they are included so that you can't accidentally create a variable with a name that conflicts with this name.)
-The line labeled `batch` in the random effects table shows that the random effects added to the term, one for each level of the factor `batch`, are modeled as random variables whose unconditional variance is estimated as 1388.33 g$^2$ in the ML fit.
+The line labeled `batch` in the random effects table shows that the random effects added to the term, one for each level of the factor `batch`, are modeled as random variables whose unconditional variance is estimated as 1388.33 g² in the ML fit.
 The corresponding standard deviation is 37.26 g.
 
 Note that the last column in the random effects summary table is the estimate of the variability expressed as a standard deviation rather than as a variance.
@@ -394,7 +394,7 @@ The values in this column are a simple re-expression (the square root) of the es
 Do not confuse them with standard errors of the variance estimators, which are not given here.
 In `add-section-reference-here` we explain why we do not provide standard errors of variance estimates.
 
-The line labeled `Residual` in this table gives the estimate of the variance of the residuals (also in g$^2$) and its corresponding standard deviation.
+The line labeled `Residual` in this table gives the estimate of the variance of the residuals (also in g²) and its corresponding standard deviation.
 The estimated standard deviation of the residuals is 49.5 g.
 
 The last line in the random effects table states the number of observations to which the model was fit and the number of levels of any "grouping factors" for the random effects.
@@ -408,7 +408,7 @@ The estimate of this parameter is 1527.5 g, which happens to be the mean yield a
 This *coefficient table* also includes the *standard error* of the estimate, which is the estimated standard deviation of the estimator, a `z` ratio, which is the ratio of the estimate to its standard error, and the probability the absolute value of a standard normal distribution exceeding the absolute value of the `z` ratio.
 
 If the hypothesis that the coefficient is zero is of interest, which is not the case here, then the value in the fourth column is an approximate p-value for the hypothesis test.
-An alternative measure of precision of the estimate - a coverage interval based on a *parametric bootstrap* - is presented in @sec-furtherassess
+An alternative measure of precision of the estimate -- a coverage interval based on a *parametric bootstrap* -- is presented in @sec-furtherassess.
 
 ### A model for the dyestuff2 data {#sec-dyestuff2lmm}
 
@@ -462,7 +462,7 @@ At this point the important thing to know is that @eq-mvbdist describes a vector
 
 The random effects are associated with the observations through a *model matrix*, $\bbZ$.
 For a model with $n$ observations and a total of $q$ random effects, $\bbZ$ will be of size $n\times q$.
-Furthermore, it is sparse - meaning that most of the elements of the matrix are zeros.
+Furthermore, it is sparse -- meaning that most of the elements of the matrix are zeros.
 In this case, $\bbZ$ is the indicator matrix for the `batch` covariate.
 
 ```{julia}
@@ -669,7 +669,7 @@ draw(
 ```
 
 The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).
-There is one peak around the "true" value for the simulation, `{julia} repr(only(dsm01.σs.batch), context=:compact=>true), and another peak at zero.
+There is one peak around the "true" value for the simulation, `{julia} repr(only(dsm01.σs.batch), context=:compact=>true)`, and another peak at zero.
 
 The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_density is being distorted by the method of approximating the density.
 A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation) approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a *kernel* such as a narrow Gaussian distribution (see the linked article for details).
