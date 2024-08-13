@@ -46,7 +46,9 @@ In agriculture the experimental units may be the plots of land or the specific p
 
 In all of these cases the categorical covariate or covariates are observed at a set of discrete *levels*.
 We may use numbers, such as subject identifiers, to designate the particular levels that we observed but these numbers are simply labels.
-The important characteristic of a categorical covariate is that, at each observed value of the response, the covariate takes on the value of one of a set of distinct levels.
+The important characteristic of a categorical covariate is that, at each observed value of the response, the covariate takes on the value of one of a set of distinct levels.[^multimember]
+
+[^multimember]: There are extensions to the classic mixed-effects model, where an observation may belong to multiple levels at the same time. For example, a publication may be associated with multiple authors. For now, we will consider the simpler and more common case of single membership.
 
 Parameters associated with the particular levels of a covariate are sometimes called the "effects" of the levels.
 If the set of possible levels of the covariate is fixed and reproducible we model the covariate using *fixed-effects* parameters.
