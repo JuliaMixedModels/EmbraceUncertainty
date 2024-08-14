@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.53">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -1281,21 +1281,21 @@ y_{i,j}=\mu+b_j+\epsilon_{i,j},\quad i = 1,\dots,5;\;j=1,\dots,6
 <span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(dsm01pars, <span class="fl">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160
 ┌ Warning: NLopt was roundoff limited
-└ @ MixedModels ~/.julia/packages/MixedModels/peUlR/src/optsummary.jl:160</code></pre>
+└ @ MixedModels ~/.julia/packages/MixedModels/hs2Ke/src/optsummary.jl:160</code></pre>
 </div>
 <div id="dsm01samp" class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>7×5 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
@@ -2146,8 +2146,8 @@ Figure&nbsp;1.8: Quantile caterpillar plot of prediction intervals for dsm01 ran
 <p>The maximum likelihood estimates of the parameters are obtained by minimizing the deviance. For linear mixed models we can minimize the profiled deviance, which is a function of <span class="math inline">\({\boldsymbol{\theta}}\)</span> only, thereby considerably simplifying the optimization problem.</p>
 <p>To assess the precision of the parameter estimates we use a parametric bootstrap sample, when feasible. Re-fitting a simple model, such as those shown in this chapter, to a randomly generated response vector is quite fast and it is reasonable to work with bootstrap samples of tens of thousands of replicates. With larger data sets and more complex models, large bootstrap samples of parameter estimates could take much longer.</p>
 <p>Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/05a171b
-">05a171b
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a091925
+">a091925
 </a>.</em></p>
 
 
