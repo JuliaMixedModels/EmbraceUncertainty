@@ -447,10 +447,8 @@ let
   plt *= mapping(
     :wrdlen => "Word length",
     :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)",
-    color=:isword,
-    side=:isword,
-  )
-  plt *= (visual(Violin) + linear(; interval=:confidence))
+    color=:isword)
+  plt *= (mapping(; side=:isword) * visual(Violin) + linear(; interval=:confidence))
   draw(
     plt,
     axis=(; limits=(nothing, (0.0, 2.8)));
