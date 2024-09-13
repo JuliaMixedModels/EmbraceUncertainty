@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.54">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -598,8 +598,8 @@ U factor:
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">=</span> chfac <span class="op">\</span> (X<span class="op">'</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
- 267.04479999999984
-  11.298073333333367</code></pre>
+ 267.04479999999995
+  11.298073333333344</code></pre>
 </div>
 </div>
 <p>Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for <span class="math inline">\(\mathbf{r}_{Xy}\)</span></p>
@@ -608,7 +608,7 @@ U factor:
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  1005.244207376381
-  102.61984718485874</code></pre>
+  102.61984718485854</code></pre>
 </div>
 </div>
 <p>then solving in-place to obtain <span class="math inline">\(\widehat{{\boldsymbol{\beta}}}\)</span></p>
@@ -616,8 +616,8 @@ U factor:
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ldiv!</span>(chfac.U, rXy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
- 267.04479999999967
-  11.298073333333384</code></pre>
+ 267.0447999999998
+  11.298073333333361</code></pre>
 </div>
 </div>
 <p>The residual vector, <span class="math inline">\({\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}}\)</span>, is</p>
@@ -625,23 +625,23 @@ U factor:
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> y <span class="op">-</span> X <span class="op">*</span> β̂</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>10-element Vector{Float64}:
-   2.3669000000001574
-  -4.868873333333227
-   7.95585333333338
-   9.692580000000078
- -25.064493333333303
+   2.3669000000000437
+  -4.868873333333283
+   7.955853333333323
+   9.69258000000002
+ -25.06449333333336
    6.072433333333322
   -0.35144000000002507
-  -2.911413333333428
-  11.712313333333213
-  -4.603860000000111</code></pre>
+  -2.911413333333371
+  11.712313333333327
+  -4.603860000000054</code></pre>
 </div>
 </div>
 <p>with geometric length or “norm”,</p>
 <div id="20" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>31.915932906580256</code></pre>
+<pre><code>31.915932906580302</code></pre>
 </div>
 </div>
 <p>For the extended Cholesky factor, create the extended matrix of sums of squares and cross products</p>
@@ -787,7 +787,7 @@ Vt factor:
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.04479999999995
-  11.298073333333347</code></pre>
+  11.29807333333336</code></pre>
 </div>
 </div>
 <p>In the extensions to linear mixed-effects models we will emphasize the Cholesky factorization over the QR decomposition or the SVD.</p>

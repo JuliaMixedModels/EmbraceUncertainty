@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.54">
+<meta name="generator" content="quarto-1.5.53">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -1431,8 +1431,8 @@ Figure&nbsp;5.5: Memory footprint of the model representation by minimum number 
 </figure>
 </div>
 </div>
-<p><span class="quarto-unresolved-ref">?fig-memoryvsL22</span> shows the dominance of the <code>[2, 2]</code> block of <code>L</code> in the overall memory footprint of the model</p>
-<div id="cell-fig-memoryvsL22" class="cell" data-execution_count="1">
+<p><a href="#fig-memoryvsl22" class="quarto-xref">Figure&nbsp;<span>5.6</span></a> shows the dominance of the <code>[2, 2]</code> block of <code>L</code> in the overall memory footprint of the model</p>
+<div id="cell-fig-memoryvsl22" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sizespeed, <span class="fu">aes</span>(; x<span class="op">=:</span>L22sz, y<span class="op">=:</span>modelsz, color<span class="op">=:</span>ucutoff)) <span class="op">+</span></span>
@@ -1459,8 +1459,8 @@ Figure&nbsp;5.6: Memory footprint of the model representation (GiB) versus the s
 <h3 data-number="5.2.3" class="anchored" data-anchor-id="speed-of-log-likelihood-evaluation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evaluation</h3>
 <p>The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates. The time for one evaluation is given in the <code>evtime</code> column of <code>sizespeed</code>. Also given is the number of evaluations to convergence, <code>nv</code>, and the time to fit the model, <code>fittime</code> The reason for considering <code>evtime</code> in addition to <code>fittime</code> and <code>nev</code> is because the <code>evtime</code> for one model, relative to other models, is reasonably stable across computers whereas <code>nev</code>, and hence, <code>fittime</code>, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).</p>
 <p>That is, we can’t expect to reproduce <code>nv</code> exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in <code>evtime</code> with respect to <code>uc</code> and <code>mc</code> can be expected to reproducible.</p>
-<p>As shown in <span class="quarto-unresolved-ref">?fig-evtimevsL22</span> the evaluation time for the objective is predominantly a function of the size of the <code>[2, 2]</code> block of <code>L</code>.</p>
-<div id="cell-fig-evtimevsL22" class="cell" data-execution_count="1">
+<p>As shown in <a href="#fig-evtimevsl22" class="quarto-xref">Figure&nbsp;<span>5.7</span></a> the evaluation time for the objective is predominantly a function of the size of the <code>[2, 2]</code> block of <code>L</code>.</p>
+<div id="cell-fig-evtimevsl22" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sizespeed, <span class="fu">aes</span>(x<span class="op">=:</span>L22sz, y<span class="op">=:</span>evtime, color<span class="op">=:</span>ucutoff)) <span class="op">+</span></span>
@@ -1481,8 +1481,8 @@ Figure&nbsp;5.7: Evaluation time for the objective (s) versus size of the [2, 2]
 </div>
 <p>However the middle panel shows that the number of iterations to convergence is highly variable. Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.</p>
 <p>The derivation of the log-likelihood for linear mixed-effects models is given in <a href="linalg.html#sec-lmmtheory" class="quarto-xref"><span>Section B.7</span></a>, which provides a rather remarkable result: the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/93886a0
-">93886a0
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a1c0629
+">a1c0629
 </a>.</em></p>
 
 
