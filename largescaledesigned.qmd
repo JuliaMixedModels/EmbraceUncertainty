@@ -5,7 +5,7 @@ fig-dpi: 150
 fig-format: png
 engine: julia
 julia:
-  exeflags: ["--project"]
+  exeflags: ["-tauto", "--project"]
 ---
 
 # A large-scale designed experiment {#sec-largescaledesigned}
@@ -17,7 +17,6 @@ Load the packages to be used
 #| output: false
 #| label: packages04
 using AlgebraOfGraphics
-using Arrow
 using CairoMakie
 using Chain
 using DataFrameMacros
@@ -29,6 +28,7 @@ using MixedModels
 using MixedModelsMakie
 using StandardizedPredictors
 using StatsBase
+using TidierPlots
 ```
 
 and define some constants, if not already defined.
@@ -39,6 +39,8 @@ and define some constants, if not already defined.
 #| label: constants04
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
+TidierPlots_set("plot_show", false)
+TidierPlots_set("plot_log", false)
 ```
 
 As with many techniques in data science, the place where "the rubber meets the road", as they say in the automotive industry, for mixed-effects models is when working on large-scale studies.
@@ -156,21 +158,24 @@ The named argument `error=false` is required because there is one column, `acc`,
 If `error=false` were not given then the error thrown when trying to `disallowmissing` on the `acc` column would be propagated and the top-level call would fail.
 :::
 
-A barchart of the word length counts, @fig-ldtwrdlenhist, shows that the majority of the items are between 3 and 14 characters.
+A bar plot of the word length counts, @fig-ldtwrdlenhist, shows that the majority of the items are between 3 and 14 characters.
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: "Histogram of word lengths in the items used in the lexical decision task."
+#| fig-cap: "Bar plot of word lengths in the items used in the lexical decision task."
 #| label: fig-ldtwrdlenhist
-#| warning: false
-let wlen = 1:21
-  draw(
-    data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
-    mapping(:wrdlen => "Length of word", :count) *
-    visual(BarPlot);
-    figure=(; size=(600, 450)),
-  )
-end
+ggplot(ldttrial, aes(; x=:wrdlen)) +
+geom_bar() +
+labs(; x="Word length")
+# #| warning: false
+# let wlen = 1:21
+#   draw(
+#     data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
+#     mapping(:wrdlen => "Length of word", :count) *
+#     visual(BarPlot);
+#     figure=(; size=(600, 450))
+#   )
+# end
 ```
 
 To examine trends in accuracy by word length we use a scatterplot smoother on the binary response, as described in @sec-plottingbinary.
@@ -285,16 +290,10 @@ A plot of the median response time versus proportion accurate, @fig-ldtmedianrtv
 #| code-fold: true
 #| fig-cap: "Median response time versus proportion accurate by subject in the LDT."
 #| label: fig-ldtmedianrtvspropacc
-#| warning: false
-draw(
-  data(bysubj) *
-  mapping(
-    :spropacc => "Proportion accurate",
-    :smedianrt => "Median response time (ms)",
-  ) *
-  (smooth() + visual(Scatter));
-  figure=(; size=(600, 450)),
-)
+ggplot(bysubj, aes(; x=:spropacc, y=:smedianrt)) +
+geom_point() +
+geom_smooth(; method="smooth") +
+labs(; x="Proportion accurate", y="Median response time (ms)")
 ```
 
 As described in @Balota_2007, the participants performed the trials in blocks of 250 followed by a short break.
@@ -350,13 +349,15 @@ A density plot of the pruned response times, @fig-elpldtrtdens, shows they are s
 #| code-fold: true
 #| fig-cap: Kernel density plot of the pruned response times (ms.) in the LDT.
 #| label: fig-elpldtrtdens
-#| warning: false
-draw(
-  data(pruned) *
-  mapping(:rt => "Response time (ms.) for correct responses") *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(pruned, aes(; x=:rt)) +
+geom_density() +
+labs(; x="Response time (ms.) for correct responses")
+# draw(
+#   data(pruned) *
+#   mapping(:rt => "Response time (ms.) for correct responses") *
+#   AlgebraOfGraphics.density();
+#   figure=(; size=(600, 340)),
+# )
 ```
 
 In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.
@@ -367,18 +368,20 @@ The density of the response speed, in responses per second, is shown in @fig-elp
 #| code-fold: true
 #| fig-cap: Kernel density plot of the pruned response speed in the LDT.
 #| label: fig-elpldtspeeddens
-#| warning: false
-draw(
-  data(pruned) *
-  mapping(
-    :rt =>
-      (
-        x -> 1000 / x
-      ) => "Response speed (s⁻¹) for correct responses",
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(transform!(pruned, :rt => (x -> 1000 ./ x) => :speed)) +
+geom_density(aes(; x=:speed)) +
+labs(; x="Response speed (s⁻¹) for correct responses")
+# draw(
+#   data(pruned) *
+#   mapping(
+#     :rt =>
+#       (
+#         x -> 1000 / x
+#       ) => "Response speed (s⁻¹) for correct responses",
+#   ) *
+#   AlgebraOfGraphics.density();
+#   figure=(; size=(600, 340)),
+# )
 ```
 
 @fig-elpldtrtdens and @fig-elpldtspeeddens indicate that it may be more reasonable to establish a lower bound of 1/3 second (333 ms) on the response latency, corresponding to an upper bound of 3 per second on the response speed.
@@ -520,9 +523,23 @@ To compare the conditional means of the random effects for item in these two mod
 #| code-fold: true
 #| fig-cap: "Conditional means of scalar random effects for item in model elm01, fit to the pruned data, versus those for model elm02, fit to the pruned data with inaccurate subjects removed."
 #| label: fig-itemreelm01vselm02
-#| warning: false
-
-CairoMakie.activate!(; type="png")
+## FIXME: figure out how to change the alpha on the points
+# ggplot(   # this throws an error on the use of color=:isword - can't work out why
+#   leftjoin!(
+#     leftjoin!(
+#       rename!(DataFrame(raneftables(elm01)[:item]), [:item, :elm01]),
+#       rename!(DataFrame(raneftables(elm02)[:item]), [:item, :elm02]);
+#       on=:item,
+#     ),
+#     select(byitem, :item, :isword => string; renamecols=false);
+#     on=:item,
+#   ),
+#   aes(; x=:elm01, y=:elm02),
+# ) + geom_point(aes(; color=:isword); alpha=0.2) +
+# labs(;
+#   x="Conditional means of item random effects for model elm01",
+#   y="Conditional means of item random effects for model elm02",
+# )
 condmeans = leftjoin!(
   leftjoin!(
     rename!(DataFrame(raneftables(elm01)[:item]), [:item, :elm01]),
@@ -541,10 +558,6 @@ draw(
   figure=(; size=(600, 400)),
 )
 ```
-
-::: {.callout-note}
-Adjust the alpha on @fig-itemreelm01vselm02.
-:::
 
 @fig-itemreelm01vselm02 is exactly of the form that would be expected in a sample from a correlated multivariate Gaussian distribution.
 The correlation of the two sets of conditional means is about 96%.

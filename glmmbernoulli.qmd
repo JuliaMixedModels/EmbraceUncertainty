@@ -149,11 +149,12 @@ contrasts[:urban] = HelmertCoding()
 com01 =
   let d = contra,
     ds = Bernoulli(),
-    f = @formula(use ~
-      1 + livch + (age + abs2(age)) * urban + (1 | dist))
+    f = @formula(
+      use ~ 1 + livch + (age + abs2(age)) * urban + (1 | dist)
+    )
 
-  fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
-end
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
+  end
 ```
 
 Notice that in the formula language defined by the [StatsModels](https://github.com/JuliaStats/StatsModels.jl) package, an interaction term is written with the `&` operator.
@@ -284,8 +285,9 @@ A series of such model fits led to a model with random effects for the combinati
 
 ```{julia}
 com05 =
-  let f = @formula(use ~
-      1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
+  let f = @formula(
+      use ~ 1 + urban + ch * age + abs2(age) + (1 | dist & urban)
+    ),
     d = contra,
     ds = Bernoulli()
 
