@@ -65,10 +65,8 @@ Subject identifiers are coded in integers from 1 to 816. We prefer them as strin
 We prefix the subject number with 'S' and leftpad the number with zeros to three digits.
 
 ```{julia}
-ldttrial = transform!(
-  DataFrame(ldttrial),
-  :seq => ByRow(>(2000)) => :s2;
-)
+ldttrial = transform!(DataFrame(ldttrial),
+                      :seq => ByRow(>(2000)) => :s2;)
 describe(ldttrial)
 ```
 
@@ -93,17 +91,13 @@ As we will create similar summaries by subject, we incorporate an 'i' in the nam
 
 ```{julia}
 byitem = @chain ldttrial begin
-  groupby(:item)
-  @combine(
-    :ni = length(:acc),               # no. of obs
-    :imiss = count(ismissing, :acc),  # no. of missing acc
-    :iacc = count(skipmissing(:acc)), # no. of accurate
-    :imedianrt = median(:rt),
-  )
-  @transform!(
-    :wrdlen = Int8(length(:item)),
-    :ipropacc = :iacc / :ni
-  )
+    groupby(:item)
+    @combine(:ni = length(:acc),               # no. of obs
+             :imiss = count(ismissing, :acc),  # no. of missing acc
+             :iacc = count(skipmissing(:acc)), # no. of accurate
+             :imedianrt = median(:rt),)
+    @transform!(:wrdlen = Int8(length(:item)),
+                :ipropacc = :iacc / :ni)
 end
 ```
 
@@ -130,13 +124,9 @@ It is called a *left* join because the left (or first) table takes precedence, i
 If there is no matching row in the second table then missing values are inserted for the columns from the right table in the result.
 
 ```{julia}
-describe(
-  leftjoin!(
-    ldttrial,
-    select(byitem, :item, :wrdlen, :isword);
-    on=:item,
-  ),
-)
+describe(leftjoin!(ldttrial,
+                   select(byitem, :item, :wrdlen, :isword);
+                   on=:item,))
 ```
 
 Notice that the `wrdlen` and `isword` variables in this table allow for missing values, because they are derived from the second argument, but there are no missing values for these variables.
@@ -164,12 +154,10 @@ A barchart of the word length counts, @fig-ldtwrdlenhist, shows that the majorit
 #| label: fig-ldtwrdlenhist
 #| warning: false
 let wlen = 1:21
-  draw(
-    data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
-    mapping(:wrdlen => "Length of word", :count) *
-    visual(BarPlot);
-    figure=(; size=(600, 450)),
-  )
+    draw(data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
+         mapping(:wrdlen => "Length of word", :count) *
+         visual(BarPlot);
+         figure=(; size=(600, 450)),)
 end
 ```
 
@@ -182,16 +170,12 @@ but accuracy decreases with increasing word length for the nonwords.
 #| fig-cap: "Smoothed curves of accuracy versus word length in the lexical decision task."
 #| label: fig-ldtaccsmooth
 #| warning: false
-draw(
-  data(filter(:acc => !ismissing, ldttrial)) *
-  mapping(
-    :wrdlen => "Word length",
-    :acc => "Accuracy";
-    color=:isword,
-  ) *
-  smooth();
-  figure=(; size=(600, 340)),
-)
+draw(data(filter(:acc => !ismissing, ldttrial)) *
+     mapping(:wrdlen => "Word length",
+             :acc => "Accuracy";
+             color=:isword,) *
+     smooth();
+     figure=(; size=(600, 340)),)
 ```
 
 @fig-ldtaccsmooth may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few.
@@ -208,16 +192,12 @@ If we restrict the smoother curves to this range, as in @fig-ldtaccsmoothrestric
 #| fig-cap: "Smoothed curves of accuracy versus word length in the range 4 to 13 characters in the lexical decision task."
 #| label: fig-ldtaccsmoothrestrict
 #| warning: false
-draw(
-  data(@subset(ldttrial, !ismissing(:acc), 4 ≤ :wrdlen ≤ 13)) *
-  mapping(
-    :wrdlen => "Word length",
-    :acc => "Accuracy";
-    color=:isword,
-  ) *
-  smooth();
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(ldttrial, !ismissing(:acc), 4 ≤ :wrdlen ≤ 13)) *
+     mapping(:wrdlen => "Word length",
+             :acc => "Accuracy";
+             color=:isword,) *
+     smooth();
+     figure=(; size=(600, 340)),)
 ```
 
 the differences are less dramatic.
@@ -230,26 +210,18 @@ Another way to visualize these results is by plotting the proportion accurate ve
 #| label: fig-propvswrdlen
 #| warning: false
 let
-  itemsummry = combine(
-    groupby(byitem, [:wrdlen, :isword]),
-    :ni => sum,
-    :imiss => sum,
-    :iacc => sum,
-  )
-  @transform!(
-    itemsummry,
-    :iacc_mean = :iacc_sum / (:ni_sum - :imiss_sum)
-  )
-  @transform!(itemsummry, :msz = sqrt((:ni_sum - :imiss_sum) / 800))
-  draw(
-    data(itemsummry) * mapping(
-      :wrdlen => "Word length",
-      :iacc_mean => "Proportion accurate";
-      color=:isword,
-      markersize=:msz,
-    );
-    figure=(; size=(600, 340)),
-  )
+    itemsummry = combine(groupby(byitem, [:wrdlen, :isword]),
+                         :ni => sum,
+                         :imiss => sum,
+                         :iacc => sum)
+    @transform!(itemsummry,
+                :iacc_mean = :iacc_sum / (:ni_sum - :imiss_sum))
+    @transform!(itemsummry, :msz = sqrt((:ni_sum - :imiss_sum) / 800))
+    draw(data(itemsummry) * mapping(:wrdlen => "Word length",
+                                    :iacc_mean => "Proportion accurate";
+                                    color=:isword,
+                                    markersize=:msz,);
+         figure=(; size=(600, 340)),)
 end
 ```
 
@@ -261,14 +233,12 @@ A summary of accuracy and median response time by subject
 
 ```{julia}
 bysubj = @chain ldttrial begin
-  groupby(:subj)
-  @combine(
-    :ns = length(:acc),               # no. of obs
-    :smiss = count(ismissing, :acc),  # no. of missing acc
-    :sacc = count(skipmissing(:acc)), # no. of accurate
-    :smedianrt = median(:rt),
-  )
-  @transform!(:spropacc = :sacc / :ns)
+    groupby(:subj)
+    @combine(:ns = length(:acc),               # no. of obs
+             :smiss = count(ismissing, :acc),  # no. of missing acc
+             :sacc = count(skipmissing(:acc)), # no. of accurate
+             :smedianrt = median(:rt),)
+    @transform!(:spropacc = :sacc / :ns)
 end
 ```
 
@@ -286,15 +256,11 @@ A plot of the median response time versus proportion accurate, @fig-ldtmedianrtv
 #| fig-cap: "Median response time versus proportion accurate by subject in the LDT."
 #| label: fig-ldtmedianrtvspropacc
 #| warning: false
-draw(
-  data(bysubj) *
-  mapping(
-    :spropacc => "Proportion accurate",
-    :smedianrt => "Median response time (ms)",
-  ) *
-  (smooth() + visual(Scatter));
-  figure=(; size=(600, 450)),
-)
+draw(data(bysubj) *
+     mapping(:spropacc => "Proportion accurate",
+             :smedianrt => "Median response time (ms)") *
+     (smooth() + visual(Scatter));
+     figure=(; size=(600, 450)),)
 ```
 
 As described in @Balota_2007, the participants performed the trials in blocks of 250 followed by a short break.
@@ -327,9 +293,9 @@ To examine the effects of the fast but inaccurate responders we will fit models 
 
 ```{julia}
 pruned = @chain ldttrial begin
-  @subset(!ismissing(:acc), 200 ≤ :rt ≤ 3000,)
-  leftjoin!(select(bysubj, :subj, :spropacc); on=:subj)
-  dropmissing!
+    @subset(!ismissing(:acc), 200 ≤ :rt ≤ 3000,)
+    leftjoin!(select(bysubj, :subj, :spropacc); on=:subj)
+    dropmissing!
 end
 size(pruned)
 ```
@@ -351,12 +317,10 @@ A density plot of the pruned response times, @fig-elpldtrtdens, shows they are s
 #| fig-cap: Kernel density plot of the pruned response times (ms.) in the LDT.
 #| label: fig-elpldtrtdens
 #| warning: false
-draw(
-  data(pruned) *
-  mapping(:rt => "Response time (ms.) for correct responses") *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(pruned) *
+     mapping(:rt => "Response time (ms.) for correct responses") *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 In such cases it is common to transform the response to a scale such as the logarithm of the response time or to the speed of the response, which is the inverse of the response time.
@@ -368,27 +332,18 @@ The density of the response speed, in responses per second, is shown in @fig-elp
 #| fig-cap: Kernel density plot of the pruned response speed in the LDT.
 #| label: fig-elpldtspeeddens
 #| warning: false
-draw(
-  data(pruned) *
-  mapping(
-    :rt =>
-      (
-        x -> 1000 / x
-      ) => "Response speed (s⁻¹) for correct responses",
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(pruned) *
+     mapping(:rt => (x -> 1000 / x) => "Response speed (s⁻¹) for correct responses") *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 @fig-elpldtrtdens and @fig-elpldtspeeddens indicate that it may be more reasonable to establish a lower bound of 1/3 second (333 ms) on the response latency, corresponding to an upper bound of 3 per second on the response speed.
 However, only about one half of one percent of the correct responses have latencies in the range of 200 ms. to 333 ms.
 
 ```{julia}
-count(
-  r -> !ismissing(r.acc) && 200 < r.rt < 333,
-  eachrow(ldttrial),
-) / count(!ismissing, ldttrial.acc)
+count(r -> !ismissing(r.acc) && 200 < r.rt < 333,
+      eachrow(ldttrial)) / count(!ismissing, ldttrial.acc)
 ```
 
 so the exact position of the lower cut-off point on the response latencies is unlikely to be very important.
@@ -401,16 +356,12 @@ For example, @fig-ldtrtvswrdlen shows the smoothed relationship between word len
 #| fig-cap: "Scatterplot smooths of response time versus word length in the LDT."
 #| label: fig-ldtrtvswrdlen
 #| warning: false
-draw(
-  data(pruned) *
-  mapping(
-    :wrdlen => "Word length",
-    :rt => "Response time (ms)";
-    :color => :isword,
-  ) *
-  smooth();
-  figure=(; size=(600, 450)),
-)
+draw(data(pruned) *
+     mapping(:wrdlen => "Word length",
+             :rt => "Response time (ms)";
+             :color => :isword,) *
+     smooth();
+     figure=(; size=(600, 450)),)
 ```
 
 and @fig-ldtspeedvswrdlen shows the similar relationships for speed
@@ -420,16 +371,12 @@ and @fig-ldtspeedvswrdlen shows the similar relationships for speed
 #| fig-cap: "Scatterplot smooths of response speed versus word length in the LDT."
 #| label: fig-ldtspeedvswrdlen
 #| warning: false
-draw(
-  data(pruned) *
-  mapping(
-    :wrdlen => "Word length",
-    :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)";
-    :color => :isword,
-  ) *
-  smooth();
-  figure=(; size=(600, 450)),
-)
+draw(data(pruned) *
+     mapping(:wrdlen => "Word length",
+             :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)";
+             :color => :isword,) *
+     smooth();
+     figure=(; size=(600, 450)),)
 ```
 
 For the most part the smoother lines in @fig-ldtspeedvswrdlen are reasonably straight.
@@ -443,17 +390,14 @@ The small amount of curvature is associated with short word lengths, say less th
 #| label: fig-speedviolin
 #| warning: false
 let
-  plt = data(@subset(pruned, :wrdlen > 3, :wrdlen < 14))
-  plt *= mapping(
-    :wrdlen => "Word length",
-    :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)",
-    color=:isword)
-  plt *= (mapping(; side=:isword) * visual(Violin) + linear(; interval=:confidence))
-  draw(
-    plt,
-    axis=(; limits=(nothing, (0.0, 2.8)));
-    figure=(; size=(600, 450)),
-  )
+    plt = data(@subset(pruned, :wrdlen > 3, :wrdlen < 14))
+    plt *= mapping(:wrdlen => "Word length",
+                   :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)";
+                   color=:isword)
+    plt *= (mapping(; side=:isword) * visual(Violin) + linear(; interval=:confidence))
+    draw(plt;
+         axis=(; limits=(nothing, (0.0, 2.8))),
+         figure=(; size=(600, 450)),)
 end
 ```
 
@@ -486,11 +430,9 @@ contrasts[:wrdlen] = Center(8);
 and fit a first model with simple, scalar, random effects for `subj` and `item`.
 
 ```{julia}
-elm01 =
-  let f = @formula 1000 / rt ~
-      1 + isword * wrdlen + (1 | item) + (1 | subj)
+elm01 = let f = @formula 1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
     fit(MixedModel, f, pruned; contrasts, progress)
-  end
+end
 ```
 
 The predicted response speed by word length and word/nonword status can be summarized as
@@ -502,12 +444,10 @@ effects(Dict(:isword => [false, true], :wrdlen => 4:2:12), elm01)
 If we restrict to only those subjects with 80% accuracy or greater the model becomes
 
 ```{julia}
-elm02 =
-  let f = @formula 1000 / rt ~
-      1 + isword * wrdlen + (1 | item) + (1 | subj)
+elm02 = let f = @formula 1000 / rt ~ 1 + isword * wrdlen + (1 | item) + (1 | subj)
     dat = filter(:spropacc => >(0.8), pruned)
     fit(MixedModel, f, dat; contrasts, progress)
-  end
+end
 ```
 
 ```{julia}
@@ -523,23 +463,18 @@ To compare the conditional means of the random effects for item in these two mod
 #| warning: false
 
 CairoMakie.activate!(; type="png")
-condmeans = leftjoin!(
-  leftjoin!(
-    rename!(DataFrame(raneftables(elm01)[:item]), [:item, :elm01]),
-    rename!(DataFrame(raneftables(elm02)[:item]), [:item, :elm02]);
-    on=:item,
-  ),
-  select(byitem, :item, :isword; copycols=false);
-  on=:item,
-)
-draw(
-  data(condmeans) * mapping(
-    :elm01 => "Conditional means of item random effects for model elm01",
-    :elm02 => "Conditional means of item random effects for model elm02";
-    color=:isword,
-  );
-  figure=(; size=(600, 400)),
-)
+condmeans = leftjoin!(leftjoin!(rename!(DataFrame(raneftables(elm01)[:item]),
+                                        [:item, :elm01]),
+                                rename!(DataFrame(raneftables(elm02)[:item]),
+                                        [:item, :elm02]);
+                                on=:item,),
+                      select(byitem, :item, :isword; copycols=false);
+                      on=:item,)
+draw(data(condmeans) *
+     mapping(:elm01 => "Conditional means of item random effects for model elm01",
+             :elm02 => "Conditional means of item random effects for model elm02";
+             color=:isword,);
+     figure=(; size=(600, 400)),)
 ```
 
 ::: {.callout-note}
@@ -563,13 +498,11 @@ saveoptsum("./optsums/elm01.json", elm01);
 ```
 
 ```{julia}
-elm01a = restoreoptsum!(
-  let f = @formula 1000 / rt ~
-      1 + isword * wrdlen + (1 | item) + (1 | subj)
-    MixedModel(f, pruned; contrasts)
-  end,
-  "./optsums/elm01.json",
-)
+elm01a = restoreoptsum!(let f = @formula 1000 / rt ~ 1 + isword * wrdlen + (1 | item) +
+                                                     (1 | subj)
+                            MixedModel(f, pruned; contrasts)
+                        end,
+                        "./optsums/elm01.json")
 ```
 
 Other covariates associated with the item are available as

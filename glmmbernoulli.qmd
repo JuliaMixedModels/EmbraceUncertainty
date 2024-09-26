@@ -80,7 +80,7 @@ with summary
 ```{julia}
 #| code-fold: true
 let df = DataFrame(contra)
-  describe(df, :mean, :min, :median, :max, :nunique, :eltype)
+    describe(df, :mean, :min, :median, :max, :nunique, :eltype)
 end
 ```
 
@@ -109,17 +109,13 @@ as in @fig-contradata,
 #| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey
 #| label: fig-contradata
 #| warning: false
-draw(
-  data(contra) *
-  mapping(
-    :age => "Centered age (yr)",
-    :use => ==("Y") => "Frequency of contraceptive use";
-    col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
-    color=:livch,
-  ) *
-  smooth();
-  figure=(; size=(650, 400)),
-)
+draw(data(contra) *
+     mapping(:age => "Centered age (yr)",
+             :use => ==("Y") => "Frequency of contraceptive use";
+             col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
+             color=:livch,) *
+     smooth();
+     figure=(; size=(650, 400)),)
 ```
 
 to show the trend in the response with respect to the covariate.
@@ -146,13 +142,11 @@ Establishing the contrasts and fitting a preliminary model with random effects f
 contrasts[:livch] = EffectsCoding(; base="0")
 contrasts[:urban] = HelmertCoding()
 
-com01 =
-  let d = contra,
+com01 = let d = contra,
     ds = Bernoulli(),
-    f = @formula(use ~
-      1 + livch + (age + abs2(age)) * urban + (1 | dist))
+    f = @formula(use ~ 1 + livch + (age + abs2(age)) * urban + (1 | dist))
 
-  fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
 end
 ```
 
@@ -194,20 +188,19 @@ contra = Table(contra; ch=contra.livch .!= "0")
 ```{julia}
 #| code-fold: true
 let df = DataFrame(contra)
-  describe(df, :mean, :min, :median, :max, :nunique, :eltype)
+    describe(df, :mean, :min, :median, :max, :nunique, :eltype)
 end
 ```
 
 we fit a reduced model.
 
 ```{julia}
-com02 =
-  let d = contra,
+com02 = let d = contra,
     ds = Bernoulli(),
     f = @formula(use ~ 1 + ch + age * age * urban + (1 | dist))
 
     fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
-  end
+end
 ```
 
 Comparing this model to the previous model
@@ -221,13 +214,12 @@ indicates that the reduced model is adequate.
 Apparently neither the second-order interaction `age & urban` nor the third-order interaction `age & age & urban` is significant and we fit a model without these terms.
 
 ```{julia}
-com03 =
-  let f = @formula(use ~ 1 + urban + ch + age * age + (1 | dist)),
+com03 = let f = @formula(use ~ 1 + urban + ch + age * age + (1 | dist)),
     d = contra,
     ds = Bernoulli()
 
     fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
-  end
+end
 ```
 
 A likelihood ratio test
@@ -245,31 +237,25 @@ A plot of the smoothed observed proportions versus centered age by `urban` and `
 #| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey.  The livch factor has been collapsed to children/nochildren.
 #| label: fig-contradata2
 #| warning: false
-draw(
-  data(contra) *
-  mapping(
-    :age => "Centered age (yr)",
-    :use => ==("Y") => "Frequency of contraceptive use";
-    col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
-    color=:ch => "Children",
-  ) *
-  smooth();
-  figure=(; size=(650, 400)),
-)
+draw(data(contra) *
+     mapping(:age => "Centered age (yr)",
+             :use => ==("Y") => "Frequency of contraceptive use";
+             col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
+             color=:ch => "Children",) *
+     smooth();
+     figure=(; size=(650, 400)),)
 ```
 
 indicates that all four groups have a quadratic trend with respect to age but the location of the peak proportion is shifted for those without children relative to those with children.
 Incorporating an interaction of `age` and `ch` allows for such a shift.
 
 ```{julia}
-com04 =
-  let f =
-      @formula(use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)),
+com04 = let f = @formula(use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)),
     d = contra,
     ds = Bernoulli()
 
     fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
-  end
+end
 ```
 
 Comparing this fitted model to the previous one
@@ -283,14 +269,12 @@ confirms the usefulness of this term.
 A series of such model fits led to a model with random effects for the combinations of `dist` and `urban`, because differences between urban and rural women in the same district were comparable to differences between districts, even after accounting for an effect of `urban` at the fixed-effects (or population) level.
 
 ```{julia}
-com05 =
-  let f = @formula(use ~
-      1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
+com05 = let f = @formula(use ~ 1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
     d = contra,
     ds = Bernoulli()
 
     fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
-  end
+end
 ```
 
 In more detail,
@@ -332,19 +316,16 @@ We want to create a plot like @fig-contradata2 by evaluating the linear predicto
 First we construct a table of covariate values, `newdata`, containing the *Cartesian product* of values of these covariates, created using a [generator expression](https://docs.julialang.org/en/v1/manual/arrays/#Generator-Expressions) returning [NamedTuples](https://docs.julialang.org/en/v1/base/base/#Core.NamedTuple), which is the standard row-wise representation of tabular data.
 
 ```{julia}
-newdata = Table(
-  (; age, ch, urban) for age in -10:3:20, ch in [false, true],
-  urban in ["N", "Y"]
-)
+newdata = Table((; age, ch, urban)
+                for age in -10:3:20, ch in [false, true],
+                    urban in ["N", "Y"])
 ```
 
 Next we isolate the fixed-effects terms from the formula for model `com05` by selecting its `rhs` property (the right-hand side of the formula) then filtering out any random-effects terms in the expression.
 
 ```{julia}
-feform = filter(
-  t -> !isa(t, MixedModels.AbstractReTerm),
-  com05.formula.rhs,
-);
+feform = filter(t -> !isa(t, MixedModels.AbstractReTerm),
+                com05.formula.rhs);
 ```
 
 ::: {.callout-note}
@@ -371,17 +352,13 @@ Plotting the result, @fig-com05pred,
 #| fig-cap: Linear predictor versus centered age from model com05
 #| label: fig-com05pred
 #| warning: false
-draw(
-  data(newdata) *
-  mapping(
-    :age => "Centered age (yr)",
-    :η => "Linear predictor value from model com05";
-    col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
-    color=:ch => "Children",
-  ) *
-  smooth();
-  figure=(; size=(650, 400)),
-)
+draw(data(newdata) *
+     mapping(:age => "Centered age (yr)",
+             :η => "Linear predictor value from model com05";
+             col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
+             color=:ch => "Children",) *
+     smooth();
+     figure=(; size=(650, 400)),)
 ```
 
 shows that these curves follow the general trends of the data plot.
@@ -421,10 +398,10 @@ is called the *logistic* function and is shown in @fig-logitinv.
 #| label: fig-logitinv
 #| warning: false
 let
-  fig = Figure(; size=(650, 300))
-  ax = Axis(fig[1, 1]; xlabel="η", ylabel="μ")
-  lines!(ax, -5.5 .. 5.5, η -> inv(1 + exp(-η)))
-  fig
+    fig = Figure(; size=(650, 300))
+    ax = Axis(fig[1, 1]; xlabel="η", ylabel="μ")
+    lines!(ax, -5.5 .. 5.5, η -> inv(1 + exp(-η)))
+    fig
 end
 ```
 
@@ -470,17 +447,13 @@ producing the population predictions on the probability scale, as shown in @fig-
 #| fig-cap: Predicted probability of contraception use versus centered age from model com05.
 #| label: fig-com05predmu
 #| warning: false
-draw(
-  data(newdata) *
-  mapping(
-    :age => "Centered age (yr)",
-    :μ => "Probability of contraceptive use";
-    col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
-    color=:ch => "Children",
-  ) *
-  smooth();
-  figure=(; size=(650, 400)),
-)
+draw(data(newdata) *
+     mapping(:age => "Centered age (yr)",
+             :μ => "Probability of contraceptive use";
+             col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
+             color=:ch => "Children",) *
+     smooth();
+     figure=(; size=(650, 400)),)
 ```
 
 On the probability scale we can compare the predictions to the observed frequencies shown with scatterplot smoother lines in @fig-contradata2.
@@ -514,7 +487,7 @@ The numerical values and the identifier of the combination of `dist` and `urban`
 
 ```{julia}
 srtdre = let retbl = only(raneftables(com05))
-  retbl[sortperm(last.(retbl))]
+    retbl[sortperm(last.(retbl))]
 end
 first(srtdre, 6)
 ```

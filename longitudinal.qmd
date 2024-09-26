@@ -89,16 +89,12 @@ A common way of plotting such longitudinal data is response versus time on a sin
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
 #| warning: false
-draw(
-  data(egdf) *
-  mapping(
-    :time => "Age (yr)",
-    :resp => "Ramus bone length (mm)",
-    color=:Subj,
-  ) *
-  (visual(Scatter) + visual(Lines));
-  figure=(; size=(600, 450)),
-)
+draw(data(egdf) *
+     mapping(:time => "Age (yr)",
+             :resp => "Ramus bone length (mm)";
+             color=:Subj) *
+     (visual(Scatter) + visual(Lines));
+     figure=(; size=(600, 450)),)
 ```
 
 Unfortunately, unless there are very few subjects, such figures, sometimes called "spaghetti plots", are difficult to decipher.
@@ -137,7 +133,7 @@ Although it seems that there isn't a strong correlation between initial bone len
 
 ```{julia}
 egm01 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts, progress)
+    fit(MixedModel, f, egdf; contrasts, progress)
 end
 print(egm01)
 ```
@@ -154,7 +150,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
 #| warning: false
-caterpillar!(Figure(size=(600, 320)), ranefinfo(egm01, :Subj))
+caterpillar!(Figure(; size=(600, 320)), ranefinfo(egm01, :Subj))
 ```
 
 ### Centering the time values
@@ -182,7 +178,7 @@ A model with `time` centered at 8 years of age can be fit as
 ```{julia}
 contrasts[:time] = Center(8)
 egm02 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts, progress)
+    fit(MixedModel, f, egdf; contrasts, progress)
 end
 print(egm02)
 ```
@@ -197,7 +193,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| label: fig-egm02caterpillar
 #| code-fold: true
 #| warning: false
-caterpillar!(Figure(size=(600, 380)), ranefinfo(egm02, :Subj))
+caterpillar!(Figure(; size=(600, 380)), ranefinfo(egm02, :Subj))
 ```
 
 A third option is to center the `time` covariate at the mean of the original `time` values.
@@ -205,7 +201,7 @@ A third option is to center the `time` covariate at the mean of the original `ti
 ```{julia}
 contrasts[:time] = Center()
 egm03 = let f = @formula resp ~ 1 + time + (1 + time | Subj)
-  fit(MixedModel, f, egdf; contrasts, progress)
+    fit(MixedModel, f, egdf; contrasts, progress)
 end
 print(egm03)
 ```
@@ -253,12 +249,10 @@ The usual cautions about polynomial terms in regression models apply even more e
 For balanced data like `egdf` we usually center the `time` axis about the mean, producing
 
 ```{julia}
-egm04 =
-  let f = @formula resp ~
-      1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
+egm04 = let f = @formula resp ~ 1 + ctime + ctime^2 + (1 + ctime + ctime^2 | Subj)
     dat = @transform(egdf, :ctime = :time - 8.75)
     fit(MixedModel, f, dat; contrasts, progress)
-  end
+end
 print(egm04)
 ```
 
@@ -314,10 +308,8 @@ Because the number of combinations of `Subj` and `Group` is equal to the number 
 These data are balanced with respect to `time` (i.e. each rat is weighed at the same set of times) but not with respect to treatment, as can be seen by checking the number of rats in each treatment group.
 
 ```{julia}
-combine(
-  groupby(unique(select(bxdf, :Group, :Subj)), :Group),
-  nrow => :n,
-)
+combine(groupby(unique(select(bxdf, :Group, :Subj)), :Group),
+        nrow => :n)
 ```
 
 ### Within-group variation
@@ -329,16 +321,13 @@ Considering first the control group, whose trajectories can be plotted in a "spa
 #| fig-cap: Weight (g) of rats in the control group of bxdf versus time in trial (wk).
 #| label: fig-bxctrlspaghetti
 #| warning: false
-bxaxes =
-  mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")
+bxaxes = mapping(:time => "Time in trial (wk)", :resp => "Body weight (g)")
 bxgdf = groupby(bxdf, :Group)
-draw(
-  data(bxgdf[("Control",)]) *
-  bxaxes *
-  mapping(; color=:Subj) *
-  (visual(Scatter) + visual(Lines));
-  figure=(; size=(600, 450)),
-)
+draw(data(bxgdf[("Control",)]) *
+     bxaxes *
+     mapping(; color=:Subj) *
+     (visual(Scatter) + visual(Lines));
+     figure=(; size=(600, 450)),)
 ```
 
 or in separate panels ordered by initial weight, @fig-bxctrllayout.
@@ -349,16 +338,12 @@ or in separate panels ordered by initial weight, @fig-bxctrllayout.
 #| label: fig-bxctrllayout
 #| warning: false
 let df = bxgdf[("Control",)]
-  draw(
-    data(df) *
-    bxaxes *
-    mapping(;
-      layout=:Subj =>
-        sorter(sort!(filter(:time => iszero, df), :resp).Subj),
-    ) *
-    visual(ScatterLines);
-    axis=(height=180, width=108),
-  )
+    draw(data(df) *
+         bxaxes *
+         mapping(;
+                 layout=:Subj => sorter(sort!(filter(:time => iszero, df), :resp).Subj),) *
+         visual(ScatterLines);
+         axis=(height=180, width=108),)
 end
 ```
 
@@ -372,17 +357,12 @@ A multi-panel plot for the Thioracil group, @fig-bxthiolayout,
 #| label: fig-bxthiolayout
 #| warning: false
 let
-  df = bxgdf[("Thioracil",)]
-  draw(
-    data(df) *
-    bxaxes *
-    mapping(
-      layout=:Subj =>
-        sorter(sort!(filter(:time => iszero, df), :resp).Subj),
-    ) *
-    visual(ScatterLines);
-    axis=(height=180, width=108),
-  )
+    df = bxgdf[("Thioracil",)]
+    draw(data(df) *
+         bxaxes *
+         mapping(; layout=:Subj => sorter(sort!(filter(:time => iszero, df), :resp).Subj)) *
+         visual(ScatterLines);
+         axis=(height=180, width=108),)
 end
 ```
 
@@ -396,17 +376,12 @@ By contrast, in the Thyroxin group, @fig-bxthyrlayout,
 #| label: fig-bxthyrlayout
 #| warning: false
 let
-  df = bxgdf[("Thyroxin",)]
-  draw(
-    data(df) *
-    bxaxes *
-    mapping(
-      layout=:Subj =>
-        sorter(sort!(filter(:time => iszero, df), :resp).Subj),
-    ) *
-    visual(ScatterLines);
-    axis=(height=180, width=108),
-  )
+    df = bxgdf[("Thyroxin",)]
+    draw(data(df) *
+         bxaxes *
+         mapping(; layout=:Subj => sorter(sort!(filter(:time => iszero, df), :resp).Subj)) *
+         visual(ScatterLines);
+         axis=(height=180, width=108),)
 end
 ```
 
@@ -427,21 +402,17 @@ We can begin with a main effect for `Group`, as in
 
 ```{julia}
 delete!(contrasts, :time)
-bxm01 =
-  let f = @formula resp ~
-      (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
+bxm01 = let f = @formula resp ~ (1 + time + time^2) * Group + (1 + time + time^2 | Subj)
     fit(MixedModel, f, bxdf; contrasts, progress)
-  end
+end
 ```
 
 but we expect that a model without the main effect for `Group`,
 
 ```{julia}
-bxm02 =
-  let f = @formula resp ~
-      1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
+bxm02 = let f = @formula resp ~ 1 + (time + time^2) & Group + (1 + time + time^2 | Subj)
     fit(MixedModel, f, bxdf; contrasts, progress)
-  end
+end
 ```
 
 will be adequate, as confirmed by
@@ -470,11 +441,9 @@ A model without systematic differences between groups in the initial weight and 
 It would indicate that the groups are initially homogeneous both in weight and growth rate but, as the trial proceeds, the different treatments change the rate of growth.
 
 ```{julia}
-bxm03 =
-  let f = @formula resp ~
-      1 + time + time^2 & Group + (1 + time + time^2 | Subj)
+bxm03 = let f = @formula resp ~ 1 + time + time^2 & Group + (1 + time + time^2 | Subj)
     fit(MixedModel, f, bxdf; contrasts, progress)
-  end
+end
 ```
 
 ```{julia}
@@ -532,37 +501,34 @@ can help to see that these points lie on a plane.
 #| label: fig-bxm03plane
 #| warning: false
 let
-  bpts = Point3f.(eachcol(only(bxm03.b)))
-  Upts = Point3f.(eachcol(svd(only(bxm03.λ)).U))
-  origin = Point3(zeros(Float32, 3))
-  xlabel, ylabel, zlabel = only(bxm03.reterms).cnames
-  zlabel = "time²"
-  perspectiveness = 0.5
-  aspect = :data
-  f = Figure(; size=(600, 250))
-  u, v, w = -Upts[2]    # second principle direction flipped to get positive w
-  elevation = asin(w)
-  azimuth = atan(v, u)
-  ax1 =
-    Axis3(f[1, 1]; aspect, xlabel, ylabel, zlabel, perspectiveness)
-  ax2 = Axis3(
-    f[1, 2];
-    aspect,
-    xlabel,
-    ylabel,
-    zlabel,
-    perspectiveness,
-    elevation,
-    azimuth,
-  )
-  scatter!(ax1, bpts; marker='∘', markersize=20)
-  scatter!(ax2, bpts; marker='∘', markersize=20)
-  for p in Upts
-    seg = [origin, p]
-    lines!(ax1, seg)
-    lines!(ax2, seg)
-  end
-  f
+    bpts = Point3f.(eachcol(only(bxm03.b)))
+    Upts = Point3f.(eachcol(svd(only(bxm03.λ)).U))
+    origin = Point3(zeros(Float32, 3))
+    xlabel, ylabel, zlabel = only(bxm03.reterms).cnames
+    zlabel = "time²"
+    perspectiveness = 0.5
+    aspect = :data
+    f = Figure(; size=(600, 250))
+    u, v, w = -Upts[2]    # second principle direction flipped to get positive w
+    elevation = asin(w)
+    azimuth = atan(v, u)
+    ax1 = Axis3(f[1, 1]; aspect, xlabel, ylabel, zlabel, perspectiveness)
+    ax2 = Axis3(f[1, 2];
+                aspect,
+                xlabel,
+                ylabel,
+                zlabel,
+                perspectiveness,
+                elevation,
+                azimuth,)
+    scatter!(ax1, bpts; marker='∘', markersize=20)
+    scatter!(ax2, bpts; marker='∘', markersize=20)
+    for p in Upts
+        seg = [origin, p]
+        lines!(ax1, seg)
+        lines!(ax2, seg)
+    end
+    f
 end
 ```
 
@@ -580,12 +546,10 @@ Coverage intervals from a parametric bootstrap sample for this model
 
 ```{julia}
 #| code-fold: true
-bxm03samp = parametricbootstrap(
-  Xoshiro(8642468),
-  10_000,
-  bxm03;
-  progress=false,
-)
+bxm03samp = parametricbootstrap(Xoshiro(8642468),
+                                10_000,
+                                bxm03;
+                                progress=false,)
 bxm03pars = DataFrame(bxm03samp.allpars)
 DataFrame(shortestcovint(bxm03samp))
 ```
@@ -599,15 +563,11 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 #| fig-cap: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodens
 #| warning: false
-draw(
-  data(@subset(bxm03pars, :type == "ρ")) *
-  mapping(
-    :value => "Bootstrap replicates of correlation estimates";
-    color=(:names => "Variables"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 400)),
-)
+draw(data(@subset(bxm03pars, :type == "ρ")) *
+     mapping(:value => "Bootstrap replicates of correlation estimates";
+             color=(:names => "Variables"),) *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 400)),)
 ```
 
 Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/Fisher_transformation), @fig-bxm03rhodensatanh, these estimates are highly skewed.
@@ -618,29 +578,21 @@ Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/F
 #| label: fig-bxm03rhodensatanh
 #| warning: false
 let
-  dat = @transform(
-    @subset(bxm03pars, :type == "ρ"),
-    :z = atanh(clamp(:value, -0.99999, 0.99999))
-  )
-  mp = mapping(
-    :z => "Fisher's z transformation of correlation estimates";
-    color=(:names => "Variables"),
-  )
-  draw(
-    data(dat) * mp * AlgebraOfGraphics.density();
-    figure=(; size=(600, 400)),
-  )
+    dat = @transform(@subset(bxm03pars, :type == "ρ"),
+                     :z = atanh(clamp(:value, -0.99999, 0.99999)))
+    mp = mapping(:z => "Fisher's z transformation of correlation estimates";
+                 color=(:names => "Variables"),)
+    draw(data(dat) * mp * AlgebraOfGraphics.density();
+         figure=(; size=(600, 400)),)
 end
 ```
 
 Because of these high correlations, trying to deal with the degenerate random effects distribution by simply removing the random effects for `time ^ 2` reduces the model too much.
 
 ```{julia}
-bxm04 =
-  let f =
-      @formula resp ~ 1 + time + time^2 & Group + (1 + time | Subj)
+bxm04 = let f = @formula resp ~ 1 + time + time^2 & Group + (1 + time | Subj)
     fit(MixedModel, f, bxdf; contrasts, progress)
-  end
+end
 ```
 
 ```{julia}
@@ -650,15 +602,13 @@ MixedModels.likelihoodratiotest(bxm04, bxm03)
 as does eliminating within-subject correlations between the random-effects for the `time^2` random effect and the other random effects.
 
 ```{julia}
-bxm05 =
-  let f = @formula resp ~
-      1 +
-      time +
-      time^2 & Group +
-      (1 + time | Subj) +
-      (0 + time^2 | Subj)
+bxm05 = let f = @formula resp ~ 1 +
+                                time +
+                                time^2 & Group +
+                                (1 + time | Subj) +
+                                (0 + time^2 | Subj)
     fit(MixedModel, f, bxdf; contrasts, progress)
-  end
+end
 ```
 
 ```{julia}
@@ -681,51 +631,36 @@ The models give essentially the same predictions of weight versus time for a "ty
 #| label: fig-bxmodfitted
 #| warning: false
 let
-  times = Float32.((0:256) / 64)
-  times² = abs2.(times)
-  z257 = zeros(Float32, 257)
-  tmat = hcat(
-    ones(Float32, 257 * 3),
-    repeat(times, 3),
-    vcat(times², z257, z257),
-    vcat(z257, times², z257),
-    vcat(z257, z257, times²),
-  )
-  grp = repeat(["Control", "Thioracil", "Thyroxin"]; inner=257)
-  draw(
-    data(
-      append!(
-        append!(
-          DataFrame(;
-            times=tmat[:, 2],
-            wt=tmat * Float32.(bxm03.beta),
-            Group=grp,
-            model="bxm03",
-          ),
-          DataFrame(;
-            times=tmat[:, 2],
-            wt=tmat * Float32.(bxm04.beta),
-            Group=grp,
-            model="bxm04",
-          ),
-        ),
-        DataFrame(;
-          times=tmat[:, 2],
-          wt=tmat * Float32.(bxm05.beta),
-          Group=grp,
-          model="bxm05",
-        ),
-      ),
-    ) *
-    mapping(
-      :times => "Time in trial (wk)",
-      :wt => "Weight (gm)";
-      color=:Group,
-      col=:model,
-    ) *
-    visual(Lines);
-    axis=(width=120, height=130),
-  )
+    times = Float32.((0:256) / 64)
+    times² = abs2.(times)
+    z257 = zeros(Float32, 257)
+    tmat = hcat(ones(Float32, 257 * 3),
+                repeat(times, 3),
+                vcat(times², z257, z257),
+                vcat(z257, times², z257),
+                vcat(z257, z257, times²))
+    grp = repeat(["Control", "Thioracil", "Thyroxin"]; inner=257)
+    draw(data(append!(append!(DataFrame(;
+                                        times=tmat[:, 2],
+                                        wt=tmat * Float32.(bxm03.beta),
+                                        Group=grp,
+                                        model="bxm03",),
+                              DataFrame(;
+                                        times=tmat[:, 2],
+                                        wt=tmat * Float32.(bxm04.beta),
+                                        Group=grp,
+                                        model="bxm04",)),
+                      DataFrame(;
+                                times=tmat[:, 2],
+                                wt=tmat * Float32.(bxm05.beta),
+                                Group=grp,
+                                model="bxm05",))) *
+         mapping(:times => "Time in trial (wk)",
+                 :wt => "Weight (gm)";
+                 color=:Group,
+                 col=:model,) *
+         visual(Lines);
+         axis=(width=120, height=130),)
 end
 ```
 
