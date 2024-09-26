@@ -436,14 +436,10 @@ For the extended Cholesky factor, create the extended matrix of sums of squares 
 
 ```{julia}
 crprod = let x = S372.days
-  Symmetric(
-    [
-      length(x) sum(x) sum(y)
-      0.0 sum(abs2, x) dot(x, y)
-      0.0 0.0 sum(abs2, y)
-    ],
-    :U,
-  )
+    Symmetric([length(x) sum(x) sum(y)
+               0.0 sum(abs2, x) dot(x, y)
+               0.0 0.0 sum(abs2, y)],
+              :U)
 end
 ```
 
@@ -458,10 +454,8 @@ extchfac = cholesky(crprod)
 and information from which the parameter estimates can be evaluated.
 
 ```{julia}
-β̂ ≈ ldiv!(
-  UpperTriangular(view(extchfac.U, 1:2, 1:2)),
-  copy(view(extchfac.U, 1:2, 3)),
-)
+β̂ ≈ ldiv!(UpperTriangular(view(extchfac.U, 1:2, 1:2)),
+           copy(view(extchfac.U, 1:2, 3)))
 ```
 
 The operator `≈` is a check of approximate equality of floating point numbers or arrays.

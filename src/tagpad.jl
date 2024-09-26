@@ -15,10 +15,11 @@ The single-argument version, e.g. `tagpad(:I)`, returns a partially-applied func
 in a `transform` or `select` call.
 
 ```@example
-show(tagpad(repeat(1:10, inner=2)))
+show(tagpad(repeat(1:10; inner=2)))
 ```
 """
-function tagpad(v::AbstractVector{<:Integer}, ndig::Integer, tag::AbstractString="S"; pool::Bool=true)
+function tagpad(v::AbstractVector{<:Integer}, ndig::Integer, tag::AbstractString="S";
+                pool::Bool=true)
     tagged = string.(tag, lpad.(v, ndig, '0'))
     return pool ? PooledArray(tagged; signed=true, compress=true) : tagged
 end

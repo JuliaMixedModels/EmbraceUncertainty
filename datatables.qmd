@@ -194,10 +194,8 @@ As shown in the last code block, the process of iterating over the rows of a `Ta
 In @sec-glmmbinomial a `newdata` table is constructed from the Cartesian product of vectors of covariates as the `newdata` table.
 
 ```{julia}
-newdata = Table(
-  (; age=a, ch=c, urban=u)  # NamedTuple from iterator product
-  for a in -10:3:20, c in [false, true], u in ["N", "Y"]
-)
+newdata = Table((; age=a, ch=c, urban=u)  # NamedTuple from iterator product
+                for a in -10:3:20, c in [false, true], u in ["N", "Y"])
 ```
 
 ::: {.callout-note collapse="true"}
@@ -218,10 +216,9 @@ In this expression the `;` is not necessary but there is another form where we j
 Thus the `newdata` table could be constructed as
 
 ```{julia}
-newdata = Table(
-  (; age, ch, urban) for age in -10:3:20, ch in [false, true],
-  urban in ["N", "Y"]
-)
+newdata = Table((; age, ch, urban)
+                for age in -10:3:20, ch in [false, true],
+                    urban in ["N", "Y"])
 ```
 
 :::
@@ -245,9 +242,7 @@ contratbl = Table(contratbl; ch=contratbl.livch .== "0")
 If later we decide that we can do without this column we can drop it using `getproperties` whose second argument should be a `Tuple` of `Symbol`s of the names of the columns to retain.
 
 ```{julia}
-contratbl = Table(
-  getproperties(contratbl, (:dist, :urban, :livch, :age, :use)),
-)
+contratbl = Table(getproperties(contratbl, (:dist, :urban, :livch, :age, :use)))
 ```
 
 ## The DataFrames package

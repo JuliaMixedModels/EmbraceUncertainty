@@ -204,8 +204,8 @@ A Julia function to evaluate both the mean and the unit deviance can be written 
 ```{julia}
 #| output: false
 function meanunitdev(y::T, η::T) where {T<:AbstractFloat}
-  expmη = exp(-η)
-  return (; μ=inv(1 + expmη), dev=2 * ((1 - y) * η + log1p(expmη)))
+    expmη = exp(-η)
+    return (; μ=inv(1 + expmη), dev=2 * ((1 - y) * η + log1p(expmη)))
 end
 ```
 
@@ -217,10 +217,10 @@ Mathematically `log1p`, read *log of 1 plus*, is defined as $\mathrm{log1p}(x)=\
 
 ```{julia}
 let small = eps() / 10
-  @show small
-  @show 1 + small
-  @show log(1 + small)
-  @show log1p(small)
+    @show small
+    @show 1 + small
+    @show log(1 + small)
+    @show log1p(small)
 end;
 ```
 
@@ -245,19 +245,16 @@ We illustrate some of these computations using only the fixed-effects specificat
 #| output: false
 #| label: com05
 contra = let tbl = dataset(:contra)
-  Table(tbl; ch=tbl.livch .≠ "0")
+    Table(tbl; ch=tbl.livch .≠ "0")
 end
 contrasts[:urban] = HelmertCoding()
 contrasts[:ch] = HelmertCoding()
-com05 =
-  let d = contra,
+com05 = let d = contra,
     ds = Bernoulli(),
-    f = @formula(
-      use ~ 1 + urban + ch * age + age & age + (1 | dist & urban)
-    )
+    f = @formula(use ~ 1 + urban + ch * age + age & age + (1 | dist & urban))
 
     fit(MixedModel, f, d, ds; contrasts, nAGQ=9, progress)
-  end
+end
 ```
 
 Extract the fixed-effects model matrix, $\bbX$, and initialize the coefficient vector, $\bbbeta$, to a copy (in case we modify it) of the estimated fixed-effects.
@@ -291,10 +288,10 @@ When minimizing the deviance it is convenient to have the different components o
 
 ```{julia}
 struct BernoulliGLM{T<:AbstractFloat}
-  X::Matrix{T}
-  β::Vector{T}
-  ytbl::NamedTuple{(:y, :η),NTuple{2,Vector{T}}}
-  rtbl::Vector{NamedTuple{(:μ, :dev),NTuple{2,T}}}
+    X::Matrix{T}
+    β::Vector{T}
+    ytbl::NamedTuple{(:y, :η),NTuple{2,Vector{T}}}
+    rtbl::Vector{NamedTuple{(:μ, :dev),NTuple{2,T}}}
 end
 ```
 
@@ -303,22 +300,20 @@ In this case the external constructor creates a `BernoulliGLM` from the model ma
 
 ```{julia}
 #| output: false
-function BernoulliGLM(
-  X::Matrix{T},
-  y::Vector{T},
-) where {T<:AbstractFloat}
+function BernoulliGLM(X::Matrix{T},
+                      y::Vector{T}) where {T<:AbstractFloat}
 
-  # check consistency of arguments
-  n = size(X, 1)                  # number of rows in X
-  if length(y) ≠ n || any(!in([0, 1]), y)
-    throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
-  end
+    # check consistency of arguments
+    n = size(X, 1)                  # number of rows in X
+    if length(y) ≠ n || any(!in([0, 1]), y)
+        throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
+    end
 
-  # initial β from linear regression of y in {-1,1} coding
-  β = X \ replace(y, 0 => -1)
-  η = X * β
+    # initial β from linear regression of y in {-1,1} coding
+    β = X \ replace(y, 0 => -1)
+    η = X * β
 
-  return BernoulliGLM(X, β, (; y, η), meanunitdev.(y, η))
+    return BernoulliGLM(X, β, (; y, η), meanunitdev.(y, η))
 end
 ```
 
@@ -341,10 +336,10 @@ We also define a mutating function, `setβ!`, that installs a new value of `β` 
 ```{julia}
 #| output: false
 function setβ!(m::BernoulliGLM, newβ)
-  (; y, η) = m.ytbl                # destructure ytbl
-  mul!(η, m.X, copyto!(m.β, newβ)) # η = X * newβ in place
-  m.rtbl .= meanunitdev.(y, η)     # update rtbl in place
-  return m
+    (; y, η) = m.ytbl                # destructure ytbl
+    mul!(η, m.X, copyto!(m.β, newβ)) # η = X * newβ in place
+    m.rtbl .= meanunitdev.(y, η)     # update rtbl in place
+    return m
 end
 ```
 
@@ -377,17 +372,15 @@ Following the instructions given at that package's repository, we create an `Opt
 
 ```{julia}
 function StatsAPI.fit!(m::BernoulliGLM{T}) where {T}
-  opt = Opt(:LN_BOBYQA, length(m.β))
-  function objective(x::Vector{T}, g::Vector{T}) where {T}
-    isempty(g) || throw(
-      ArgumentError("Gradient not available, g must be empty"),
-    )
-    return deviance(setβ!(m, x))
-  end
-  opt.min_objective = objective
-  minf, minx, ret = optimize(opt, copy(m.β))
-  @info (; code=ret, nevals=opt.numevals, minf)
-  return m
+    opt = Opt(:LN_BOBYQA, length(m.β))
+    function objective(x::Vector{T}, g::Vector{T}) where {T}
+        isempty(g) || throw(ArgumentError("Gradient not available, g must be empty"))
+        return deviance(setβ!(m, x))
+    end
+    opt.min_objective = objective
+    minf, minx, ret = optimize(opt, copy(m.β))
+    @info (; code=ret, nevals=opt.numevals, minf)
+    return m
 end
 ```
 
@@ -402,8 +395,7 @@ Each evaluation of the deviance is fast, requiring only a fraction of a millisec
 
 ```{julia}
 βopt = copy(com05fe.β)
-@benchmark deviance(setβ!(m, β)) seconds = 1 setup =
-  (m = com05fe; β = βopt)
+@benchmark deviance(setβ!(m, β)) seconds = 1 setup = (m = com05fe; β = βopt)
 ```
 
 but the already large number of evaluations for these six coefficients would not scale well as this dimension increases.
@@ -505,15 +497,13 @@ We also add fields `Xqr`, in which the weighted model matrix, $\bbW^{1/2}\bbX$, 
 ```{julia}
 #| output: false
 struct BernoulliIRLS{T<:AbstractFloat}
-  X::Matrix{T}
-  Xqr::Matrix{T}                # copy of X used in the QR decomp
-  β::Vector{T}
-  βcp::Vector{T}                # copy of previous β
-  Whalf::Diagonal{T,Vector{T}}  # rtwwt as a Diagonal matrix
-  ytbl::NamedTuple{(:y, :η),NTuple{2,Vector{T}}}
-  rtbl::Vector{
-    NamedTuple{(:μ, :dev, :rtwwt, :wwres, :wwresp),NTuple{5,T}},
-  }
+    X::Matrix{T}
+    Xqr::Matrix{T}                # copy of X used in the QR decomp
+    β::Vector{T}
+    βcp::Vector{T}                # copy of previous β
+    Whalf::Diagonal{T,Vector{T}}  # rtwwt as a Diagonal matrix
+    ytbl::NamedTuple{(:y, :η),NTuple{2,Vector{T}}}
+    rtbl::Vector{NamedTuple{(:μ, :dev, :rtwwt, :wwres, :wwresp),NTuple{5,T}}}
 end
 ```
 
@@ -521,22 +511,20 @@ with constructor
 
 ```{julia}
 #| output: false
-function BernoulliIRLS(
-  X::Matrix{T},
-  y::Vector{T},
-) where {T<:AbstractFloat}
-  n = size(X, 1)          # number of rows of X
-  if length(y) ≠ n || !all(v -> (iszero(v) || isone(v)), y)
-    throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
-  end
-  # initial β from linear least squares fit of y in {-1,1} coding
-  Xqr = copy(X)
-  β = qr!(Xqr) \ replace(y, 0 => -1)
-  βcp = copy(β)
-  η = X * β
-  rtbl = tblrow.(y, η)
-  Whalf = Diagonal([r.rtwwt for r in rtbl])
-  return BernoulliIRLS(X, Xqr, β, βcp, Whalf, (; y, η), rtbl)
+function BernoulliIRLS(X::Matrix{T},
+                       y::Vector{T}) where {T<:AbstractFloat}
+    n = size(X, 1)          # number of rows of X
+    if length(y) ≠ n || !all(v -> (iszero(v) || isone(v)), y)
+        throw(ArgumentError("y is not an $n-vector of 0's and 1's"))
+    end
+    # initial β from linear least squares fit of y in {-1,1} coding
+    Xqr = copy(X)
+    β = qr!(Xqr) \ replace(y, 0 => -1)
+    βcp = copy(β)
+    η = X * β
+    rtbl = tblrow.(y, η)
+    Whalf = Diagonal([r.rtwwt for r in rtbl])
+    return BernoulliIRLS(X, Xqr, β, βcp, Whalf, (; y, η), rtbl)
 end
 ```
 
@@ -545,20 +533,18 @@ The `offset` argument, which defaults to zero, is not used in calls for `Bernoul
 
 ```{julia}
 #| output: false
-function tblrow(
-  y::T,
-  η::T,
-  offset::T=zero(T),
-) where {T<:AbstractFloat}
-  rtexpmη = exp(-η / 2)      # square root of exp(-η)
-  expmη = abs2(rtexpmη)      # exp(-η)
-  denom = 1 + expmη
-  μ = inv(denom)
-  dev = 2 * ((1 - y) * η + log1p(expmη))
-  rtwwt = rtexpmη / denom    # sqrt of working wt
-  wwres = (y - μ) / rtwwt    # weighted working resid
-  wwresp = wwres + rtwwt * (η - offset)
-  return (; μ, dev, rtwwt, wwres, wwresp)
+function tblrow(y::T,
+                η::T,
+                offset::T=zero(T)) where {T<:AbstractFloat}
+    rtexpmη = exp(-η / 2)      # square root of exp(-η)
+    expmη = abs2(rtexpmη)      # exp(-η)
+    denom = 1 + expmη
+    μ = inv(denom)
+    dev = 2 * ((1 - y) * η + log1p(expmη))
+    rtwwt = rtexpmη / denom    # sqrt of working wt
+    wwres = (y - μ) / rtwwt    # weighted working resid
+    wwresp = wwres + rtwwt * (η - offset)
+    return (; μ, dev, rtwwt, wwres, wwresp)
 end
 ```
 
@@ -572,15 +558,15 @@ Next we define a mutating function, `updateβ!`, that evaluates $\bbbeta^{(k)}$,
 ```{julia}
 #| output: false
 function updateβ!(m::BernoulliIRLS)
-  (; X, Xqr, β, βcp, Whalf, ytbl, rtbl) = m  # destructure m & ytbl
-  (; y, η) = ytbl
-  copyto!(βcp, β)                            # keep a copy of β
-  copyto!(Whalf.diag, r.rtwwt for r in rtbl) # rtwwt -> Whalf
-  mul!(Xqr, Whalf, X)                        # weighted model matrix
-  copyto!(η, r.wwresp for r in rtbl)         # use η as temp storage
-  ldiv!(β, qr!(Xqr), η)                      # weighted least squares
-  rtbl .= tblrow.(y, mul!(η, X, β))          # update η and rtbl
-  return m
+    (; X, Xqr, β, βcp, Whalf, ytbl, rtbl) = m  # destructure m & ytbl
+    (; y, η) = ytbl
+    copyto!(βcp, β)                            # keep a copy of β
+    copyto!(Whalf.diag, r.rtwwt for r in rtbl) # rtwwt -> Whalf
+    mul!(Xqr, Whalf, X)                        # weighted model matrix
+    copyto!(η, r.wwresp for r in rtbl)         # use η as temp storage
+    ldiv!(β, qr!(Xqr), η)                      # weighted least squares
+    rtbl .= tblrow.(y, mul!(η, X, β))          # update η and rtbl
+    return m
 end
 ```
 
@@ -604,26 +590,26 @@ We create a `fit!` method to iterate to convergence.
 ```{julia}
 #| output: false
 function StatsAPI.fit!(m::BernoulliIRLS, β₀=m.β; verbose::Bool=true)
-  (; X, β, βcp, ytbl, rtbl) = m
-  (; y, η) = ytbl
-  rtbl .= tblrow.(y, mul!(η, X, copyto!(β, β₀)))
-  olddev = deviance(m)
-  verbose && @info 0, olddev   # record the deviance at initial β
-  for i in 1:100               # perform at most 100 iterations
-    newdev = deviance(updateβ!(m))
-    verbose && @info i, newdev # iteration number and deviance
-    if newdev > olddev
-      @warn "failure to decrease deviance"
-      copyto!(β, βcp)          # roll back changes to β, η, and rtbl
-      rtbl = tblrow.(y, mul!(η, X, β))
-      break
-    elseif (olddev - newdev) < (1.0e-10 * olddev)
-      break                    # exit loop if deviance is stable
-    else
-      olddev = newdev
+    (; X, β, βcp, ytbl, rtbl) = m
+    (; y, η) = ytbl
+    rtbl .= tblrow.(y, mul!(η, X, copyto!(β, β₀)))
+    olddev = deviance(m)
+    verbose && @info 0, olddev   # record the deviance at initial β
+    for i in 1:100               # perform at most 100 iterations
+        newdev = deviance(updateβ!(m))
+        verbose && @info i, newdev # iteration number and deviance
+        if newdev > olddev
+            @warn "failure to decrease deviance"
+            copyto!(β, βcp)          # roll back changes to β, η, and rtbl
+            rtbl = tblrow.(y, mul!(η, X, β))
+            break
+        elseif (olddev - newdev) < (1.0e-10 * olddev)
+            break                    # exit loop if deviance is stable
+        else
+            olddev = newdev
+        end
     end
-  end
-  return m
+    return m
 end
 ```
 
@@ -696,19 +682,13 @@ We define a struct
 ```{julia}
 #| output: false
 struct BernoulliPIRLS{T<:AbstractFloat,S<:Integer}
-  X::Matrix{T}
-  θβ::Vector{T}
-  ytbl::NamedTuple{                     # column-table
-    (:refs, :y, :η, :offset),
-    Tuple{Vector{S},Vector{T},Vector{T},Vector{T}},
-  }
-  utbl::NamedTuple{                     # column-table
-    (:u, :u0, :Ldiag, :pdev, :pdev0, :aGHQ),
-    NTuple{6,Vector{T}},
-  }
-  rtbl::Vector{                         # row-table
-    NamedTuple{(:μ, :dev, :rtwwt, :wwres, :wwresp),NTuple{5,T}},
-  }
+    X::Matrix{T}
+    θβ::Vector{T}
+    ytbl::NamedTuple{(:refs, :y, :η, :offset),
+                     Tuple{Vector{S},Vector{T},Vector{T},Vector{T}}}
+    utbl::NamedTuple{(:u, :u0, :Ldiag, :pdev, :pdev0, :aGHQ),
+                     NTuple{6,Vector{T}}}
+    rtbl::Vector{NamedTuple{(:μ, :dev, :rtwwt, :wwres, :wwresp),NTuple{5,T}}}
 end
 ```
 
@@ -716,33 +696,29 @@ with an external constructor
 
 ```{julia}
 #| output: false
-function BernoulliPIRLS(
-  X::Matrix{T},
-  y::Vector{T},
-  refs::Vector{S},
-) where {T<:AbstractFloat,S<:Integer}
-  # use IRLS to check X and y, obtain initial β, and establish rtbl
-  irls = fit!(BernoulliIRLS(X, y); verbose=false)
-  β = irls.β
-  θβ = append!(ones(T, 1), β)       # initial θ = 1
-  η = X * β
+function BernoulliPIRLS(X::Matrix{T},
+                        y::Vector{T},
+                        refs::Vector{S}) where {T<:AbstractFloat,S<:Integer}
+    # use IRLS to check X and y, obtain initial β, and establish rtbl
+    irls = fit!(BernoulliIRLS(X, y); verbose=false)
+    β = irls.β
+    θβ = append!(ones(T, 1), β)       # initial θ = 1
+    η = X * β
 
-  # refs should contain all values from 1 to maximum(refs)
-  refvals = sort!(unique(refs))
-  q = length(refvals)
-  if refvals ≠ 1:q
-    throw(ArgumentError("sort!(unique(refs)) must be 1:$q"))
-  end
-  length(refs) == length(y) ||
-    throw(ArgumentError("lengths of y and refs aren't equal"))
+    # refs should contain all values from 1 to maximum(refs)
+    refvals = sort!(unique(refs))
+    q = length(refvals)
+    if refvals ≠ 1:q
+        throw(ArgumentError("sort!(unique(refs)) must be 1:$q"))
+    end
+    length(refs) == length(y) ||
+        throw(ArgumentError("lengths of y and refs aren't equal"))
 
-  ytbl = (; refs, y, η, offset=copy(η))
+    ytbl = (; refs, y, η, offset=copy(η))
 
-  utbl = NamedTuple(
-    nm => zeros(T, q) for
-    nm in (:u, :u0, :Ldiag, :pdev, :pdev0, :aGHQ)
-  )
-  return updatetbl!(BernoulliPIRLS(X, θβ, ytbl, utbl, irls.rtbl))
+    utbl = NamedTuple(nm => zeros(T, q) for
+                      nm in (:u, :u0, :Ldiag, :pdev, :pdev0, :aGHQ))
+    return updatetbl!(BernoulliPIRLS(X, θβ, ytbl, utbl, irls.rtbl))
 end
 ```
 
@@ -763,16 +739,16 @@ For this model $\bbtheta$ is one-dimensional and $\bbLambda_{\bbtheta}$ is a sca
 ```{julia}
 #| output: false
 function updatetbl!(m::BernoulliPIRLS)
-  (; refs, y, η, offset) = m.ytbl
-  u = m.utbl.u
-  θ = first(m.θβ)
-  # evaluate η = offset + ZΛu where Λ is θ * I and Z is one-hot
-  fill!(η, 0)
-  @inbounds for i in eachindex(η, refs, offset)
-    η[i] += offset[i] + u[refs[i]] * θ
-  end
-  m.rtbl .= tblrow.(y, η, offset)
-  return m
+    (; refs, y, η, offset) = m.ytbl
+    u = m.utbl.u
+    θ = first(m.θβ)
+    # evaluate η = offset + ZΛu where Λ is θ * I and Z is one-hot
+    fill!(η, 0)
+    @inbounds for i in eachindex(η, refs, offset)
+        η[i] += offset[i] + u[refs[i]] * θ
+    end
+    m.rtbl .= tblrow.(y, η, offset)
+    return m
 end
 ```
 
@@ -781,7 +757,7 @@ The `pdeviance` method returns the deviance for the GLM model plus the penalty o
 ```{julia}
 #| output: false
 function pdeviance(m::BernoulliPIRLS)
-  return sum(r.dev for r in m.rtbl) + sum(abs2, m.utbl.u)
+    return sum(r.dev for r in m.rtbl) + sum(abs2, m.utbl.u)
 end
 ```
 
@@ -792,23 +768,23 @@ At convergence of the PIRLS algorithm the elements of `Ldiag` are replaced by th
 ```{julia}
 #| output: false
 function updateu!(m::BernoulliPIRLS)
-  (; u, u0, Ldiag) = m.utbl
-  copyto!(u0, u)              # keep a copy of u
-  θ = first(m.θβ)             # extract the scalar θ
-  fill!(u, 0)
-  if iszero(θ)                # skip the update if θ == 0
-    fill!(Ldiag, 1)           # L is the identity if θ == 0
-    return updatetbl!(m)
-  end
-  fill!(Ldiag, 0)
-  @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
-    rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ
-    Ldiag[ri] += abs2(rtWΛ)   # accumulate Λ'Z'WZΛ
-    u[ri] += rtWΛ * ti.wwresp # accumulate Λ'Z'Wỹ
-  end
-  Ldiag .+= 1                 # form diagonal of Λ'Z'WZΛ + I = LL'
-  u ./= Ldiag                 # solve for u with diagonal LL'
-  return updatetbl!(m)        # and update η and rtbl
+    (; u, u0, Ldiag) = m.utbl
+    copyto!(u0, u)              # keep a copy of u
+    θ = first(m.θβ)             # extract the scalar θ
+    fill!(u, 0)
+    if iszero(θ)                # skip the update if θ == 0
+        fill!(Ldiag, 1)           # L is the identity if θ == 0
+        return updatetbl!(m)
+    end
+    fill!(Ldiag, 0)
+    @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
+        rtWΛ = θ * ti.rtwwt       # non-zero in i'th row of √WZΛ
+        Ldiag[ri] += abs2(rtWΛ)   # accumulate Λ'Z'WZΛ
+        u[ri] += rtWΛ * ti.wwresp # accumulate Λ'Z'Wỹ
+    end
+    Ldiag .+= 1                 # form diagonal of Λ'Z'WZΛ + I = LL'
+    u ./= Ldiag                 # solve for u with diagonal LL'
+    return updatetbl!(m)        # and update η and rtbl
 end
 ```
 
@@ -830,29 +806,29 @@ Create a `pirls!` method for this struct.
 ```{julia}
 #| output: false
 function pirls!(m::BernoulliPIRLS; verbose::Bool=false)
-  (; u, u0, Ldiag) = m.utbl
-  fill!(u, 0)                  # start from u == 0
-  copyto!(u0, u)               # keep a copy of u
-  oldpdev = pdeviance(updatetbl!(m))
-  verbose && @info 0, oldpdev
-  for i in 1:10                # maximum of 10 PIRLS iterations
-    newpdev = pdeviance(updateu!(m))
-    verbose && @info i, newpdev
-    if newpdev > oldpdev       # PIRLS iteration failed
-      @warn "PIRLS iteration did not reduce penalized deviance"
-      copyto!(u, u0)           # restore previous u
-      updatetbl!(m)            # restore η and rtbl
-      break
-    elseif (oldpdev - newpdev) < (1.0e-8 * oldpdev)
-      copyto!(u0, u)           # keep a copy of u
-      break
-    else
-      copyto!(u0, u)           # keep a copy of u
-      oldpdev = newpdev
+    (; u, u0, Ldiag) = m.utbl
+    fill!(u, 0)                  # start from u == 0
+    copyto!(u0, u)               # keep a copy of u
+    oldpdev = pdeviance(updatetbl!(m))
+    verbose && @info 0, oldpdev
+    for i in 1:10                # maximum of 10 PIRLS iterations
+        newpdev = pdeviance(updateu!(m))
+        verbose && @info i, newpdev
+        if newpdev > oldpdev       # PIRLS iteration failed
+            @warn "PIRLS iteration did not reduce penalized deviance"
+            copyto!(u, u0)           # restore previous u
+            updatetbl!(m)            # restore η and rtbl
+            break
+        elseif (oldpdev - newpdev) < (1.0e-8 * oldpdev)
+            copyto!(u0, u)           # keep a copy of u
+            break
+        else
+            copyto!(u0, u)           # keep a copy of u
+            oldpdev = newpdev
+        end
     end
-  end
-  map!(sqrt, Ldiag, Ldiag)     # replace diag(LL') by diag(L)
-  return m
+    map!(sqrt, Ldiag, Ldiag)     # replace diag(LL') by diag(L)
+    return m
 end
 ```
 
@@ -915,7 +891,7 @@ $$
 ```{julia}
 #| output: false
 function laplaceapprox(m::BernoulliPIRLS)
-  return pdeviance(m) + 2 * sum(log, m.utbl.Ldiag)
+    return pdeviance(m) + 2 * sum(log, m.utbl.Ldiag)
 end
 ```
 
@@ -928,25 +904,25 @@ The remaining step is to optimize Laplace's approximation to the GLMM deviance w
 ```{julia}
 #| output: false
 function StatsAPI.fit!(m::BernoulliPIRLS)
-  θβ = m.θβ
-  pp1 = length(θβ)                # length(β) = p and length(θ) = 1
-  opt = Opt(:LN_BOBYQA, pp1)
-  mβ = view(θβ, 2:pp1)
-  function obj(x, g)
-    if !isempty(g)
-      throw(ArgumentError("gradient not provided, g must be empty"))
+    θβ = m.θβ
+    pp1 = length(θβ)                # length(β) = p and length(θ) = 1
+    opt = Opt(:LN_BOBYQA, pp1)
+    mβ = view(θβ, 2:pp1)
+    function obj(x, g)
+        if !isempty(g)
+            throw(ArgumentError("gradient not provided, g must be empty"))
+        end
+        copyto!(θβ, x)
+        mul!(m.ytbl.offset, m.X, mβ)
+        return laplaceapprox(pirls!(m))
     end
-    copyto!(θβ, x)
-    mul!(m.ytbl.offset, m.X, mβ)
-    return laplaceapprox(pirls!(m))
-  end
-  opt.min_objective = obj
-  lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
-  lb[1] = 0                       # scalar θ must be non-negative
-  NLopt.lower_bounds!(opt, lb)
-  minf, minx, ret = optimize(opt, copy(θβ))
-  @info (; ret, fevals=opt.numevals, minf)
-  return m
+    opt.min_objective = obj
+    lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
+    lb[1] = 0                       # scalar θ must be non-negative
+    NLopt.lower_bounds!(opt, lb)
+    minf, minx, ret = optimize(opt, copy(θβ))
+    @info (; ret, fevals=opt.numevals, minf)
+    return m
 end
 ```
 
@@ -956,26 +932,22 @@ fit!(m);
 
 ```{julia}
 #| code-fold: true
-print(
-  "Converged to θ = ",
-  first(m.θβ),
-  " and β =",
-  view(m.θβ, 2:lastindex(m.θβ)),
-)
+print("Converged to θ = ",
+      first(m.θβ),
+      " and β =",
+      view(m.θβ, 2:lastindex(m.θβ)))
 ```
 
 These estimates differ somewhat from those for model `com05`.
 
 ```{julia}
 #| code-fold: true
-print(
-  "Estimates for com05: θ = ",
-  only(com05.θ),
-  ", fmin = ",
-  deviance(com05),
-  ", and β =",
-  com05.β,
-)
+print("Estimates for com05: θ = ",
+      only(com05.θ),
+      ", fmin = ",
+      deviance(com05),
+      ", and β =",
+      com05.β)
 ```
 
 The discrepancy in the results is because the `com05` results are based on a more accurate approximation to the integral called *adaptive Gauss-Hermite Quadrature*, which is discussed in @sec-aGHQ.
@@ -1107,11 +1079,10 @@ A function of `k` to evaluate the abscissae and weights is
 ```{julia}
 #| output: false
 function gausshermitenorm(k)
-  ev = eigen(SymTridiagonal(zeros(k), sqrt.(1:(k - 1))))
-  return Table((;
-    abscissae=ev.values,
-    weights=abs2.(ev.vectors[1, :]),
-  ))
+    ev = eigen(SymTridiagonal(zeros(k), sqrt.(1:(k - 1))))
+    return Table((;
+                  abscissae=ev.values,
+                  weights=abs2.(ev.vectors[1, :]),))
 end
 ```
 
@@ -1128,11 +1099,9 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| fig-cap: Weights and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghnine
 #| warning: false
-draw(
-  data(gausshermitenorm(9)) *
-  mapping(:abscissae => "Positions", :weights);
-  figure=(; size=(600, 450)),
-)
+draw(data(gausshermitenorm(9)) *
+     mapping(:abscissae => "Positions", :weights);
+     figure=(; size=(600, 450)),)
 ```
 
 Notice that the magnitudes of the weights drop quite dramatically away from zero, even on a logarithmic scale (@fig-ghninelog)
@@ -1142,20 +1111,16 @@ Notice that the magnitudes of the weights drop quite dramatically away from zero
 #| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghninelog
 #| warning: false
-draw(
-  data(gausshermitenorm(9)) * mapping(
-    :abscissae => "Positions",
-    :weights => log2 => "log₂(weight)",
-  );
-  figure=(; size=(600, 450)),
-)
+draw(data(gausshermitenorm(9)) * mapping(:abscissae => "Positions",
+                                         :weights => log2 => "log₂(weight)");
+     figure=(; size=(600, 450)),)
 ```
 
 The definition of `MixedModels.GHnorm` is similar to the `gausshermitenorm` function with some extra provisions for ensuring symmetry of the abscissae and of the weights and for caching values once they have been calculated.
 
 ```{julia}
 let tbl = GHnorm(9)
-  Table(abscissae=tbl.z, weights=tbl.w)
+    Table(; abscissae=tbl.z, weights=tbl.w)
 end
 ```
 
@@ -1171,7 +1136,7 @@ For example, $\mathbb{E}[\mathcal{X}^2]$ where $\mathcal{X}\sim\mathcal{N}(2, 3^
 
 ```{julia}
 let μ = 2, σ = 3, ghn3 = GHnorm(3)
-  sum(@. ghn3.w * abs2(μ + σ * ghn3.z))  # should be μ² + σ² = 13
+    sum(@. ghn3.w * abs2(μ + σ * ghn3.z))  # should be μ² + σ² = 13
 end
 ```
 
@@ -1185,12 +1150,12 @@ We have provided a `pdev` vector in the `utbl` field of a `BernoulliPIRLS` objec
 ```{julia}
 #| output: false
 function pdevcomps!(m::BernoulliPIRLS)
-  (; u, pdev) = m.utbl
-  pdev .= abs2.(u)        # initialize pdevj to square of uj
-  @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
-    pdev[ri] += ti.dev
-  end
-  return m
+    (; u, pdev) = m.utbl
+    pdev .= abs2.(u)        # initialize pdevj to square of uj
+    @inbounds for (ri, ti) in zip(m.ytbl.refs, m.rtbl)
+        pdev[ri] += ti.dev
+    end
+    return m
 end
 ```
 
@@ -1208,29 +1173,27 @@ Consider the change in the penalized deviance from that at the conditional mode 
 ```{julia}
 #| output: false
 #| code-fold: show
-function pdevdiff(
-  m::BernoulliPIRLS{T};
-  zvals=collect(-3.5:inv(32):3.5),
-  inds=1:5,
-) where {T}
-  (; u, u0, Ldiag, pdev, pdev0) = m.utbl
-  pdevcomps!(pirls!(m))             # assign u0
-  copyto!(pdev0, pdev)              # and pdev0
-  ni = length(inds)
-  nz = length(zvals)
-  uvals = Array{T}(undef, ni, nz)
-  exact = Array{T}(undef, ni, nz)
-  for (j, z) in enumerate(zvals)
-    u .= u0 .+ z ./ Ldiag           # evaluate u from z
-    pdevcomps!(updatetbl!(m))       # evaluate pdev
-    for (i, ind) in enumerate(inds) # store selected u and pdev
-      uvals[i, j] = u[ind]
-      exact[i, j] = pdev[ind] - pdev0[ind]
+function pdevdiff(m::BernoulliPIRLS{T};
+                  zvals=collect(-3.5:inv(32):3.5),
+                  inds=1:5,) where {T}
+    (; u, u0, Ldiag, pdev, pdev0) = m.utbl
+    pdevcomps!(pirls!(m))             # assign u0
+    copyto!(pdev0, pdev)              # and pdev0
+    ni = length(inds)
+    nz = length(zvals)
+    uvals = Array{T}(undef, ni, nz)
+    exact = Array{T}(undef, ni, nz)
+    for (j, z) in enumerate(zvals)
+        u .= u0 .+ z ./ Ldiag           # evaluate u from z
+        pdevcomps!(updatetbl!(m))       # evaluate pdev
+        for (i, ind) in enumerate(inds) # store selected u and pdev
+            uvals[i, j] = u[ind]
+            exact[i, j] = pdev[ind] - pdev0[ind]
+        end
     end
-  end
-  uvals = collect(uvals')           # transpose uvals
-  exact = collect(exact')           # and exact
-  return (; zvals, inds, uvals, exact)
+    uvals = collect(uvals')           # transpose uvals
+    exact = collect(exact')           # and exact
+    return (; zvals, inds, uvals, exact)
 end
 m05pdevdiff = pdevdiff(m);
 ```
@@ -1243,19 +1206,15 @@ We begin with plots of the difference in the penalized deviance from its value a
 #| label: fig-uscalepdev
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; size=(600, 375)),
-  ax = Axis(
-    fig[1, 1];
-    xlabel="u",
-    ylabel="Change in penalized deviance",
-  )
+    fig = Figure(; size=(600, 375)),
+    ax = Axis(fig[1, 1];
+              xlabel="u",
+              ylabel="Change in penalized deviance",)
 
-  lins = [
-    lines!(ax, view(uvals, :, j), view(exact, :, j)) for
-    j in axes(uvals, 2)
-  ]
-  Legend(fig[1, 2], lins, string.(inds))
-  fig
+    lins = [lines!(ax, view(uvals, :, j), view(exact, :, j)) for
+            j in axes(uvals, 2)]
+    Legend(fig[1, 2], lins, string.(inds))
+    fig
 end
 ```
 
@@ -1267,17 +1226,14 @@ then shift and scale the horizontal axis to the $z$ scale for this difference in
 #| label: fig-zscalepdev
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; size=(600, 375)),
-  ax = Axis(
-    fig[1, 1];
-    xlabel="z",
-    ylabel="Change in penalized deviance",
-  )
+    fig = Figure(; size=(600, 375)),
+    ax = Axis(fig[1, 1];
+              xlabel="z",
+              ylabel="Change in penalized deviance",)
 
-  lins =
-    [lines!(ax, zvals, view(exact, :, j)) for j in axes(uvals, 2)]
-  Legend(fig[1, 2], lins, string.(inds))
-  fig
+    lins = [lines!(ax, zvals, view(exact, :, j)) for j in axes(uvals, 2)]
+    Legend(fig[1, 2], lins, string.(inds))
+    fig
 end
 ```
 
@@ -1289,19 +1245,15 @@ The next stage is to plot, on the $z$ scale, the difference between the penalize
 #| label: fig-zpdevdiff
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; size=(600, 375)),
-  ax = Axis(
-    fig[1, 1];
-    xlabel="z",
-    ylabel="Penalized deviance minus quadratic approx",
-  )
+    fig = Figure(; size=(600, 375)),
+    ax = Axis(fig[1, 1];
+              xlabel="z",
+              ylabel="Penalized deviance minus quadratic approx",)
 
-  lins = [
-    lines!(ax, zvals, view(exact, :, j) .- abs2.(zvals)) for
-    j in axes(uvals, 2)
-  ]
-  Legend(fig[1, 2], lins, string.(inds))
-  fig
+    lins = [lines!(ax, zvals, view(exact, :, j) .- abs2.(zvals)) for
+            j in axes(uvals, 2)]
+    Legend(fig[1, 2], lins, string.(inds))
+    fig
 end
 ```
 
@@ -1313,22 +1265,17 @@ and, finally, the exponential of negative half of this difference in @fig-zexpne
 #| label: fig-zexpneghalfdiff
 #| warning: false
 let (; zvals, inds, uvals, exact) = m05pdevdiff,
-  fig = Figure(; size=(600, 375)),
-  ax = Axis(
-    fig[1, 1];
-    xlabel="z",
-    ylabel="Exp of half the quadratic minus penalized deviance",
-  )
+    fig = Figure(; size=(600, 375)),
+    ax = Axis(fig[1, 1];
+              xlabel="z",
+              ylabel="Exp of half the quadratic minus penalized deviance",)
 
-  lins = [
-    lines!(
-      ax,
-      zvals,
-      exp.(0.5 .* (abs2.(zvals) .- view(exact, :, j))),
-    ) for j in axes(uvals, 2)
-  ]
-  Legend(fig[1, 2], lins, string.(inds))
-  fig
+    lins = [lines!(ax,
+                   zvals,
+                   exp.(0.5 .* (abs2.(zvals) .- view(exact, :, j))))
+            for j in axes(uvals, 2)]
+    Legend(fig[1, 2], lins, string.(inds))
+    fig
 end
 ```
 
@@ -1353,24 +1300,24 @@ We use the `aGHQ` column of `m.utbl` to accumulate these contributions and to ta
 #| output: false
 #| code-fold: show
 function evalGHQ!(m::BernoulliPIRLS; nGHQ::Integer=9)
-  (; ytbl, utbl, rtbl) = m
-  (; u, u0, Ldiag, pdev, pdev0, aGHQ) = utbl
-  ghqtbl = GHnorm(nGHQ)
-  pdevcomps!(pirls!(m))  # ensure that u0 and pdev0 are current
-  copyto!(pdev0, pdev)
-  fill!(aGHQ, 0)
-  for (z, w) in zip(ghqtbl.z, ghqtbl.w)
-    if iszero(z)         # exp term is one when z == 0
-      aGHQ .+= w
-    else
-      u .= u0 .+ z ./ Ldiag
-      pdevcomps!(updatetbl!(m))
-      aGHQ .+= w .* exp.((abs2(z) .+ pdev0 .- pdev) ./ 2)
+    (; ytbl, utbl, rtbl) = m
+    (; u, u0, Ldiag, pdev, pdev0, aGHQ) = utbl
+    ghqtbl = GHnorm(nGHQ)
+    pdevcomps!(pirls!(m))  # ensure that u0 and pdev0 are current
+    copyto!(pdev0, pdev)
+    fill!(aGHQ, 0)
+    for (z, w) in zip(ghqtbl.z, ghqtbl.w)
+        if iszero(z)         # exp term is one when z == 0
+            aGHQ .+= w
+        else
+            u .= u0 .+ z ./ Ldiag
+            pdevcomps!(updatetbl!(m))
+            aGHQ .+= w .* exp.((abs2(z) .+ pdev0 .- pdev) ./ 2)
+        end
     end
-  end
-  map!(log, aGHQ, aGHQ)  # log.(aGHQ) in place
-  aGHQ .*= -2
-  return m
+    map!(log, aGHQ, aGHQ)  # log.(aGHQ) in place
+    aGHQ .*= -2
+    return m
 end
 ```
 
@@ -1395,27 +1342,27 @@ When we consider $f_j(z_j)$, shown in @fig-zexpneghalfdiff, the exponential func
 ```{julia}
 #| output: false
 function fitGHQ!(m::BernoulliPIRLS; nGHQ::Integer=9)
-  (; Ldiag, pdev0, aGHQ) = m.utbl
-  θβ = m.θβ
-  pp1 = length(θβ)                # length(β) = p and length(θ) = 1
-  opt = Opt(:LN_BOBYQA, pp1)
-  mβ = view(θβ, 2:pp1)
-  function obj(x, g)
-    if !isempty(g)
-      throw(ArgumentError("gradient not provided, g must be empty"))
+    (; Ldiag, pdev0, aGHQ) = m.utbl
+    θβ = m.θβ
+    pp1 = length(θβ)                # length(β) = p and length(θ) = 1
+    opt = Opt(:LN_BOBYQA, pp1)
+    mβ = view(θβ, 2:pp1)
+    function obj(x, g)
+        if !isempty(g)
+            throw(ArgumentError("gradient not provided, g must be empty"))
+        end
+        copyto!(θβ, x)
+        mul!(m.ytbl.offset, m.X, mβ)
+        evalGHQ!(m; nGHQ)
+        return sum(pdev0) + sum(aGHQ) + 2 * sum(log, Ldiag)
     end
-    copyto!(θβ, x)
-    mul!(m.ytbl.offset, m.X, mβ)
-    evalGHQ!(m; nGHQ)
-    return sum(pdev0) + sum(aGHQ) + 2 * sum(log, Ldiag)
-  end
-  opt.min_objective = obj
-  lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
-  lb[1] = 0                       # scalar θ must be non-negative
-  NLopt.lower_bounds!(opt, lb)
-  minf, minx, ret = optimize(opt, copy(θβ))
-  @info (; ret, fevals=opt.numevals, minf)
-  return m
+    opt.min_objective = obj
+    lb = fill!(similar(θβ), -Inf)   # vector of lower bounds
+    lb[1] = 0                       # scalar θ must be non-negative
+    NLopt.lower_bounds!(opt, lb)
+    minf, minx, ret = optimize(opt, copy(θβ))
+    @info (; ret, fevals=opt.numevals, minf)
+    return m
 end
 ```
 
