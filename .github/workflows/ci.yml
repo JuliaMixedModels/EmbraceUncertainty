@@ -30,7 +30,6 @@ jobs:
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-          arch: ${{ matrix.arch }}
       - name: Cache
         uses: julia-actions/cache@v2
         with:
