@@ -1,6 +1,6 @@
 name = "EmbraceUncertainty"
 uuid = "81be8970-b14c-4107-8889-06289fef228c"
-authors = ["Phillip Alday <me@phillipalday.com>, Reinhold Kliegl <reinhold.kliegl@gmail.com>, Douglas Bates <dmbates@gmail.com>"]
+authors = ["Phillip Alday <me@phillipalday.com>", "Reinhold Kliegl <reinhold.kliegl@gmail.com>", "Douglas Bates <dmbates@gmail.com>"]
 version = "0.1.0"
 
 [deps]
@@ -44,7 +44,9 @@ ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [compat]
 AlgebraOfGraphics = "0.6, 0.7, 0.8"
+Aqua = "0.8.7"
 Arrow = "2"
+BenchmarkTools = "1"
 CSV = "0.10"
 CairoMakie = "0.11, 0.12"
 CategoricalArrays = "0.10"
@@ -52,17 +54,22 @@ Chain = "0.5,0.6"
 DataAPI = "1"
 DataFrameMacros = "0.3,0.4"
 DataFrames = "1.3"
+Dates = "1"
 Distributions = "0.25"
 Downloads = "1"
 Effects = "1"
 FreqTables = "0.4"
 GLM = "1"
 LinearAlgebra = "1"
+Markdown = "1"
 MixedModels = "4,5"
+MixedModelsDatasets = "0.1.1"
 MixedModelsMakie = "0.4"
 NLopt = "1"
+Pkg = "1"
 PooledArrays = "1"
 RCall = "0.13,0.14"
+RectangularFullPacked = "0.2"
 Random = "1"
 SHA = "0.7"
 Scratch = "1"
@@ -71,6 +78,17 @@ StatsAPI = "1"
 StatsBase = "0.33, 0.34"
 StatsModels = "0.7"
 Tables = "1"
+TidierPlots = "0.8"
+Test = "1.11.0"
+TestSetExtensions = "3.0.0"
 TypedTables = "1"
 ZipFile = "0.10"
 julia = "1.8"
+
+[extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
+
+[targets]
+test = ["Aqua", "Test", "TestSetExtensions"]
