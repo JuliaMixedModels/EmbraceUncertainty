@@ -46,6 +46,7 @@ using MixedModelsMakie
 using Random
 using RCall
 using StandardizedPredictors
+using TidierPlots
 ```
 
 and declare some constants, if not already defined.
@@ -56,6 +57,8 @@ and declare some constants, if not already defined.
 #| label: constants03
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
+TidierPlots_set("plot_show", false)
+TidierPlots_set("plot_log", false)
 ```
 
 Longitudinal data consist of repeated measurements on the same subject, or some other observational unit, taken over time.
@@ -88,7 +91,8 @@ A common way of plotting such longitudinal data is response versus time on a sin
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.
 #| label: fig-egspaghetti
-#| warning: false
+# ggplot(egdf, aes(; x=:time, y=:resp, color=:Subj)) +  # need to figure out colormap
+# geom_point(; size=10)# + geom_line()
 draw(
   data(egdf) *
   mapping(
@@ -587,6 +591,7 @@ bxm03samp = parametricbootstrap(
   progress=false,
 )
 bxm03pars = DataFrame(bxm03samp.allpars)
+tbl = DataFrame(bxm03samp.tbl)
 DataFrame(shortestcovint(bxm03samp))
 ```
 
@@ -598,16 +603,18 @@ A kernel density plot, @fig-bxm03rhodens, of the parametric bootstrap estimates 
 #| code-fold: true
 #| fig-cap: Kernel density plots of parametric bootstrap estimates of correlation estimates from model bxm03
 #| label: fig-bxm03rhodens
-#| warning: false
-draw(
-  data(@subset(bxm03pars, :type == "ρ")) *
-  mapping(
-    :value => "Bootstrap replicates of correlation estimates";
-    color=(:names => "Variables"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 400)),
-)
+ggplot(stack(tbl, [:ρ1, :ρ2, :ρ3]), aes(; x=:value, color=:variable)) +
+  geom_density() +
+  labs(; x="Bootstrap replicates of correlation estimates")
+# draw(
+#   data(@subset(bxm03pars, :type == "ρ")) *
+#   mapping(
+#     :value => "Bootstrap replicates of correlation estimates";
+#     color=(:names => "Variables"),
+#   ) *
+#   AlgebraOfGraphics.density();
+#   figure=(; size=(600, 400)),
+# )
 ```
 
 Even on the scale of [Fisher's z transformation](https://en.wikipedia.org/wiki/Fisher_transformation), @fig-bxm03rhodensatanh, these estimates are highly skewed.

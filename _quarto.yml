@@ -70,9 +70,7 @@ format:
 engine: julia
 
 julia:
-  exeflags: 
-    - --project
-    - -tauto
+  exeflags: ["-tauto", "--project"]
 
 execute:
   freeze: auto
