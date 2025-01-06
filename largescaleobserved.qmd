@@ -406,12 +406,12 @@ ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
     labs(x="Minimum number of ratings per movie", y="Size of model (GiB)")
 ```
 
-@fig-memoryvsL22 shows the dominance of the `[2, 2]` block of `L` in the overall memory footprint of the model
+@fig-memoryvsl22 shows the dominance of the `[2, 2]` block of `L` in the overall memory footprint of the model
 
 ```{julia}
 #| code-fold: true
 #| fig-cap: Memory footprint of the model representation (GiB) versus the size of the [2, 2] block of L (GiB)
-#| label: fig-memoryvsL22
+#| label: fig-memoryvsl22
 ggplot(sizespeed, aes(; x=:L22sz, y=:modelsz, color=:ucutoff)) +
     geom_point() +
     geom_line() +
@@ -435,12 +435,12 @@ The reason for considering `evtime` in addition to `fittime` and `nev` is becaus
 
 That is, we can't expect to reproduce `nv` exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in `evtime` with respect to `uc` and `mc` can be expected to reproducible.
 
-As shown in @fig-evtimevsL22 the evaluation time for the objective is predominantly a function of the size of the `[2, 2]` block of `L`.
+As shown in @fig-evtimevsl22 the evaluation time for the objective is predominantly a function of the size of the `[2, 2]` block of `L`.
 
 ```{julia}
 #| code-fold: true
 #| fig-cap: "Evaluation time for the objective (s) versus size of the [2, 2] block of L (GiB)"
-#| label: fig-evtimevsL22
+#| label: fig-evtimevsl22
 ggplot(sizespeed, aes(x=:L22sz, y=:evtime, color=:ucutoff)) +
     geom_point() +
     geom_line() +
