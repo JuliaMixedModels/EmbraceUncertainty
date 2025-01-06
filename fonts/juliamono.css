@@ -1,0 +1,39 @@
+/* Inspired by: https://github.com/fonsp/Pluto.jl/tree/main/frontend/fonts/juliamono.css */
+/* Some interesting notes here too: https://www.456bereastreet.com/archive/201012/font-face_tip_define_font-weight_and_font-style_to_keep_your_css_simple/ */
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono-webfonts/JuliaMono-RegularLatin.woff2") format("woff2");
+    font-display: swap;
+    font-weight: 400;
+    unicode-range: U+00-7F; /* Basic Latin characters */
+}
+
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono-webfonts/JuliaMono-BoldLatin.woff2") format("woff2");
+    font-display: swap;
+    font-weight: 700;
+    unicode-range: U+00-7F; /* Basic Latin characters */
+}
+
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono-webfonts/JuliaMono-Regular.woff2") format("woff2");
+    font-display: swap;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono-webfonts/JuliaMono-Bold.woff2") format("woff2");
+    font-display: swap;
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: JuliaMono;
+    src: url("https://cdn.jsdelivr.net/gh/cormullion/juliamono-webfonts/JuliaMono-RegularItalic.woff2") format("woff2");
+    font-display: swap;
+    font-weight: 400;
+    font-style: italic;
+}
