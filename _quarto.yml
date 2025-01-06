@@ -1,6 +1,8 @@
 project:
   type: book
   output-dir: docs
+  resources:
+    - "/fonts/*"
 
 book:
   title: "Embrace Uncertainty"
