@@ -38,8 +38,7 @@ and define some constants and a utility function
 #| code-fold: true
 #| output: false
 #| label: constants05
-optsumdir(paths::AbstractString...) =
-  joinpath(@__DIR__, "optsums", paths...)
+optsumdir(paths::AbstractString...) = joinpath(@__DIR__, "optsums", paths...)
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
 ```
@@ -70,8 +69,7 @@ Convert this Arrow table to a `Table` and drop the `timestamp` column, which we 
 (For small data sets dropping such columns is not important but with over 25 million ratings it does help to drop unnecessary columns to save some memory space.)
 
 ```{julia}
-ratings =
-  Table(getproperties(ratings, (:userId, :movieId, :rating)))
+ratings = Table(getproperties(ratings, (:userId, :movieId, :rating)))
 ```
 
 Information on the movies is available in the `movies` dataset.
@@ -90,13 +88,9 @@ extrema(movies.nrtngs)
 The number of ratings per user is also highly skewed
 
 ```{julia}
-users = Table(
-  combine(
-    groupby(DataFrame(ratings), :userId),
-    nrow => :urtngs,
-    :rating => mean => :umnrtng,
-  ),
-)
+users = Table(combine(groupby(DataFrame(ratings), :userId),
+                      nrow => :urtngs,
+                      :rating => mean => :umnrtng))
 ```
 
 ```{julia}
@@ -114,43 +108,35 @@ Because the distribution of the number of ratings per movie or per user is so hi
 #| label: fig-nrtngsecdf
 #| warning: false
 let
-  f = Figure(; size=(700, 350))
-  xscale = log10
-  xminorticksvisible = true
-  xminorgridvisible = true
-  yminorticksvisible = true
-  xminorticks = IntervalsBetween(10)
-  ylabel = "Relative cumulative frequency"
-  nrtngs = sort(movies.nrtngs)
-  ecdfplot(
-    f[1, 1],
-    nrtngs;
-    npoints=last(nrtngs),
-    axis=(
-      xlabel="Number of ratings per movie (logarithmic scale)",
-      xminorgridvisible,
-      xminorticks,
-      xminorticksvisible,
-      xscale,
-      ylabel,
-      yminorticksvisible,
-    ),
-  )
-  urtngs = sort(users.urtngs)
-  ecdfplot(
-    f[1, 2],
-    urtngs;
-    npoints=last(urtngs),
-    axis=(
-      xlabel="Number of ratings per user (logarithmic scale)",
-      xminorgridvisible,
-      xminorticks,
-      xminorticksvisible,
-      xscale,
-      yminorticksvisible,
-    ),
-  )
-  f
+    f = Figure(; size=(700, 350))
+    xscale = log10
+    xminorticksvisible = true
+    xminorgridvisible = true
+    yminorticksvisible = true
+    xminorticks = IntervalsBetween(10)
+    ylabel = "Relative cumulative frequency"
+    nrtngs = sort(movies.nrtngs)
+    ecdfplot(f[1, 1],
+             nrtngs;
+             npoints=last(nrtngs),
+             axis=(xlabel="Number of ratings per movie (logarithmic scale)",
+                   xminorgridvisible,
+                   xminorticks,
+                   xminorticksvisible,
+                   xscale,
+                   ylabel,
+                   yminorticksvisible),)
+    urtngs = sort(users.urtngs)
+    ecdfplot(f[1, 2],
+             urtngs;
+             npoints=last(urtngs),
+             axis=(xlabel="Number of ratings per user (logarithmic scale)",
+                   xminorgridvisible,
+                   xminorticks,
+                   xminorticksvisible,
+                   xscale,
+                   yminorticksvisible),)
+    f
 end
 ```
 
@@ -172,19 +158,12 @@ Furthermore, the distribution of ratings for movies with only one rating is syst
 First, add `nrtngs` and `urtngs` as columns of the `ratings` table.
 
 ```{julia}
-ratings = Table(
-  disallowmissing!(
-    leftjoin!(
-      leftjoin!(
-        DataFrame(ratings),
-        select!(DataFrame(movies), :movieId, :nrtngs);
-        on=:movieId,
-      ),
-      select!(DataFrame(users), :userId, :urtngs);
-      on=:userId,
-    ),
-  ),
-)
+ratings = Table(disallowmissing!(leftjoin!(leftjoin!(DataFrame(ratings),
+                                                     select!(DataFrame(movies), :movieId,
+                                                             :nrtngs);
+                                                     on=:movieId,),
+                                           select!(DataFrame(users), :userId, :urtngs);
+                                           on=:userId,)))
 ```
 
 then create a bar chart of the two distributions
@@ -195,33 +174,28 @@ then create a bar chart of the two distributions
 #| label: fig-ratingsbarcharts
 #| warning: false
 let
-  fiveplus = zeros(Int, 10)
-  onlyone = zeros(Int, 10)
-  for (i, n) in
-      zip(round.(Int, Float32(2) .* ratings.rating), ratings.nrtngs)
-    if n > 4
-      fiveplus[i] += 1
-    elseif isone(n)
-      onlyone[i] += 1
+    fiveplus = zeros(Int, 10)
+    onlyone = zeros(Int, 10)
+    for (i, n) in
+        zip(round.(Int, Float32(2) .* ratings.rating), ratings.nrtngs)
+        if n > 4
+            fiveplus[i] += 1
+        elseif isone(n)
+            onlyone[i] += 1
+        end
     end
-  end
-  fiveprop = fiveplus ./ sum(fiveplus)
-  oneprop = onlyone ./ sum(onlyone)
-  draw(
-    data((;
-      props=vcat(fiveprop, oneprop),
-      rating=repeat(0.5:0.5:5.0; outer=2),
-      nratings=repeat(["≥5", "only 1"]; inner=10),
-    )) *
-    mapping(
-      :rating => nonnumeric,
-      :props => "Proportion of ratings";
-      color=:nratings => "Ratings/movie",
-      dodge=:nratings,
-    ) *
-    visual(BarPlot);
-    figure=(; size=(600, 400)),
-  )
+    fiveprop = fiveplus ./ sum(fiveplus)
+    oneprop = onlyone ./ sum(onlyone)
+    draw(data((;
+               props=vcat(fiveprop, oneprop),
+               rating=repeat(0.5:0.5:5.0; outer=2),
+               nratings=repeat(["≥5", "only 1"]; inner=10),)) *
+         mapping(:rating => nonnumeric,
+                 :props => "Proportion of ratings";
+                 color=:nratings => "Ratings/movie",
+                 dodge=:nratings,) *
+         visual(BarPlot);
+         figure=(; size=(600, 400)),)
 end
 ```
 
@@ -270,9 +244,9 @@ As shown if @fig-nratingsbycutoff, the number of ratings varies from a little ov
 #| label: fig-nratingsbycutoff
 #| fig-cap: "Number of ratings in reduced table by movie cutoff value"
 ggplot(sizespeed, aes(; x=:mc, y=:nratings, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Minimum number of ratings per movie", y="Number of ratings")
+geom_point() +
+geom_line() +
+labs(; x="Minimum number of ratings per movie", y="Number of ratings")
 ```
 
 For this range of choices of cutoffs, the user cutoff has more impact on the number of ratings in the reduced dataset than does the movie cutoff.
@@ -286,9 +260,9 @@ A glance at the table shows that the number of users, `nusers`, is essentially a
 #| label: fig-nusersbycutoff
 #| fig-cap: "Number of users in reduced table by movie cutoff value"
 ggplot(sizespeed, aes(; x=:mc, y=:nmvie, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Minimum number of ratings per movie", y="Number of movies in table")
+geom_point() +
+geom_line() +
+labs(; x="Minimum number of ratings per movie", y="Number of movies in table")
 ```
 
 ```{julia}
@@ -305,31 +279,23 @@ This, and any of the models shown in the table, can be restored in a few minutes
 
 ```{julia}
 #| code-fold: true
-function ratingsoptsum(
-  mcutoff::Integer,
-  ucutoff::Integer;
-  data=Table(ratings),
-  form=@formula(rating ~ 1 + (1 | userId) + (1 | movieId)),
-  contrasts=contrasts,
-)
-  optsumfnm = optsumdir(
-    "mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json",
-  )
-  model = LinearMixedModel(
-      form,
-      filter(
-        r -> (r.nrtngs ≥ mcutoff) & (r.urtngs ≥ ucutoff),
-        data,
-      );
-      contrasts,
-    )
-  isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
+function ratingsoptsum(mcutoff::Integer,
+                       ucutoff::Integer;
+                       data=Table(ratings),
+                       form=@formula(rating ~ 1 + (1 | userId) + (1 | movieId)),
+                       contrasts=contrasts,)
+    optsumfnm = optsumdir("mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json")
+    model = LinearMixedModel(form,
+                             filter(r -> (r.nrtngs ≥ mcutoff) & (r.urtngs ≥ ucutoff),
+                                    data);
+                             contrasts,)
+    isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
 
-  @warn "File $optsumfnm is not available, fitting model."
-  model.optsum.initial .= 0.5
-  fit!(model; thin=1)
-  saveoptsum(optsumfnm, model)
-  return model
+    @warn "File $optsumfnm is not available, fitting model."
+    model.optsum.initial .= 0.5
+    fit!(model; thin=1)
+    saveoptsum(optsumfnm, model)
+    return model
 end
 mvm50u80 = ratingsoptsum(50, 80)
 print(mvm50u80)
@@ -354,17 +320,16 @@ The memory footprint (bytes) of each of the blocks is
 ```{julia}
 #| code-fold: true
 let
-  block = String[]
-  for i in 1:3
-    for j in 1:i
-      push!(block, "[$i,$j]")
+    block = String[]
+    for i in 1:3
+        for j in 1:i
+            push!(block, "[$i,$j]")
+        end
     end
-  end
-  Table((;
-    block,
-    Abytes=Base.summarysize.(mvm50u80.A),
-    Lbytes=Base.summarysize.(mvm50u80.L),
-  ))
+    Table((;
+           block,
+           Abytes=Base.summarysize.(mvm50u80.A),
+           Lbytes=Base.summarysize.(mvm50u80.L),))
 end
 ```
 
@@ -372,9 +337,7 @@ resulting in total memory footprints (GiB) of
 
 ```{julia}
 #| code-fold: true
-NamedTuple{(:A, :L)}(
-  Base.summarysize.(getproperty.(Ref(mvm50u80), (:A, :L))) ./ 2^30,
-)
+NamedTuple{(:A, :L)}(Base.summarysize.(getproperty.(Ref(mvm50u80), (:A, :L))) ./ 2^30)
 ```
 
 That is, `L` requires roughly 10 times the amount of storage as does `A`, and that difference is entirely due to the different structure of the [2,2] block.
@@ -386,8 +349,8 @@ The matrix is about 98% zeros or, equivalently, a little over 2% nonzeros,
 
 ```{julia}
 let
-  L21 = mvm50u80.L[2]  # blocks are stored in a one-dimensional array
-  nnz(L21) / length(L21)
+    L21 = mvm50u80.L[2]  # blocks are stored in a one-dimensional array
+    nnz(L21) / length(L21)
 end
 ```
 
@@ -400,10 +363,10 @@ The memory footprint of the model representation depends strongly on the number 
 #| code-fold: true
 #| fig-cap: Memory footprint of the model representation by minimum number of ratings per user and per movie."
 #| label: fig-memoryfootprint
-ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Minimum number of ratings per movie", y="Size of model (GiB)")
+ggplot(sizespeed, aes(; x=:mc, y=:modelsz, color=:ucutoff)) +
+geom_point() +
+geom_line() +
+labs(; x="Minimum number of ratings per movie", y="Size of model (GiB)")
 ```
 
 @fig-memoryvsl22 shows the dominance of the `[2, 2]` block of `L` in the overall memory footprint of the model
@@ -413,9 +376,9 @@ ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
 #| fig-cap: Memory footprint of the model representation (GiB) versus the size of the [2, 2] block of L (GiB)
 #| label: fig-memoryvsl22
 ggplot(sizespeed, aes(; x=:L22sz, y=:modelsz, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(y="Size of model representation (GiB)", x="Size of [2,2] block of L (GiB)")
+geom_point() +
+geom_line() +
+labs(; y="Size of model representation (GiB)", x="Size of [2,2] block of L (GiB)")
 ```
 
 @fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
@@ -441,10 +404,10 @@ As shown in @fig-evtimevsl22 the evaluation time for the objective is predominan
 #| code-fold: true
 #| fig-cap: "Evaluation time for the objective (s) versus size of the [2, 2] block of L (GiB)"
 #| label: fig-evtimevsl22
-ggplot(sizespeed, aes(x=:L22sz, y=:evtime, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Size of [2,2] block of L (GiB)", y="Time for one evaluation of objective (s)")
+ggplot(sizespeed, aes(; x=:L22sz, y=:evtime, color=:ucutoff)) +
+geom_point() +
+geom_line() +
+labs(; x="Size of [2,2] block of L (GiB)", y="Time for one evaluation of objective (s)")
 ```
 
 However the middle panel shows that the number of iterations to convergence is highly variable.
