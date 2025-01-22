@@ -205,11 +205,19 @@ In general, if $\mcX$ is an $n$-dimensional random variable with mean $\bbmu$ an
 $$
 \require{unicode}
 𝔼\left[\mcU\right] =
-𝔼\left[\mathbf{A}\mcX\right] =
-\mathbf{A}𝔼\left[\mcX\right] =
-\mathbf{A}\bbmu
+\mathbf{A}\bbmu \quad\textrm{and}\quad \text{Var}\left(\mcU\right) = \mathbf{A}\bbSigma\mathbf{A}'.
 $$ {#eq-mvexpectedlin}
-and
+<details>
+<summary>Proof</summary>
+For the expectation: 
+$$
+  \require{unicode}
+𝔼\left[{\mathcal{U}}\right] =
+𝔼\left[\mathbf{A}{\mathcal{X}}\right] =
+\mathbf{A}𝔼\left[{\mathcal{X}}\right] =
+\mathbf{A}{\boldsymbol{\mu}}.
+$$
+For the variance:
 $$
 \begin{aligned}
 \text{Var}\left(\mcU\right)
@@ -218,9 +226,11 @@ $$
 &=𝔼\left[\mathbf{A}\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\mathbf{A}'\right]\\
 &=\mathbf{A}\,𝔼\left[\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\right]\mathbf{A}'\\
 &=\mathbf{A}\text{Var}(\mcX)\mathbf{A}'\\
-&=\mathbf{A}\bbSigma\mathbf{A}'
+&=\mathbf{A}\bbSigma\mathbf{A}'.
 \end{aligned}
-$$ {#eq-mvvarlin}
+$$
+</details>
+
 
 A linear function, $\mcU=\mathbf{A}\mcX$, of a multivariate Gaussian distribution, $\mcX\sim\mcN(\bbmu,\bbSigma)$, [is also Gaussian](https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Affine_transformation) which implies:
 $$
