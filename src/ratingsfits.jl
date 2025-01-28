@@ -1,11 +1,23 @@
+# this script is used to generate the various model fits for the movielens data
+# and cache the results, including timing information
+using Arrow
 using DataFrames
-using EmbraceUncertainty: dataset
+using EmbraceUncertainty: EmbraceUncertainty as EU
 using MixedModels
 
-datadir(paths::AbstractString...) = joinpath(@__DIR__, "data", paths...)
-optsumdir(paths::AbstractString...) = joinpath(@__DIR__, "optsums", paths...)
+using MixedModels: ProgressMeter
 
-ratings = DataFrame(dataset(:ratings))
+rootpath() = dirname(joinpath(@__DIR__))
+
+datadir(paths::AbstractString...) = joinpath(rootpath(), "data", paths...)
+optsumdir(paths::AbstractString...) = joinpath(rootpath(), "optsums", paths...)
+
+mkpath(datadir())
+mkpath(optsumdir())
+
+# make sure we're using the 32M dataset
+EU.load_quiver(EU.ML_32M_URL)
+ratings = DataFrame(Arrow.Table(joinpath(EU.CACHE[], "ratings.arrow")))
 disallowmissing!(
     leftjoin!(
         leftjoin!(
@@ -23,7 +35,7 @@ function dooptsum(
     ucutoff::Integer;
     data=ratings,
     form=@formula(rating ~ 1 + (1|userId) + (1|movieId)),
-    thin=1,
+    fitlog=true,
     initial=[0.5, 0.5],
     initial_step=[0.1,0.1],
     progress=false,
@@ -33,7 +45,7 @@ function dooptsum(
     mvm.optsum.initial_step = initial_step
     mvusr = size(mvm.L[2])
     println()
-    fittm = @timed fit!(mvm; thin, progress)
+    fittm = @timed fit!(mvm; fitlog, progress)
     saveoptsum(optsumdir("mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json"), mvm)
     evtm = @timed objective(updateL!(setθ!(mvm, mvm.θ)))
     open(datadir("sizespeed.csv"), "a") do io
@@ -71,3 +83,13 @@ function ratingsoptsum(
         optsumfnm,
     )
 end
+
+p = ProgressMeter.Progress(n; showspeed=true)
+for u in [5, 10, 20, 40, 80], m in [1, 2, 5, 10, 15, 20, 50]
+    GC.gc()
+    GC.gc()
+    dooptsum(m, u)
+    GC.gc()
+    ProgressMeter.next!(p)
+end
+ProgressMeter.finish!(p)

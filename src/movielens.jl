@@ -1,6 +1,7 @@
 const ML_25M_URL = "https://files.grouplens.org/datasets/movielens/ml-25m.zip"
+const ML_32M_URL = "https://files.grouplens.org/datasets/movielens/ml-32m.zip"
 
-const metadata = Dict{String,String}("url" => ML_25M_URL)
+const metadata = Dict{String,String}("url" => ML_32M_URL)
 
 function create_arrow(fname, df)
     arrowfile = _file(splitext(basename(fname))[1])
@@ -25,10 +26,10 @@ const GENRES = ["Action", "Adventure", "Animation",
                 "Thriller",
                 "War", "Western"]
 
-function load_quiver()
+function load_quiver(url=ML_25M_URL)
     @info "Downloading data"
     quiver = String[]
-    open(Downloads.download(ML_25M_URL), "r") do io
+    open(Downloads.download(url), "r") do io
         zipfile = ZipFile.Reader(io)
         @info "Extracting and saving ratings"
         ratings = DataFrame(
