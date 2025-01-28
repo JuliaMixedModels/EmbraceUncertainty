@@ -83,9 +83,10 @@ function ratingsoptsum(
         optsumfnm,
     )
 end
-
-p = ProgressMeter.Progress(n; showspeed=true)
-for u in [5, 10, 20, 40, 80], m in [1, 2, 5, 10, 15, 20, 50]
+usteps = [5, 10, 20, 40, 80]
+msteps = [1, 2, 5, 10, 15, 20, 50]
+p = ProgressMeter.Progress(length(usteps) * length(msteps); showspeed=true)
+for u in usteps, m in msteps
     GC.gc()
     GC.gc()
     dooptsum(m, u)
