@@ -669,7 +669,7 @@ draw(
 ```
 
 The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).
-There is one peak around the "true" value for the simulation, `{julia} repr(only(dsm01.σs.batch), context=:compact=>true), and another peak at zero.
+There is one peak around the "true" value for the simulation, `{julia} repr(only(dsm01.σs.batch), context=:compact=>true)`, and another peak at zero.
 
 The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_density is being distorted by the method of approximating the density.
 A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation) approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a *kernel* such as a narrow Gaussian distribution (see the linked article for details).
