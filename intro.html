@@ -1751,7 +1751,7 @@ Figure&nbsp;1.4: Kernel density plot of bootstrap variance-component parameter e
 </figure>
 </div>
 </div>
-<p>The estimator for the residual standard deviation, <span class="math inline">\(\sigma\)</span>, is approximately normally distributed but the estimator for <span class="math inline">\(\sigma_1\)</span>, the standard deviation of the <code>batch</code> random effects is bimodal (i.e.&nbsp;has two “modes” or local maxima). There is one peak around the “true” value for the simulation, `{julia} repr(only(dsm01.σs.batch), context=:compact=&gt;true), and another peak at zero.</p>
+<p>The estimator for the residual standard deviation, <span class="math inline">\(\sigma\)</span>, is approximately normally distributed but the estimator for <span class="math inline">\(\sigma_1\)</span>, the standard deviation of the <code>batch</code> random effects is bimodal (i.e.&nbsp;has two “modes” or local maxima). There is one peak around the “true” value for the simulation, 37.2603, and another peak at zero.</p>
 <p>The apparent distribution of the estimates of <span class="math inline">\(\sigma_1\)</span> in <a href="#fig-dsm01_bs_sigma_density" class="quarto-xref">Figure&nbsp;<span>1.4</span></a> is being distorted by the method of approximating the density. A <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">kernel density estimate</a> approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a <em>kernel</em> such as a narrow Gaussian distribution (see the linked article for details). In this case the distribution of the estimates is a combination of a continuous distribution and a spike or point mass at zero as shown in a histogram, <a href="#fig-dsm01_bs_sigma_hist" class="quarto-xref">Figure&nbsp;<span>1.5</span></a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
@@ -1908,13 +1908,13 @@ Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01
 <span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a><span class="fu">DataFrame</span>(dsm01trace.optsum.fitlog)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="dsm01trace" class="cell-output cell-output-display" data-execution_count="1">
-<div><div style="float: left;"><span>18×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
-<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<div><div style="float: left;"><span>0×2 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
+<table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true" style="margin-bottom: 6px;">
 <thead>
 <tr class="header">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;">Row</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">1</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">2</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Column1</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Column2</th>
 </tr>
 <tr class="subheader headerLastRow even">
 <th class="rowNumber" data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold;"></th>
@@ -1923,96 +1923,6 @@ Figure&nbsp;1.6: Histogram of bootstrap variance-components from model dsm01
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">1</td>
-<td style="text-align: left;">[1.0]</td>
-<td style="text-align: right;">327.767</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">2</td>
-<td style="text-align: left;">[1.75]</td>
-<td style="text-align: right;">331.036</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">3</td>
-<td style="text-align: left;">[0.25]</td>
-<td style="text-align: right;">330.646</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">4</td>
-<td style="text-align: left;">[0.97619]</td>
-<td style="text-align: right;">327.695</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">5</td>
-<td style="text-align: left;">[0.928569]</td>
-<td style="text-align: right;">327.566</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">6</td>
-<td style="text-align: left;">[0.833327]</td>
-<td style="text-align: right;">327.383</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">7</td>
-<td style="text-align: left;">[0.807188]</td>
-<td style="text-align: right;">327.353</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">8</td>
-<td style="text-align: left;">[0.799688]</td>
-<td style="text-align: right;">327.347</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">9</td>
-<td style="text-align: left;">[0.792188]</td>
-<td style="text-align: right;">327.341</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">10</td>
-<td style="text-align: left;">[0.777188]</td>
-<td style="text-align: right;">327.333</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">11</td>
-<td style="text-align: left;">[0.747188]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">12</td>
-<td style="text-align: left;">[0.739688]</td>
-<td style="text-align: right;">327.329</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">13</td>
-<td style="text-align: left;">[0.752777]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">14</td>
-<td style="text-align: left;">[0.753527]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">15</td>
-<td style="text-align: left;">[0.752584]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">16</td>
-<td style="text-align: left;">[0.752509]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
-<tr class="odd">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">17</td>
-<td style="text-align: left;">[0.752591]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
-<tr class="even">
-<td class="rowNumber" style="text-align: right; font-weight: bold;">18</td>
-<td style="text-align: left;">[0.752581]</td>
-<td style="text-align: right;">327.327</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -2128,8 +2038,8 @@ Figure&nbsp;1.8: Quantile caterpillar plot of prediction intervals for dsm01 ran
 <p>The maximum likelihood estimates of the parameters are obtained by minimizing the deviance. For linear mixed models we can minimize the profiled deviance, which is a function of <span class="math inline">\({\boldsymbol{\theta}}\)</span> only, thereby considerably simplifying the optimization problem.</p>
 <p>To assess the precision of the parameter estimates we use a parametric bootstrap sample, when feasible. Re-fitting a simple model, such as those shown in this chapter, to a randomly generated response vector is quite fast and it is reasonable to work with bootstrap samples of tens of thousands of replicates. With larger data sets and more complex models, large bootstrap samples of parameter estimates could take much longer.</p>
 <p>Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/293f420
-">293f420
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/b6d19c1
+">b6d19c1
 </a>.</em></p>
 
 

@@ -679,14 +679,14 @@ Why StatsAPI.deviance and not just deviance?
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">deviance</span>(<span class="fu">setβ!</span>(m, β)) seconds <span class="op">=</span> <span class="fl">1</span> setup <span class="op">=</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  (m <span class="op">=</span> com05fe; β <span class="op">=</span> βopt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>BenchmarkTools.Trial: 10000 samples with 1 evaluation.
- Range (min … max):  37.044 μs … 297.229 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     37.340 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   39.309 μs ±   7.241 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+<pre><code>BenchmarkTools.Trial: 10000 samples with 1 evaluation per sample.
+ Range (min … max):  36.608 μs … 147.628 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     37.563 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   37.709 μs ±   2.576 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-  █▂ ▂▁                                                        ▁
-  ██▆██▇██▇▆▇▇▆▅▅▅▅▄▅▄▆▅▄▅▇▇▇▇▆▆▇▆▇█▇██▇█▇▇▆▆▅▆▆▆▆▆▅▄▅▄▁▅▄▄▄▄▄ █
-  37 μs         Histogram: log(frequency) by time      71.9 μs &lt;
+  ▄▆▂   █▇▂         ▁▁                                         ▂
+  ███▅▄▇███▇▄▅▇▇▆▅▅▇████▅▄▅▅▅▅▆▅▅▆▅▅▅▄▄▅▅▄▅▄▅▄▅▄▁▄▄▄▃▁▃▁▃▄▃▁▄▃ █
+  36.6 μs       Histogram: log(frequency) by time        45 μs &lt;
 
  Memory estimate: 16 bytes, allocs estimate: 1.</code></pre>
 </div>
@@ -867,14 +867,14 @@ w_i&amp;=\mu_i(1-\mu_i)\\
 <div id="60" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">deviance</span>(<span class="fu">updateβ!</span>(m)) seconds <span class="op">=</span> <span class="fl">1</span> setup <span class="op">=</span> (m <span class="op">=</span> com05fe)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>BenchmarkTools.Trial: 7151 samples with 1 evaluation.
- Range (min … max):  122.921 μs … 392.887 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     131.016 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   137.067 μs ±  18.590 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+<pre><code>BenchmarkTools.Trial: 7504 samples with 1 evaluation per sample.
+ Range (min … max):  118.439 μs … 282.241 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     129.683 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   130.895 μs ±   9.314 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-  ▅▂▅▁▇█▆▄▄▃▁▁▁▁ ▁▁▁ ▁▁▁▁         ▁                             ▂
-  █████████████████████████████▇████████▇█▇▇▇▇▆▇█▇▇▆▇▅▅▆▅▆▆▄▁▅▄ █
-  123 μs        Histogram: log(frequency) by time        210 μs &lt;
+       ▆▃▁▆▅▆▅▇██▆▅▃▁                                           ▂
+  █▄▇▇▆███████████████▆▅▆▄▅▇▆▆▆▆▆███▇▆▇▆▇▆▆▅▇▅▄▇▅▆▄▅▆▇▆▆▅▆▆▇▆▆▆ █
+  118 μs        Histogram: log(frequency) by time        170 μs &lt;
 
  Memory estimate: 16.02 KiB, allocs estimate: 9.</code></pre>
 </div>
@@ -1105,14 +1105,14 @@ Why are θ and β stored in a single vector?
 <div id="84" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="fu">pirls!</span>(mm) seconds <span class="op">=</span> <span class="fl">1</span> setup <span class="op">=</span> (mm <span class="op">=</span> m)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>BenchmarkTools.Trial: 3864 samples with 1 evaluation.
- Range (min … max):  245.900 μs … 486.113 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     246.629 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   256.742 μs ±  26.087 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+<pre><code>BenchmarkTools.Trial: 3976 samples with 1 evaluation per sample.
+ Range (min … max):  240.641 μs … 527.869 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     242.756 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   249.662 μs ±  21.669 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
 
-  █▅▄▁▁            ▁▁                                           ▁
-  █████████████▇▇▇██████▆▆▇▆▅▅▆▆▅▅▄▄▅▆▆▄▄▄▁▅▅▄▄▅▅▃▅▄▄▅▄▆▆▇▆▆▃▄▄ █
-  246 μs        Histogram: log(frequency) by time        377 μs &lt;
+  █▅ ▆▄▁    ▂         ▁                                         ▁
+  ██████▆▆▇▇██▇▇▇▇▇▆▄██▇████▇▇▇▇▆▆▅▇▅▆▅▃▄▅▅▅▅▅▅▅▃▅▄▅▅▅▅▅▄▃▁▃▃▅▄ █
+  241 μs        Histogram: log(frequency) by time        342 μs &lt;
 
  Memory estimate: 112 bytes, allocs estimate: 1.</code></pre>
 </div>
@@ -1738,8 +1738,8 @@ f_j(z_j)=\exp{\left(\frac{\tilde{d}_j(z_j/\ell_j+\tilde{u}_j)-\tilde{d}_j(\tilde
  -0.0056246062539383156</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/293f420
-">293f420
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/b6d19c1
+">b6d19c1
 </a>.</em></p>
 
 
