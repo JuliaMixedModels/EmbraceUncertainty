@@ -5,7 +5,7 @@ fig-dpi: 150
 fig-format: png
 engine: julia
 julia:
-  exeflags: ["--project"]
+  exeflags: [ "-tauto", "--project"]
 ---
 
 # A simple, linear, mixed-effects model {#sec-examlmm}
@@ -117,8 +117,11 @@ using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
 using Random            # random number generation
 using StatsBase         # basic statistical summaries
+using TidierPlots       # ggplot2-like graphics in Julia
 
 using EmbraceUncertainty: dataset  # `dataset` means this one
+TidierPlots_set("plot_show", false)
+TidierPlots_set("plot_log", false)
 ```
 
 A package must be attached before any of the data sets or functions in the package can be used.
@@ -620,6 +623,7 @@ Plots of the bootstrap estimates for individual parameters are obtained by extra
 For example,
 
 ```{julia}
+tbl = DataFrame(dsm01samp.tbl)
 βdf = @subset(dsm01pars, :type == "β")
 ```
 
@@ -632,15 +636,9 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
 #| warning: false
-draw(
-  data(@subset(dsm01pars, :type == "β")) *
-  mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(tbl, aes(; x=:β1)) +
+geom_density() +
+labs(; x="Bootstrap samples of β₁")
 ```
 
 The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `{julia} repr(mean(βdf.value), context=:compact=>true)`  which is close to the estimated `β₁` of `{julia} repr(only(dsm01.β), context=:compact=>true)`.
@@ -657,15 +655,18 @@ The situation is different for the estimates of the standard deviation parameter
 #| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
 #| warning: false
-draw(
-  data(@subset(dsm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+ggplot(stack(DataFrame(tbl), 3:4), aes(; x=:value, color=:variable)) +
+geom_density(alpha=0.6) +
+labs(; x="Bootstrap samples of σ")
+# draw(
+#   data(@subset(dsm01pars, :type == "σ")) *
+#   mapping(
+#     :value => "Bootstrap samples of σ";
+#     color=(:group => "Group"),
+#   ) *
+#   AlgebraOfGraphics.density();
+#   figure=(; size=(600, 340)),
+# )
 ```
 
 The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).

@@ -11,8 +11,8 @@ Load the packages to be used
 using DataFrames
 using EmbraceUncertainty: dataset
 using MixedModels
-using Tables
-using TypedTables
+using Tables: Tables, columnnames, table
+using TypedTables: Table, getproperties
 ```
 
 A call to fit a mixed-effects model using the `MixedModels` package follows the *formula/data* specification that is common to many statistical model-fitting packages, especially those in [R](https://r-project.org).
@@ -27,7 +27,7 @@ These include the *data.frame* type in [R](https://R-Project.org) and the [data.
 
 An increasing popular representation of data frames is as [Arrow](https://arrow.apache.org) tables.
 [Polars](https://pola.rs) uses the Arrow format internally as does the [DuckDB](https://duckdb.org) database.
-Recently it was announced that the 2.0 release of [pandas](https://pandas.pydata.org) will allow for Arrow tables.
+Also, the 2.0 and later releases of [pandas](https://pandas.pydata.org) will allow for Arrow tables.
 
 Arrow specifies a language-independent tabular memory format that provides many desirable properties, such as provision for missing data and compact representation of categorical data vectors, for data science.
 The memory format also defines a file format for storing and exchanging data tables.
@@ -55,9 +55,10 @@ Before going into detail about the properties and use of the `Table` type, let u
 An important characteristic of any system for working with data tables is whether the table is stored in memory column-wise or row-wise.
 
 As described above, most implementations of data frames for data science store the data column-wise.
+That is, elements of a column are stored in adjacent memory locations, allowing for fast traversals of columns.
 
 In *relational database management systems* (RDBMS), such as [PostgreSQL](https://postgresql.org), [SQLite](https://sqlite.org), and a multitude of commercial systems, a data table, called a *relation*, is typically stored row-wise.
-Such systems typically use [SQL](https://en.wikipedia.org/wiki/SQL), the *structured query language*, to define and access the data in tables, which is why that acronym appears in many of the names.
+Such systems generally use [SQL](https://en.wikipedia.org/wiki/SQL), the *structured query language*, to define and access the data in tables, which is why that acronym appears in many of the names.
 There are exceptions to the row-wise rule, such as [DuckDB](https://duckdb.org), an SQL-based RDBMS, that, as mentioned above, represents relations as Arrow tables.
 
 Many external representations of data tables, such as in comma-separated-value (CSV) files, are row-oriented.
@@ -82,11 +83,61 @@ Tables.RowTable
 The actual implementation of a row-table or column-table type may be different from these prototypes but it must provide access methods as if it were one of these types.
 `Tables.jl` provides the "glue" to treat a particular data table type as if it were row-oriented, by calling `Tables.rows` or `Tables.rowtable` on it, or column-oriented, by calling `Tables.columntable` on it.
 
+### MatrixTable as a concrete table type
+
+[Tables.jl](https://github.com/JuliaData/Tables.jl) does provide one concrete table type, which is a `MatrixTable`.
+As the name implies, this is a column-table view of a `Matrix`.
+Because the data values are stored in a matrix, the columns must be homogeneous - that is, the element types of all the columns must be the same.
+
+We will use this type of table in @sec-GLMMdeviance to evaluate and store several related properties of each observation in a generalized linear model.
+In this case all of the properties are expressed as floating-point numbers.
+We construct the table as
+
+```{julia}
+ytbl =
+  let header = (:y, :offset, :η, :μ, :dev, :rtwwt, :wwresp)
+
+    tb = table(
+      zeros(Float64, length(contra.use), length(header));
+      header,
+    )
+    tb.y .= contra.use .≠ "N"
+    tb
+  end
+last(Table(ytbl), 8)
+```
+
+The columns of the table are accessed as *properties*, e.g. `ytbl.η`.
+
+A common idiom when passing a column table to a Julia function is to *destructure* the table into individual columns, which is a notation for binding several names to properties of the tables in one statement.
+That is, instead of beginning a function with several statements like
+
+```julia
+function updateμ!(ytbl)
+  y = ytbl.y
+  η = ytbl.η
+  offset = ytbl.offset
+  μ = ytbl.μ
+  ...
+  return ytbl
+end
+```
+
+one can write
+
+```julia
+function updateμ!(ytbl)
+  (; y, η, offset, μ) = ytbl
+  ...
+  return ytbl
+end
+```
+
 ## The Table type from TypedTables
 
 [TypedTables.jl](https://github.com/JuliaData/TypedTables.jl) is a lightweight package (about 1500 lines of source code) that provides a concrete implementation of column-tables, called simply `Table`, as a `NamedTuple` of vectors.
 
-A `Table` that is constructed from another type of column-table, such as an `Arrow.Table` or a `DataFrame` or an explicit `NamedTuple` of vectors, is simply a wrapper around the original table's contents.
+A `Table` that is constructed from another type of column-table, such as an `Arrow.Table` or a `DataFrame` or an explicit `NamedTuple` of vectors, is just a wrapper around the original table's contents.
 On the other hand, constructing a `Table` from a row table first creates a `ColumnTable`, then wraps it.
 
 ```{julia}

@@ -5,7 +5,7 @@ fig-dpi: 150
 fig-format: png
 engine: julia
 julia:
-  exeflags: ["--project"]
+  exeflags: ["-tauto", "--project"]
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
@@ -136,8 +136,9 @@ Load the packages to be used
 #| output: false
 #| label: packagesA03
 using AlgebraOfGraphics
-using BenchmarkTools
 using CairoMakie
+using Chairmarks    # a more modern BenchmarkTools
+using DataFrames
 using EmbraceUncertainty: dataset
 using FreqTables
 using LinearAlgebra
@@ -146,6 +147,7 @@ using MixedModelsMakie
 using NLopt
 using PooledArrays
 using StatsAPI
+using TidierPlots
 ```
 
 and define some constants
@@ -156,6 +158,8 @@ and define some constants
 #| label: constantsA03
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
+TidierPlots_set("plot_show", false)
+TidierPlots_set("plot_log", false)
 ```
 
 ## Generalized linear models for binary data {#sec-BernoulliGLM}
@@ -402,8 +406,7 @@ Each evaluation of the deviance is fast, requiring only a fraction of a millisec
 
 ```{julia}
 βopt = copy(com05fe.β)
-@benchmark deviance(setβ!(m, β)) seconds = 1 setup =
-  (m = com05fe; β = βopt)
+@be deviance(setβ!($com05fe, $βopt))
 ```
 
 but the already large number of evaluations for these six coefficients would not scale well as this dimension increases.
@@ -635,7 +638,7 @@ The IRLS algorithm has converged in 4 iterations to essentially the same devianc
 Each iteration of the IRLS algorithm takes more time than a deviance evaluation, but still only a fraction of a millisecond on a laptop computer.
 
 ```{julia}
-@benchmark deviance(updateβ!(m)) seconds = 1 setup = (m = com05fe)
+@be deviance(updateβ!($com05fe))
 ```
 
 ## GLMMs and the PIRLS algorithm {#sec-PIRLS}
@@ -866,7 +869,7 @@ pirls!(m; verbose=true);
 As with IRLS, PIRLS is a fast and stable algorithm for determining the mode of the conditional distribution $(\mcU|\mcY=\bby)$ with $\bbtheta$ and $\bbbeta$ held fixed.
 
 ```{julia}
-@benchmark pirls!(mm) seconds = 1 setup = (mm = m)
+@be pirls!($m)
 ```
 
 The time taken for the four iterations to determine the conditional mode of $\bbu$ is comparable to the time taken for a single call to `updateβ!`.
@@ -1127,28 +1130,34 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| code-fold: true
 #| fig-cap: Weights and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghnine
-#| warning: false
-draw(
-  data(gausshermitenorm(9)) *
-  mapping(:abscissae => "Positions", :weights);
-  figure=(; size=(600, 450)),
-)
+df9 = DataFrame(gausshermitenorm(9))
+ggplot(df9, aes(; x=:abscissae, y=:weights)) +
+geom_point() +
+labs(; x="Positions", y="Weights")
+# draw(
+#   data(gausshermitenorm(9)) *
+#   mapping(:abscissae => "Positions", :weights);
+#   figure=(; size=(600,450)),
+# )
 ```
 
-Notice that the magnitudes of the weights drop quite dramatically away from zero, even on a logarithmic scale (@fig-ghninelog)
+Notice that the magnitudes of the weights drop quite dramatically as the position moves away from zero, even on a logarithmic scale (@fig-ghninelog)
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Weights (logarithm base 2) and positions for the 9th order normalized Gauss-Hermite quadrature rule
+#| fig-cap: Weights (logarithm base 10) and positions for the 9th order normalized Gauss-Hermite quadrature rule
 #| label: fig-ghninelog
-#| warning: false
-draw(
-  data(gausshermitenorm(9)) * mapping(
-    :abscissae => "Positions",
-    :weights => log2 => "log₂(weight)",
-  );
-  figure=(; size=(600, 450)),
-)
+ggplot(df9, aes(; x=:abscissae, y=:weights)) +
+geom_point() +
+labs(; x="Positions", y="Weights") +
+scale_y_log10()
+# draw(
+#   data(gausshermitenorm(9)) * mapping(
+#     :abscissae => "Positions",
+#     :weights => log2 => "log₂(weight)",
+#   );
+#   figure=(; size=(600,450)),
+# )
 ```
 
 The definition of `MixedModels.GHnorm` is similar to the `gausshermitenorm` function with some extra provisions for ensuring symmetry of the abscissae and of the weights and for caching values once they have been calculated.
