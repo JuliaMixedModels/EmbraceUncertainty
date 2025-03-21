@@ -66,7 +66,11 @@ format:
     # sets the background of inline code and code output but not code blocks?
     # also overrides code-bg in the SCSS file
     # monobackgroundcolor: '#fafafa'
-
+   html-math-method:
+     method: mathjax
+     # see https://github.com/mathjax/MathJax/issues/3325#issuecomment-2631818793
+     url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+     
 engine: julia
 
 julia:
