@@ -638,6 +638,24 @@ Each iteration of the IRLS algorithm takes more time than a deviance evaluation,
 @benchmark deviance(updateβ!(m)) seconds = 1 setup = (m = com05fe)
 ```
 
+:::{.callout-note collapse="true"}
+
+### Alternative version of the IRLS algorithm
+
+We discussed a "fixed point" version of the IRLS algorithm in the preceeding text.
+There is another version of the IRLS algorithm which expresses the new iterate for $\theta$ as a Newton-Raphson update with the following update equation:
+$$
+  \bbbeta^{(k)}\ =\ \bbbeta^{(k-1)} + \alpha \times \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bbr} ,
+$$
+where $\alpha$ is a step size parameter.
+In fact, this is the version of the IRLS algorithm implemented in [GLM.jl](https://juliastats.org/GLM.jl/stable/).
+For $\alpha = 1$ it is easy to see that the above equation is equivalent to the $\bbbeta^{(k)} = \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bby}$, simply use the identity $\bbbeta^{(k-1)} = \left(\bbX'\bbW\bbX\right)^{-1} \left(\bbX'\bbW\bbX\right) \bbbeta$ and combine the two terms on the right hand side.
+For more details see [this RPubs tutorial](https://rpubs.com/enwuliu/1011024) by Enwu Liu.
+
+However, the Newton-Rhapson version is not really suitable for PIRLS and was therefore not elaborated in this text.
+
+:::
+
 ## GLMMs and the PIRLS algorithm {#sec-PIRLS}
 
 In @sec-lmmtheory we showed that, given a value of $\bbtheta$, which determines the relative covariance factor, $\bbLambda_{\bbtheta}$, of the random effects, $\mcB$, the *conditional mode*, $\tilde{\bbb}$, of the random effects can be evaluated as the solution to a *penalized least squares* (PLS) problem.
