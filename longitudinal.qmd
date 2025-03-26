@@ -46,6 +46,7 @@ using MixedModelsMakie
 using Random
 using RCall
 using StandardizedPredictors
+using GLM
 ```
 
 and declare some constants, if not already defined.
@@ -96,7 +97,8 @@ draw(
     :resp => "Ramus bone length (mm)",
     color=:Subj,
   ) *
-  (visual(Scatter) + visual(Lines));
+  (visual(Scatter) + visual(Lines)),
+  scales(Color = (; legend = false,));
   figure=(; size=(600, 450)),
 )
 ```
@@ -105,22 +107,33 @@ Unfortunately, unless there are very few subjects, such figures, sometimes calle
 
 A preferred alternative is to plot response versus time with each subject's data in a separate panel (@fig-eglayout).
 
-```{r}
+```{julia}
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
 #| label: fig-eglayout
-plot(
-  lattice::xyplot(
-    resp ~ time|Subj,
-    $egdf,
-    type=c("g","p","r"),
-    aspect="xy",
-    index.cond=function(x,y) coef(lm(y ~ x)) %*% c(1,8),
-    xlab="Age (yr)",
-    ylab="Ramus bone length (mm)",
-  )
+lmeg = lm(@formula(resp~ 1 + time*Subj),egdf);
+newx = DataFrame(Subj = unique(egdf.Subj));
+newx.time .= 8.;
+newx.inter = predict(lmeg,newx);
+
+draw(
+  data(egdf) *
+  mapping(
+    :time => "Age (yr)",
+    :resp => "Ramus bone length (mm)",
+    layout = :Subj => sorter(sort!(newx, :inter).Subj),
+  ) * (visual(Scatter, marker = '∘', markersize = 20) + linear(;interval=nothing)) * visual(color = :blue),
+  scales(Layout = (; palette = vec([(b,a) for a in 1:10, b in 2:-1:1]))),
+  axis = (; xticklabelrotation = pi/2, xticklabelsize = 10),
+  figure = (; size=(600, 400))
 )
-NULL
+
+f = current_figure();
+colgap!(f.layout, 2);
+rowgap!(f.layout, 5);
+
+f
+
 ```
 
 To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
@@ -170,7 +183,7 @@ If the purpose of the experiment is to create a predictive model for the growth 
 
 Alternatively, we could center at the average observed time, 8.75 years, or at some other value of interest.
 
-The important thing is to make clear what the `(Itercept)` parameter estimates represent.
+The important thing is to make clear what the `(Intercept)` parameter estimates represent.
 The [StandardizedPredictors.jl](https://github.com/beacon-biosignals/StandardizedPredictors.jl) package allows for convenient representations of several standardizing transformations in a `contrasts` specification for the model.
 An advantage of this method of coding a transformation is that the coefficient names include a concise description of the transformation.
 
@@ -336,8 +349,10 @@ draw(
   data(bxgdf[("Control",)]) *
   bxaxes *
   mapping(; color=:Subj) *
-  (visual(Scatter) + visual(Lines));
+  (visual(Scatter) + visual(Lines)),
+  scales(Color = (; legend = false,));
   figure=(; size=(600, 450)),
+  legend = (; position=:bottom, titleposition = :left)
 )
 ```
 
@@ -603,10 +618,12 @@ draw(
   data(@subset(bxm03pars, :type == "ρ")) *
   mapping(
     :value => "Bootstrap replicates of correlation estimates";
-    color=(:names => "Variables"),
+    color = :names => renamer(["(Intercept), time" => "(Intercept), time", "(Intercept), time ^ 2" => "(Intercept), time².", "time, time ^ 2" => "time, time²"])  => "Variables"
   ) *
-  AlgebraOfGraphics.density();
+  AlgebraOfGraphics.density(),
+  scales(Color = (; palette = [:tomato, :teal, :orange],));
   figure=(; size=(600, 400)),
+  legend=(;position=:bottom, titleposition = :left)
 )
 ```
 
@@ -624,11 +641,13 @@ let
   )
   mp = mapping(
     :z => "Fisher's z transformation of correlation estimates";
-    color=(:names => "Variables"),
+    color=:names => renamer(["(Intercept), time" => "(Intercept), time", "(Intercept), time ^ 2" => "(Intercept), time².", "time, time ^ 2" => "time, time²"])  => "Variables"
   )
   draw(
-    data(dat) * mp * AlgebraOfGraphics.density();
+    data(dat) * mp * AlgebraOfGraphics.density(),
+    scales(Color = (; palette = [:tomato, :teal, :orange],));
     figure=(; size=(600, 400)),
+    legend=(;position=:bottom, titleposition = :left)
   )
 end
 ```
@@ -723,8 +742,10 @@ let
       color=:Group,
       col=:model,
     ) *
-    visual(Lines);
-    axis=(width=120, height=130),
+    visual(Lines),
+    scales(Color = (; palette = [:tomato, :teal, :orange],));
+    figure=(; size=(600, 400)),
+    legend=(;position=:bottom, titleposition = :left)
   )
 end
 ```
