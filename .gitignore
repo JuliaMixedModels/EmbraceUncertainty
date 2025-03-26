@@ -16,3 +16,5 @@ data/
 /.quarto/
 
 /.luarc.json
+lcov.info
+*.cov

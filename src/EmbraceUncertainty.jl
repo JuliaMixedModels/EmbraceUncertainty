@@ -19,7 +19,7 @@ const MMDS = String[]
 function __init__()
     CACHE[] = @get_scratch!("data")
     mkpath(CACHE[])
-    append!(MMDS, MixedModelsDatasets.datasets())
+    return append!(MMDS, MixedModelsDatasets.datasets())
 end
 
 include("datasets.jl")
@@ -38,7 +38,7 @@ function age_at_event(edate::TimeType, dob::TimeType)
 end
 
 export GENRES,
-    age_at_event,
-    tagpad
-    
+       age_at_event,
+       tagpad
+
 end # module EmbraceUncertainty

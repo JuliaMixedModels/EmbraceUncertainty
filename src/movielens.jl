@@ -31,31 +31,25 @@ function load_quiver()
     open(Downloads.download(ML_25M_URL), "r") do io
         zipfile = ZipFile.Reader(io)
         @info "Extracting and saving ratings"
-        ratings = DataFrame(
-            extract_csv(
-                zipfile,
-                "ratings.csv";
-                types=[Int32, Int32, Float32, Int32],
-                pool=[true, true, true, false],
-            )
-        )
+        ratings = DataFrame(extract_csv(zipfile,
+                                        "ratings.csv";
+                                        types=[Int32, Int32, Float32, Int32],
+                                        pool=[true, true, true, false],))
         ratings.movieId = tagpad(ratings.movieId, "M")
         ratings.userId = tagpad(ratings.userId, "U")
         push!(quiver, create_arrow("ratings.csv", ratings))
         @info "Extracting movies that are in the ratings table"
-        movies = extract_csv(zipfile, "movies.csv"; types=[Int32,String,String], pool=false)
+        movies = extract_csv(zipfile, "movies.csv"; types=[Int32, String, String],
+                             pool=false)
         movies.movieId = tagpad(movies.movieId, "M")
-        links = extract_csv(zipfile, "links.csv"; types=[Int32,Int32,Int32])
+        links = extract_csv(zipfile, "links.csv"; types=[Int32, Int32, Int32])
         links.movieId = tagpad(links.movieId, "M")
-        movies = leftjoin!(
-            leftjoin!(
-                sort!(combine(groupby(ratings, :movieId), nrow => :nrtngs), :nrtngs; rev=true),
-                movies,
-                on=:movieId,
-            ),
-            links;
-            on=:movieId,
-        )
+        movies = leftjoin!(leftjoin!(sort!(combine(groupby(ratings, :movieId),
+                                                   nrow => :nrtngs), :nrtngs; rev=true),
+                                     movies;
+                                     on=:movieId),
+                           links;
+                           on=:movieId,)
         disallowmissing!(movies; error=false)
         movies.nrtngs = Int32.(movies.nrtngs)
         for g in GENRES
@@ -66,7 +60,7 @@ function load_quiver()
         @info "Extracting and saving README"
         readme = only(filter(f -> endswith(f.name, "README.txt"), zipfile.files))
         open(joinpath(CACHE[], "README.txt"), "w") do io
-            write(io, read(readme))
+            return write(io, read(readme))
         end
 
         return nothing

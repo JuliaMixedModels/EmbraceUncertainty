@@ -119,41 +119,32 @@ Returns a `DataFrame` created from df with the levels of `grps` reordered accord
 `combine(groupby(df, grps), resp => sumryf)` and this summary DataFrame, also with the
 levels of `grps` reordered.
 """
-function _meanrespfrm(
-  df,
-  resp::Symbol,
-  grps::Symbol;
-  sumryf::Function=mean,
-)
-  # ensure the relevant columns are types that Makie can deal with 
-  df = transform(
-    df,
-    resp => Array,
-    grps => CategoricalArray;
-    renamecols=false,
-  )
-  # create a summary table by mean resp
-  sumry =
-    sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
-  glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
-  levels!(df[!, grps], glevs)
-  levels!(sumry[!, grps], glevs)
-  return df, sumry
+function _meanrespfrm(df,
+                      resp::Symbol,
+                      grps::Symbol;
+                      sumryf::Function=mean,)
+    # ensure the relevant columns are types that Makie can deal with 
+    df = transform(df,
+                   resp => Array,
+                   grps => CategoricalArray;
+                   renamecols=false,)
+    # create a summary table by mean resp
+    sumry = sort!(combine(groupby(df, grps), resp => sumryf => resp), resp)
+    glevs = string.(sumry[!, grps])   # group levels in ascending order of mean resp
+    levels!(df[!, grps], glevs)
+    levels!(sumry[!, grps], glevs)
+    return df, sumry
 end
 
 let
-  df, _ = _meanrespfrm(penicillin, :diameter, :plate)
-  sort!(df, [:plate, :sample])
+    df, _ = _meanrespfrm(penicillin, :diameter, :plate)
+    sort!(df, [:plate, :sample])
 
-  mp = mapping(
-    :diameter => "Diameter of inhibition zone [mm]",
-    :plate => "Plate";
-    color=:sample,
-  )
-  draw(
-    data(df) * mp * visual(ScatterLines; marker='○', markersize=12);
-    figure=(; size=(600, 450)),
-  )
+    mp = mapping(:diameter => "Diameter of inhibition zone [mm]",
+                 :plate => "Plate";
+                 color=:sample,)
+    draw(data(df) * mp * visual(ScatterLines; marker='○', markersize=12);
+         figure=(; size=(600, 450)),)
 end
 ```
 
@@ -187,7 +178,7 @@ A model incorporating random effects for both the `plate` and the `sample` is st
 
 ```{julia}
 pnm01 = let f = @formula diameter ~ 1 + (1 | plate) + (1 | sample)
-  fit(MixedModel, f, penicillin; contrasts, progress)
+    fit(MixedModel, f, penicillin; contrasts, progress)
 end
 ```
 
@@ -271,15 +262,11 @@ As for model `dsm01` the bootstrap parameter estimates of the fixed-effects para
 #| fig-cap: "Parametric bootstrap estimates of fixed-effects parameters in model pnm01"
 #| label: fig-pnm01bsbeta
 #| warning: false
-draw(
-  data(@subset(pnm01pars, :type == "β")) *
-  mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(pnm01pars, :type == "β")) *
+     mapping(:value => "Bootstrap samples of β";
+             color=(:names => "Names"),) *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 and the shortest coverage interval on this parameter is close to the Wald interval
@@ -296,15 +283,11 @@ The densities of the variance-components, on the scale of the standard deviation
 #| label: fig-pnm01bssigma
 #| code-fold: true
 #| warning: false
-draw(
-  data(@subset(pnm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(pnm01pars, :type == "σ")) *
+     mapping(:value => "Bootstrap samples of σ";
+             color=(:group => "Group"),) *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 The lack of precision in the estimate of $\sigma_2$, the standard deviation of the random effects for `sample`, is a consequence of only having 6 distinct levels of the `sample` factor.
@@ -334,10 +317,8 @@ pastes = dataset(:pastes)
 ```
 
 ```{julia}
-pastes = transform(
-  DataFrame(pastes),
-  [:batch, :cask] => ByRow((x, y) -> string(x, y)) => :sample,
-)
+pastes = transform(DataFrame(pastes),
+                   [:batch, :cask] => ByRow((x, y) -> string(x, y)) => :sample)
 describe(pastes)
 ```
 
@@ -413,7 +394,7 @@ We include random-effects terms for each factor, as in
 
 ```{julia}
 psm01 = let f = @formula strength ~ 1 + (1 | sample) + (1 | batch)
-  fit(MixedModel, f, pastes; contrasts, progress)
+    fit(MixedModel, f, pastes; contrasts, progress)
 end
 ```
 
@@ -449,7 +430,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
 #| warning: false
-caterpillar!(Figure(size=(600, 240)), ranefinfo(psm01, :batch))
+caterpillar!(Figure(; size=(600, 240)), ranefinfo(psm01, :batch))
 ```
 
 confirm this impression in that all the prediction intervals for the random effects for contain zero.
@@ -467,15 +448,11 @@ psm01pars = DataFrame(psm01samp.allpars);
 #| label: fig-psm01bssampdens
 #| code-fold: true
 #| warning: false
-draw(
-  data(@subset(psm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(psm01pars, :type == "σ")) *
+     mapping(:value => "Bootstrap samples of σ";
+             color=(:group => "Group"),) *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 Because there are several indications that $\sigma_2$ could reasonably be zero, resulting in a simpler model incorporating random effects for only `sample`, we perform a statistical test of this hypothesis.
@@ -506,7 +483,7 @@ The restricted model fit
 
 ```{julia}
 psm02 = let f = @formula strength ~ 1 + (1 | sample)
-  fit(MixedModel, f, pastes; contrasts, progress)
+    fit(MixedModel, f, pastes; contrasts, progress)
 end
 ```
 
@@ -535,12 +512,10 @@ DataFrame(shortestcovint(psm01samp))
 
 ```{julia}
 #| code-fold: true
-psm02samp = parametricbootstrap(
-  Random.seed!(9753579),
-  10_000,
-  psm02;
-  progress,
-)
+psm02samp = parametricbootstrap(Random.seed!(9753579),
+                                10_000,
+                                psm02;
+                                progress,)
 DataFrame(shortestcovint(psm02samp))
 ```
 
@@ -587,12 +562,10 @@ Although the response, `y`, is on a scale of 1 to 5,
 #| fig-cap: "Histogram of instructor ratings in the *insteval* data"
 #| label: fig-instevalhist
 #| warning: false
-draw(
-  data(Table(response=1:5, count=counts(insteval.y))) *
-  mapping(:response => "Rating", :count => "Count") *
-  visual(BarPlot);
-  figure=(; size=(600, 340)),
-)
+draw(data(Table(; response=1:5, count=counts(insteval.y))) *
+     mapping(:response => "Rating", :count => "Count") *
+     visual(BarPlot);
+     figure=(; size=(600, 340)),)
 ```
 
 it is sufficiently diffuse to warrant treating it as if it were a continuous response.
@@ -601,7 +574,7 @@ At this point we will fit models that have random effects for student, instructo
 
 ```{julia}
 iem01 = let f = @formula y ~ 1 + (1 | s) + (1 | d) + (1 | dept)
-  fit(MixedModel, f, insteval; contrasts, progress)
+    fit(MixedModel, f, insteval; contrasts, progress)
 end
 ```
 
@@ -614,14 +587,14 @@ It is not surprising that zero is within most of the prediction intervals on the
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
 #| warning: false
-caterpillar!(Figure(size=(600, 300)), ranefinfo(iem01, :dept))
+caterpillar!(Figure(; size=(600, 300)), ranefinfo(iem01, :dept))
 ```
 
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
 
 ```{julia}
 iem02 = let f = @formula y ~ 1 + (1 | s) + (1 | d)
-  fit(MixedModel, f, insteval; contrasts, progress)
+    fit(MixedModel, f, insteval; contrasts, progress)
 end
 MixedModels.likelihoodratiotest(iem02, iem01)
 ```
@@ -661,10 +634,9 @@ There are several ways in which `service` can be incorporated in a model like th
 The simplest approach is to add `service` to the fixed-effects specification
 
 ```{julia}
-iem03 =
-  let f = @formula y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept)
+iem03 = let f = @formula y ~ 1 + service + (1 | s) + (1 | d) + (1 | dept)
     fit(MixedModel, f, insteval; contrasts, progress)
-  end
+end
 ```
 
 In model `iem03` the effect of `service` is considered to be constant across departments and is modeled with a single fixed-effects parameter, which is the difference in a typical rating in a service course to a non-service course.
@@ -693,12 +665,10 @@ shows the differences in precision due to different numbers of observations for 
 #| fig-cap: "Histogram of the number of observations per instructor in the insteval data"
 #| label: fig-iednobshist
 #| warning: false
-draw(
-  data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
-  mapping(:n => "Number of observations") *
-  AlgebraOfGraphics.histogram(; bins=410);
-  figure=(; size=(600, 450)),
-)
+draw(data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
+     mapping(:n => "Number of observations") *
+     AlgebraOfGraphics.histogram(; bins=410);
+     figure=(; size=(600, 450)),)
 ```
 
 The precision of the conditional distributions of the random effects, as measured by the width of the intervals, varies considerably between instructors.
@@ -706,10 +676,8 @@ The precision of the conditional distributions of the random effects, as measure
 We can determine that instructor `I1258` has the largest mean of the conditional distributions of the random effects
 
 ```{julia}
-last(
-  sort(DataFrame(ranefinfotable(ranefinfo(iem01, :d))), :cmode),
-  5,
-)
+last(sort(DataFrame(ranefinfotable(ranefinfo(iem01, :d))), :cmode),
+     5)
 ```
 
 but the conditional distribution of this random effect clearly overlaps significantly with others.
@@ -734,8 +702,8 @@ For convenience, multiple, nested random-effects terms can be specified using a 
 ```{julia}
 #| label: psm01alt
 print(let f = @formula(strength ~ 1 + (1 | batch / cask))
-  fit(MixedModel, f, pastes; progress)
-end)
+          fit(MixedModel, f, pastes; progress)
+      end)
 ```
 
 We will avoid terms of this form, preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.

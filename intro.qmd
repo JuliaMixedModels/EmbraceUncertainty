@@ -212,23 +212,14 @@ Although this table does show us an important property of the data, namely that 
 #| code-fold: true
 #| warning: false
 let
-  sumry = sort!(
-    combine(groupby(dyestuff, :batch), :yield => mean => :yield),
-    :yield,
-  )
-  mp = mapping(
-    :yield => "Yield of dyestuff [g]",
-    :batch =>
-      sorter(sumry.batch) => "Batch of intermediate product",
-  )
-  draw(
-    (
-      data(dyestuff) *
-      mp *
-      visual(Scatter; marker='○', markersize=12)
-    ) + (data(sumry) * mp * visual(Lines));
-    figure=(; size=(600, 300)),
-  )
+    sumry = sort!(combine(groupby(dyestuff, :batch), :yield => mean => :yield),
+                  :yield)
+    mp = mapping(:yield => "Yield of dyestuff [g]",
+                 :batch => sorter(sumry.batch) => "Batch of intermediate product")
+    draw((data(dyestuff) *
+          mp *
+          visual(Scatter; marker='○', markersize=12)) + (data(sumry) * mp * visual(Lines));
+         figure=(; size=(600, 300)),)
 end
 ```
 
@@ -288,22 +279,14 @@ A data plot (@fig-dyestuff2data)
 #| code-fold: true
 #| warning: false
 let
-  sumry = sort!(
-    combine(groupby(dyestuff2, :batch), :yield => mean => :yield),
-    :yield,
-  )
-  mp = mapping(
-    :yield => "Simulated yield",
-    :batch => sorter(sumry.batch) => "Batch",
-  )
-  draw(
-    (
-      data(dyestuff2) *
-      mp *
-      visual(Scatter; marker='○', markersize=12)
-    ) + (data(sumry) * mp * visual(Lines));
-    figure=(; size=(600, 300)),
-  )
+    sumry = sort!(combine(groupby(dyestuff2, :batch), :yield => mean => :yield),
+                  :yield)
+    mp = mapping(:yield => "Simulated yield",
+                 :batch => sorter(sumry.batch) => "Batch")
+    draw((data(dyestuff2) *
+          mp *
+          visual(Scatter; marker='○', markersize=12)) + (data(sumry) * mp * visual(Lines));
+         figure=(; size=(600, 300)),)
 end
 ```
 
@@ -328,7 +311,7 @@ We fit a model to the data allowing for an overall level of the `yield` and for 
 ```{julia}
 #| label: dsm01
 dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff; progress=false)
+    fit(MixedModel, f, dyestuff; progress=false)
 end
 ```
 
@@ -417,7 +400,7 @@ Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\
 ```{julia}
 #| label: dsm02
 dsm02 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff2; progress=false)
+    fit(MixedModel, f, dyestuff2; progress=false)
 end
 print(dsm02)
 ```
@@ -632,15 +615,11 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| fig-cap: Kernel density plot of bootstrap fixed-effects parameter estimates from dsm01
 #| label: fig-dsm01_bs_beta_density
 #| warning: false
-draw(
-  data(@subset(dsm01pars, :type == "β")) *
-  mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(dsm01pars, :type == "β")) *
+     mapping(:value => "Bootstrap samples of β";
+             color=(:names => "Names"),) *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `{julia} repr(mean(βdf.value), context=:compact=>true)`  which is close to the estimated `β₁` of `{julia} repr(only(dsm01.β), context=:compact=>true)`.
@@ -657,15 +636,11 @@ The situation is different for the estimates of the standard deviation parameter
 #| fig-cap: Kernel density plot of bootstrap variance-component parameter estimates from model dsm01
 #| label: fig-dsm01_bs_sigma_density
 #| warning: false
-draw(
-  data(@subset(dsm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.density();
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(dsm01pars, :type == "σ")) *
+     mapping(:value => "Bootstrap samples of σ";
+             color=(:group => "Group"),) *
+     AlgebraOfGraphics.density();
+     figure=(; size=(600, 340)),)
 ```
 
 The estimator for the residual standard deviation, $\sigma$, is approximately normally distributed but the estimator for $\sigma_1$, the standard deviation of the `batch` random effects is bimodal (i.e. has two "modes" or local maxima).
@@ -687,15 +662,11 @@ Use a lower alpha in the colors for multiple histograms so the bars behind anoth
 #| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
 #| label: fig-dsm01_bs_sigma_hist
 #| warning: false
-draw(
-  data(@subset(dsm01pars, :type == "σ")) *
-  mapping(
-    :value => "Bootstrap parameter estimates of σ";
-    color=(:group => "Group"),
-  ) *
-  AlgebraOfGraphics.histogram(; bins=80);
-  figure=(; size=(600, 340)),
-)
+draw(data(@subset(dsm01pars, :type == "σ")) *
+     mapping(:value => "Bootstrap parameter estimates of σ";
+             color=(:group => "Group"),) *
+     AlgebraOfGraphics.histogram(; bins=80);
+     figure=(; size=(600, 340)),)
 ```
 
 Nearly 1000 of the 10,000 bootstrap fits are "singular" in that the estimated unconditional distribution of the random effects is degenerate.
@@ -718,15 +689,11 @@ In many cases standard errors are quoted for estimates of the variance component
 #| fig-cap: Histogram of bootstrap variance-components from model dsm01
 #| label: fig-dsm01_bs_sigmasqr_hist
 #| warning: false
-draw(
-  data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
-  mapping(
-    :value_abs2 => "Bootstrap sample of estimates of σ²",
-    color=:group,
-  ) *
-  AlgebraOfGraphics.histogram(; bins=200);
-  figure=(; size=(600, 340)),
-)
+draw(data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
+     mapping(:value_abs2 => "Bootstrap sample of estimates of σ²";
+             color=:group) *
+     AlgebraOfGraphics.histogram(; bins=200);
+     figure=(; size=(600, 340)),)
 ```
 
 The approach of creating coverage intervals from a bootstrap sample of parameter estimates, described in the next section, does accommodate non-normal distributions.
@@ -760,13 +727,11 @@ The optional argument, `thin=1`, in a call to `fit` causes all the values of $\b
 
 ```{julia}
 #| label: dsm01trace
-dsm01trace = fit(
-  MixedModel,
-  @formula(yield ~ 1 + (1 | batch)),
-  dyestuff;
-  thin=1,
-  progress=false,
-)
+dsm01trace = fit(MixedModel,
+                 @formula(yield ~ 1 + (1 | batch)),
+                 dyestuff;
+                 thin=1,
+                 progress=false,)
 DataFrame(dsm01trace.optsum.fitlog)
 ```
 
@@ -824,7 +789,7 @@ A plot of these prediction intervals is sometimes called a *caterpillar plot* be
 #| fig-cap: Caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-caterpillar_dsm01
 #| warning: false
-caterpillar!(Figure(size=(600, 200)), ranefinfo(dsm01, :batch))
+caterpillar!(Figure(; size=(600, 200)), ranefinfo(dsm01, :batch))
 ```
 
 The `caterpillar` function returns a plot with linear spacing of the
@@ -836,7 +801,7 @@ An alternative, the `qqcaterpillar` function
 #| fig-cap: Quantile caterpillar plot of prediction intervals for dsm01 random effects
 #| label: fig-qqcaterpillar_dsm01
 #| warning: false
-qqcaterpillar!(Figure(size=(600, 200)), ranefinfo(dsm01, :batch))
+qqcaterpillar!(Figure(; size=(600, 200)), ranefinfo(dsm01, :batch))
 ```
 
 returns a plot like @fig-qqcaterpillar_dsm01 where the intervals are plotted with vertical spacing corresponding to the quantiles of the standard normal distribution.
@@ -873,13 +838,11 @@ There is an advantage in assigning the contrasts dictionary to the name `contras
 ```{julia}
 #| code-fold: false
 #| eval: false
-dsm01 = fit(
-  MixedModel,
-  @formula(yield ~ 1 + (1 | batch)),
-  dyestuff;
-  contrasts=contrasts,
-  progress=false,
-)
+dsm01 = fit(MixedModel,
+            @formula(yield ~ 1 + (1 | batch)),
+            dyestuff;
+            contrasts=contrasts,
+            progress=false,)
 ```
 
 can be condensed to
@@ -887,13 +850,11 @@ can be condensed to
 ```{julia}
 #| code-fold: false
 #| eval: false
-dsm01 = fit(
-  MixedModel,
-  @formula(yield ~ 1 + (1 | batch)),
-  dyestuff;
-  contrasts,
-  progress=false,
-)
+dsm01 = fit(MixedModel,
+            @formula(yield ~ 1 + (1 | batch)),
+            dyestuff;
+            contrasts,
+            progress=false,)
 ```
 
 That is, if the name of the object to be passed as a named argument is the same as the name of the argument, like `contrasts=contrasts`, then the name does not need to be repeated.
@@ -915,7 +876,7 @@ Thus `dsm01` can be assigned as
 #| code-fold: false
 #| eval: false
 dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff; contrasts, progress=false)
+    fit(MixedModel, f, dyestuff; contrasts, progress=false)
 end
 ```
 
