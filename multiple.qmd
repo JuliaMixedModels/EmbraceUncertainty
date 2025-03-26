@@ -519,6 +519,18 @@ MixedModels.likelihoodratiotest(psm02, psm01)
 which provides a p-value of 52%.
 Because typical standards for "small" p-values are 5% or 1%, a p-value over 50% would not be considered significant at any reasonable level.
 
+:::{.callout-note collapse="true"}
+
+### `lrtest` function for nested models
+
+For nested models we can also use the `lrtest` function defined by the `StatsModels` package as follows:
+```{julia}
+lrtest(psm02, psm01)
+```
+However, unlike `MixedModels.likelihoodratiotest`, the `lrtest` function does not work for non-nested models.
+
+:::
+
 We do need to be cautious in quoting this p-value, however, because the parameter value being tested, $\sigma_2=0$, is on the boundary of set of possible values, $\sigma_2\ge 0$, for this parameter.
 The argument for using a $\chi^2_1$ distribution to calculate a p-value for the change in the deviance does not apply when the parameter value being tested is on the boundary.
 As shown in @pinheirobates2000 [, Sect. 2.5], the p-value from the $\chi^2_1$ distribution will be "conservative" in the sense that it is larger than a simulation-based p-value would be.
