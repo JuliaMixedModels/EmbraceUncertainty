@@ -4,6 +4,8 @@ fig-height: 3
 fig-dpi: 150
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: 
     - --project
@@ -28,7 +30,6 @@ using MixedModels
 using MixedModelsMakie
 using SparseArrays         # for the nnz function
 using Statistics           # for the mean function
-using TidierPlots
 using TypedTables
 ```
 
@@ -269,10 +270,18 @@ As shown if @fig-nratingsbycutoff, the number of ratings varies from a little ov
 #| code-fold: true
 #| label: fig-nratingsbycutoff
 #| fig-cap: "Number of ratings in reduced table by movie cutoff value"
-ggplot(sizespeed, aes(; x=:mc, y=:nratings, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Minimum number of ratings per movie", y="Number of ratings")
+
+sizespeed.ucbak = sizespeed.uc
+sizespeed.uc = nonnumeric.(sizespeed.uc)
+draw(
+  data(sizespeed) *
+  mapping(
+    :mc => "Minimum number of ratings per movie (mc)",
+    :nratings => "Total number of ratings",
+    color=:uc,
+  ) * visual(ScatterLines);
+  figure=(; size=(600, 350))
+)
 ```
 
 For this range of choices of cutoffs, the user cutoff has more impact on the number of ratings in the reduced dataset than does the movie cutoff.
@@ -285,10 +294,16 @@ A glance at the table shows that the number of users, `nusers`, is essentially a
 #| code-fold: true
 #| label: fig-nusersbycutoff
 #| fig-cap: "Number of users in reduced table by movie cutoff value"
-ggplot(sizespeed, aes(; x=:mc, y=:nmvie, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Minimum number of ratings per movie", y="Number of movies in table")
+
+draw(
+  data(sizespeed) *
+  mapping(
+    :mc => "Minimum number of ratings per movie (mc)",
+    :nmvie => "Number of movies in table",
+    color=:uc) *
+    visual(ScatterLines);
+  figure=(; size=(600, 350))
+)
 ```
 
 ```{julia}
@@ -400,10 +415,16 @@ The memory footprint of the model representation depends strongly on the number 
 #| code-fold: true
 #| fig-cap: Memory footprint of the model representation by minimum number of ratings per user and per movie."
 #| label: fig-memoryfootprint
-ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Minimum number of ratings per movie", y="Size of model (GiB)")
+
+draw(
+  data(sizespeed) *
+  mapping(
+    :mc => "Minimum number of ratings per movie (mc)",
+    :modelsz => "Size of model object (GiB)",
+    color=:uc) *
+    visual(ScatterLines);
+    figure=(; size=(600, 350))
+)
 ```
 
 @fig-memoryvsl22 shows the dominance of the `[2, 2]` block of `L` in the overall memory footprint of the model
@@ -412,10 +433,18 @@ ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
 #| code-fold: true
 #| fig-cap: Memory footprint of the model representation (GiB) versus the size of the [2, 2] block of L (GiB)
 #| label: fig-memoryvsl22
-ggplot(sizespeed, aes(; x=:L22sz, y=:modelsz, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(y="Size of model representation (GiB)", x="Size of [2,2] block of L (GiB)")
+
+draw(
+  data(transform!(sizespeed, [:L22sz, :modelsz] => ((x, y) -> x ./ y) => :L22prop)) *
+  mapping(
+    :modelsz => "Size of model object (GiB)",
+    [:L22sz => "Size of [2,2] block of L (GiB)", :L22prop => "Proportion of memory footprint in L[2,2]"],
+    col = dims(1) => renamer(["Size of L[2,2] block", "Memory Proportion of L[2,2] block"]),
+    color=:uc) *
+    visual(ScatterLines);
+    legend = (; position = :bottom, titleposition=:left),
+    figure=(; size=(600, 350))
+)
 ```
 
 @fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
@@ -441,10 +470,16 @@ As shown in @fig-evtimevsl22 the evaluation time for the objective is predominan
 #| code-fold: true
 #| fig-cap: "Evaluation time for the objective (s) versus size of the [2, 2] block of L (GiB)"
 #| label: fig-evtimevsl22
-ggplot(sizespeed, aes(x=:L22sz, y=:evtime, color=:ucutoff)) +
-    geom_point() +
-    geom_line() +
-    labs(x="Size of [2,2] block of L (GiB)", y="Time for one evaluation of objective (s)")
+
+draw(
+  data(sizespeed) *
+  mapping(
+    :L22sz => "Size of [2,2] block of L (GiB)",
+    :evtime => "Time for one evaluation of objective (s)",
+    color=:uc) *
+    visual(ScatterLines);
+    figure=(; size=(600, 350))
+)
 ```
 
 However the middle panel shows that the number of iterations to convergence is highly variable.
