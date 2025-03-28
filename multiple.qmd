@@ -249,7 +249,7 @@ We say that "fill-in" has occurred when forming the sparse Cholesky decompositio
 In this case there is a relatively minor amount of fill but in other cases there can be a substantial amount of fill.
 The computational methods are tuned to reduce the amount of fill.
 
-### Precision of parameter estimates in the Pencillin model {#sec-Penicillinprecision}
+### Precision of parameter estimates in the Penicillin model {#sec-Penicillinprecision}
 
 A parametric bootstrap sample of the parameter estimates
 
