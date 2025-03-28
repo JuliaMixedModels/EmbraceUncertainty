@@ -16,3 +16,4 @@ data/
 /.quarto/
 
 /.luarc.json
+.cache/
