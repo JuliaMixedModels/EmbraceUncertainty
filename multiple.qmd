@@ -4,6 +4,8 @@ fig-height: 3
 fig-dpi: 150
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: ["--project"]
 ---
@@ -350,19 +352,32 @@ It would be fine to do this within a batch but the plot would be misleading if w
 There is no relationship between cask 'a' in batch 'A' and cask 'a' in batch 'B'.
 The labels 'a', 'b' and 'c' are used only to distinguish the three samples within a batch; they do not have a meaning across batches.
 
-```{r}
+```{julia}
 #| code-fold: true
 #| fig-cap: "Strength of paste preparations according to sample within batch"
 #| label: fig-pastesdot
-pp <- within($pastes, bb <- reorder(batch, strength))
-plot(
-  lattice::dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
-    strip.left = TRUE, layout = c(1, 10),
-    scales = list(y = list(relation = "free")),
-    ylab = "Sample within batch", type = c("p", "a"),
-    xlab = "Paste strength", jitter.y = TRUE)
-)
-NULL
+
+draw(
+  data(pastes) *
+  mapping(
+    :cask,
+    :strength,
+    col = :batch => sorter(sort!(combine(groupby(pastes, :batch), :strength => mean => "strength" ), :strength).batch)
+  ) * visual(Scatter; marker = '∘', markersize = 15, color = :blue) +
+  data(combine(groupby(pastes, [:cask, :batch]), :strength => mean => "strength" )) *
+  mapping(
+    :cask,
+    :strength,
+    col = :batch => sorter(sort!(combine(groupby(pastes, :batch), :strength => mean => "strength" ), :strength).batch)
+  ) * visual(Lines; color = :blue);
+  axis = (; xticklabelsize = 10),
+  figure = (; size=(600, 350))
+);
+
+f = current_figure();
+
+colgap!(f.layout, 4)
+f
 ```
 
 In @fig-pastesdot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
