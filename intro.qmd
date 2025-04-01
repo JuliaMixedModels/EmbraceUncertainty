@@ -4,6 +4,8 @@ fig-height: 3
 fig-dpi: 150
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: ["--project"]
 ---
@@ -239,7 +241,7 @@ For example, four of the five preparations from batch F produced lower yields th
 
 This plot, and essentially all the other plots in this book, were created using the [Makie](https://makie.juliaplots.io) package [@DanischKrumbiegel2021].
 
-In `yet-to-be-written-appendix` we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot.
+In @sec-aog we review some of the principles of data graphics, such as reordering the levels of the factor by increasing mean response, that enhance the informativeness of the plot.
 For example, in this plot the levels of `batch` are sorted by increasing mean yield, to make visual comparisons between batches easier, and the vertical positions are *jittered* to avoid overplotting of points.
 (Note that the two lowest yields of samples from batch `A` are identical.)
 
@@ -675,13 +677,6 @@ The apparent distribution of the estimates of $\sigma_1$ in @fig-dsm01_bs_sigma_
 A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation) approximates a probability density from a finite sample by blurring or smearing the positions of the sample values according to a *kernel* such as a narrow Gaussian distribution (see the linked article for details).
 In this case the distribution of the estimates is a combination of a continuous distribution and a spike or point mass at zero as shown in a histogram, @fig-dsm01_bs_sigma_hist.
 
-:::{.callout-note collapse="true"}
-
-### Adjust the alpha in multiple histograms
-
-Use a lower alpha in the colors for multiple histograms so the bars behind another color are more visible
-:::
-
 ```{julia}
 #| code-fold: true
 #| fig-cap: Histogram of bootstrap variance-components as standard deviations from model dsm01
@@ -693,7 +688,7 @@ draw(
     :value => "Bootstrap parameter estimates of σ";
     color=(:group => "Group"),
   ) *
-  AlgebraOfGraphics.histogram(; bins=80);
+  AlgebraOfGraphics.histogram(; bins=80) * visual(alpha = 0.4);
   figure=(; size=(600, 340)),
 )
 ```
@@ -724,7 +719,7 @@ draw(
     :value_abs2 => "Bootstrap sample of estimates of σ²",
     color=:group,
   ) *
-  AlgebraOfGraphics.histogram(; bins=200);
+  AlgebraOfGraphics.histogram(; bins=200) * visual(alpha = 0.4);
   figure=(; size=(600, 340)),
 )
 ```

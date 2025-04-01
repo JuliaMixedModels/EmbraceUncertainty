@@ -5,9 +5,9 @@ project:
     - "/fonts/*"
 
 book:
-  title: "Embrace Uncertainty"
+  title: "Embrace Uncertainty (Preview)"
   subtitle: "Mixed-effects models with Julia"
-  author: 
+  author:
     - name: Phillip Alday
       email: me@phillipalday.com
       orcid: 0000-0002-9984-5745
@@ -45,6 +45,7 @@ book:
     - datatables.qmd
     - linalg.qmd
     - aGHQ.qmd
+    - algebraofgraphics.qmd
 
 execute-dir: project
 
@@ -62,7 +63,7 @@ format:
   html:
     # for more info, see
     # https://quarto.org/docs/output-formats/html-themes.html
-    theme: [sandstone, theme.scss]
+    theme: [cosmo, theme.scss]
     # sets the background of inline code and code output but not code blocks?
     # also overrides code-bg in the SCSS file
     # monobackgroundcolor: '#fafafa'
@@ -70,7 +71,7 @@ format:
 engine: julia
 
 julia:
-  exeflags: 
+  exeflags:
     - --project
     - -tauto
 
