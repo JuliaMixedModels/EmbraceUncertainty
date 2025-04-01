@@ -7,7 +7,7 @@ project:
 book:
   title: "Embrace Uncertainty"
   subtitle: "Mixed-effects models with Julia"
-  author: 
+  author:
     - name: Phillip Alday
       email: me@phillipalday.com
       orcid: 0000-0002-9984-5745
@@ -45,6 +45,9 @@ book:
     - datatables.qmd
     - linalg.qmd
     - aGHQ.qmd
+    - traditional_concepts.qmd
+    - wilkinson-notation.md
+
 
 execute-dir: project
 
@@ -57,7 +60,7 @@ github:
 
 resources:
   - CNAME
-  
+
 format:
   html:
     # for more info, see
@@ -70,7 +73,7 @@ format:
 engine: julia
 
 julia:
-  exeflags: 
+  exeflags:
     - --project
     - -tauto
 
