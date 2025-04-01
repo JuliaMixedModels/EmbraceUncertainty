@@ -1,0 +1,44 @@
+---
+engine: julia
+---
+
+# A note on identities and concepts from "classical" statistics {#sec-traditional-concepts}
+
+One common source of misunderstanding mixed-effects models seems to be the way in which the linear regression and analysis of variance are taught.
+In particular, many *identities* hold for ordinary least squares "fixed-effects" regression that are then taken as *definitions* of the relevant quantities.
+
+For example, in simple regression `y ~ x`[^wilkinson], the coefficient of determination is equal to the square of the Pearson correlation coefficient between the response `y` and the predictor `x`.
+This *identity* is reinforced by the usual notation for the respective quantities, i.e. $R^2$ and $r$.
+However, it is important to note that these quantities are **not** formally defined in terms of each other.[^wikipedia-definition]
+Instead, the Pearson correlation coefficient is formally defined as $$\frac{\text{cov}(X,Y)}{\sigma_X\sigma_Y}$$ i.e. the standardized covariance between two random variables.
+The coefficient of determination is usually defined in terms of "total sum of squares" and "residual sum of squares" $$ 1 - \frac{SS_\text{residual}}{SS_\text{total}} $$ but even this definition again brings us to another set of identities being used as definitions.
+
+[^wilkinson]: Throughout this appendix, we use the Wilkinson-Roger notation where convenient instead of the full mathematical notation
+
+[^wikipedia-definition]: Unfortunately, many popular sources, including [Wikipedia](https://web.archive.org/web/20250330013023/https://en.wikipedia.org/wiki/Coefficient_of_determination) at the time of writing, confuse this matter with statements such as
+
+    > There are several definitions of R2 that are only sometimes equivalent.
+
+    There may be multiple possible definitions, but the "equaliances" are better thought of as *identities* that hold under certain conditions.
+
+In the frequentist framework, we often use *maximum likelihood estimation* to fit a model to our data, such that the parameter estimates maximize the likelihood of the assumed statistical model.
+For classical linear regression, this is equivalent to minimizing the sum of squared residuals, which is why the technique is often called "ordinary least squares".
+However, this is again an *identity* and not a *definition*.
+The likelihood is defined without using sums of squares, but it follows from the definition of the normal distribution that minimizing the squared error (i.e. the sum of squared residuals) will yield the maximum likelihood estimate.
+In the classical ANOVA framework, this fact is then used to partition the variance into three components: the explained or model sum of squares, the residual sum of squares and total sum of squares, where the sum of the first two components is equal to the third.[^pythagoras]
+The mixed-effects model extends the classical ANOVA framework by allowing further paritioning of the variance, which means that this simple identity quickly breaks down.
+For this reason, many properties assumed within the classical framework breakdown for mixed effects models.
+Even concepts such as *the* fully saturated model, which is often used to define other quantities, quickly become difficult to define.
+Note that we wrote **the** fully saturated model: there must be precisely one fully saturated model for many of these other definitions to hold -- such as the definition of total sum of squares -- and without a unique value, we simply cannot define a single value.
+
+[^pythagoras]: The particular geometry of these sums was used by Fisher to simplify certain computations in the days before computers. By construction, the residuals are *orthogonal* to the fitted values, which means that the residual sum of squares and the model sum of squares correspond to the length of two sides of a right triangle, with the total sum of squares being the length of the hypothenuse. This geometric interpretation is very useful, but also quickly becomes quite complicated when we consider further paritions of the variance contained within the model.
+
+We have often commented in other fora (various mailing lists, help sites and GitHub issues) about the challenges of finding definitions of classical quantities that still hold onto all their original properities. Doug's [mailing list response "https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html"](https://stat.ethz.ch/pipermail/r-help/2006-May/094765.html) is a valuable read that highlights how even things as simple as defining the denominator degrees of freedom is challenging in the mixed models framework.
+It's important to note here that these many of these hard-to-define quantities are most useful as input to other "simple" formulae based on the asymptotic behavior of the classical linear regression model (such as convergence to an $F$-distribution).
+Unfortunately, it is unclear whether that same asymptotic behavior holds in the general case of the mixed effects model.
+While the asymptotic behavior largely seems to hold in the idealized case of perfect balance and full nesting, it is not at all clear whether it does in the messiness of real world data, where balance, nesting and crossing are rarely perfect, as we have attempted to make clear throughout this book.
+
+While this appendix seems very pessmistic, we would like to call out one point of optimism.
+Much of the historical work around finding and applying the identities and properties of various quantities for classical ANOVA and linear regression stem from a time when datasets were comparably small and "computer" referred to a person employed purely to perform calculation by hand.
+With modern computation -- both hardware and software -- other methods are available to us.
+For example, bootstrapping and profiling provide methods for computing confidence intervals, which are far more informative than $p$-values anyway.
