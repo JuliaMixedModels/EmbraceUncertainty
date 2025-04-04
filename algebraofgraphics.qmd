@@ -24,7 +24,7 @@ While this may all sound very abstract we will see these concepts in action shor
 ## A plot with a single layer
 
 To illustrate the principles briefly explained above, we plot the `elstongrizzle` dataset in multiple ways building up to the plots in @sec-longitudinal.
-We start off we first plot the length of ramus bone against time for all subjects.
+We start off we first plot the length of Ramus bone against time for all subjects.
 To do so we first load all the relevant packages,
 
 ```{julia}
@@ -138,6 +138,8 @@ The `scales` argument can also be used to modify other features of plot elements
 To demonstrate this, we change the color palette used for plotting to `darktest` color palette (See [`Makie.jl` documentation](https://docs.makie.org/stable/explanations/colors#misc)).
 
 ```{julia}
+#| label: fig-scatterline-dartest
+#| fig-cap: Scatter-plot with overlaid lines using the `darktest` colorscheme
 draw(
   egscatterlines,
   scales(Color = (; legend = false, palette = :darktest))
@@ -146,8 +148,23 @@ draw(
 
 ## Faceting
 
+@fig-scatterline-dartest is still crowded, and one way to fix this would be to plot each subject in a separate panel.
+In `ggplot2` this is achieved by using `facet`.
+Since we want to facet by `Subj`, we need to map a feature of the data (`Subj`) to an element of the plot.
+Thus, we must define some sort of mapping to achieve this.
+In this case, we want to use the equivalent of `ggplot2::facet_wrap`, which is the `layout` element of the feature. Similar to mapping the subject ID to color, we can map `Subj` to `layout` as follows:
+```{julia}
+draw(
+  egscatterlines * mapping(layout = :Subj),
+  scales(Color = (; legend = false, palette = :darktest));
+  figure = (; size = (800, 400))
+)
+```
+
+It is also possible to facet by two features, one along the horizontal direction and one along the vertical direction using the `col` and `row` (this would be akin to `ggplot2::facet_grid`) keyword arguments in the mapping.
+
 :::{.callout-note}
 
-**TODO:** use the `col` keyword mapping to create facets by subject instead of colors by subject
+**TODO:** use the `layout` keyword mapping to create facets by subject instead of colors by subject
 
 :::
