@@ -134,6 +134,15 @@ draw(
 )
 ```
 
+The `scales` argument can also be used to modify other features of plot elements.
+To demonstrate this, we change the color palette used for plotting to `darktest` color palette (See [`Makie.jl` documentation](https://docs.makie.org/stable/explanations/colors#misc)).
+
+```{julia}
+draw(
+  egscatterlines,
+  scales(Color = (; legend = false, palette = :darktest))
+)
+```
 
 ## Faceting
 
