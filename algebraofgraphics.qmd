@@ -4,6 +4,8 @@ fig-height: 3
 fig-dpi: 150
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: ["--project"]
 ---
@@ -44,7 +46,7 @@ and the dataset:
 elstongrizzle = DataFrame(dataset(:elstongrizzle))
 ```
 
-The scatterplot is defined by the mapping from the data to the $x$ and $y$ axis of the plots.
+The scatter-plot is defined by the mapping from the data to the $x$ and $y$ axis of the plots.
 
 ```{julia}
 ramusscatter = data(elstongrizzle) * mapping(:time, :resp) * visual(Scatter)
@@ -108,11 +110,29 @@ and _voila_ we just created two layers at once!
 
 ## Modifying common elements with `draw`
 
+One issue with the plot above is that the legend is far too big to fit vertically on the side.
+So let's try putting at the bottom of the plot.
+This is an action that is not related to any single layer, and can be modified using optional arguments to the draw method as follows:
+```{julia}
+draw(
+  egscatterlines;
+  legend = (; position = :bottom, titleposition = :left)
+)
+```
+
+Note that we reused the object `egscatterlines` which is a stack of layers from before.
+While this is better than before, the individual subject names are not really relevant to this plot, so let's remove the legend altogether.
+
 :::{.callout-note}
-
-**TODO:** move legend to bottom using the `legend` keyword argument for `draw`
-
+**TODO:** How to explain why legend is disabled in the `scales`?
 :::
+
+```{julia}
+draw(
+  egscatterlines,
+  scales(Color = (; legend = false))
+)
+```
 
 
 ## Faceting
