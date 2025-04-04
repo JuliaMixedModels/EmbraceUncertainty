@@ -1,0 +1,170 @@
+---
+fig-width: 4
+fig-height: 3
+fig-dpi: 150
+fig-format: png
+engine: julia
+execute:
+  cache: true
+julia:
+  exeflags: ["--project"]
+---
+
+# Algebra of Graphics {#sec-aog}
+
+In this appendix, we give a demonstration of and introduction to the [`AlgebraOfGraphics`](https://aog.makie.org/) package and plotting system.
+The key concepts in `AlgebraOfGraphics` (or AoG for short) are layers, the `+` operator, and the `*` operator.
+Each layer in an AoG plot consists of at least (1) a mapping from the data to the plot elements (such as the x-axis, y-axis, and color), and (2) a visual that defines the type of plot (for example, scatterplot or lines), which are combined using the `*` operator.
+The mapping is analogous to the "aesthetic mapping" in the grammar-of-graphics based [`ggplot2`](https://ggplot2.tidyverse.org) package in `R` and the visual is the same as a "geom".
+While the `+` operator allows us to stack layers together, the `*` operator allows us to both construct a layer and modify multiple layers at once.
+Once we have constructed the layers of a plot, we can display or print the plot using the `draw` function.
+Additionally, the draw function allows us to apply modifications that do not depend on the data to common elements in the plot.
+While this may all sound very abstract we will see these concepts in action shortly.
+
+## A plot with a single layer
+
+To illustrate the principles briefly explained above, we plot the `elstongrizzle` dataset in multiple ways building up to the plots in @sec-longitudinal.
+We start off we first plot the length of Ramus bone against time for all subjects.
+To do so we first load all the relevant packages,
+
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: app-aog-packages
+using AlgebraOfGraphics
+using CairoMakie
+using DataFrames, DataFrameMacros
+using GLM # for the lm needed to arrange the final plot
+using EmbraceUncertainty: dataset
+```
+and the dataset:
+
+```{julia}
+#| code-fold: true
+#| output: false
+#| label: app-aog-data
+elstongrizzle = DataFrame(dataset(:elstongrizzle))
+```
+
+The scatter-plot is defined by the mapping from the data to the $x$ and $y$ axis of the plots.
+
+```{julia}
+ramusscatter = data(elstongrizzle) * mapping(:time, :resp) * visual(Scatter)
+```
+
+
+```{julia}
+draw(ramusscatter)
+```
+
+This plot is not very useful because the points for all the subjects are mixed in together.
+To distinguish data for different subjects, let's color the data points by subject.
+This means that we must map the subject ID (`Subj`) to the `color` attribute of the plot.
+
+```{julia}
+draw(ramusscatter*mapping(color = :Subj))
+```
+
+Although this worked, the more concise way to achieve the same thing is to define all the mappings at once as follows:
+```{julia}
+egscatter = data(elstongrizzle) *
+    mapping(:time, :resp, color = :Subj) *
+    visual(Scatter)
+draw(egscatter)
+```
+
+
+## Adding another layer
+
+To construct a layer for lines, we can use the `visual(Lines)`:
+```{julia}
+eglines = data(elstongrizzle) *
+    mapping(:time, :resp, color = :Subj) *
+    visual(Lines)
+
+draw(eglines)
+```
+
+We can now combine the layers by simply using `+`!
+
+```{julia}
+draw(egscatter + eglines)
+```
+
+You may have noticed that the mapping from the data to the plot elements is the same for both layers is the same.
+This is where the power of the algebra comes in.
+We can define two layers with the same mapping using the following code:
+```{julia}
+egscatterlines = data(elstongrizzle) *
+                    mapping(:time, :resp, color = :Subj) *
+                    (visual(Scatter) + visual(Lines))
+```
+Let's unpack this.
+We can define two partial layers with `visual(Scatter) + visual(Lines)` and both are defined with the common mapping, which we can achieve by modifying, i.e. using the `*` operator on the stack of two (partial) layers.
+To confirm if this actually works, we can just invoke `draw`:
+```{julia}
+draw(egscatterlines)
+```
+and _voila_ we just created two layers at once!
+
+
+## Modifying common elements with `draw`
+
+One issue with the plot above is that the legend is far too big to fit vertically on the side.
+So let's try putting at the bottom of the plot.
+This is an action that is not related to any single layer, and can be modified using optional arguments to the draw method as follows:
+```{julia}
+draw(
+  egscatterlines;
+  legend = (; position = :bottom, titleposition = :left)
+)
+```
+
+Note that we reused the object `egscatterlines` which is a stack of layers from before.
+While this is better than before, the individual subject names are not really relevant to this plot, so let's remove the legend altogether.
+
+:::{.callout-note}
+**TODO:** How to explain why legend is disabled in the `scales`?
+:::
+
+```{julia}
+draw(
+  egscatterlines,
+  scales(Color = (; legend = false))
+)
+```
+
+The `scales` argument can also be used to modify other features of plot elements.
+To demonstrate this, we change the color palette used for plotting to `darktest` color palette (See [`Makie.jl` documentation](https://docs.makie.org/stable/explanations/colors#misc)).
+
+```{julia}
+#| label: fig-scatterline-dartest
+#| fig-cap: Scatter-plot with overlaid lines using the `darktest` colorscheme
+draw(
+  egscatterlines,
+  scales(Color = (; legend = false, palette = :darktest))
+)
+```
+
+## Faceting
+
+@fig-scatterline-dartest is still crowded, and one way to fix this would be to plot each subject in a separate panel.
+In `ggplot2` this is achieved by using `facet`.
+Since we want to facet by `Subj`, we need to map a feature of the data (`Subj`) to an element of the plot.
+Thus, we must define some sort of mapping to achieve this.
+In this case, we want to use the equivalent of `ggplot2::facet_wrap`, which is the `layout` element of the feature. Similar to mapping the subject ID to color, we can map `Subj` to `layout` as follows:
+```{julia}
+draw(
+  egscatterlines * mapping(layout = :Subj),
+  scales(Color = (; legend = false, palette = :darktest));
+  figure = (; size = (800, 400))
+)
+```
+
+It is also possible to facet by two features, one along the horizontal direction and one along the vertical direction using the `col` and `row` (this would be akin to `ggplot2::facet_grid`) keyword arguments in the mapping.
+
+:::{.callout-note}
+
+**TODO:** use the `layout` keyword mapping to create facets by subject instead of colors by subject
+
+:::
