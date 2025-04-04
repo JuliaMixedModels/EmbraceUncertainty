@@ -47,7 +47,6 @@ using EmbraceUncertainty: dataset
 using MixedModels
 using MixedModelsMakie
 using Random
-using RCall
 using StatsBase
 ```
 

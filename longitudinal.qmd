@@ -46,7 +46,6 @@ using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
 using Random
-using RCall
 using StandardizedPredictors
 using GLM
 ```
