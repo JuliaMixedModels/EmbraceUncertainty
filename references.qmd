@@ -27,12 +27,13 @@ Pkg.status()
 ```
 
 ```{julia}
-using RCall
 #| echo: false
+using RCall
 ```
 
 ```{r}
-sessionInfo()
+print(sessionInfo())
+NULL
 ```
 
 *This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
