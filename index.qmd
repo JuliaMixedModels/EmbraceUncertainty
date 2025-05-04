@@ -11,4 +11,4 @@ The purpose of those technical discussions is to establish a firm mathematical a
 
 This book has been produced with Quarto.  To learn more about Quarto books visit [https://quarto.org/docs/books](https://quarto.org/docs/books).
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
