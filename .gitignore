@@ -14,7 +14,8 @@ _freeze/
 .jupyter_cache/
 docs/
 data/
+/*.html
 *_files/
-
+site_libs/
 /.quarto/
 /.luarc.json
