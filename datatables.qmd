@@ -259,4 +259,4 @@ This package is particularly well-suited to more advanced data manipulation such
 
 @JSSv107i04 compares the performance of DataFrames.jl to other data frame implementations in R and Python.
 
-*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >} and Julia {{< julia >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

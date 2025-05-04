@@ -553,4 +553,4 @@ exp(last(first(srtdre)))
 
 or about 40%.
 
-*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >} and Julia {{< julia >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
