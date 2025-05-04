@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.17">
+<meta name="generator" content="quarto-1.7.29">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -19,6 +19,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -57,10 +92,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-1a0225cd3bee5feaa61925699987b62d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7edfaf1c48232bdc7da6ab4de57864f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-4285de8c9e1376331f0775bed87c2efb.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-2ae7bcff249d0cf02b4a55d0e864bb15.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -208,8 +243,14 @@ div.csl-indent {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#software-versions" id="toc-software-versions" class="nav-link active" data-scroll-target="#software-versions">Software versions</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -332,11 +373,118 @@ Wickham, H. (2011). The split-apply-combine strategy for data analysis.
 <em>Journal of Statistical Software</em>, <em>40</em>(1), 1–29. <a href="https://doi.org/10.18637/jss.v040.i01">https://doi.org/10.18637/jss.v040.i01</a>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/2078c62
-">2078c62
-</a>.</em></p>
+<section id="software-versions" class="level1">
+<h1>Software versions</h1>
+<div id="2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">versioninfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Julia Version 1.11.5
+Commit 760b2e5b739 (2025-04-14 06:53 UTC)
+Build Info:
+  Official https://julialang.org/ release
+Platform Info:
+  OS: Linux (x86_64-linux-gnu)
+  CPU: 16 × Intel(R) Xeon(R) E-2288G CPU @ 3.70GHz
+  WORD_SIZE: 64
+  LLVM: libLLVM-16.0.6 (ORCJIT, skylake)
+Threads: 16 default, 0 interactive, 8 GC (on 16 virtual cores)
+Environment:
+  JULIA_PROJECT = @.
+  JULIA_LOAD_PATH = @:@stdlib</code></pre>
+</div>
+</div>
+<div id="4" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>BLAS.<span class="fu">get_config</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>LinearAlgebra.BLAS.LBTConfig
+Libraries: 
+└ [ILP64] libopenblas64_.so</code></pre>
+</div>
+</div>
+<div id="6" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">status</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-cyan-fg ansi-bold">Project</span> EmbraceUncertainty v0.1.0
+<span class="ansi-green-fg ansi-bold">Status</span> `~/Work/EmbraceUncertainty/Project.toml`
+  <span class="ansi-bright-black-fg">[cbdf2221] </span>AlgebraOfGraphics v0.10.4
+  <span class="ansi-bright-black-fg">[69666777] </span>Arrow v2.8.0
+  <span class="ansi-bright-black-fg">[6e4b80f9] </span>BenchmarkTools v1.6.0
+  <span class="ansi-bright-black-fg">[336ed68f] </span>CSV v0.10.15
+  <span class="ansi-bright-black-fg">[13f3f980] </span>CairoMakie v0.13.4
+  <span class="ansi-bright-black-fg">[324d7699] </span>CategoricalArrays v0.10.8
+  <span class="ansi-bright-black-fg">[8be319e6] </span>Chain v0.6.0
+  <span class="ansi-bright-black-fg">[9a962f9c] </span>DataAPI v1.16.0
+  <span class="ansi-bright-black-fg">[75880514] </span>DataFrameMacros v0.4.1
+  <span class="ansi-bright-black-fg">[a93c6f00] </span>DataFrames v1.7.0
+  <span class="ansi-bright-black-fg">[31c24e10] </span>Distributions v0.25.119
+  <span class="ansi-bright-black-fg">[8f03c58b] </span>Effects v1.4.0
+  <span class="ansi-bright-black-fg">[da1fdf0e] </span>FreqTables v0.4.6
+  <span class="ansi-bright-black-fg">[38e38edf] </span>GLM v1.9.0
+  <span class="ansi-bright-black-fg">[ff71e718] </span>MixedModels v4.34.1
+  <span class="ansi-bright-black-fg">[7e9fb7ac] </span>MixedModelsDatasets v0.1.2
+  <span class="ansi-bright-black-fg">[b12ae82c] </span>MixedModelsMakie v0.4.7
+  <span class="ansi-bright-black-fg">[76087f3c] </span>NLopt v1.1.3
+  <span class="ansi-bright-black-fg">[2dfb63ee] </span>PooledArrays v1.4.3
+  <span class="ansi-bright-black-fg">[6f49c342] </span>RCall v0.14.8
+  <span class="ansi-bright-black-fg">[27983f2f] </span>RectangularFullPacked v0.2.1
+  <span class="ansi-bright-black-fg">[6c6a2e73] </span>Scratch v1.2.1
+  <span class="ansi-bright-black-fg">[5064a6a7] </span>StandardizedPredictors v1.0.1
+  <span class="ansi-bright-black-fg">[82ae8749] </span>StatsAPI v1.7.0
+  <span class="ansi-bright-black-fg">[2913bbd2] </span>StatsBase v0.34.4
+  <span class="ansi-bright-black-fg">[3eaba693] </span>StatsModels v0.7.4
+  <span class="ansi-bright-black-fg">[bd369af6] </span>Tables v1.12.0
+  <span class="ansi-bright-black-fg">[337ecbd1] </span>TidierPlots v0.11.1
+  <span class="ansi-bright-black-fg">[9d95f2ec] </span>TypedTables v1.4.6
+  <span class="ansi-bright-black-fg">[a5390f91] </span>ZipFile v0.10.1
+  <span class="ansi-bright-black-fg">[ade2ca70] </span>Dates v1.11.0
+  <span class="ansi-bright-black-fg">[f43a241f] </span>Downloads v1.6.0
+  <span class="ansi-bright-black-fg">[37e2e46d] </span>LinearAlgebra v1.11.0
+  <span class="ansi-bright-black-fg">[d6f4376e] </span>Markdown v1.11.0
+  <span class="ansi-bright-black-fg">[44cfe95a] </span>Pkg v1.11.0
+  <span class="ansi-bright-black-fg">[9a3f8284] </span>Random v1.11.0
+  <span class="ansi-bright-black-fg">[ea8e919c] </span>SHA v0.7.0
+</pre>
+</div>
+</div>
+</div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sessionInfo</span>())</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="10" class="cell" data-execution_count="1">
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Linux Mint 22.1
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/libmkl_rt.so;  LAPACK version 3.8.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8          LC_NUMERIC=C                 
+ [3] LC_TIME=en_AU.UTF-8           LC_COLLATE=en_US.UTF-8       
+ [5] LC_MONETARY=en_AU.UTF-8       LC_MESSAGES=en_US.UTF-8      
+ [7] LC_PAPER=en_AU.UTF-8          LC_NAME=en_AU.UTF-8          
+ [9] LC_ADDRESS=en_AU.UTF-8        LC_TELEPHONE=en_AU.UTF-8     
+[11] LC_MEASUREMENT=en_AU.UTF-8    LC_IDENTIFICATION=en_AU.UTF-8
+
+time zone: America/Chicago
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+[1] compiler_4.5.0</code></pre>
+</div>
+</div>
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/08faf63
+">08faf63
+</a> using Quarto 1.7.29.</em></p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
