@@ -947,4 +947,4 @@ With larger data sets and more complex models, large bootstrap samples of parame
 
 Prediction intervals from the conditional distribution of the random effects, given the observed data, allow us to assess the precision of the random effects.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

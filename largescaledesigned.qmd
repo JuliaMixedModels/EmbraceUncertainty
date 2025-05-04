@@ -610,4 +610,4 @@ Also, there is at least one outlier with a conditional mode over 1.0.
 qqcaterpillar!(Figure(; size=(600, 450)), ranefinfo(elm02, :subj))
 ```
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
