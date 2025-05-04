@@ -125,7 +125,7 @@ function _meanrespfrm(
   grps::Symbol;
   sumryf::Function=mean,
 )
-  # ensure the relevant columns are types that Makie can deal with 
+  # ensure the relevant columns are types that Makie can deal with
   df = transform(
     df,
     resp => Array,
@@ -751,4 +751,4 @@ That is, profile-based confidence intervals on the fixed-effects parameter, $\be
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >} and Julia {{< julia >}}.*
