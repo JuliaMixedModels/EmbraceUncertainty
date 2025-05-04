@@ -76,3 +76,4 @@ julia:
 
 execute:
   freeze: auto
+  cache: true
