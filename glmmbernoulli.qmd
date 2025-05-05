@@ -1,7 +1,7 @@
 ---
 fig-width: 4
 fig-height: 3
-fig-dpi: 150
+fig-dpi: 192
 fig-format: png
 engine: julia
 julia:
