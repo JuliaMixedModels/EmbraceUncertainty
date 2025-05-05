@@ -95,7 +95,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7edfaf1c48232bdc7da6ab4de57864f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-2ae7bcff249d0cf02b4a55d0e864bb15.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-6827b874287f4e1fd92990edaa406c70.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -384,10 +384,10 @@ Build Info:
   Official https://julialang.org/ release
 Platform Info:
   OS: Linux (x86_64-linux-gnu)
-  CPU: 16 × Intel(R) Xeon(R) E-2288G CPU @ 3.70GHz
+  CPU: 8 × 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
   WORD_SIZE: 64
-  LLVM: libLLVM-16.0.6 (ORCJIT, skylake)
-Threads: 16 default, 0 interactive, 8 GC (on 16 virtual cores)
+  LLVM: libLLVM-16.0.6 (ORCJIT, tigerlake)
+Threads: 8 default, 0 interactive, 4 GC (on 8 virtual cores)
 Environment:
   JULIA_PROJECT = @.
   JULIA_LOAD_PATH = @:@stdlib</code></pre>
@@ -433,7 +433,7 @@ Libraries:
   <span class="ansi-bright-black-fg">[6c6a2e73] </span>Scratch v1.2.1
   <span class="ansi-bright-black-fg">[5064a6a7] </span>StandardizedPredictors v1.0.1
   <span class="ansi-bright-black-fg">[82ae8749] </span>StatsAPI v1.7.0
-  <span class="ansi-bright-black-fg">[2913bbd2] </span>StatsBase v0.34.4
+  <span class="ansi-bright-black-fg">[2913bbd2] </span>StatsBase v0.34.5
   <span class="ansi-bright-black-fg">[3eaba693] </span>StatsModels v0.7.4
   <span class="ansi-bright-black-fg">[bd369af6] </span>Tables v1.12.0
   <span class="ansi-bright-black-fg">[337ecbd1] </span>TidierPlots v0.11.1
@@ -456,18 +456,19 @@ Libraries:
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.0 (2025-04-11)
 Platform: x86_64-pc-linux-gnu
-Running under: Linux Mint 22.1
+Running under: Pop!_OS 22.04 LTS
 
 Matrix products: default
-BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/libmkl_rt.so;  LAPACK version 3.8.0
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0  LAPACK version 3.10.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8          LC_NUMERIC=C                 
- [3] LC_TIME=en_AU.UTF-8           LC_COLLATE=en_US.UTF-8       
- [5] LC_MONETARY=en_AU.UTF-8       LC_MESSAGES=en_US.UTF-8      
- [7] LC_PAPER=en_AU.UTF-8          LC_NAME=en_AU.UTF-8          
- [9] LC_ADDRESS=en_AU.UTF-8        LC_TELEPHONE=en_AU.UTF-8     
-[11] LC_MEASUREMENT=en_AU.UTF-8    LC_IDENTIFICATION=en_AU.UTF-8
+ [3] LC_TIME=en_US.UTF-8           LC_COLLATE=en_US.UTF-8       
+ [5] LC_MONETARY=en_US.UTF-8       LC_MESSAGES=en_US.UTF-8      
+ [7] LC_PAPER=en_US.UTF-8          LC_NAME=en_US.UTF-8          
+ [9] LC_ADDRESS=en_US.UTF-8        LC_TELEPHONE=en_US.UTF-8     
+[11] LC_MEASUREMENT=en_US.UTF-8    LC_IDENTIFICATION=en_US.UTF-8
 
 time zone: America/Chicago
 tzcode source: system (glibc)
@@ -479,8 +480,8 @@ loaded via a namespace (and not attached):
 [1] compiler_4.5.0</code></pre>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/08faf63
-">08faf63
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a33ede0
+">a33ede0
 </a> using Quarto 1.7.29.</em></p>
 
 
