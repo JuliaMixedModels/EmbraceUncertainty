@@ -2528,16 +2528,28 @@ Note
 <p>These models take only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.</p>
 <p>The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers. We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the <code>MixedModel</code> object followed by restoring the <code>optsum</code> object.</p>
 <div id="70" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveoptsum</span>(<span class="st">"./optsums/elm01.json"</span>, elm01);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> file <span class="op">=</span> <span class="st">"./optsums/elm01.json"</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  !<span class="fu">isfile</span>(file) <span class="op">&amp;&amp;</span> <span class="fu">saveoptsum</span>(file, elm01);</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>false</code></pre>
+</div>
 </div>
 <div id="72" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>elm01a <span class="op">=</span> <span class="fu">restoreoptsum!</span>(</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> <span class="fl">1000</span> <span class="op">/</span> rt <span class="op">~</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span> isword <span class="op">*</span> wrdlen <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> item) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> subj)</span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MixedModel</span>(f, pruned; contrasts)</span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span>,</span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"./optsums/elm01.json"</span>,</span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>elm01a <span class="op">=</span> <span class="fu">restoreoptsum!</span>(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">let</span> f <span class="op">=</span> <span class="pp">@formula</span> <span class="fl">1000</span> <span class="op">/</span> rt <span class="op">~</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>      <span class="fl">1</span> <span class="op">+</span> isword <span class="op">*</span> wrdlen <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> item) <span class="op">+</span> (<span class="fl">1</span> <span class="op">|</span> subj)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">MixedModel</span>(f, pruned; contrasts)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="kw">end</span>,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"./optsums/elm01.json"</span>,</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-yellow-fg ansi-bold">┌ </span><span class="ansi-yellow-fg ansi-bold">Warning: </span>optsum was saved with an older version of MixedModels.jl: consider resaving.
+<span class="ansi-yellow-fg ansi-bold">└ </span><span class="ansi-bright-black-fg">@ MixedModels ~/.julia/packages/MixedModels/bu3nA/src/serialization.jl:94</span>
+</pre>
+</div>
+</div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <tbody>
@@ -2601,8 +2613,8 @@ Note
 </div>
 <p>Other covariates associated with the item are available as</p>
 <div id="74" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>elpldtitem <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_item))</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>elpldtitem <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_item))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtitem)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>9×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
@@ -2726,8 +2738,8 @@ Note
 </div>
 <p>and those associated with the subject are</p>
 <div id="76" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>elpldtsubj <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_subj))</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtsubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>elpldtsubj <span class="op">=</span> <span class="fu">DataFrame</span>(<span class="fu">dataset</span>(<span class="op">:</span>ELP_ldt_subj))</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(elpldtsubj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>20×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small" data-quarto-postprocess="true">
@@ -2963,7 +2975,7 @@ Note
 <div id="cell-fig-elm01caterpillarsubj" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(<span class="fu">Figure</span>(; size<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">450</span>)), <span class="fu">ranefinfo</span>(elm01, <span class="op">:</span>subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(<span class="fu">Figure</span>(; size<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">450</span>)), <span class="fu">ranefinfo</span>(elm01, <span class="op">:</span>subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="fig-elm01caterpillarsubj" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
 <figure class="quarto-float quarto-float-fig figure">
@@ -2981,7 +2993,7 @@ Figure&nbsp;4.12: Conditional means and 95% prediction intervals for subject ran
 <div id="cell-fig-elm02caterpillarsubj" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(<span class="fu">Figure</span>(; size<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">450</span>)), <span class="fu">ranefinfo</span>(elm02, <span class="op">:</span>subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqcaterpillar!</span>(<span class="fu">Figure</span>(; size<span class="op">=</span>(<span class="fl">600</span>, <span class="fl">450</span>)), <span class="fu">ranefinfo</span>(elm02, <span class="op">:</span>subj))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="fig-elm02caterpillarsubj" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored" data-execution_count="1">
 <figure class="quarto-float quarto-float-fig figure">
@@ -2994,8 +3006,8 @@ Figure&nbsp;4.13: Conditional means and 95% prediction intervals for subject ran
 </figure>
 </div>
 </div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/a33ede0
-">a33ede0
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/c5fddf5
+">c5fddf5
 </a> using Quarto 1.7.29.</em></p>
 
 
