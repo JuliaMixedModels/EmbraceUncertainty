@@ -559,7 +559,9 @@ The amount of time to fit more complex models will be much greater so we may wan
 We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the `MixedModel` object followed by restoring the `optsum` object.
 
 ```{julia}
-saveoptsum("./optsums/elm01.json", elm01);
+let file = "./optsums/elm01.json"
+  !isfile(file) && saveoptsum(file, elm01);
+end
 ```
 
 ```{julia}
