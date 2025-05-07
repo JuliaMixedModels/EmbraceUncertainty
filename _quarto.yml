@@ -46,6 +46,9 @@ book:
     - datatables.qmd
     - linalg.qmd
     - aGHQ.qmd
+    - traditional_concepts.qmd
+    - wilkinson-notation.md
+
 
 execute-dir: project
 
