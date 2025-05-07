@@ -1,7 +1,7 @@
 ---
 fig-width: 4
 fig-height: 3
-fig-dpi: 150
+fig-dpi: 192
 fig-format: png
 engine: julia
 execute:
@@ -1427,4 +1427,4 @@ fitGHQ!(m)
 m.θβ
 ```
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

@@ -4,16 +4,19 @@ _gen/
 Manifest*.toml
 .vscode/
 .DS_Store
+*.swp
+*\~
 
 .quarto/
 _book/
 _freeze/
+.cache/
 .jupyter_cache/
 docs/
 data/
+/*.html
 *_files/
-
+site_libs/
 /.quarto/
-
 /.luarc.json
 .cache/

@@ -1,6 +1,39 @@
+---
+engine: julia
+julia:
+  exeflags: ["--project"]
+---
+
 # References {.unnumbered}
 
 ::: {#refs}
 :::
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+# Software versions
+
+
+```{julia}
+versioninfo()
+```
+
+```{julia}
+using LinearAlgebra
+BLAS.get_config()
+```
+
+```{julia}
+using Pkg
+Pkg.status()
+```
+
+```{julia}
+#| echo: false
+using RCall
+```
+
+```{r}
+print(sessionInfo())
+NULL
+```
+
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
