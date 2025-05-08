@@ -26,11 +26,6 @@ using Pkg
 Pkg.status()
 ```
 
-```{julia}
-#| echo: false
-using RCall
-```
-
 ```{r}
 print(sessionInfo())
 NULL
