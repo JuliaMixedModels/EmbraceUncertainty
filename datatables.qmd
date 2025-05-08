@@ -1,5 +1,7 @@
 ---
 engine: julia
+execute:
+  cache: true
 ---
 
 # Working with data tables {#sec-datatables}
