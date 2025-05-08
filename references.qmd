@@ -26,9 +26,5 @@ using Pkg
 Pkg.status()
 ```
 
-```{r}
-print(sessionInfo())
-NULL
-```
 
 *This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
