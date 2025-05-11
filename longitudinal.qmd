@@ -47,7 +47,7 @@ using MixedModels
 using MixedModelsMakie
 using Random
 using StandardizedPredictors
-using GLM
+using Statistics
 ```
 
 and declare some constants, if not already defined.
@@ -112,29 +112,45 @@ A preferred alternative is to plot response versus time with each subject's data
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
 #| label: fig-eglayout
-lmeg = lm(@formula(resp~ 1 + time*Subj),egdf);
-newx = DataFrame(Subj = unique(egdf.Subj));
-newx.time .= 8.;
-newx.inter = predict(lmeg,newx);
+age_8 = subset(egdf, :time => ByRow(==(8)))
+sort!(age_8, :resp)
+slopes = combine(
+    groupby(egdf, :Subj),
+    :resp => std => :sy,
+    :time => std => :sx,
+    [:resp, :time] => ((a,b) -> cor(a, b)) => :corr,
+    [:time, :resp] => ((x,y) -> cor(x, y) * std(y) / std(x)) => :slopeabs,
+)
 
-draw(
-  data(egdf) *
+ry = maximum(egdf.resp) - minimum(egdf.resp)
+rx = maximum(egdf.time) - minimum(egdf.time)
+
+α = median(slopes.slopeabs) * rx / ry
+
+plt = data(egdf) *
   mapping(
     :time => "Age (yr)",
     :resp => "Ramus bone length (mm)",
-    layout = :Subj => sorter(sort!(newx, :inter).Subj),
-  ) * (visual(Scatter, marker = '∘', markersize = 20) + linear(;interval=nothing)) * visual(color = :blue),
-  scales(Layout = (; palette = vec([(b,a) for a in 1:10, b in 2:-1:1]))),
-  axis = (; xticklabelrotation = pi/2, xticklabelsize = 10),
-  figure = (; size=(600, 400))
-)
+    layout = :Subj => sorter(age_8.Subj),
+  ) * (visual(Scatter, marker = '∘', markersize = 20) + linear(; interval=nothing)) *
+  visual(color = :blue)
+draw(plt, scales(Layout = (; palette = vec([(b,a) for a in 1:10, b in 2:-1:1])));
+         axis = (; aspect = α, xticklabelrotation = pi/2, xticklabelsize = 10),
+         figure = (; size=(800, 600))
+);
 
 f = current_figure();
-colgap!(f.layout, 2);
+
+f = current_figure();
+colgap!(f.layout, 0);
 rowgap!(f.layout, 5);
+for col in 1:10
+    print
+    colsize!(f.layout, col, Aspect(1, α))
+end
+
 
 f
-
 ```
 
 To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
