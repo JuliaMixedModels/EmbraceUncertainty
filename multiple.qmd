@@ -355,27 +355,35 @@ The labels 'a', 'b' and 'c' are used only to distinguish the three samples withi
 #| code-fold: true
 #| fig-cap: "Strength of paste preparations according to sample within batch"
 #| label: fig-pastesdot
+batch_sort = sort!(combine(groupby(pastes, :batch),
+                           :strength => mean => :strength),
+                   :strength; rev=true).batch
 
-draw(
+paste_means = combine(groupby(pastes, [:cask, :batch]),
+                      :sample,
+                      :strength => mean => "strength" )
+
+fg = draw(
   data(pastes) *
   mapping(
-    :cask,
     :strength,
-    col = :batch => sorter(sort!(combine(groupby(pastes, :batch), :strength => mean => "strength" ), :strength).batch)
+    :cask => "Cask within batch",
+    row = :batch => sorter(batch_sort)
   ) * visual(Scatter; marker = '∘', markersize = 15, color = :blue) +
-  data(combine(groupby(pastes, [:cask, :batch]), :strength => mean => "strength" )) *
+  data(paste_means) *
   mapping(
-    :cask,
     :strength,
-    col = :batch => sorter(sort!(combine(groupby(pastes, :batch), :strength => mean => "strength" ), :strength).batch)
+    :cask => "Cask within batch",
+    row = :batch => sorter(batch_sort)
   ) * visual(Lines; color = :blue);
-  axis = (; xticklabelsize = 10),
-  figure = (; size=(700, 350))
+  # axis = (; xticklabelsize = 10),
+  facet = (; linkyaxes=:minimal),
+  figure = (; size=(600, 600))
 );
 
-f = current_figure();
+f = fg.figure
 
-colgap!(f.layout, 4)
+rowgap!(f.layout, 4)
 f
 ```
 
