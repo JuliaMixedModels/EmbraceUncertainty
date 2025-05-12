@@ -134,14 +134,13 @@ plt = data(egdf) *
     layout = :Subj => sorter(age_8.Subj),
   ) * (visual(Scatter, marker = '∘', markersize = 20) + linear(; interval=nothing)) *
   visual(color = :blue)
-draw(plt, scales(Layout = (; palette = vec([(b,a) for a in 1:10, b in 2:-1:1])));
+fg = draw(plt, scales(Layout = (; palette = vec([(b,a) for a in 1:10, b in 2:-1:1])));
          axis = (; aspect = α, xticklabelrotation = pi/2, xticklabelsize = 10),
          figure = (; size=(800, 600))
 );
 
-f = current_figure();
+f = fg.figure
 
-f = current_figure();
 colgap!(f.layout, 0);
 rowgap!(f.layout, 5);
 for col in 1:10
