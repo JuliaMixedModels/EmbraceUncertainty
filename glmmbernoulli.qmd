@@ -4,6 +4,8 @@ fig-height: 3
 fig-dpi: 192
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: ["--project"]
 ---

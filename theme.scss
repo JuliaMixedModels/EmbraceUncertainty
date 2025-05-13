@@ -13,8 +13,8 @@ $code-bg: #f8f5f0;
 $font-family-monospace: JuliaMono, Menlo, "Roboto Mono", "Lucida Sans Typewriter", "Source Code Pro", monospace;
 
 pre {
-    line-height: normal;
+    line-height: normal !important;
     code {
-        line-height: normal;
+        line-height: normal !important;
     }
 }

@@ -19,3 +19,4 @@ data/
 site_libs/
 /.quarto/
 /.luarc.json
+.cache/
