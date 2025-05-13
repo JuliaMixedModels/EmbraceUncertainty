@@ -366,24 +366,24 @@ paste_means = combine(groupby(pastes, [:cask, :batch]),
 fg = draw(
   data(pastes) *
   mapping(
-    :strength,
     :cask => "Cask within batch",
-    row = :batch => sorter(batch_sort)
+    :strength,
+    col = :batch => sorter(batch_sort)
   ) * visual(Scatter; marker = '∘', markersize = 15, color = :blue) +
   data(paste_means) *
   mapping(
-    :strength,
     :cask => "Cask within batch",
-    row = :batch => sorter(batch_sort)
+    :strength,
+    col = :batch => sorter(batch_sort)
   ) * visual(Lines; color = :blue);
   # axis = (; xticklabelsize = 10),
   facet = (; linkyaxes=:minimal),
-  figure = (; size=(600, 600))
+  figure = (; size=(700, 350))
 );
 
 f = fg.figure
 
-rowgap!(f.layout, 4)
+colgap!(f.layout, 4)
 f
 ```
 
