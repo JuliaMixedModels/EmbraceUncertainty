@@ -1,5 +1,13 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 192
+fig-format: png
+engine: julia
+execute:
+  cache: true
+julia:
+  exeflags: ["--project"]
 ---
 
 # Generalized linear mixed models for binary responses {#sec-glmmbinomial}
@@ -25,7 +33,6 @@ Attach the packages to be used in this chapter
 #| label: packages06
 using AlgebraOfGraphics
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using DataFrames         # only used for `describe`
 using EmbraceUncertainty: dataset
 using FreqTables
@@ -113,7 +120,7 @@ draw(
     color=:livch,
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(650, 400)),
 )
 ```
 
@@ -141,10 +148,13 @@ Establishing the contrasts and fitting a preliminary model with random effects f
 contrasts[:livch] = EffectsCoding(; base="0")
 contrasts[:urban] = HelmertCoding()
 
-com01 = let
-  f = @formula use ~
-    1 + livch + (age + abs2(age)) * urban + (1 | dist)
-  fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+com01 =
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(use ~
+      1 + livch + (age + abs2(age)) * urban + (1 | dist))
+
+  fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
 end
 ```
 
@@ -194,8 +204,11 @@ we fit a reduced model.
 
 ```{julia}
 com02 =
-  let f = @formula use ~ 1 + ch + age * age * urban + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(use ~ 1 + ch + age * age * urban + (1 | dist))
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -211,8 +224,11 @@ Apparently neither the second-order interaction `age & urban` nor the third-orde
 
 ```{julia}
 com03 =
-  let f = @formula use ~ 1 + urban + ch + age * age + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+  let f = @formula(use ~ 1 + urban + ch + age * age + (1 | dist)),
+    d = contra,
+    ds = Bernoulli()
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -240,7 +256,7 @@ draw(
     color=:ch => "Children",
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(650, 400)),
 )
 ```
 
@@ -250,8 +266,11 @@ Incorporating an interaction of `age` and `ch` allows for such a shift.
 ```{julia}
 com04 =
   let f =
-      @formula use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+      @formula(use ~ 1 + urban + ch * age + abs2(age) + (1 | dist)),
+    d = contra,
+    ds = Bernoulli()
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -267,9 +286,12 @@ A series of such model fits led to a model with random effects for the combinati
 
 ```{julia}
 com05 =
-  let f = @formula use ~
-      1 + urban + ch * age + abs2(age) + (1 | dist & urban)
-    fit(MixedModel, f, contra, Bernoulli(); contrasts, nAGQ, progress)
+  let f = @formula(use ~
+      1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
+    d = contra,
+    ds = Bernoulli()
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
   end
 ```
 
@@ -360,7 +382,7 @@ draw(
     color=:ch => "Children",
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(650, 400)),
 )
 ```
 
@@ -401,7 +423,7 @@ is called the *logistic* function and is shown in @fig-logitinv.
 #| label: fig-logitinv
 #| warning: false
 let
-  fig = Figure(; resolution=(800, 400))
+  fig = Figure(; size=(650, 300))
   ax = Axis(fig[1, 1]; xlabel="η", ylabel="μ")
   lines!(ax, -5.5 .. 5.5, η -> inv(1 + exp(-η)))
   fig
@@ -459,7 +481,7 @@ draw(
     color=:ch => "Children",
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(650, 400)),
 )
 ```
 
@@ -485,7 +507,7 @@ A normal probability plot of the conditional modes of the random effects for mod
 #| fig-cap: Caterpillar plot of the conditional modes of the random-effects for model `com05`
 #| label: fig-com05qqcaterpillar
 #| warning: false
-qqcaterpillar(com05)
+qqcaterpillar!(Figure(; size=(650, 450)), com05)
 ```
 
 shows that the smallest random effects are approximately -1 and the largest are approximately 1.
@@ -533,4 +555,4 @@ exp(last(first(srtdre)))
 
 or about 40%.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

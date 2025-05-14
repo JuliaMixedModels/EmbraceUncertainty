@@ -5,5 +5,16 @@
   https://quarto.org/docs/output-formats/html-themes.html#sass-variables
 */
 /*-- scss:defaults --*/
+@import '../../fonts/juliamono.css';
+
 $code-block-bg: #f8f5f0;
 $code-bg: #f8f5f0;
+
+$font-family-monospace: JuliaMono, Menlo, "Roboto Mono", "Lucida Sans Typewriter", "Source Code Pro", monospace;
+
+pre {
+    line-height: normal !important;
+    code {
+        line-height: normal !important;
+    }
+}

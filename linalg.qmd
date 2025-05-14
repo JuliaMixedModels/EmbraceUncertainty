@@ -1,5 +1,5 @@
 ---
-jupyter: julia-1.10
+engine: julia
 ---
 
 # Linear algebra for linear models {#sec-linalg}
@@ -139,7 +139,7 @@ $$ {#eq-forwardsolve}
 and so on.
 
 One point to note here is that $b_1$ is not needed after $x_1$ is evaluated, $b_2$ is not needed after $x_2$ is evaluated, and so on.
-That is, the forward solution can be carried out *in place* with each element of $\mathbf{b}$ overwriting the corresponding element of $\bbx$.
+That is, the forward solution can be carried out *in place* by overwriting each element of $\mathbf{b}$ with the corresponding element of $\bbx$.
 This property is useful for avoiding allocation of storage in, for example, evaluation of an objective function during optimization.
 
 The corresponding method of solving an upper-triangular system of equations is called *backward solution*, where $b_n$ is evaluated first, then $b_{n-1}$, and so on.
@@ -205,11 +205,19 @@ In general, if $\mcX$ is an $n$-dimensional random variable with mean $\bbmu$ an
 $$
 \require{unicode}
 𝔼\left[\mcU\right] =
-𝔼\left[\mathbf{A}\mcX\right] =
-\mathbf{A}𝔼\left[\mcX\right] =
-\mathbf{A}\bbmu
+\mathbf{A}\bbmu \quad\textrm{and}\quad \text{Var}\left(\mcU\right) = \mathbf{A}\bbSigma\mathbf{A}'.
 $$ {#eq-mvexpectedlin}
-and
+<details>
+<summary>Proof</summary>
+For the expectation: 
+$$
+  \require{unicode}
+𝔼\left[{\mathcal{U}}\right] =
+𝔼\left[\mathbf{A}{\mathcal{X}}\right] =
+\mathbf{A}𝔼\left[{\mathcal{X}}\right] =
+\mathbf{A}{\boldsymbol{\mu}}.
+$$
+For the variance:
 $$
 \begin{aligned}
 \text{Var}\left(\mcU\right)
@@ -218,18 +226,20 @@ $$
 &=𝔼\left[\mathbf{A}\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\mathbf{A}'\right]\\
 &=\mathbf{A}\,𝔼\left[\left(\mcX-\bbmu\right)\left(\mcX-\bbmu\right)'\right]\mathbf{A}'\\
 &=\mathbf{A}\text{Var}(\mcX)\mathbf{A}'\\
-&=\mathbf{A}\bbSigma\mathbf{A}'
+&=\mathbf{A}\bbSigma\mathbf{A}'.
 \end{aligned}
-$$ {#eq-mvvarlin}
+$$
+</details>
 
-A linear function, $\mcU=\mathbf{A}\mcX$, of a multivariate Gaussian distribution, $\mcX\sim\mcN(\bbmu,\bbSigma)$, is also Gaussian and these relationships imply that
+
+A linear function, $\mcU=\mathbf{A}\mcX$, of a multivariate Gaussian distribution, $\mcX\sim\mcN(\bbmu,\bbSigma)$, [is also Gaussian](https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Affine_transformation) which implies:
 $$
 \mcU\sim\mcN(\mathbf{A}\bbmu, \mathbf{A}\bbSigma\mathbf{A}')
 $$ {#eq-mvnlinfunc}
 
 For the special case of $\mathbf{A}$ being of dimension $1\times n$ (i.e. a *row vector*), the expression for the $1\times 1$ covariance matrix is the quadratic form defined by $\bbSigma$, which is why $\bbSigma$ must be positive definite for the conditional distributions to be non-degenerate.
 
-## Back at the linear model
+## Back to the linear model
 
 The probability density function for the linear model, @eq-mvnlinmod, is
 $$

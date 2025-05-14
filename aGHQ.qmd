@@ -1,5 +1,13 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 192
+fig-format: png
+engine: julia
+execute:
+  cache: true
+julia:
+  exeflags: ["--project"]
 ---
 
 # GLMM log-likelihood {#sec-GLMMdeviance}
@@ -250,17 +258,13 @@ end
 contrasts[:urban] = HelmertCoding()
 contrasts[:ch] = HelmertCoding()
 com05 =
-  let f = @formula use ~
-      1 + urban + ch * age + age & age + (1 | dist & urban)
-    fit(
-      MixedModel,
-      f,
-      contra,
-      Bernoulli();
-      contrasts,
-      nAGQ=9,
-      progress,
+  let d = contra,
+    ds = Bernoulli(),
+    f = @formula(
+      use ~ 1 + urban + ch * age + age & age + (1 | dist & urban)
     )
+
+    fit(MixedModel, f, d, ds; contrasts, nAGQ=9, progress)
   end
 ```
 
@@ -1170,7 +1174,8 @@ The weights and positions for the 9th order rule are shown in @fig-ghnine.
 #| warning: false
 draw(
   data(gausshermitenorm(9)) *
-  mapping(:abscissae => "Positions", :weights),
+  mapping(:abscissae => "Positions", :weights);
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -1185,7 +1190,8 @@ draw(
   data(gausshermitenorm(9)) * mapping(
     :abscissae => "Positions",
     :weights => log2 => "log₂(weight)",
-  ),
+  );
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -1458,4 +1464,4 @@ fitGHQ!(m);
 This converged to θ = `{julia} repr(first(m.θβ), context=:compact => true)` and β =
 `{julia} repr(view(m.θβ, 2:length(m.θβ)), context=:compact => true)`.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

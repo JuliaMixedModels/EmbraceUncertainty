@@ -1,5 +1,13 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 192
+fig-format: png
+engine: julia
+execute:
+  cache: true
+julia:
+  exeflags: ["--project"]
 ---
 
 # Models for longitudinal data {#sec-longitudinal}
@@ -31,7 +39,6 @@ Load the packages to be used,
 #| label: packages03
 using AlgebraOfGraphics
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using DataFrameMacros
 using DataFrames
 using EmbraceUncertainty: dataset
@@ -39,11 +46,12 @@ using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
 using Random
-using RCall
 using StandardizedPredictors
+using Statistics
 ```
 
 and declare some constants, if not already defined.
+
 ```{julia}
 #| code-fold: true
 #| output: false
@@ -91,6 +99,8 @@ draw(
     color=:Subj,
   ) *
   (visual(Scatter) + visual(Lines)),
+  scales(Color = (; legend = false,));
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -102,20 +112,44 @@ A preferred alternative is to plot response versus time with each subject's data
 #| code-fold: true
 #| fig-cap: Length of ramus bone versus age for a sample of 20 boys.  The panels are ordered rowwise, starting at the bottom left, by increasing bone length at age 8.
 #| label: fig-eglayout
-RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=7)
-R"""
-print(
-  lattice::xyplot(
-    resp ~ time|Subj,
-    $egdf,
-    type=c("g","p","r"),
-    aspect="xy",
-    index.cond=function(x,y) coef(lm(y ~ x)) %*% c(1,8),
-    xlab="Age (yr)",
-    ylab="Ramus bone length (mm)",
-    ),
-  )
-""";
+age_8 = subset(egdf, :time => ByRow(==(8)))
+sort!(age_8, :resp)
+slopes = combine(
+    groupby(egdf, :Subj),
+    :resp => std => :sy,
+    :time => std => :sx,
+    [:resp, :time] => ((a,b) -> cor(a, b)) => :corr,
+    [:time, :resp] => ((x,y) -> cor(x, y) * std(y) / std(x)) => :slopeabs,
+)
+
+ry = maximum(egdf.resp) - minimum(egdf.resp)
+rx = maximum(egdf.time) - minimum(egdf.time)
+
+α = median(slopes.slopeabs) * rx / ry
+
+plt = data(egdf) *
+  mapping(
+    :time => "Age (yr)",
+    :resp => "Ramus bone length (mm)",
+    layout = :Subj => sorter(age_8.Subj),
+  ) * (visual(Scatter, marker = '∘', markersize = 20) + linear(; interval=nothing)) *
+  visual(color = :blue)
+fg = draw(plt, scales(Layout = (; palette = vec([(b,a) for a in 1:10, b in 2:-1:1])));
+         axis = (; aspect = α, xticklabelrotation = pi/2, xticklabelsize = 10),
+         figure = (; size=(800, 600))
+);
+
+f = fg.figure
+
+colgap!(f.layout, 0);
+rowgap!(f.layout, 5);
+for col in 1:10
+    print
+    colsize!(f.layout, col, Aspect(1, α))
+end
+
+
+f
 ```
 
 To aid comparisons between subjects the axes are the same in every panel and the order of the panels is chosen systematically - in @fig-eglayout the order is by increasing bone length at 8 years of age.
@@ -149,7 +183,7 @@ A caterpillar plot of the random effects for intercept and slope, @fig-egm01cate
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model egm01
 #| label: fig-egm01caterpillar
 #| warning: false
-caterpillar!(Figure(resolution=(800, 500)), ranefinfo(egm01, :Subj))
+caterpillar!(Figure(size=(600, 320)), ranefinfo(egm01, :Subj))
 ```
 
 ### Centering the time values
@@ -165,7 +199,7 @@ If the purpose of the experiment is to create a predictive model for the growth 
 
 Alternatively, we could center at the average observed time, 8.75 years, or at some other value of interest.
 
-The important thing is to make clear what the `(Itercept)` parameter estimates represent.
+The important thing is to make clear what the `(Intercept)` parameter estimates represent.
 The [StandardizedPredictors.jl](https://github.com/beacon-biosignals/StandardizedPredictors.jl) package allows for convenient representations of several standardizing transformations in a `contrasts` specification for the model.
 An advantage of this method of coding a transformation is that the coefficient names include a concise description of the transformation.
 
@@ -192,7 +226,7 @@ A caterpillar plot, @fig-egm02caterpillar, for `egm02` shows much smaller spread
 #| label: fig-egm02caterpillar
 #| code-fold: true
 #| warning: false
-caterpillar!(Figure(resolution=(800, 550)), ranefinfo(egm02, :Subj))
+caterpillar!(Figure(size=(600, 380)), ranefinfo(egm02, :Subj))
 ```
 
 A third option is to center the `time` covariate at the mean of the original `time` values.
@@ -227,7 +261,7 @@ A *shrinkage plot* shows the conditional means of the random effects from the mo
 #| fig-cap: Shrinkage plot of the random effects for model egm02.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm02shrinkage
 #| warning: false
-shrinkageplot!(Figure(; resolution=(600, 600)), egm02)
+shrinkageplot!(Figure(; size=(600, 600)), egm02)
 ```
 
 @fig-egm02shrinkage reinforces some of the conclusions from @fig-egm02caterpillar.
@@ -267,7 +301,7 @@ A shrinkage plot, @fig-egm04shrinkage, shows that the random effects for the qua
 #| fig-cap: Shrinkage plot of the random effects for model egm04.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-egm04shrinkage
 #| warning: false
-shrinkageplot!(Figure(; resolution=(800, 800)), egm04)
+shrinkageplot!(Figure(; size=(600, 600)), egm04)
 ```
 
 Both of these results lead to the conclusion that linear growth, over the observed range of ages, should be adequate - a conclusion reinforced by a likelihood ratio test.
@@ -332,6 +366,9 @@ draw(
   bxaxes *
   mapping(; color=:Subj) *
   (visual(Scatter) + visual(Lines)),
+  scales(Color = (; legend = false,));
+  figure=(; size=(600, 450)),
+  legend = (; position=:bottom, titleposition = :left)
 )
 ```
 
@@ -351,7 +388,7 @@ let df = bxgdf[("Control",)]
         sorter(sort!(filter(:time => iszero, df), :resp).Subj),
     ) *
     visual(ScatterLines);
-    axis=(height=250, width=150),
+    axis=(height=180, width=108),
   )
 end
 ```
@@ -375,7 +412,7 @@ let
         sorter(sort!(filter(:time => iszero, df), :resp).Subj),
     ) *
     visual(ScatterLines);
-    axis=(height=250, width=150),
+    axis=(height=180, width=108),
   )
 end
 ```
@@ -399,7 +436,7 @@ let
         sorter(sort!(filter(:time => iszero, df), :resp).Subj),
     ) *
     visual(ScatterLines);
-    axis=(height=250, width=150),
+    axis=(height=180, width=108),
   )
 end
 ```
@@ -484,7 +521,7 @@ A caterpillar plot created from the conditional means and standard deviations of
 #| fig-cap: Conditional modes and 95% prediction intervals on the random effects for slope and intercept in model bxm03
 #| label: fig-bxm03caterpillar
 #| warning: false
-caterpillar(bxm03)
+caterpillar!(Figure(; size=(600, 720)), bxm03)
 ```
 
 A shrinkage plot, @fig-bxm03shrinkage
@@ -494,7 +531,7 @@ A shrinkage plot, @fig-bxm03shrinkage
 #| fig-cap: Shrinkage plot of the random effects for model bxm03.  Blue dots are the conditional means of the random effects at the parameter estimates.  Red dots are the corresponding unconstrained estimates.
 #| label: fig-bxm03shrinkage
 #| warning: false
-shrinkageplot!(Figure(; resolution=(800, 800)), bxm03)
+shrinkageplot!(Figure(; size=(600, 600)), bxm03)
 ```
 
 shows that the random effects are considerably shrunk towards the origin, relative to the "unconstrained" values from within-subject fits, but none of the panels shows them collapsing to a line.
@@ -533,7 +570,7 @@ let
   zlabel = "time²"
   perspectiveness = 0.5
   aspect = :data
-  f = Figure(; resolution=(1200, 500))
+  f = Figure(; size=(600, 250))
   u, v, w = -Upts[2]    # second principle direction flipped to get positive w
   elevation = asin(w)
   azimuth = atan(v, u)
@@ -597,9 +634,12 @@ draw(
   data(@subset(bxm03pars, :type == "ρ")) *
   mapping(
     :value => "Bootstrap replicates of correlation estimates";
-    color=(:names => "Variables"),
+    color = :names => renamer(["(Intercept), time" => "(Intercept), time", "(Intercept), time ^ 2" => "(Intercept), time².", "time, time ^ 2" => "time, time²"])  => "Variables"
   ) *
-  AlgebraOfGraphics.density();
+  AlgebraOfGraphics.density(),
+  scales(Color = (; palette = [:tomato, :teal, :orange],));
+  figure=(; size=(600, 400)),
+  legend=(;position=:bottom, titleposition = :left)
 )
 ```
 
@@ -617,11 +657,13 @@ let
   )
   mp = mapping(
     :z => "Fisher's z transformation of correlation estimates";
-    color=(:names => "Variables"),
+    color=:names => renamer(["(Intercept), time" => "(Intercept), time", "(Intercept), time ^ 2" => "(Intercept), time².", "time, time ^ 2" => "time, time²"])  => "Variables"
   )
   draw(
-    data(dat) * mp * AlgebraOfGraphics.density();
-    figure=(; resolution=(800, 450)),
+    data(dat) * mp * AlgebraOfGraphics.density(),
+    scales(Color = (; palette = [:tomato, :teal, :orange],));
+    figure=(; size=(600, 400)),
+    legend=(;position=:bottom, titleposition = :left)
   )
 end
 ```
@@ -716,8 +758,10 @@ let
       color=:Group,
       col=:model,
     ) *
-    visual(Lines);
-    axis=(width=350, height=350),
+    visual(Lines),
+    scales(Color = (; palette = [:tomato, :teal, :orange],));
+    figure=(; size=(600, 400)),
+    legend=(;position=:bottom, titleposition = :left)
   )
 end
 ```
@@ -733,4 +777,4 @@ Other points to make:
 
 :::
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

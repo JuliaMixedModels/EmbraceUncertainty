@@ -1,11 +1,14 @@
+quarto-required: ">= 1.7.29"
 project:
   type: book
   output-dir: docs
+  resources:
+    - "/fonts/*"
 
 book:
   title: "Embrace Uncertainty"
   subtitle: "Mixed-effects models with Julia"
-  author: 
+  author:
     - name: Phillip Alday
       email: me@phillipalday.com
       orcid: 0000-0002-9984-5745
@@ -29,7 +32,7 @@ book:
           state: WI
           url: https://www.wisc.edu
           department: Statistics
-  date: today
+  date: last-modified
   chapters:
     - index.qmd
     - intro.qmd
@@ -55,7 +58,7 @@ github:
 
 resources:
   - CNAME
-  
+
 format:
   html:
     # for more info, see
@@ -65,7 +68,13 @@ format:
     # also overrides code-bg in the SCSS file
     # monobackgroundcolor: '#fafafa'
 
-jupyter: julia-1.10
+engine: julia
+
+julia:
+  exeflags:
+    - --project
+    - -tauto
+
 execute:
-  cache: false    # inline results conflict with cache use
   freeze: auto
+  cache: true

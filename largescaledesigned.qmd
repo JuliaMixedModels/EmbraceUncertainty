@@ -1,5 +1,13 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 192
+fig-format: png
+engine: julia
+execute:
+  cache: true
+julia:
+  exeflags: ["--project"]
 ---
 
 # A large-scale designed experiment {#sec-largescaledesigned}
@@ -13,7 +21,6 @@ Load the packages to be used
 using AlgebraOfGraphics
 using Arrow
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using Chain
 using DataFrameMacros
 using DataFrames
@@ -27,11 +34,12 @@ using StatsBase
 ```
 
 and define some constants, if not already defined.
+
 ```{julia}
 #| code-fold: true
 #| output: false
 #| label: constants04
-@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
+@isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(progress) || const progress = false
 ```
 
@@ -55,16 +63,22 @@ Initially we consider only the trial-level data.
 ldttrial = dataset(:ELP_ldt_trial)
 ```
 
+Subject identifiers are coded in integers from 1 to 816. We prefer them as strings of the same length.
+We prefix the subject number with 'S' and leftpad the number with zeros to three digits.
+
 ```{julia}
-ldttrial =
-  transform!(DataFrame(ldttrial), :seq => (x -> x .> 2000) => :s2)
+ldttrial = transform!(
+  DataFrame(ldttrial),
+  :seq => ByRow(>(2000)) => :s2;
+)
 describe(ldttrial)
 ```
 
-The two response variables are `acc` - the accuracy of the response - and `rt`, the response time in milliseconds.
 There is one trial-level covariate, `seq`, the sequence number of the trial within subj.
 Each subject participated in two sessions on different days, with 2000 trials recorded on the first day.
-The `s2` column, added to the data frame using `@transform!`, is a Boolean value indicating if the trial is in the second session.
+We add the `s2` column to the data frame using `@transform!`. The new variable `s2` is a Boolean value indicating if the trial is in the second session.
+
+The two response variables are `acc` - the accuracy of the response - and `rt`, the response time in milliseconds. The target stimuli to be judged as word or nonword are stored in variable `item`.
 
 ## Initial data exploration {#sec-ldtinitialexplore}
 
@@ -155,7 +169,8 @@ let wlen = 1:21
   draw(
     data((; wrdlen=wlen, count=counts(byitem.wrdlen, wlen))) *
     mapping(:wrdlen => "Length of word", :count) *
-    visual(BarPlot),
+    visual(BarPlot);
+    figure=(; size=(600, 450)),
   )
 end
 ```
@@ -177,12 +192,12 @@ draw(
     color=:isword,
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
 @fig-ldtaccsmooth may be a bit misleading because the largest discrepancies in proportion of accurate identifications of words and nonwords occur for the longest words, of which there are few.
-Over 95% of the words are between 4 and 13 characters in length
+Over 96% of the words are between 4 and 13 characters in length
 
 ```{julia}
 count(x -> 4 ≤ x ≤ 13, byitem.wrdlen) / nrow(byitem)
@@ -203,7 +218,7 @@ draw(
     color=:isword,
   ) *
   smooth();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -235,7 +250,7 @@ let
       color=:isword,
       markersize=:msz,
     );
-    figure=(; resolution=(800, 450)),
+    figure=(; size=(600, 340)),
   )
 end
 ```
@@ -280,6 +295,7 @@ draw(
     :smedianrt => "Median response time (ms)",
   ) *
   (smooth() + visual(Scatter));
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -296,7 +312,7 @@ count(<(0.8), bysubj.spropacc) / nrow(bysubj)
 ```
 
 and there is some association of faster response times with low accuracy.
-The majority of the subjects whose median response time is less than 500 ms. are accurate on less than 75% of their trials.
+The majority of the subjects whose median response time is less than 500 ms are accurate on less than 75% of their trials.
 Another way of characterizing the relationship is that none of the subjects with 90% accuracy or greater had a median response time less than 500 ms.
 
 ```{julia}
@@ -341,7 +357,7 @@ draw(
   data(pruned) *
   mapping(:rt => "Response time (ms.) for correct responses") *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -363,7 +379,7 @@ draw(
       ) => "Response speed (s⁻¹) for correct responses",
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -395,6 +411,7 @@ draw(
     :color => :isword,
   ) *
   smooth();
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -413,6 +430,7 @@ draw(
     :color => :isword,
   ) *
   smooth();
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -431,11 +449,13 @@ let
   plt *= mapping(
     :wrdlen => "Word length",
     :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)",
-    color=:isword,
-    side=:isword,
+    color=:isword)
+  plt *= (mapping(; side=:isword) * visual(Violin) + linear(; interval=:confidence))
+  draw(
+    plt,
+    axis=(; limits=(nothing, (0.0, 2.8)));
+    figure=(; size=(600, 450)),
   )
-  plt *= (visual(Violin) + linear(; interval=:confidence))
-  draw(plt, axis=(; limits=(nothing, (0.0, 2.8))))
 end
 ```
 
@@ -468,10 +488,11 @@ contrasts[:wrdlen] = Center(8);
 and fit a first model with simple, scalar, random effects for `subj` and `item`.
 
 ```{julia}
-elm01 = let f = @formula 1000/rt ~
-    1 + isword * wrdlen + (1 | item) + (1 | subj)
-  fit(MixedModel, f, pruned; contrasts, progress)
-end
+elm01 =
+  let f = @formula 1000 / rt ~
+      1 + isword * wrdlen + (1 | item) + (1 | subj)
+    fit(MixedModel, f, pruned; contrasts, progress)
+  end
 ```
 
 The predicted response speed by word length and word/nonword status can be summarized as
@@ -483,11 +504,12 @@ effects(Dict(:isword => [false, true], :wrdlen => 4:2:12), elm01)
 If we restrict to only those subjects with 80% accuracy or greater the model becomes
 
 ```{julia}
-elm02 = let f = @formula 1000 / rt ~
-    1 + isword * wrdlen + (1 | item) + (1 | subj)
-  dat = filter(:spropacc => >(0.8), pruned)
-  fit(MixedModel, f, dat; contrasts, progress)
-end
+elm02 =
+  let f = @formula 1000 / rt ~
+      1 + isword * wrdlen + (1 | item) + (1 | subj)
+    dat = filter(:spropacc => >(0.8), pruned)
+    fit(MixedModel, f, dat; contrasts, progress)
+  end
 ```
 
 ```{julia}
@@ -518,7 +540,7 @@ draw(
     :elm02 => "Conditional means of item random effects for model elm02";
     color=:isword,
   );
-  axis=(; width=600, height=600),
+  figure=(; size=(600, 400)),
 )
 ```
 
@@ -533,19 +555,15 @@ The correlation of the two sets of conditional means is about 96%.
 cor(Matrix(select(condmeans, :elm01, :elm02)))
 ```
 
-```{julia}
-#| echo: false
-#| output: false
-CairoMakie.activate!(; type="png")
-```
-
 These models take only a few seconds to fit on a modern laptop computer, which is quite remarkable given the size of the data set and the number of random effects.
 
 The amount of time to fit more complex models will be much greater so we may want to move those fits to more powerful server computers.
 We can split the tasks of fitting and analyzing a model between computers by saving the optimization summary after the model fit and later creating the `MixedModel` object followed by restoring the `optsum` object.
 
 ```{julia}
-saveoptsum("./optsums/elm01.json", elm01);
+let file = "./optsums/elm01.json"
+  !isfile(file) && saveoptsum(file, elm01);
+end
 ```
 
 ```{julia}
@@ -580,10 +598,7 @@ A caterpillar plot, @fig-elm01caterpillarsubj,
 #| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm01.
 #| label: fig-elm01caterpillarsubj
 #| warning: false
-qqcaterpillar!(
-  Figure(resolution=(800, 650)),
-  ranefinfo(elm01, :subj),
-)
+qqcaterpillar!(Figure(; size=(600, 450)), ranefinfo(elm01, :subj))
 ```
 
 shows definite distinctions between subjects because the widths of the prediction intervals are small compared to the range of the conditional modes.
@@ -596,10 +611,7 @@ Also, there is at least one outlier with a conditional mode over 1.0.
 #| fig-cap: Conditional means and 95% prediction intervals for subject random effects in elm02.
 #| label: fig-elm02caterpillarsubj
 #| warning: false
-qqcaterpillar!(
-  Figure(resolution=(800, 650)),
-  ranefinfo(elm02, :subj),
-)
+qqcaterpillar!(Figure(; size=(600, 450)), ranefinfo(elm02, :subj))
 ```
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

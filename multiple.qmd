@@ -1,5 +1,13 @@
 ---
-jupyter: julia-1.10
+fig-width: 4
+fig-height: 3
+fig-dpi: 192
+fig-format: png
+engine: julia
+execute:
+  cache: true
+julia:
+  exeflags: ["--project"]
 ---
 
 # Models with multiple random-effects terms {#sec-Multiple}
@@ -32,7 +40,6 @@ Attach the packages to be used in this chapter
 #| label: packages02
 using AlgebraOfGraphics
 using CairoMakie
-CairoMakie.activate!(; type="svg")
 using CategoricalArrays
 using DataFrameMacros
 using DataFrames
@@ -40,7 +47,6 @@ using EmbraceUncertainty: dataset
 using MixedModels
 using MixedModelsMakie
 using Random
-using RCall
 using StatsBase
 ```
 
@@ -120,7 +126,7 @@ function _meanrespfrm(
   grps::Symbol;
   sumryf::Function=mean,
 )
-  # ensure the relevant columns are types that Makie can deal with 
+  # ensure the relevant columns are types that Makie can deal with
   df = transform(
     df,
     resp => Array,
@@ -146,7 +152,8 @@ let
     color=:sample,
   )
   draw(
-    data(df) * mp * visual(ScatterLines; marker='○', markersize=12),
+    data(df) * mp * visual(ScatterLines; marker='○', markersize=12);
+    figure=(; size=(600, 450)),
   )
 end
 ```
@@ -193,10 +200,7 @@ These conclusions are consistent with what we see in the data plot (@fig-penicil
 #| code-fold: true
 #| label: fig-pnm01platepred
 #| warning: false
-caterpillar!(
-  Figure(; resolution=(800, 480)),
-  ranefinfo(pnm01, :plate),
-)
+caterpillar!(Figure(; size=(600, 340)), ranefinfo(pnm01, :plate))
 ```
 
 ```{julia}
@@ -204,10 +208,7 @@ caterpillar!(
 #| code-fold: true
 #| label: fig-pnm01samplepred
 #| warning: false
-caterpillar!(
-  Figure(; resolution=(800, 160)),
-  ranefinfo(pnm01, :sample),
-)
+caterpillar!(Figure(; size=(600, 180)), ranefinfo(pnm01, :sample))
 ```
 
 The prediction intervals on the random effects (@fig-pnm01platepred and @fig-pnm01samplepred) confirm that the conditional distribution of the random effects for `plate` displays much less variability than does the conditional distribution of the random effects for `sample`.
@@ -247,7 +248,7 @@ We say that "fill-in" has occurred when forming the sparse Cholesky decompositio
 In this case there is a relatively minor amount of fill but in other cases there can be a substantial amount of fill.
 The computational methods are tuned to reduce the amount of fill.
 
-### Precision of parameter estimates in the Pencillin model {#sec-Penicillinprecision}
+### Precision of parameter estimates in the Penicillin model {#sec-Penicillinprecision}
 
 A parametric bootstrap sample of the parameter estimates
 
@@ -278,7 +279,7 @@ draw(
     color=(:names => "Names"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -303,7 +304,7 @@ draw(
     color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -334,8 +335,10 @@ pastes = dataset(:pastes)
 ```
 
 ```{julia}
-pastes =
-  @transform(DataFrame(pastes), :sample = string(:batch, :cask))
+pastes = transform(
+  DataFrame(pastes),
+  [:batch, :cask] => ByRow((x, y) -> string(x, y)) => :sample,
+)
 describe(pastes)
 ```
 
@@ -352,20 +355,36 @@ The labels 'a', 'b' and 'c' are used only to distinguish the three samples withi
 #| code-fold: true
 #| fig-cap: "Strength of paste preparations according to sample within batch"
 #| label: fig-pastesdot
+batch_sort = sort!(combine(groupby(pastes, :batch),
+                           :strength => mean => :strength),
+                   :strength; rev=true).batch
 
-RCall.ijulia_setdevice(MIME("image/svg+xml"); width=8, height=8)
-R"""
-require("lattice", quietly=TRUE)
-pp <- $pastes
-pp <- within(pp, bb <- reorder(batch, strength))
-print(
-  dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
-    strip.left = TRUE, layout = c(1, 10),
-    scales = list(y = list(relation = "free")),
-    ylab = "Sample within batch", type = c("p", "a"),
-    xlab = "Paste strength", jitter.y = TRUE)
-)
-""";
+paste_means = combine(groupby(pastes, [:cask, :batch]),
+                      :sample,
+                      :strength => mean => "strength" )
+
+fg = draw(
+  data(pastes) *
+  mapping(
+    :cask => "Cask within batch",
+    :strength,
+    col = :batch => sorter(batch_sort)
+  ) * visual(Scatter; marker = '∘', markersize = 15, color = :blue) +
+  data(paste_means) *
+  mapping(
+    :cask => "Cask within batch",
+    :strength,
+    col = :batch => sorter(batch_sort)
+  ) * visual(Lines; color = :blue);
+  # axis = (; xticklabelsize = 10),
+  facet = (; linkyaxes=:minimal),
+  figure = (; size=(700, 350))
+);
+
+f = fg.figure
+
+colgap!(f.layout, 4)
+f
 ```
 
 In @fig-pastesdot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
@@ -452,10 +471,7 @@ Plots of the prediction intervals of the random effects (@fig-psm01batchcaterpil
 #| fig-cap: "Plot of *batch* prediction intervals from *psm01*"
 #| label: fig-psm01batchcaterpillar
 #| warning: false
-caterpillar!(
-  Figure(resolution=(800, 300)),
-  ranefinfo(psm01, :batch),
-)
+caterpillar!(Figure(size=(600, 240)), ranefinfo(psm01, :batch))
 ```
 
 confirm this impression in that all the prediction intervals for the random effects for contain zero.
@@ -480,7 +496,7 @@ draw(
     color=(:group => "Group"),
   ) *
   AlgebraOfGraphics.density();
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -597,7 +613,7 @@ draw(
   data(Table(response=1:5, count=counts(insteval.y))) *
   mapping(:response => "Rating", :count => "Count") *
   visual(BarPlot);
-  figure=(; resolution=(800, 450)),
+  figure=(; size=(600, 340)),
 )
 ```
 
@@ -620,7 +636,7 @@ It is not surprising that zero is within most of the prediction intervals on the
 #| fig-cap: "Prediction intervals on random effects for department in model iem01"
 #| label: fig-iem01caterpillardept
 #| warning: false
-caterpillar!(Figure(resolution=(800, 400)), ranefinfo(iem01, :dept))
+caterpillar!(Figure(size=(600, 300)), ranefinfo(iem01, :dept))
 ```
 
 However, the p-value for the LRT of $H_0:\sigma_3=0$ versus $H_a:\sigma_3>0$
@@ -689,10 +705,7 @@ A `qqcaterpillar` plot of the instructor (i.e. factor `d` in the data) random ef
 #| fig-cap: "Caterpillar plot of the instructor BLUPS for model iem01 versus standard normal quantiles"
 #| label: fig-iem01qqcaterpillard
 #| warning: false
-qqcaterpillar!(
-  Figure(; resolution=(800, 650)),
-  ranefinfo(iem01, :d),
-)
+qqcaterpillar!(Figure(; size=(600, 480)), ranefinfo(iem01, :d))
 ```
 
 shows the differences in precision due to different numbers of observations for different instructors.
@@ -706,7 +719,7 @@ draw(
   data(combine(groupby(DataFrame(insteval), :d), nrow => :n)) *
   mapping(:n => "Number of observations") *
   AlgebraOfGraphics.histogram(; bins=410);
-  figure=(; resolution=(800, 600)),
+  figure=(; size=(600, 450)),
 )
 ```
 
@@ -742,11 +755,9 @@ For convenience, multiple, nested random-effects terms can be specified using a 
 
 ```{julia}
 #| label: psm01alt
-print(
-  let f = @formula(strength ~ 1 + (1 | batch / cask))
-    fit(MixedModel, f, pastes; progress)
-  end
-)
+print(let f = @formula(strength ~ 1 + (1 | batch / cask))
+  fit(MixedModel, f, pastes; progress)
+end)
 ```
 
 We will avoid terms of this form, preferring instead an explicit specification with simple, scalar terms based on unambiguous grouping factors.
@@ -762,4 +773,4 @@ That is, profile-based confidence intervals on the fixed-effects parameter, $\be
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

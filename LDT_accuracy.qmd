@@ -1,0 +1,73 @@
+---
+engine: julia
+---
+
+# Analysis of accuracy in the LDT
+
+The lexical decision task (LDT) for the English Lexicon Project recorded the response time and the accuracy of the response.
+
+Here we analyze the accuracy of the response with a generalized linear mixed model.
+
+Attach the packages to be used
+
+```{julia}
+#| code-fold: true
+#| output: false
+using CairoMakie
+CairoMakie.activate!(; type="svg")
+using DataFrames
+using EmbraceUncertainty: dataset
+using MixedModels
+using MixedModelsMakie
+using StandardizedPredictors
+```
+
+and define some constants
+
+```{julia}
+#| code-fold: true
+#| output: false
+@isdefined(contrasts) || const contrasts = Dict{Symbol, Any}()
+@isdefined(progress) || const progress = false
+```
+
+## Create the dataset
+
+
+```{julia}
+#| output: false
+trials = innerjoin(
+    DataFrame(dataset(:ELP_ldt_trial)),
+    select(DataFrame(dataset(:ELP_ldt_item)), :item, :isword, :wrdlen),
+    on = :item
+)
+```
+
+```{julia}
+describe(trials, :min, :max, :nunique, :nmissing, :eltype)
+```
+
+## Fit a preliminary model
+
+This takes about ten to fifteen minutes on a recent laptop
+
+```{julia}
+contrasts[:isword] = EffectsCoding()
+contrasts[:wrdlen] = Center(8)
+@time gm1 = let f = @formula(acc ~ 1 + isword * wrdlen + (1|item) + (1|subj))
+    fit(MixedModel, f, trials, Bernoulli(); contrasts, progress, init_from_lmm=(:β, :θ))
+end
+```
+
+
+```{julia}
+print(gm1)
+```
+
+
+```{julia}
+#| fig-cap: Conditional modes and 95% prediction intervals on random effects for subject in model gm1
+#| label: fig-gm1condmodesubj
+#| code-fold: true
+qqcaterpillar!(Figure(; size=(800,800)), gm1, :subj)
+```
