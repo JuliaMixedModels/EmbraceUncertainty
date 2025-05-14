@@ -1,9 +1,11 @@
 ---
 fig-width: 4
 fig-height: 3
-fig-dpi: 150
+fig-dpi: 192
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: ["--project"]
 ---
@@ -45,7 +47,6 @@ using EmbraceUncertainty: dataset
 using MixedModels
 using MixedModelsMakie
 using Random
-using RCall
 using StatsBase
 ```
 
@@ -125,7 +126,7 @@ function _meanrespfrm(
   grps::Symbol;
   sumryf::Function=mean,
 )
-  # ensure the relevant columns are types that Makie can deal with 
+  # ensure the relevant columns are types that Makie can deal with
   df = transform(
     df,
     resp => Array,
@@ -247,7 +248,7 @@ We say that "fill-in" has occurred when forming the sparse Cholesky decompositio
 In this case there is a relatively minor amount of fill but in other cases there can be a substantial amount of fill.
 The computational methods are tuned to reduce the amount of fill.
 
-### Precision of parameter estimates in the Pencillin model {#sec-Penicillinprecision}
+### Precision of parameter estimates in the Penicillin model {#sec-Penicillinprecision}
 
 A parametric bootstrap sample of the parameter estimates
 
@@ -350,19 +351,40 @@ It would be fine to do this within a batch but the plot would be misleading if w
 There is no relationship between cask 'a' in batch 'A' and cask 'a' in batch 'B'.
 The labels 'a', 'b' and 'c' are used only to distinguish the three samples within a batch; they do not have a meaning across batches.
 
-```{r}
+```{julia}
 #| code-fold: true
 #| fig-cap: "Strength of paste preparations according to sample within batch"
 #| label: fig-pastesdot
-pp <- within($pastes, bb <- reorder(batch, strength))
-plot(
-  lattice::dotplot(sample ~ strength | bb, pp, pch = 21, strip = FALSE,
-    strip.left = TRUE, layout = c(1, 10),
-    scales = list(y = list(relation = "free")),
-    ylab = "Sample within batch", type = c("p", "a"),
-    xlab = "Paste strength", jitter.y = TRUE)
-)
-NULL
+batch_sort = sort!(combine(groupby(pastes, :batch),
+                           :strength => mean => :strength),
+                   :strength; rev=true).batch
+
+paste_means = combine(groupby(pastes, [:cask, :batch]),
+                      :sample,
+                      :strength => mean => "strength" )
+
+fg = draw(
+  data(pastes) *
+  mapping(
+    :cask => "Cask within batch",
+    :strength,
+    col = :batch => sorter(batch_sort)
+  ) * visual(Scatter; marker = '∘', markersize = 15, color = :blue) +
+  data(paste_means) *
+  mapping(
+    :cask => "Cask within batch",
+    :strength,
+    col = :batch => sorter(batch_sort)
+  ) * visual(Lines; color = :blue);
+  # axis = (; xticklabelsize = 10),
+  facet = (; linkyaxes=:minimal),
+  figure = (; size=(700, 350))
+);
+
+f = fg.figure
+
+colgap!(f.layout, 4)
+f
 ```
 
 In @fig-pastesdot we plot the two strength measurements on each of the samples within each of the batches and join up the average strength for each sample.
@@ -763,4 +785,4 @@ That is, profile-based confidence intervals on the fixed-effects parameter, $\be
 
 Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be "statistically significant" even when its practical significance is questionable.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

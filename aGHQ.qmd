@@ -1,9 +1,11 @@
 ---
 fig-width: 4
 fig-height: 3
-fig-dpi: 150
+fig-dpi: 192
 fig-format: png
 engine: julia
+execute:
+  cache: true
 julia:
   exeflags: ["--project"]
 ---
@@ -637,6 +639,28 @@ Each iteration of the IRLS algorithm takes more time than a deviance evaluation,
 ```{julia}
 @benchmark deviance(updateβ!(m)) seconds = 1 setup = (m = com05fe)
 ```
+
+:::{.callout-note collapse="true"}
+
+### Alternative version of the IRLS algorithm
+
+The preceeding text presented a fixed-point version of the IRLS algorithm.
+There is another version of the IRLS algorithm which expresses the next iteration step for $\beta$ as a Newton-Raphson update with the following update equation:
+$$
+  \bbbeta^{(k)}\ =\ \bbbeta^{(k-1)} + \alpha \times \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bbr} ,
+$$
+where $\alpha$ is a step size parameter.
+
+For $\alpha = 1$, it is easy to see that the Newton-Raphson step is equivalent to the fixed-point formulation
+$$
+  \bbbeta^{(k)} = \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bby}
+$$
+by using the identity $\bbbeta^{(k-1)} = \left(\bbX'\bbW\bbX\right)^{-1} \left(\bbX'\bbW\bbX\right) \bbbeta$ and combing the two terms on the right hand side.
+For more details see [this RPubs tutorial](https://rpubs.com/enwuliu/1011024) by Enwu Liu.
+
+The Newton-Raphson formulation is used by [GLM.jl](https://juliastats.org/GLM.jl/stable/), but is less suitable for penalized IRLS (PIRLS), which we use below to extend this approach to generalized linear mixed models.
+
+:::
 
 ## GLMMs and the PIRLS algorithm {#sec-PIRLS}
 
@@ -1425,4 +1449,4 @@ fitGHQ!(m)
 m.θβ
 ```
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*
