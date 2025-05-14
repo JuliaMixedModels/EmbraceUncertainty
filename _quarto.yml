@@ -1,3 +1,4 @@
+quarto-required: ">= 1.7.29"
 project:
   type: book
   output-dir: docs
@@ -7,7 +8,7 @@ project:
 book:
   title: "Embrace Uncertainty"
   subtitle: "Mixed-effects models with Julia"
-  author: 
+  author:
     - name: Phillip Alday
       email: me@phillipalday.com
       orcid: 0000-0002-9984-5745
@@ -57,7 +58,7 @@ github:
 
 resources:
   - CNAME
-  
+
 format:
   html:
     # for more info, see
@@ -70,9 +71,10 @@ format:
 engine: julia
 
 julia:
-  exeflags: 
+  exeflags:
     - --project
     - -tauto
 
 execute:
   freeze: auto
+  cache: true
