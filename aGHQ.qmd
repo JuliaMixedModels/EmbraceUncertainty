@@ -644,17 +644,21 @@ Each iteration of the IRLS algorithm takes more time than a deviance evaluation,
 
 ### Alternative version of the IRLS algorithm
 
-We discussed a "fixed point" version of the IRLS algorithm in the preceeding text.
-There is another version of the IRLS algorithm which expresses the new iterate for $\theta$ as a Newton-Raphson update with the following update equation:
+The preceeding text presented a fixed-point version of the IRLS algorithm.
+There is another version of the IRLS algorithm which expresses the next iteration step for $\beta$ as a Newton-Raphson update with the following update equation:
 $$
   \bbbeta^{(k)}\ =\ \bbbeta^{(k-1)} + \alpha \times \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bbr} ,
 $$
 where $\alpha$ is a step size parameter.
-In fact, this is the version of the IRLS algorithm implemented in [GLM.jl](https://juliastats.org/GLM.jl/stable/).
-For $\alpha = 1$ it is easy to see that the above equation is equivalent to the $\bbbeta^{(k)} = \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bby}$, simply use the identity $\bbbeta^{(k-1)} = \left(\bbX'\bbW\bbX\right)^{-1} \left(\bbX'\bbW\bbX\right) \bbbeta$ and combine the two terms on the right hand side.
+
+For $\alpha = 1$, it is easy to see that the Newton-Raphson step is equivalent to the fixed-point formulation
+$$
+  \bbbeta^{(k)} = \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bby}
+$$
+by using the identity $\bbbeta^{(k-1)} = \left(\bbX'\bbW\bbX\right)^{-1} \left(\bbX'\bbW\bbX\right) \bbbeta$ and combing the two terms on the right hand side.
 For more details see [this RPubs tutorial](https://rpubs.com/enwuliu/1011024) by Enwu Liu.
 
-However, the Newton-Rhapson version is not really suitable for PIRLS and was therefore not elaborated in this text.
+The Newton-Raphson formulation is used by [GLM.jl](https://juliastats.org/GLM.jl/stable/), but is less suitable for penalized IRLS (PIRLS), which we use below to extend this approach to generalized linear mixed models.
 
 :::
 
