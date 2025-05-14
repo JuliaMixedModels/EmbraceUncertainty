@@ -1147,7 +1147,7 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<code>lrtest</code> function for nested models
+<code>lrtest</code> function
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
@@ -1166,7 +1166,12 @@ Figure&nbsp;2.8: Kernel density plots of bootstrap estimates of σ for model psm
 ──────────────────────────────────────────────────────</code></pre>
 </div>
 </div>
-<p><code>lrtest</code> is a generic function designed to work on all types of regression models, while <code>likelihoodratiotest</code> is completely specialized for the types used in <code>MixedModels.jl</code>. This results in a few differences between the functions: - <code>likelihoodratiotest</code> includes the model formulae in the output, while <code>lrtest</code> does not because not all regression models are defined using the formula interface - <code>lrtest</code> performs additional safety checks for nesting of models compared to <code>likelihoodratiotest</code>. Nesting isn’t always trivial to check for mixed effects models, so the tests performed by <code>isnested</code> (which <code>lrtest</code> calls behind the scenes) err on the more conservative side, i.e.&nbsp;rejecting some nested models as being non nested. <code>likelihoodratiotest</code> does not use <code>isnested</code>, but instead uses fewer more basic compatibility tests and leaves it up to the user to make sure that their models are nested. - <code>likelihoodratiotest</code> has methods defined for comparing a model without random effects, i.e.&nbsp;a n non mixed model, to mixed models. This comparison is useful when checking whether the sole random effect offers any improvement to fit compared to the classical regression model. (When that random effect is singular, then it per definition does not improve model fit!)</p>
+<p><code>lrtest</code> is a generic function designed to work on all types of regression models, while <code>likelihoodratiotest</code> is completely specialized for the types used in <code>MixedModels.jl</code>. This results in a few differences between the functions:</p>
+<ul>
+<li><code>likelihoodratiotest</code> includes the model formulae in the output, while <code>lrtest</code> does not because not all regression models are defined using the formula interface</li>
+<li><code>lrtest</code> performs additional safety checks for nesting of models compared to <code>likelihoodratiotest</code>. Nesting isn’t always trivial to check for mixed effects models, so the tests performed by <code>isnested</code> (which <code>lrtest</code> calls behind the scenes) err on the more conservative side, i.e.&nbsp;rejecting some nested models as being non nested. <code>likelihoodratiotest</code> does not use <code>isnested</code>, but instead uses fewer more basic compatibility tests and leaves it up to the user to make sure that their models are nested.</li>
+<li><code>likelihoodratiotest</code> has methods defined for comparing a model without random effects, i.e.&nbsp;a n non mixed model, to mixed models. This comparison is useful when checking whether the sole random effect offers any improvement to fit compared to the classical regression model. (When that random effect is singular, then it per definition does not improve model fit!)</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1797,8 +1802,8 @@ Residual                  0.678002 0.823409
 <p>The insteval data, described in <a href="#sec-insteval" class="quarto-xref"><span>Section 2.3.1</span></a>, illustrate some of the characteristics of the real data to which mixed-effects models are now fit. There is a large number of observations associated with several grouping factors; two of which, student and instructor, have a large number of levels and are partially crossed. Such data are common in sociological and educational studies but until recently it has been very difficult to fit models that appropriately reflect such a structure. Much of the literature on mixed-effects models leaves the impression that multiple random effects terms can only be associated with nested grouping factors. The resulting emphasis on hierarchical or multilevel configurations is an artifact of the computational methods used to fit the models, not the models themselves.</p>
 <p>The parameters of the models fit to small data sets have properties similar to those for the models in the previous chapter. That is, profile-based confidence intervals on the fixed-effects parameter, <span class="math inline">\(\beta_0\)</span>, are symmetric about the estimate but overdispersed relative to those that would be calculated from a normal distribution.</p>
 <p>Another observation from the last example is that, for data sets with a very large numbers of observations, a term in a model may be “statistically significant” even when its practical significance is questionable.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/3a83006
-">3a83006
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/89c94bc
+">89c94bc
 </a> using Quarto 1.7.29.</em></p>
 
 
