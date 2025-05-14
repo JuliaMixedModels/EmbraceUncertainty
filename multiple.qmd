@@ -543,7 +543,7 @@ Because typical standards for "small" p-values are 5% or 1%, a p-value over 50% 
 
 :::{.callout-note collapse="true"}
 
-### `lrtest` function for nested models
+### `lrtest` function
 
 We can also use the `lrtest` function defined by the `StatsModels` package as follows:
 ```{julia}
@@ -551,6 +551,7 @@ lrtest(psm02, psm01)
 ```
 
 `lrtest` is a generic function designed to work on all types of regression models, while `likelihoodratiotest` is completely specialized for the types used in `MixedModels.jl`. This results in a few differences between the functions:
+
 - `likelihoodratiotest` includes the model formulae in the output, while `lrtest` does not because not all regression models are defined using the formula interface
 - `lrtest` performs additional safety checks for nesting of models compared to `likelihoodratiotest`. Nesting isn't always trivial to check for mixed effects models, so the tests performed by `isnested` (which `lrtest` calls behind the scenes) err on the more conservative side, i.e. rejecting some nested models as being non nested. `likelihoodratiotest` does not use `isnested`, but instead uses fewer more basic compatibility tests and leaves it up to the user to make sure that their models are nested.
 - `likelihoodratiotest` has methods defined for comparing a model without random effects, i.e. a n non mixed model, to mixed models. This comparison is useful when checking whether the sole random effect offers any improvement to fit compared to the classical regression model. (When that random effect is singular, then it per definition does not improve model fit!)
