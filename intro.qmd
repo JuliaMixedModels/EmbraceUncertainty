@@ -858,7 +858,7 @@ In the past it was helpful to specify a `Grouping()` contrast for grouping facto
 contrasts = Dict(:batch => Grouping())
 ```
 
-but versions 4.21 of the `MixedModels` package or later do this automatically.
+but versions 4.21 or later of the `MixedModels` package do this automatically.
 
 (Symbols in Julia can be written as a colon followed by the name of the symbol.
 The colon creates an expression but, if the expression consists of a single name, then the expression is the symbol.)
