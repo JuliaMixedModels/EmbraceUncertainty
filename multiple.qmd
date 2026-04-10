@@ -685,13 +685,13 @@ Before leaving this model we examine the sparse Cholesky factor, $\bbL$, which i
 L = sparseL(iem01; full=true)
 ```
 
-Even as a sparse matrix `L` requires a considerable amount of memory, about 9 MB,
+Even as a sparse matrix `L` requires a considerable amount of memory, about 17 MB,
 
 ```{julia}
 (Base.summarysize(L), Base.summarysize(collect(L)))
 ```
 
-but as a triangular dense matrix it requires over 10 times as much (about 135 MB).
+but as a triangular dense matrix it requires nearly 8 times as much (about 135 MB).
 There are $4116^2$ elements in the triangular matrix, each of which requires 8 bytes of storage.
 
 ### Effect of service courses
@@ -713,7 +713,7 @@ This parameter also affects the interpretation of the `(Intercept)` coefficient.
 With the `service` term in the model the `(Intercept)` becomes a typical rating at the reference level (i.e. non-service or `service: N`) because the default coding for the `service` term is zero at the reference level and one for `service: Y`.
 
 The coding can be changed by specifying a non-default contrast for `service`.
-For example, the `EffectsCoding` and `HelmerCoding` contrasts will both assign -1 to the first level (`N` in this case) and +1 to the second level (`Y`).
+For example, the `EffectsCoding` and `HelmertCoding` contrasts will both assign -1 to the first level (`N` in this case) and +1 to the second level (`Y`).
 
 ### "Best-liked"
 

@@ -1044,7 +1044,7 @@ $$
 \begin{aligned}
 -2\log\int_{u_j}\frac{e^{-\tilde{d}_j(u_j)/2}}{\sqrt{2\pi}}\,du_j&\approx
 -2\log\int_{u_j}\frac{e^{\left((-\tilde{d}_j(\tilde{u_j})-\ell_j^2(u_j-\tilde{u}_j)^2)/2\right)}}{\sqrt{2\pi}}\,du_j\\
-&=\tilde{d}_j(\tilde{u}_j)-2\log\int_{u_j}\frac{e^{-\ell_j^2(u_j-\tilde{u}_j)/2}}{\sqrt{2\pi}}\,du_j\\
+&=\tilde{d}_j(\tilde{u}_j)-2\log\int_{u_j}\frac{e^{-\ell_j^2(u_j-\tilde{u}_j)^2/2}}{\sqrt{2\pi}}\,du_j\\
 &=\tilde{d}_j(\tilde{u}_j)-2\log\int_{z_j}\frac{e^{-z_j^2/2}}{\sqrt{2\pi}}\,\frac{dz_j}{\ell_j}\\
 &=\tilde{d}_j(\tilde{u}_j)+2\log(\ell_j)-2\log\int_{z_j}\frac{e^{-z_j^2/2}}{\sqrt{2\pi}}\,dz_j\\
 &=\tilde{d}_j(\tilde{u}_j)+2\log(\ell_j)-2\log(1)\\

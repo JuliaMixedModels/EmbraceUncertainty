@@ -20,3 +20,5 @@ site_libs/
 /.quarto/
 /.luarc.json
 .cache/
+
+**/*.quarto_ipynb

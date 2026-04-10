@@ -398,7 +398,7 @@ The memory footprint of the model representation depends strongly on the number 
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Memory footprint of the model representation by minimum number of ratings per user and per movie."
+#| fig-cap: Memory footprint of the model representation by minimum number of ratings per user and per movie.
 #| label: fig-memoryfootprint
 ggplot(sizespeed, aes(x=:mc, y=:modelsz, color=:ucutoff)) +
     geom_point() +
