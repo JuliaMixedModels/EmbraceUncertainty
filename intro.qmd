@@ -330,7 +330,7 @@ We fit a model to the data allowing for an overall level of the `yield` and for 
 ```{julia}
 #| label: dsm01
 dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff; progress=false)
+  fit(MixedModel, f, dyestuff; progress=isinteractive())
 end
 ```
 
@@ -345,11 +345,12 @@ The call to `fit` constructs a `LinearMixedModel` object, evaluates the [maximum
 
 :::{.callout-note collapse="true"}
 
-### The named argument, progress=false
+### The named argument, `progress`
 
 The estimates are determined via an iterative optimization algorithm.
 In an interactive session a progress bar showing the number of iterations, the current value of the objective and the average time per iteration is displayed during this optimization.
 For a static display of the results in a book we suppress this display with the optional, named argument `progress=false`.
+As a convenient way to toggle automatically between a live progress display and a static display, we can use the `Base` function `isinteractive()` so that progress bars are only displayed in interactive sessions. 
 
 Note that the punctuation used to separate the positional arguments (the first three arguments) from the named argument is a semi-colon, not a comma.
 In this function call the semi-colon is optional -- a comma could be used instead.
@@ -419,7 +420,7 @@ Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\
 ```{julia}
 #| label: dsm02
 dsm02 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff2; progress=false)
+  fit(MixedModel, f, dyestuff2; progress=isinteractive())
 end
 print(dsm02)
 ```
@@ -603,7 +604,7 @@ To examine the distribution of the parameter estimates we extract a table of all
 #| label: dsm01samp
 #| warning: false
 Random.seed!(4321234)      # random number generator
-dsm01samp = parametricbootstrap(10_000, dsm01; progress=false)
+dsm01samp = parametricbootstrap(10_000, dsm01; progress=isinteractive())
 dsm01pars = DataFrame(dsm01samp.allpars)
 first(dsm01pars, 7)
 ```
@@ -751,7 +752,7 @@ The interval on the residual standard deviation, $\sigma$, is reasonable, given 
 
 ### Tracking the progress of the iterations {#sec-dsm01trace}
 
-The optional argument, `thin=1`, in a call to `fit` causes all the values of $\boldsymbol\theta$ and the corresponding value of objective from the iterative optimization to be stored in the `optsum` property.
+By default, the parameter vector and value of the obective at each step of the iterative fitting process are stored in the `fitlog` field of the model's `optsum` property.
 
 ```{julia}
 #| label: dsm01trace
@@ -759,8 +760,7 @@ dsm01trace = fit(
   MixedModel,
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
-  thin=1,
-  progress=false,
+  progress=isinteractive(),
 )
 DataFrame(dsm01trace.optsum.fitlog)
 ```
@@ -873,7 +873,7 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts=contrasts,
-  progress=false,
+  progress=isinteractive(),
 )
 ```
 
@@ -887,7 +887,7 @@ dsm01 = fit(
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
   contrasts,
-  progress=false,
+  progress=isinteractive(),
 )
 ```
 
@@ -895,7 +895,7 @@ That is, if the name of the object to be passed as a named argument is the same 
 Note that the comma after the positional arguments must be changed to a semicolon in this convention.
 This is necessary because it indicates that arguments following the semicolon are named arguments, not positional.
 
-Similarly, we could (and will, in later chapters), bind the name `progress` to `false` in the Main environment and use `progress` as a named argument instead of `progress=false` to suppress output of the progress of the iterations.
+Similarly, we could (and will, in later chapters), bind the name `progress` to `isinteractive()` in the Main environment and simply use `progress` as a named argument instead of `progress=isinteractive()` to suppress output of the progress of the iterations in static, i.e. non interactive, output.
 
 Another convention we will use is assigning the formula separately from the call to `fit` as part of a `let` block.
 Often the formula can become rather long, sometimes needing multiple lines in the call, and it becomes difficult to keep track of the other arguments.
@@ -910,7 +910,7 @@ Thus `dsm01` can be assigned as
 #| code-fold: false
 #| eval: false
 dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
-  fit(MixedModel, f, dyestuff; contrasts, progress=false)
+  fit(MixedModel, f, dyestuff; contrasts, progress=isinteractive())
 end
 ```
 
