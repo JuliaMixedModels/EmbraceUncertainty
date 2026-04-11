@@ -1,11 +1,11 @@
 ---
 fig-width: 4
 fig-height: 3
-fig-dpi: 150
+fig-dpi: 192
 fig-format: png
 engine: julia
 julia:
-  exeflags: 
+  exeflags:
     - --project
 ---
 
@@ -453,4 +453,4 @@ Most of these models required between 20 and 25 evaluations but some required al
 The derivation of the log-likelihood for linear mixed-effects models is given in @sec-lmmtheory, which provides a rather remarkable result:
 the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.
 
-*This page was rendered from git revision {{< git-rev short=true >}}.*
+*This page was rendered from git revision {{< git-rev short=true >}} using Quarto {{< version >}}.*

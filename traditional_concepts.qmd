@@ -42,3 +42,5 @@ While this appendix may read as a pessmistic take on cherished concepts, we call
 Much of the historical work around finding and applying the identities and properties of various quantities for classical ANOVA and linear regression stem from a time when datasets were comparably small and "computer" referred to a person employed purely to perform calculation by hand.
 With modern computation -- both hardware and software -- other methods are available to us.
 For example, bootstrapping and profiling provide methods for computing confidence intervals, which are far more informative than $p$-values anyway.
+
+There is a model underlying all classical statistical tests, the general linear model, and more often than not
