@@ -1,5 +1,6 @@
 _build/
 _gen/
+.cache/
 *.log
 Manifest*.toml
 .vscode/
@@ -16,3 +17,5 @@ data/
 /.quarto/
 
 /.luarc.json
+
+**/*.quarto_ipynb

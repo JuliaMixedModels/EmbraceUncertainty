@@ -764,7 +764,6 @@ dsm01trace = fit(
   MixedModel,
   @formula(yield ~ 1 + (1 | batch)),
   dyestuff;
-  thin=1,
   progress=false,
 )
 DataFrame(dsm01trace.optsum.fitlog)
