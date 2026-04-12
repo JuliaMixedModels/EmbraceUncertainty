@@ -615,7 +615,7 @@ bxm03samp = parametricbootstrap(
   Xoshiro(8642468),
   10_000,
   bxm03;
-  progress=false,
+  progress=isinteractive(),
 )
 bxm03pars = DataFrame(bxm03samp.allpars)
 DataFrame(shortestcovint(bxm03samp))
