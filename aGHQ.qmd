@@ -644,7 +644,7 @@ Each iteration of the IRLS algorithm takes more time than a deviance evaluation,
 
 ### Alternative version of the IRLS algorithm
 
-The preceeding text presented a fixed-point version of the IRLS algorithm.
+The preceding text presented a fixed-point version of the IRLS algorithm.
 There is another version of the IRLS algorithm which expresses the next iteration step for $\beta$ as a Newton-Raphson update with the following update equation:
 $$
   \bbbeta^{(k)}\ =\ \bbbeta^{(k-1)} + \alpha \times \left(\bbX'\bbW\bbX\right)^{-1} \bbX'\bbW\tilde{\bbr} ,
