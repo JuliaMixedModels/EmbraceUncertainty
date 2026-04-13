@@ -191,7 +191,7 @@ draw(
     :acc => "Accuracy";
     color=:isword,
   ) *
-  smooth();
+  smooth(; interval=nothing);
   figure=(; size=(600, 340)),
 )
 ```
@@ -217,7 +217,7 @@ draw(
     :acc => "Accuracy";
     color=:isword,
   ) *
-  smooth();
+  smooth(; interval=nothing);
   figure=(; size=(600, 340)),
 )
 ```
@@ -410,7 +410,7 @@ draw(
     :rt => "Response time (ms)";
     :color => :isword,
   ) *
-  smooth();
+  smooth(; interval=nothing);
   figure=(; size=(600, 450)),
 )
 ```
@@ -429,7 +429,7 @@ draw(
     :rt => (x -> 1000 / x) => "Speed of response (s⁻¹)";
     :color => :isword,
   ) *
-  smooth();
+  smooth(; interval=nothing);
   figure=(; size=(600, 450)),
 )
 ```

@@ -828,8 +828,7 @@ $$ {#eq-21}
 even though the maximum likelihood estimate of $\sigma^2$ is
 
 $$
-\widehat{\sigma^2_{L}}=\frac{\|\bby-\vec
-X\widehat{\bbbeta}\|^2}{n} .
+\widehat{\sigma^2_{L}}=\frac{\|\bby-\bbX\widehat{\bbbeta}\|^2}{n} .
 $$ {#eq-22}
 
 The argument for preferring $\widehat{\sigma^2_R}$ to $\widehat{\sigma^2_{L}}$ as an estimate of $\sigma^2$ is that the numerator in both estimates is the sum of squared residuals at $\widehat{\bbbeta}$ and, although the residual vector, $\bby-\bbX\widehat{\bbbeta}$, is an $n$-dimensional vector, it satisfies $p$ linearly independent constraints, $\bbX'(\bby-\bbX\widehat{\bbbeta})=\mathbf{0}$.
