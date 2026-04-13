@@ -2,17 +2,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.29">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Phillip Alday">
 <meta name="author" content="Reinhold Kliegl">
 <meta name="author" content="Douglas Bates">
-<meta name="dcterms.date" content="2025-09-26">
+<meta name="dcterms.date" content="2026-04-13">
 
 <title>Embrace Uncertainty</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -41,10 +44,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7edfaf1c48232bdc7da6ab4de57864f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-6ef763e2b72a26c18fbc59a18e2e5780.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6df8b08c78ec18a86db6d5199f24628b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-7bbfecc957e3b61a8164a8c1ebbcb4ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -185,6 +188,18 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">GLMM log-likelihood</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./traditional_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">A note on identities and concepts from “classical” statistics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wilkinson-notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Wilkinson-Rogers (1973) notation for models of (co)variance</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -253,7 +268,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 26, 2025</p>
+      <p class="date">April 13, 2026</p>
     </div>
   </div>
   
@@ -271,9 +286,9 @@ ul.task-list li input[type="checkbox"] {
 <p>The practical aspects of fitting such models to experimental or observational data and in evaluating such models are introduced through the <a href="https://julialang.org">Julia programming language</a> and its <a href="https://github.com/JuliaStats/MixedModels.jl">MixedModels</a> package.</p>
 <p>This book is intended for researchers in applications areas, such as Psychology or Linguistics, and for researchers in Statistical methods. Some of the technical discussions, especially in the appendices, may be rather daunting for applications-area researchers, who should feel free to skim those sections. The purpose of those technical discussions is to establish a firm mathematical and theoretical basis for the computational methods.</p>
 <p>This book has been produced with Quarto. To learn more about Quarto books visit <a href="https://quarto.org/docs/books">https://quarto.org/docs/books</a>.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/dde209c
-">dde209c
-</a> using Quarto 1.7.29.</em></p>
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/5e55a39
+">5e55a39
+</a> using Quarto 1.9.36.</em></p>
 
 
 </section>
@@ -330,13 +345,14 @@ ul.task-list li input[type="checkbox"] {
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

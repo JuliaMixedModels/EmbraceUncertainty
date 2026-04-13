@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>References – Embrace Uncertainty</title>
+<title>Appendix E — Wilkinson-Rogers (1973) notation for models of (co)variance – Embrace Uncertainty</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -23,61 +23,7 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -87,8 +33,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./datatables.html" rel="next">
-<link href="./glmmbernoulli.html" rel="prev">
+<link href="./traditional_concepts.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -127,6 +72,35 @@ div.csl-indent {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -139,7 +113,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./references.html">References</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./datatables.html">Appendices</a></li><li class="breadcrumb-item"><a href="./wilkinson-notation.html"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Wilkinson-Rogers (1973) notation for models of (co)variance</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -208,7 +182,7 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link active">
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
 </li>
@@ -247,7 +221,7 @@ div.csl-indent {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./wilkinson-notation.html" class="sidebar-item-text sidebar-link">
+  <a href="./wilkinson-notation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Wilkinson-Rogers (1973) notation for models of (co)variance</span></span></a>
   </div>
 </li>
@@ -263,16 +237,17 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#software-versions" id="toc-software-versions" class="nav-link active" data-scroll-target="#software-versions">Software versions</a></li>
+  <li><a href="#general-rules" id="toc-general-rules" class="nav-link active" data-scroll-target="#general-rules"><span class="header-section-number">E.1</span> General rules</a></li>
+  <li><a href="#mixed-models-in-wilkinson-rogers-and-mathematical-notation" id="toc-mixed-models-in-wilkinson-rogers-and-mathematical-notation" class="nav-link" data-scroll-target="#mixed-models-in-wilkinson-rogers-and-mathematical-notation"><span class="header-section-number">E.2</span> Mixed models in Wilkinson-Rogers and mathematical notation</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./datatables.html">Appendices</a></li><li class="breadcrumb-item"><a href="./wilkinson-notation.html"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Wilkinson-Rogers (1973) notation for models of (co)variance</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">References</h1>
+<h1 class="title"><span id="sec:wilkinson" class="quarto-section-identifier">Appendix E — Wilkinson-Rogers (1973) notation for models of (co)variance</span></h1>
 </div>
 
 
@@ -289,187 +264,56 @@ div.csl-indent {
 </header>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
-<div id="ref-Balota_2007" class="csl-entry" role="listitem">
-Balota, D. A., Yap, M. J., Hutchison, K. A., Cortese, M. J., Kessler,
-B., Loftis, B., Neely, J. H., Nelson, D. L., Simpson, G. B., &amp;
-Treiman, R. (2007). The <span>E</span>nglish lexicon project.
-<em>Behavior Research Methods</em>, <em>39</em>(3), 445–459. <a href="https://doi.org/10.3758/bf03193014">https://doi.org/10.3758/bf03193014</a>
-</div>
-<div id="ref-bates.maechler.etal:2015" class="csl-entry" role="listitem">
-Bates, D., Maechler, M., Bolker, B. M., &amp; Walker, S. (2015). Fitting
-linear mixed-effects models using lme4. <em>Journal of Statistical
-Software</em>, <em>67</em>(1), 1–48. <a href="https://doi.org/10.18637/jss.v067.i01">https://doi.org/10.18637/jss.v067.i01</a>
-</div>
-<div id="ref-JSSv107i04" class="csl-entry" role="listitem">
-Bouchet-Valat, M., &amp; Kamiński, B. (2023). DataFrames.jl: Flexible
-and fast tabular data in <span>J</span>ulia. <em>Journal of Statistical
-Software</em>, <em>107</em>(4), 1–32. <a href="https://doi.org/10.18637/jss.v107.i04">https://doi.org/10.18637/jss.v107.i04</a>
-</div>
-<div id="ref-box1950" class="csl-entry" role="listitem">
-Box, G. E. P. (1950). Problems in the analysis of growth and wear
-curves. <em>Biometrics</em>, <em>6</em>(4), 362. <a href="https://doi.org/10.2307/3001781">https://doi.org/10.2307/3001781</a>
-</div>
-<div id="ref-Box1964" class="csl-entry" role="listitem">
-Box, G. E. P., &amp; Cox, D. R. (1964). An analysis of transformations.
-<em>Journal of the Royal Statistical Society: Series B
-(Methodological)</em>, <em>26</em>(2), 211–243. <a href="https://doi.org/10.1111/j.2517-6161.1964.tb00553.x">https://doi.org/10.1111/j.2517-6161.1964.tb00553.x</a>
-</div>
-<div id="ref-box73:_bayes_infer_statis_analy" class="csl-entry" role="listitem">
-Box, G. E. P., &amp; Tiao, G. C. (1973). <em>Bayesian inference in
-statistical analysis</em>. Addison-Wesley.
-</div>
-<div id="ref-DanischKrumbiegel2021" class="csl-entry" role="listitem">
-Danisch, S., &amp; Krumbiegel, J. (2021). Makie.jl: Flexible
-high-performance data visualization for <span>J</span>ulia. <em>Journal
-of Open Source Software</em>, <em>6</em>(65), 3349. <a href="https://doi.org/10.21105/joss.03349">https://doi.org/10.21105/joss.03349</a>
-</div>
-<div id="ref-davies72:_statis_method_in_resear_and_produc" class="csl-entry" role="listitem">
-Davies, O. L., &amp; Goldsmith, P. L. (Eds.). (1972). <em>Statistical
-methods in research and production</em> (4th ed.). Hafner.
-</div>
-<div id="ref-davis2002" class="csl-entry" role="listitem">
-Davis, C. S. (2002). Statistical methods for the analysis of repeated
-measurements. In <em>Springer Texts in Statistics</em> (pp. xxiv + 415).
-New York, NY: Springer. <a href="https://doi.org/10.1007/b97287">https://doi.org/10.1007/b97287</a>
-</div>
-<div id="ref-elstongrizzle1962" class="csl-entry" role="listitem">
-Elston, R. C., &amp; Grizzle, J. E. (1962). Estimation of time-response
-curves and their confidence bands. <em>Biometrics</em>, <em>18</em>,
-148–159. <a href="https://doi.org/10.2307/2527453">https://doi.org/10.2307/2527453</a>
-</div>
-<div id="ref-Harper2016" class="csl-entry" role="listitem">
-Harper, F. M., &amp; Konstan, J. A. (2016). The <span>MovieLens</span>
-datasets. <em><span>ACM</span> Transactions on Interactive Intelligent
-Systems</em>, <em>5</em>(4), 1–19. <a href="https://doi.org/10.1145/2827872">https://doi.org/10.1145/2827872</a>
-</div>
-<div id="ref-huq:cleland:1990" class="csl-entry" role="listitem">
-Huq, N. M., &amp; Cleland, J. (1990). <em>Bangladesh fertility survey
-1989 (main report)</em>. National Institute of Population Research;
-Training.
-</div>
-<div id="ref-Kaminski2023" class="csl-entry" role="listitem">
-Kamiński, B. (2023). <em>Julia for data analysis</em>. Manning.
-</div>
-<div id="ref-pinheirobates2000" class="csl-entry" role="listitem">
-Pinheiro, J. C., &amp; Bates, D. M. (2000). <em>Mixed-effects models in
-<span>S</span> and <span>S-Plus</span></em> (pp. xvi + 528). New York,
-NY: Springer. <a href="https://doi.org/10.1007/b98882">https://doi.org/10.1007/b98882</a>
-</div>
-<div id="ref-powell2009bobyqa" class="csl-entry" role="listitem">
-Powell, M. J. (2009). The BOBYQA algorithm for bound constrained
-optimization without derivatives. <em>Cambridge NA Report NA2009/06,
-University of Cambridge, Cambridge</em>, <em>26</em>.
-</div>
-<div id="ref-MLwiNUser:2000" class="csl-entry" role="listitem">
-Rasbash, J., Browne, W., Goldstein, H., Yang, M., &amp; Plewis, I.
-(2000). <em>A user’s guide to <span>MLwiN</span></em>. Multilevel Models
-Project, Institute of Education, University of London.
-</div>
-<div id="ref-Rauden:Bryk:2002" class="csl-entry" role="listitem">
-Raudenbush, S. W., &amp; Bryk, A. S. (2002). <em>Hierarchical linear
-models: Applications and data analysis methods</em> (2nd ed.). Sage.
-</div>
-<div id="ref-saka:ishi:kita:1986" class="csl-entry" role="listitem">
-Sakamoto, Y., Ishiguro, M., &amp; Kitagawa, G. (1986). <em>Akaike
-information criterion statistics</em> (p. 290). Reidel.
-</div>
-<div id="ref-schw:1978" class="csl-entry" role="listitem">
-Schwarz, G. (1978). Estimating the dimension of a model. <em>Annals of
-Statistics</em>, <em>6</em>, 461–464.
-</div>
-<div id="ref-TierneyKadane1986" class="csl-entry" role="listitem">
-Tierney, L., &amp; Kadane, J. B. (1986). Accurate approximations for
-posterior moments and marginal densities. <em>Journal of the American
-Statistical Association</em>, <em>81</em>(393), 82–86. <a href="https://doi.org/10.1080/01621459.1986.10478240">https://doi.org/10.1080/01621459.1986.10478240</a>
-</div>
-<div id="ref-Wickham2011" class="csl-entry" role="listitem">
-Wickham, H. (2011). The split-apply-combine strategy for data analysis.
-<em>Journal of Statistical Software</em>, <em>40</em>(1), 1–29. <a href="https://doi.org/10.18637/jss.v040.i01">https://doi.org/10.18637/jss.v040.i01</a>
-</div>
-</div>
-<section id="software-versions" class="level1">
-<h1>Software versions</h1>
-<div id="2" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">versioninfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Julia Version 1.10.11
-Commit a2b11907d7b (2026-03-09 14:59 UTC)
-Build Info:
-  Official https://julialang.org/ release
-Platform Info:
-  OS: Linux (x86_64-linux-gnu)
-  CPU: 8 × 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
-  WORD_SIZE: 64
-  LIBM: libopenlibm
-  LLVM: libLLVM-15.0.7 (ORCJIT, tigerlake)
-Threads: 8 default, 0 interactive, 4 GC (on 8 virtual cores)
-Environment:
-  JULIA_PROJECT = @.
-  JULIA_LOAD_PATH = @:@stdlib</code></pre>
-</div>
-</div>
-<div id="4" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>BLAS.<span class="fu">get_config</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
-<pre><code>LinearAlgebra.BLAS.LBTConfig
-Libraries: 
-└ [ILP64] libopenblas64_.so</code></pre>
-</div>
-</div>
-<div id="6" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Pkg</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">Pkg</span>.<span class="fu">status</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-cyan-fg ansi-bold">Project</span> EmbraceUncertainty v0.1.0
-<span class="ansi-green-fg ansi-bold">Status</span> `~/Work/EmbraceUncertainty/Project.toml`
-<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[cbdf2221] </span>AlgebraOfGraphics v0.10.9
-  <span class="ansi-bright-black-fg">[69666777] </span>Arrow v2.8.1
-  <span class="ansi-bright-black-fg">[6e4b80f9] </span>BenchmarkTools v1.7.0
-  <span class="ansi-bright-black-fg">[336ed68f] </span>CSV v0.10.16
-<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[13f3f980] </span>CairoMakie v0.13.10
-<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[324d7699] </span>CategoricalArrays v0.10.9
-<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[8be319e6] </span>Chain v0.6.0
-  <span class="ansi-bright-black-fg">[9a962f9c] </span>DataAPI v1.16.0
-  <span class="ansi-bright-black-fg">[75880514] </span>DataFrameMacros v0.4.1
-  <span class="ansi-bright-black-fg">[a93c6f00] </span>DataFrames v1.8.2
-  <span class="ansi-bright-black-fg">[31c24e10] </span>Distributions v0.25.123
-  <span class="ansi-bright-black-fg">[8f03c58b] </span>Effects v1.7.0
-  <span class="ansi-bright-black-fg">[da1fdf0e] </span>FreqTables v1.0.0
-  <span class="ansi-bright-black-fg">[38e38edf] </span>GLM v1.9.3
-  <span class="ansi-bright-black-fg">[4345ca2d] </span>Loess v0.6.5
-  <span class="ansi-bright-black-fg">[ff71e718] </span>MixedModels v5.3.0
-  <span class="ansi-bright-black-fg">[7e9fb7ac] </span>MixedModelsDatasets v0.1.2
-  <span class="ansi-bright-black-fg">[b12ae82c] </span>MixedModelsMakie v0.4.11
-  <span class="ansi-bright-black-fg">[76087f3c] </span>NLopt v1.2.1
-  <span class="ansi-bright-black-fg">[2dfb63ee] </span>PooledArrays v1.4.3
-  <span class="ansi-bright-black-fg">[27983f2f] </span>RectangularFullPacked v0.2.1
-  <span class="ansi-bright-black-fg">[6c6a2e73] </span>Scratch v1.3.0
-  <span class="ansi-bright-black-fg">[5064a6a7] </span>StandardizedPredictors v1.0.1
-  <span class="ansi-bright-black-fg">[82ae8749] </span>StatsAPI v1.8.0
-  <span class="ansi-bright-black-fg">[2913bbd2] </span>StatsBase v0.34.10
-<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[3eaba693] </span>StatsModels v0.7.4
-  <span class="ansi-bright-black-fg">[bd369af6] </span>Tables v1.12.1
-<span class="ansi-yellow-fg">⌅</span> <span class="ansi-bright-black-fg">[337ecbd1] </span>TidierPlots v0.11.1
-  <span class="ansi-bright-black-fg">[9d95f2ec] </span>TypedTables v1.4.6
-  <span class="ansi-bright-black-fg">[a5390f91] </span>ZipFile v0.10.1
-  <span class="ansi-bright-black-fg">[ade2ca70] </span>Dates
-  <span class="ansi-bright-black-fg">[f43a241f] </span>Downloads v1.6.0
-  <span class="ansi-bright-black-fg">[37e2e46d] </span>LinearAlgebra
-  <span class="ansi-bright-black-fg">[d6f4376e] </span>Markdown
-  <span class="ansi-bright-black-fg">[44cfe95a] </span>Pkg v1.10.0
-  <span class="ansi-bright-black-fg">[9a3f8284] </span>Random
-  <span class="ansi-bright-black-fg">[ea8e919c] </span>SHA v0.7.0
-<span class="ansi-cyan-fg ansi-bold">Info</span> Packages marked with <span class="ansi-yellow-fg">⌅</span> have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated`
-</pre>
-</div>
-</div>
-</div>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/5e55a39
-">5e55a39
-</a> using Quarto 1.9.36.</em></p>
+<section id="general-rules" class="level2" data-number="E.1">
+<h2 data-number="E.1" class="anchored" data-anchor-id="general-rules"><span class="header-section-number">E.1</span> General rules</h2>
+<ul>
+<li>“Addition” (<code>+</code>) indicates additive, i.e., main effects: <code>a + b</code> indicates main effects of <code>a</code> and <code>b</code>.</li>
+<li>“Multiplication” (<code>*</code>) indicates crossing: main effects and interactions between two terms: <code>a * b</code> indicates main effects of <code>a</code> and <code>b</code> as well as their interaction.</li>
+<li>Usual algebraic rules apply (associativity and distributivity):
+<ul>
+<li><code>(a + b) * c</code> is equivalent to <code>a * c + b * c</code></li>
+<li><code>a * b * c</code> corresponds to main effects of <code>a</code>, <code>b</code>, and <code>c</code>, as well as all three two-way interactions and the three-way interaction.</li>
+</ul></li>
+<li>Categorical terms are expanded into the associated indicators/contrast variables.</li>
+<li>Tilde (<code>~</code>) is used to separate response from predictors.</li>
+<li>The intercept is indicated by <code>1</code>.</li>
+<li><code>y ~ 1 + (a + b) * c</code> is read as:
+<ul>
+<li>The response variable is <code>y</code>.</li>
+<li>The model contains an intercept.</li>
+<li>The model contains main effects of <code>a</code>, <code>b</code>, and <code>c</code>.</li>
+<li>The model contains interactions between a and c and between b and c but not a and b</li>
+</ul></li>
+<li>We extend this notation for mixed-effects models with the grouping notation (<code>|</code>):
+<ul>
+<li><code>(1 + a | subject)</code> indicates “by-subject random effects for the intercept and main effect <code>a</code>”.</li>
+<li>This is in line with the usual statistical reading of <code>|</code> as “conditional on”.</li>
+</ul></li>
+</ul>
+</section>
+<section id="mixed-models-in-wilkinson-rogers-and-mathematical-notation" class="level2" data-number="E.2">
+<h2 data-number="E.2" class="anchored" data-anchor-id="mixed-models-in-wilkinson-rogers-and-mathematical-notation"><span class="header-section-number">E.2</span> Mixed models in Wilkinson-Rogers and mathematical notation</h2>
+<p>Models fit with MixedModels.jl are generally linear mixed-effects models with unconstrained random effects covariance matrices and homoskedastic, normally distributed residuals. Under these assumptions, the model specification</p>
+<p><code>response ~ 1 + (age + sex) * education * n_children  + (1 | subject)</code></p>
+<p>corresponds to the statistical model</p>
+<p><span class="math display">\[\begin{align*}
+\left(Y |\mathcal{B}=b\right) &amp;\sim N\left(X\beta + Zb, \sigma^2 I \right) \\
+\mathcal{B} &amp;\sim N\left(0, G\right)
+\end{align*}\]</span></p>
+<p>for which we wish to obtain the maximum-likelihood estimates for <span class="math inline">\(G\)</span> and thus the fixed-effects <span class="math inline">\(\beta\)</span>.</p>
+<ul>
+<li>The model contains no restrictions on <span class="math inline">\(G\)</span>, except that it is positive semidefinite.</li>
+<li>The response Y is the value of a given response.</li>
+<li>The fixed-effects design matrix X consists of columns for
+<ul>
+<li>the intercept, age, sex, education, and number of children (contrast coded as appropriate)</li>
+<li>the interaction of all lower order terms, excluding interactions between age and sex</li>
+</ul></li>
+<li>The random-effects design matrix Z includes a column for
+<ul>
+<li>the intercept for each subject</li>
+</ul></li>
+</ul>
 
 
 </section>
@@ -877,14 +721,11 @@ Libraries:
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./glmmbernoulli.html" class="pagination-link" aria-label="Generalized linear mixed models for binary responses">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Generalized linear mixed models for binary responses</span></span>
+      <a href="./traditional_concepts.html" class="pagination-link" aria-label="A note on identities and concepts from &quot;classical&quot; statistics">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">A note on identities and concepts from “classical” statistics</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./datatables.html" class="pagination-link" aria-label="Working with data tables">
-        <span class="nav-page-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Working with data tables</span></span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->

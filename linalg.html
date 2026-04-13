@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.29">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Appendix B — Linear algebra for linear models – Embrace Uncertainty</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -93,10 +96,10 @@ div.csl-indent {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7edfaf1c48232bdc7da6ab4de57864f3.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-6ef763e2b72a26c18fbc59a18e2e5780.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-6df8b08c78ec18a86db6d5199f24628b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-7bbfecc957e3b61a8164a8c1ebbcb4ac.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -126,7 +129,7 @@ div.csl-indent {
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -139,7 +142,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -266,6 +269,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">C</span>&nbsp; <span class="chapter-title">GLMM log-likelihood</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./traditional_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">D</span>&nbsp; <span class="chapter-title">A note on identities and concepts from “classical” statistics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./wilkinson-notation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">E</span>&nbsp; <span class="chapter-title">Wilkinson-Rogers (1973) notation for models of (co)variance</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -321,9 +336,9 @@ window.Quarto = {
 <div id="2" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">EmbraceUncertainty</span>: dataset</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">MixedModels</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>In this appendix we describe properties of the multivariate Gaussian (or “normal”) distribution and how linear models and linear mixed models can be formulated in terms of this distribution.</p>
@@ -550,8 +565,8 @@ r^2({\boldsymbol{\beta}})&amp;=\|{\mathbf{y}}-{\mathbf{X}}{\boldsymbol{\beta}}\|
 <h2 data-number="B.5" class="anchored" data-anchor-id="numerical-example"><span class="header-section-number">B.5</span> Numerical example</h2>
 <p>Suppose we wish to fit a simple linear regression model to the reaction time as a function of days of sleep deprivation to the data from subject <code>S372</code> in the <code>sleepstudy</code> dataset.</p>
 <div id="4" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sleepstudy <span class="op">=</span> <span class="fu">Table</span>(<span class="fu">dataset</span>(<span class="op">:</span>sleepstudy))</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>S372 <span class="op">=</span> sleepstudy[sleepstudy.subj <span class="op">.==</span> <span class="st">"S372"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>sleepstudy <span class="op">=</span> <span class="fu">Table</span>(<span class="fu">dataset</span>(<span class="op">:</span>sleepstudy))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>S372 <span class="op">=</span> sleepstudy[sleepstudy.subj <span class="op">.==</span> <span class="st">"S372"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Table with 3 columns and 10 rows:
       subj  days  reaction
@@ -570,7 +585,7 @@ r^2({\boldsymbol{\beta}})&amp;=\|{\mathbf{y}}-{\mathbf{X}}{\boldsymbol{\beta}}\|
 </div>
 <p>The model matrix and the response vector can be constructed as</p>
 <div id="6" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> <span class="fu">hcat</span>(<span class="fu">ones</span>(<span class="fu">length</span>(S372)), S372.days)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> <span class="fu">hcat</span>(<span class="fu">ones</span>(<span class="fu">length</span>(S372)), S372.days)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>10×2 Matrix{Float64}:
  1.0  0.0
@@ -587,15 +602,15 @@ r^2({\boldsymbol{\beta}})&amp;=\|{\mathbf{y}}-{\mathbf{X}}{\boldsymbol{\beta}}\|
 </div>
 <p>and</p>
 <div id="8" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> S372.reaction</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> S372.reaction</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">show</span>(y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[269.4117, 273.474, 297.5968, 310.6316, 287.1726, 329.6076, 334.4818, 343.2199, 369.1417, 364.1236]</code></pre>
 </div>
 </div>
 <p>from which we obtain the Cholesky factor</p>
 <div id="10" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>chfac <span class="op">=</span> <span class="fu">cholesky!</span>(X<span class="op">'</span>X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>chfac <span class="op">=</span> <span class="fu">cholesky!</span>(X<span class="op">'</span>X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Cholesky{Float64, Matrix{Float64}}
 U factor:
@@ -607,7 +622,7 @@ U factor:
 <p>(Recall that the upper triangular Cholesky factor is the <code>U</code> property of the <code>Cholesky</code> type.)</p>
 <p>The <code>\</code> operator with a <code>Cholesky</code> factor on the left performs both the forward and backward solutions to obtain the least squares estimates</p>
 <div id="12" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">=</span> chfac <span class="op">\</span> (X<span class="op">'</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">=</span> chfac <span class="op">\</span> (X<span class="op">'</span>y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.04479999999995
@@ -616,7 +631,7 @@ U factor:
 </div>
 <p>Alternatively, we could carry out the two solutions of the triangular systems explicitly by first solving for <span class="math inline">\(\mathbf{r}_{Xy}\)</span></p>
 <div id="14" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rXy <span class="op">=</span> <span class="fu">ldiv!</span>(chfac.L, X<span class="op">'</span>y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rXy <span class="op">=</span> <span class="fu">ldiv!</span>(chfac.L, X<span class="op">'</span>y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  1005.244207376381
@@ -625,7 +640,7 @@ U factor:
 </div>
 <p>then solving in-place to obtain <span class="math inline">\(\widehat{{\boldsymbol{\beta}}}\)</span></p>
 <div id="16" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ldiv!</span>(chfac.U, rXy)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ldiv!</span>(chfac.U, rXy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.0447999999998
@@ -634,7 +649,7 @@ U factor:
 </div>
 <p>The residual vector, <span class="math inline">\({\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}}\)</span>, is</p>
 <div id="18" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> y <span class="op">-</span> X <span class="op">*</span> β̂</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> y <span class="op">-</span> X <span class="op">*</span> β̂</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>10-element Vector{Float64}:
    2.3669000000000437
@@ -651,14 +666,14 @@ U factor:
 </div>
 <p>with geometric length or “norm”,</p>
 <div id="20" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>31.915932906580302</code></pre>
 </div>
 </div>
 <p>For the extended Cholesky factor, create the extended matrix of sums of squares and cross products</p>
 <div id="22" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>crprod <span class="op">=</span> <span class="kw">let</span> x <span class="op">=</span> S372.days</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>crprod <span class="op">=</span> <span class="kw">let</span> x <span class="op">=</span> S372.days</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Symmetric</span>(</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    [</span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">length</span>(x) <span class="fu">sum</span>(x) <span class="fu">sum</span>(y)</span>
@@ -667,7 +682,7 @@ U factor:
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    ],</span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">:</span>U,</span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>3×3 Symmetric{Float64, Matrix{Float64}}:
    10.0      45.0   3178.86
@@ -678,7 +693,7 @@ U factor:
 <p>The call to <code>Symmetric</code> with the second argument the symbol <code>:U</code> indicates that the matrix should be treated as symmetric but only the upper triangle is given.</p>
 <p>The Cholesky factor of the <code>crprod</code> reproduces <span class="math inline">\({\mathbf{R}}_{XX}\)</span>, <span class="math inline">\(\mathbf{r}_{Xy}\)</span>, and the norm of the residual, <span class="math inline">\(r_{yy}\)</span>.</p>
 <div id="24" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>extchfac <span class="op">=</span> <span class="fu">cholesky</span>(crprod)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>extchfac <span class="op">=</span> <span class="fu">cholesky</span>(crprod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Cholesky{Float64, Matrix{Float64}}
 U factor:
@@ -690,10 +705,10 @@ U factor:
 </div>
 <p>and information from which the parameter estimates can be evaluated.</p>
 <div id="26" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">≈</span> <span class="fu">ldiv!</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>β̂ <span class="op">≈</span> <span class="fu">ldiv!</span>(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">UpperTriangular</span>(<span class="fu">view</span>(extchfac.U, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>)),</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">copy</span>(<span class="fu">view</span>(extchfac.U, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">3</span>)),</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>true</code></pre>
 </div>
@@ -701,7 +716,7 @@ U factor:
 <p>The operator <code>≈</code> is a check of approximate equality of floating point numbers or arrays. Exact equality of floating point results from “equivalent” calculations cannot be relied upon.</p>
 <p>Similarly we check that the value of <span class="math inline">\(r_{y,y}\)</span> is approximately equal to the norm of the residual vector.</p>
 <div id="28" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r) <span class="op">≈</span> extchfac.U[<span class="fl">3</span>, <span class="fl">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">norm</span>(r) <span class="op">≈</span> extchfac.U[<span class="fl">3</span>, <span class="fl">3</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>true</code></pre>
 </div>
@@ -712,8 +727,8 @@ U factor:
 <p>There are two other decompositions of the model matrix <span class="math inline">\({\mathbf{X}}\)</span> or the augmented model matrix <span class="math inline">\([\mathbf{X,y}]\)</span> that can be used to evaluate the least squares estimates; the <a href="https://en.wikipedia.org/wiki/QR_decomposition">QR decomposition</a> and the <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition">singular value decomposition (SVD)</a>.</p>
 <p>The QR decomposition expresses <span class="math inline">\({\mathbf{X}}\)</span> as the product of an <em>orthogonal</em> matrix, <span class="math inline">\(\mathbf{Q}\)</span>, and an upper triangular matrix <span class="math inline">\({\mathbf{R}}\)</span>. The upper triangular <span class="math inline">\({\mathbf{R}}\)</span> is related to the upper triangular Cholesky factor in that the numerical values are the same but the signs can be different. In particular, the usual way of creating <span class="math inline">\(\mathbf{Q}\)</span> and <span class="math inline">\({\mathbf{R}}\)</span> using <a href="https://en.wikipedia.org/wiki/Householder_transformation">Householder transformations</a> typically results in the first row of <span class="math inline">\({\mathbf{R}}\)</span> from the <code>qr</code> function being the negative of the first row of the upper Cholesky factor.</p>
 <div id="30" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>qrfac <span class="op">=</span> <span class="fu">qr</span>(X)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>qrfac.R</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>qrfac <span class="op">=</span> <span class="fu">qr</span>(X)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>qrfac.R</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2×2 Matrix{Float64}:
  -3.16228  -14.2302
@@ -722,7 +737,7 @@ U factor:
 </div>
 <p>Just as the Cholesky factor can be used on the left of the <code>\</code> operator, so can the <code>qr</code> factor but with <code>y</code> on the right.</p>
 <div id="32" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>b3 <span class="op">=</span> qrfac <span class="op">\</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>b3 <span class="op">=</span> qrfac <span class="op">\</span> y</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.0447999999998
@@ -735,7 +750,7 @@ U factor:
 \tag{B.31}\]</span></span> To form the product <span class="math inline">\(\mathbf{QR}\)</span> the matrix <span class="math inline">\({\mathbf{R}}\)</span> is treated as if it were <span class="math inline">\(n\times p\)</span> with zeros below the main diagonal.</p>
 <p>The <span class="math inline">\(n\times n\)</span> matrix <span class="math inline">\(\mathbf{Q}\)</span> can be very large if <span class="math inline">\(n\)</span>, the number of observations, is large but it does not need to be explicitly evaluated. In practice <span class="math inline">\(\mathbf{Q}\)</span> is a “virtual” matrix represented as a product of Householder reflections that only require storage of the size of <span class="math inline">\({\mathbf{X}}\)</span>. The effect of multiplying a vector or matrix by <span class="math inline">\(\mathbf{Q}\)</span> or by <span class="math inline">\(\mathbf{Q}'\)</span> is achieved by applying the Householder reflections in a particular order.</p>
 <div id="34" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>rXy2 <span class="op">=</span> qrfac.Q<span class="op">'</span>y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>rXy2 <span class="op">=</span> qrfac.Q<span class="op">'</span>y</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>10-element Vector{Float64}:
  -1005.244207376381
@@ -751,7 +766,7 @@ U factor:
 </div>
 </div>
 <div id="36" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> <span class="fu">ldiv!</span>(<span class="fu">UpperTriangular</span>(qrfac.R), rXy2[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>b4 <span class="op">=</span> <span class="fu">ldiv!</span>(<span class="fu">UpperTriangular</span>(qrfac.R), rXy2[<span class="fl">1</span><span class="op">:</span><span class="fl">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.0447999999998
@@ -763,7 +778,7 @@ U factor:
 \]</span></p>
 <p>Unlike the <span class="math inline">\(\mathbf{Q}\)</span> in the QR decomposition, the orthogonal matrices <span class="math inline">\(\mathbf{U}\)</span> and <span class="math inline">\(\mathbf{V}\)</span> are explicitly evaluated. Because of this, the default for the <code>svd</code> function is to produce a compact form where <span class="math inline">\(\mathbf{U}\)</span> is <span class="math inline">\(n\times p\)</span> and only the diagonal of <span class="math inline">\(\mathbf{S}\)</span> is returned.</p>
 <div id="38" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>Xsvd <span class="op">=</span> <span class="fu">svd</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>Xsvd <span class="op">=</span> <span class="fu">svd</span>(X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>SVD{Float64, Float64, Matrix{Float64}, Vector{Float64}}
 U factor:
@@ -795,7 +810,7 @@ Vt factor:
 \tag{B.32}\]</span></span></p>
 <p>for the diagonal <span class="math inline">\(\mathbf{S}\)</span>.</p>
 <div id="40" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>b5 <span class="op">=</span> Xsvd.V <span class="op">*</span> (Xsvd.U<span class="op">'</span>y <span class="op">./</span> Xsvd.S)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>b5 <span class="op">=</span> Xsvd.V <span class="op">*</span> (Xsvd.U<span class="op">'</span>y <span class="op">./</span> Xsvd.S)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>2-element Vector{Float64}:
  267.04479999999995
@@ -1000,8 +1015,7 @@ n\left(1+\log\left(\frac{2\pi r_{yy}^2({\boldsymbol{\theta}})}{n}\right)\right)
 \tag{B.48}\]</span></span></p>
 <p>even though the maximum likelihood estimate of <span class="math inline">\(\sigma^2\)</span> is</p>
 <p><span id="eq-22"><span class="math display">\[
-\widehat{\sigma^2_{L}}=\frac{\|{\mathbf{y}}-\vec
-X\widehat{{\boldsymbol{\beta}}}\|^2}{n} .
+\widehat{\sigma^2_{L}}=\frac{\|{\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}}\|^2}{n} .
 \tag{B.49}\]</span></span></p>
 <p>The argument for preferring <span class="math inline">\(\widehat{\sigma^2_R}\)</span> to <span class="math inline">\(\widehat{\sigma^2_{L}}\)</span> as an estimate of <span class="math inline">\(\sigma^2\)</span> is that the numerator in both estimates is the sum of squared residuals at <span class="math inline">\(\widehat{{\boldsymbol{\beta}}}\)</span> and, although the residual vector, <span class="math inline">\({\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}}\)</span>, is an <span class="math inline">\(n\)</span>-dimensional vector, it satisfies <span class="math inline">\(p\)</span> linearly independent constraints, <span class="math inline">\({\mathbf{X}}'({\mathbf{y}}-{\mathbf{X}}\widehat{{\boldsymbol{\beta}}})=\mathbf{0}\)</span>. That is, the residual at <span class="math inline">\(\widehat{{\boldsymbol{\beta}}}\)</span> is the projection of the observed response vector, <span class="math inline">\({\mathbf{y}}\)</span>, into an <span class="math inline">\((n-p)\)</span>-dimensional linear subspace of the <span class="math inline">\(n\)</span>-dimensional response space. The estimate <span class="math inline">\(\widehat{\sigma^2_R}\)</span> takes into account the fact that <span class="math inline">\(\sigma^2\)</span> is estimated from residuals that have only <span class="math inline">\(n-p\)</span> <em>degrees of freedom</em>.</p>
 <p>Another argument often put forward for REML estimation is that <span class="math inline">\(\widehat{\sigma^2_R}\)</span> is an <em>unbiased</em> estimate of <span class="math inline">\(\sigma^2\)</span>, in the sense that the expected value of the estimator is equal to the value of the parameter. However, determining the expected value of an estimator involves integrating with respect to the density of the estimator and we have seen that densities of estimators of variances will be skewed, often highly skewed. It is not clear why we should be interested in the expected value of a highly skewed estimator. If we were to transform to a more symmetric scale, such as the estimator of the standard deviation or the estimator of the logarithm of the standard deviation, the REML estimator would no longer be unbiased. Furthermore, this property of unbiasedness of variance estimators does not generalize from the linear regression model to linear mixed models. This is all to say that the distinction between REML and ML estimates of variances and variance components is probably less important than many people believe.</p>
@@ -1104,13 +1118,14 @@ Bates, D., Maechler, M., Bolker, B. M., &amp; Walker, S. (2015). Fitting linear 
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
