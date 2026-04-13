@@ -241,7 +241,7 @@ During the creation of a new `Table` columns can be added or removed.
 For example, in @sec-glmmbinomial we added a Boolean column, `ch`, indicating if `livch` is not `"0"`, to the `contra` table using an expression like
 
 ```{julia}
-contratbl = Table(contratbl; ch=contratbl.livch .== "0")
+contratbl = Table(contratbl; ch=contratbl.livch .≠ "0")
 ```
 
 If later we decide that we can do without this column we can drop it using `getproperties` whose second argument should be a `Tuple` of `Symbol`s of the names of the columns to retain.
