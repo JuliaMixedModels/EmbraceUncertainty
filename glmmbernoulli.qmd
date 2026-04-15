@@ -87,7 +87,7 @@ end
 ```
 
 The response of interest is `use`, whether the woman chooses to use artificial contraception, which is a *binary* response with only two possible values, `N` and `Y`.
-The covariates include the district (`dist`) in which the woman resides, the number of live children she currently has (`livch`, coded as `0`, `1`, `2`, and `3+`), her `age`, and `urban`, also coded as `N` and `Y`, indicating rural or urban.
+The covariates include the district (`dist`) in which the woman resides, the number of live children she currently has (`livch`, coded as `0`, `1`, `2`, and `3+`), her `age`, and `urban`, also coded as `N` and `Y`, indicating if she lives in a rural or urban environment.
 
 Note that the mean of these `age` values is close to zero but not exactly zero.
 This occurs when the values have been centered about the sample mean then rounded.
@@ -108,7 +108,7 @@ as in @fig-contradata,
 
 ```{julia}
 #| code-fold: true
-#| fig-cap: Smoothed relative frequency of contraception use versus centered age for women in the 1989 Bangladesh Fertility Survey
+#| fig-cap: Smoothed relative frequency of contraception use versus centered age for a selection of women in the 1989 Bangladesh Fertility Survey.  The bands are pointwise 95% confidence intervals on the probability of contraceptive use.
 #| label: fig-contradata
 #| warning: false
 draw(
