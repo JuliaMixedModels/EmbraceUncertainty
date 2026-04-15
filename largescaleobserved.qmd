@@ -258,7 +258,7 @@ sizespeed.ucutoff = collect(sizespeed.ucutoff)  # temporary fix to get TidierPlo
 sizespeed
 ```
 
-In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nev` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.
+In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nv` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.
 
 The "[2,2] block of the `L` matrix" is described in @sec-lrgobsmemprint.
 
@@ -307,7 +307,6 @@ draw(
 ```
 
 ```{julia}
-#| code-fold: true
 describe(DataFrame(sizespeed), :mean, :min, :median, :max, :nunique, :eltype)
 ```
 
@@ -392,7 +391,7 @@ NamedTuple{(:A, :L)}(
 )
 ```
 
-That is, `L` requires roughly 10 times the amount of storage as does `A`, and that difference is entirely due to the different structure of the [2,2] block.
+That is, `L` requires roughly 6 times the amount of storage as does `A`, and that difference is entirely due to the different structure of the [2,2] block.
 
 This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as [fill-in](https://en.wikipedia.org/wiki/Sparse_matrix).
 
@@ -460,9 +459,11 @@ In general, for models with scalar random effects for two incompletely crossed g
 The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates.
 The time for one evaluation is given in the `evtime` column of `sizespeed`.
 Also given is the number of evaluations to convergence, `nv`, and the time to fit the model, `fittime`
-The reason for considering `evtime` in addition to `fittime` and `nev` is because the `evtime` for one model, relative to other models, is reasonably stable across computers whereas `nev`, and hence, `fittime`, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).
+The reason for considering `evtime` in addition to `fittime` and `nv` is because the `evtime` for one model, relative to other models, is reasonably stable across computers whereas `nv`, and hence, `fittime`, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).
 
-That is, we can't expect to reproduce `nv` exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in `evtime` with respect to `uc` and `mc` can be expected to reproducible.
+To reiterate, the number of iterations to convergence, `nv`, is highly variable.
+Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.
+Thus we can't expect to reproduce `nv` exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in `evtime` with respect to `uc` and `mc` can be expected to reproducible.
 
 As shown in @fig-evtimevsl22 the evaluation time for the objective is predominantly a function of the size of the `[2, 2]` block of `L`.
 
@@ -481,9 +482,6 @@ draw(
     figure=(; size=(600, 350))
 )
 ```
-
-However the middle panel shows that the number of iterations to convergence is highly variable.
-Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.
 
 The derivation of the log-likelihood for linear mixed-effects models is given in @sec-lmmtheory, which provides a rather remarkable result:
 the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.
