@@ -1083,7 +1083,7 @@ Figure&nbsp;5.2: Distribution of ratings for movies with only one rating compare
 </div>
 </div>
 </div>
-<p>In this table, <code>mc</code> is the “movie cutoff” (i.e.&nbsp;the threshold on the number of ratings per movie); <code>uc</code> is the user cutoff (threshold on the number of ratings per user); <code>nratings</code>, <code>nusers</code> and <code>nmvie</code> are the number of ratings, users and movies in the resulting trimmed data set; <code>modelsz</code> is the size (in GiB) of the model fit; <code>L22sz</code> is the size of the [2,2] block of the <code>L</code> matrix in that model; <code>fittime</code> is the time (in seconds) required to fit the model; <code>nev</code> is the number of function evaluations until convergence; and <code>evtime</code> is the time (s) per function evaluation.</p>
+<p>In this table, <code>mc</code> is the “movie cutoff” (i.e.&nbsp;the threshold on the number of ratings per movie); <code>uc</code> is the user cutoff (threshold on the number of ratings per user); <code>nratings</code>, <code>nusers</code> and <code>nmvie</code> are the number of ratings, users and movies in the resulting trimmed data set; <code>modelsz</code> is the size (in GiB) of the model fit; <code>L22sz</code> is the size of the [2,2] block of the <code>L</code> matrix in that model; <code>fittime</code> is the time (in seconds) required to fit the model; <code>nv</code> is the number of function evaluations until convergence; and <code>evtime</code> is the time (s) per function evaluation.</p>
 <p>The “[2,2] block of the <code>L</code> matrix” is described in <a href="#sec-lrgobsmemprint" class="quarto-xref"><span>Section 5.2.2</span></a>.</p>
 <section id="dimensions-of-the-model-versus-cut-off-values" class="level3" data-number="5.2.1">
 <h3 data-number="5.2.1" class="anchored" data-anchor-id="dimensions-of-the-model-versus-cut-off-values"><span class="header-section-number">5.2.1</span> Dimensions of the model versus cut-off values</h3>
@@ -1142,10 +1142,7 @@ Figure&nbsp;5.4: Number of users in reduced table by movie cutoff value
 </div>
 </div>
 <div id="34" class="cell" data-execution_count="1">
-<details class="code-fold">
-<summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(<span class="fu">DataFrame</span>(sizespeed), <span class="op">:</span>mean, <span class="op">:</span>min, <span class="op">:</span>median, <span class="op">:</span>max, <span class="op">:</span>nunique, <span class="op">:</span>eltype)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <div><div style="float: left;"><span>12×7 DataFrame</span></div><div style="clear: both;"></div></div><div class="data-frame" style="overflow-x: scroll;">
 <table class="data-frame caption-top table table-sm table-striped small">
@@ -1438,7 +1435,7 @@ Residual              0.714548 0.845310
 <pre><code>(A = 0.2372906431555748, L = 1.5306652337312698)</code></pre>
 </div>
 </div>
-<p>That is, <code>L</code> requires roughly 10 times the amount of storage as does <code>A</code>, and that difference is entirely due to the different structure of the [2,2] block.</p>
+<p>That is, <code>L</code> requires roughly 6 times the amount of storage as does <code>A</code>, and that difference is entirely due to the different structure of the [2,2] block.</p>
 <p>This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as <a href="https://en.wikipedia.org/wiki/Sparse_matrix">fill-in</a>.</p>
 <p>Note that although the dimensions of the [2,1] block are larger than those of the [2,2] block its memory footprint is smaller because it is a sparse matrix. The matrix is about 98% zeros or, equivalently, a little over 2% nonzeros,</p>
 <div id="44" class="cell" data-execution_count="1">
@@ -1509,8 +1506,8 @@ Figure&nbsp;5.6: Memory footprint of the model representation (GiB) versus the s
 </section>
 <section id="speed-of-log-likelihood-evaluation" class="level3" data-number="5.2.3">
 <h3 data-number="5.2.3" class="anchored" data-anchor-id="speed-of-log-likelihood-evaluation"><span class="header-section-number">5.2.3</span> Speed of log-likelihood evaluation</h3>
-<p>The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates. The time for one evaluation is given in the <code>evtime</code> column of <code>sizespeed</code>. Also given is the number of evaluations to convergence, <code>nv</code>, and the time to fit the model, <code>fittime</code> The reason for considering <code>evtime</code> in addition to <code>fittime</code> and <code>nev</code> is because the <code>evtime</code> for one model, relative to other models, is reasonably stable across computers whereas <code>nev</code>, and hence, <code>fittime</code>, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).</p>
-<p>That is, we can’t expect to reproduce <code>nv</code> exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in <code>evtime</code> with respect to <code>uc</code> and <code>mc</code> can be expected to reproducible.</p>
+<p>The time required to fit a model to large data sets is dominated by the time required to evaluate the log-likelihood during the optimization of the parameter estimates. The time for one evaluation is given in the <code>evtime</code> column of <code>sizespeed</code>. Also given is the number of evaluations to convergence, <code>nv</code>, and the time to fit the model, <code>fittime</code> The reason for considering <code>evtime</code> in addition to <code>fittime</code> and <code>nv</code> is because the <code>evtime</code> for one model, relative to other models, is reasonably stable across computers whereas <code>nv</code>, and hence, <code>fittime</code>, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).</p>
+<p>To reiterate, the number of iterations to convergence, <code>nv</code>, is highly variable. Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations. Thus we can’t expect to reproduce <code>nv</code> exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in <code>evtime</code> with respect to <code>uc</code> and <code>mc</code> can be expected to reproducible.</p>
 <p>As shown in <a href="#fig-evtimevsl22" class="quarto-xref">Figure&nbsp;<span>5.7</span></a> the evaluation time for the objective is predominantly a function of the size of the <code>[2, 2]</code> block of <code>L</code>.</p>
 <div id="cell-fig-evtimevsl22" class="cell" data-execution_count="1">
 <details class="code-fold">
@@ -1536,10 +1533,9 @@ Figure&nbsp;5.7: Evaluation time for the objective (s) versus size of the [2, 2]
 </figure>
 </div>
 </div>
-<p>However the middle panel shows that the number of iterations to convergence is highly variable. Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.</p>
 <p>The derivation of the log-likelihood for linear mixed-effects models is given in <a href="linalg.html#sec-lmmtheory" class="quarto-xref"><span>Section B.7</span></a>, which provides a rather remarkable result: the profiled log-likelihood for a linear mixed-effects model can be evaluated from Cholesky factor of a blocked, positive-definite symmetric matrix.</p>
-<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/5e55a39
-">5e55a39
+<p><em>This page was rendered from git revision <a href="https://github.com/JuliaMixedModels/EmbraceUncertainty/tree/ed49088
+">ed49088
 </a> using Quarto 1.9.36.</em></p>
 
 
