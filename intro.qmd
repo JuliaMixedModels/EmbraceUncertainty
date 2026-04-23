@@ -773,7 +773,7 @@ The corresponding density plots are shown in @fig-profile-density-sigma.
 profiledensity!(Figure(; size=(640,270)), dsm01pr; ptyp='σ', share_y_scale=false)
 ```
 
-The profile density curve for the parameter $\sigma_1$ goes to zero smoothly as $\sigma_1$ descreases to zero but this is somewhat misleading.
+The profile density curve for the parameter $\sigma_1$ goes to zero smoothly as $\sigma_1$ decreases to zero but this is somewhat misleading.
 In the next section we discuss another technique, the `parametric bootstrap`, to assess the variability in parameter estimates.
 The bootstrap samples for the $\sigma_1$ parameter in model `dsm01` have a hybrid probability distribution, consisting of a probability density for $\sigma_1>0$ and a point mass at $\sigma_1=0$.
 The technique for creating the profile density only picks up the continuous probability distribution for $\sigma_1>0$.
