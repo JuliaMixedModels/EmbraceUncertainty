@@ -115,6 +115,7 @@ using AlgebraOfGraphics # high-level graphics
 using CairoMakie        # graphics back-end
 using DataFrameMacros   # elegant DataFrame manipulation
 using DataFrames        # DataFrame implementation
+using GLM               # to fit a linear model w/o random effects
 using MixedModels       # fit and examine mixed-effects models
 using MixedModelsMakie  # graphics for mixed-effects models
 using Random            # random number generation
@@ -334,7 +335,7 @@ dsm01 = let f = @formula(yield ~ 1 + (1 | batch))
 end
 ```
 
-By default, this compact display of mixed-effects model fits is used in [Jupyter](https://jupyter.org) notebooks, which are the evaluation engine for [quarto books](https://quarto.org/docs/books/) with Julia code chunks.
+By default, this compact display of mixed-effects model fits is used by the evaluation engine for [quarto books](https://quarto.org/docs/books/) with Julia code chunks.
 To obtain more information we can `print` the model, as in
 
 ```{julia}
@@ -369,7 +370,7 @@ The display of the fitted model has four major sections:
 
 We consider each of these sections in turn.
 
-The description section states that this is a linear mixed model in which the parameters have been estimate by maximum likelihood (ML).
+The description section states that this is a linear mixed model in which the parameters have been estimated by maximum likelihood (ML).
 The model formula is displayed for later reference.
 
 The display of a model fit by maximum likelihood provides several model-fit statistics such as Akaike's Information Criterion [@saka:ishi:kita:1986], Schwarz's Bayesian Information Criterion [@schw:1978], the log-likelihood at the parameter estimates, and negative twice the log-likelihood, which is the estimation criterion transformed to the scale of the *deviance*.
@@ -408,10 +409,10 @@ The final part of the printed display gives the estimates and standard errors of
 The only fixed-effects term in the model formula is the `1`, denoting a constant which, as explained above, is labeled as `(Intercept)`.
 The estimate of this parameter is 1527.5 g, which happens to be the mean yield across all the data - a consequence of the experiment being *balanced*, in the sense that there was the same number of observations for each batch.
 
-This *coefficient table* also includes the *standard error* of the estimate, which is the estimated standard deviation of the estimator, a `z` ratio, which is the ratio of the estimate to its standard error, and the probability the absolute value of a standard normal distribution exceeding the absolute value of the `z` ratio.
+This *coefficient table* also includes the *standard error* of the estimate, which is the estimated standard deviation of the estimator, a `z` ratio, which is the ratio of the estimate to its standard error, and the probability that the absolute value of a standard normal distribution exceeds the absolute value of the `z` ratio.
 
-If the hypothesis that the coefficient is zero is of interest, which is not the case here, then the value in the fourth column is an approximate p-value for the hypothesis test.
-An alternative measure of precision of the estimate - a coverage interval based on a *parametric bootstrap* - is presented in @sec-furtherassess
+If the hypothesis that the coefficient is zero were of interest, which is not the case here, then the value in the fourth column is an approximate p-value for the hypothesis test.
+Alternative measures of precision of the estimate --- based on *profiling* the objective or on a *parametric bootstrap* --- are presented in @sec-furtherassess
 
 ### A model for the dyestuff2 data {#sec-dyestuff2lmm}
 
@@ -419,6 +420,7 @@ Fitting a similar model to the `dyestuff2` data produces an estimate $\widehat{\
 
 ```{julia}
 #| label: dsm02
+#| warning: false
 dsm02 = let f = @formula(yield ~ 1 + (1 | batch))
   fit(MixedModel, f, dyestuff2; progress=isinteractive())
 end
@@ -469,7 +471,7 @@ Furthermore, it is sparse - meaning that most of the elements of the matrix are 
 In this case, $\bbZ$ is the indicator matrix for the `batch` covariate.
 
 ```{julia}
-Zdsm01 = Int.(Matrix(only(dsm01.reterms)))
+Zdsm01 = Int.(Matrix(only(dsm01.reterms)))  # convert to integers for compact display
 ```
 
 The expression to produce that output first extracted the random-effects terms information from `dsm01`, extracted the term for the first grouping factor, checking that there is only one, converted it to a matrix and converted the matrix to integers to save on space when printing.
@@ -512,7 +514,7 @@ $$
 \end{aligned}
 $$ {#eq-lmmdist}
 
-From these two distributions, the joint distribution of $\mcY$ and $\mcB$, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value $\bby$ of $\mcY$.
+From these two distributions, the joint distribution of $\mcY$ and $\mcB$, which is also multivariate Gaussian, can be determined and from that the likelihood for the parameters, given the observed value, $\bby$, of $\mcY$.
 
 Details on the derivation and evaluation of the log-likelihood are given in @sec-lmmtheory.
 At this point the important results are that the *profiled* log-likelihood for models `dsm01` and `dsm02` can be evaluated directly (i.e. without an iterative optimization) from a single parameter, $\theta=\sigma_1/\sigma$.
@@ -582,6 +584,55 @@ producing a lower Cholesky factor of
 ```{julia}
 sparseL(dsm01; full=true)
 ```
+### Tracking the progress of the iterations {#sec-dsm01trace}
+
+By default, the reduced parameter vector, $\boldsymbol{\theta}$, and value of the objective at each step of the iterative fitting process are stored in the `fitlog` field of the model's `optsum` property.
+
+```{julia}
+#| label: dsm01trace
+DataFrame(dsm01.optsum.fitlog)
+```
+
+Here the algorithm converges after `{julia} nrow(dsm01.optsum.fitlog)` function evaluations to a profiled objective of `{julia} repr(dsm01.objective, context=:compact=>true)` at θ = `{julia} repr(only(dsm01.theta), context=:compact=>true)`.
+
+As $\boldsymbol{\theta}$ is one dimensional in this case we can plot the objective function over a range of values of $\theta$, highlighting the points that were evaluated during the iterative optimization, @fig-profiled-objective.
+
+```{julia}
+#| label: fig-profiled-objective
+#| code-fold: true
+#| fig-cap: The profiled objective for model `dsm01` as a function of $\theta=\sigma_1/\sigma$ (blue-green line).  The circles are the values of $\theta$ and the objective at each function evaluation during the minimization of the objective.  Lines join successive evaluations. The first three evaluations are at $\theta=1.$, $\theta=2.$, and $\theta=0.$, to establish a quadratic approximation to the objective.  Evaluations after those first three are for values of $\theta$ in the range $[0.65, 1.05]$ with convergence to $\theta=0.75258$.  The last five evaluations are more-or-less superimposed on the scale of this figure.
+let prog_layer = data(
+  transform!(DataFrame(dsm01.optsum.fitlog), :θ => (x -> only.(x)); renamecols=false)
+) * mapping(
+  :θ,
+  :objective => "Profiled objective"
+) * visual(ScatterLines; marker='○', markersize=8)
+
+func_layer = data(
+  transform!(
+    DataFrame(θ = collect(-0.25:inv(64):2.125)),
+    :θ => ByRow(objective!(dsm01)) => :objective
+  )
+) * mapping(
+  :θ,
+  :objective => "Profiled objective"
+) * visual(Lines, alpha=0.8, color=:teal)
+  objective!(dsm01, dsm01.optsum.final)  # restore parameter estimate in dsm01
+  updateL!(setθ!(dsm01, dsm01.optsum.final))  # restore optimal θ
+  draw(func_layer + prog_layer; figure=(; size=(600, 340)))
+end
+```
+
+Notice in @fig-profiled-objective that the objective function, $f$, can be evaluated for negative values of $\theta$ and that it is an *even* function, in the sense that $f(-\theta)=f(\theta)$ for all $\theta$.
+This is because the objective can be written a function of $\theta^2$.
+To interpret the converged value of $\theta=\sigma_1/\sigma$ as the ratio of standard deviations we choose the positive value at convergence.
+That is, the final value of $\theta$ after convergence will always be non-negative but negative values are allowed during the iterative optimization.
+
+For example, the `fitlog` for the model `dsm02` shows evaluations at negative values of $\theta$.
+
+```{julia}
+DataFrame(dsm02.optsum.fitlog)
+```
 
 ## Variability of parameter estimates {#sec-furtherassess}
 
@@ -589,7 +640,150 @@ The parameter estimates in a statistical model represent our "best guess" at the
 However, they are not the whole story.
 Statistical models characterize the variability in the data and we should assess the effect of this variability on the precision of the parameter estimates and of predictions made from the model.
 
-One method of assessing the variability in the parameter estimates is through a [parametric bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Parametric_bootstrap), a process where a large number of data sets are simulated from the assumed model using the estimated parameter values as the "true" parameter values.
+### Profiling the objective function
+
+One way of defining, say, a 95% confidence interval on the value of a parameter, say, $\beta$, is as the set of values $\beta_0$ for which a hypothesis test $H_0:\beta=\beta_0$ versus $H_a:\beta\neq\beta_0$ is not rejected at the 5% level.
+If we were to use a [likelihood ratio test](https://en.wikipedia.org/wiki/Likelihood-ratio_test) of this hypothesis we would fit the model without constraints (the alternative model) and fit the model with the constraint $\beta=\beta_0$ (the null model) and look at the difference in the quality of the fit.
+
+For example, to test $H_0: \beta=1500$ we would fit a model for which $\beta$ has been constrained to be 1500, which we accomplish by subtracting 1500 from each value of the response and eliminating the fixed-effects parameter, $\beta$, from the model fit,
+
+```{julia}
+dsm01_1500 = fit(MixedModel, @formula((yield - 1500) ~ 0 + (1|batch)), dyestuff)
+show(dsm01_1500)
+```
+
+We then perform the likelihood ratio test comparing this model fit to the alternative model, which was fit without constraints on $\beta$.
+
+```{julia}
+#| label: likelihoodratiotest
+MixedModels.likelihoodratiotest(dsm01_1500, dsm01)
+```
+
+An alternative presentation of this hypothesis test is
+
+```{julia}
+#| label: lrtest
+lrt01 = lrtest(dsm01_1500, dsm01)
+```
+
+The test statistic, `{julia} repr(abs(only(diff(collect(lrt01.deviance)))); context=:compact=>true)`, which is the difference of the `Deviance` values, is compared to a $\chi^2$ distribution on 1 degree of freedom, producing a p-value of $0.1542$.
+Thus $1500$ will be in a 95% confidence interval on $\beta$ formed by "inverting" this test.
+It will also be in a 90% confidence interval and in a 85% confidence interval but not in an 80% interval.
+
+We could continue the (somewhat tedious) process of obtaining p-values for likelihood ratio tests of $H_0:\beta=\beta_0$ versus $H_a:\beta\neq\beta_0$ for various values of $\beta_0$ until we refine the end points of the intervals for different coverage levels.
+Fortunately there is a `profile` function to automate this process for $\beta$ and for the other parameters in the model.
+
+```{julia}
+#| label: dsm01pr
+dsm01pr = profile(dsm01)
+filter(r -> r.p == :β1, dsm01pr.tbl)   # rows of profiles for β1
+```
+
+The columns of this table are `p`, the parameter that is held constant during the constrained optimization, $\zeta$, which is the *signed square root* of the likelihood-ratio test statistic, and the parameter values at the constrained optimum.
+We have selected, using the `filter` function, the rows in which $\beta_1$ is the parameter being constrained to a particular value.
+
+The value of $\zeta(\beta_1)$ in this table is plus-or-minus the square root of the likelihood ratio (LR) test statistic,
+where the sign is negative for values of $\beta_1$ less than the estimate and positive for values greater than the estimate.
+By taking the signed square root of the LR test statistic, which is approximately distributed as a $\chi^2$ on 1 degree of freedom (i.e. the square of a standard Gaussian, i.e. "normal", distribution) we obtain a test statistic that can be compared to a standard Gaussian distribution.
+
+A `zetaplot` of $\zeta(\beta_1)$ versus $\beta_1$, [@fig-profile-beta], shows that the distribution of the estimate of $\beta_1$ is over-dispersed relative to a Gaussian, shown for reference as a dashed straight line in this figure.
+
+That is, the extent to which the line in a plot like @fig-profile-beta deviates from a straight line indicates the extent to which the parameter estimates deviate from a normal distribution, just as a [normal probability plot](https://en.wikipedia.org/wiki/Normal_probability_plot) is applied to a random sample.
+
+Here we see that the estimate of $\beta$ has a symmetric distribution but is over-dispersed relative to a Gaussian distribution (i.e. it has "heavier tails" than a Gaussian).
+This is not surprising in that there are only 30 observations in the `dyestuff` data and estimators based on a small number of data points tend to be over-dispersed.
+
+```{julia}
+#| label: fig-profile-beta
+#| code-fold: true
+#| fig-cap: Plot of the profile-$\zeta$ function for the parameter $\beta$ in model `dsm01`.  The points on the curve are values of $\beta$ where the profile log-likelihood was evaluated.  The dashed line is a reference line corresponding to a Gaussian distribution.
+zetaplot!(Figure(; size=(400, 400)), dsm01pr; ptyp='β')
+```
+
+For the purposes of visualizing confidence intervals on a parameter it is more convenient to plot the absolute value of the profiled $\zeta$, [@fig-profile-abs-beta].
+
+```{julia}
+#| label: fig-profile-abs-beta
+#| code-fold: true
+#| fig-cap: Plot of the absolute value of the profile-$\zeta$ function for the parameter $\beta$ in model `dsm01`.  The intervals are 50%, 80%, 90%, 95%, and 99% confidence intervals on this parameter.
+zetaplot!(Figure(; size=(500,340)), dsm01pr; ptyp='β', absv=true)
+```
+
+The numerical values of the end-points of a particular confidence interval can be obtained as
+
+```{julia}
+confint(dsm01pr; level=0.95)
+```
+
+It is possible to evaluate the probability density corresponding to the $\zeta$ plot, as in [@fig-profile-density-beta]
+
+```{julia}
+#| code-fold: true
+#| label: fig-profile-density-beta
+#| fig-cap: Probability density corresponding to the profile $\zeta$ values for the $\beta$ parameter in model `dsm01`.
+profiledensity!(Figure(; size=(600, 340)), dsm01pr; ptyp='β')
+```
+
+from which we can see that the shape is symmetric like a Gaussian, even though the probability density is over-dispersed relative to a Gaussian.
+It turns out that it is difficult to detect over-dispersion in a density plot, which is why we tend to use normal probability plots to detect this in a sample.
+
+### Confidence intervals on standard deviations
+
+The object returned by `profile` applied to a mixed-effects model contains the profiled objective values for each of the parameters.
+For example, the profiled LR test statistic for values of $\sigma_1$, the standard deviation of the random effects for `batch`, is
+
+```{julia}
+filter(r -> r.p == :σ1, dsm01pr.tbl)
+```
+
+::: {.callout-note collapse="true"}
+
+### Should we rectify the $\theta$ values before storing them?
+
+It looks as if the *rectify*ing of $\theta$ values on the diagonal of $\bbLambda$ to ensure they are non-negative is not done in the profiling fits.
+
+:::
+
+A profile-$\zeta$ plot using the absolute value of $\zeta$, @fig-profile-abs-sigma, shows that profile-based confidence intervals on $\sigma$ are not symmetric around the estimate --- they are skewed to the right.
+
+```{julia}
+#| code-fold: true
+#| label: fig-profile-abs-sigma
+#| fig-cap: Absolute value of the profile $\zeta$ as a function of $\sigma$ and of $\sigma_1$.  The intervals are 50%, 80%, 90%, 95%, and 99% confidence intervals on these parameters.
+zetaplot!(Figure(; size=(780,325)), dsm01pr; ptyp='σ', absv=true)
+```
+
+
+The confidence intervals on $\sigma_1$ are even more unusual.
+The parameter is bounded below at $\sigma_1=0$, which corresponds to a likelihood ratio test p-value of 0.0201
+
+```{julia}
+#| label: zero-sigma-1-lr-test
+MixedModels.likelihoodratiotest(lm(@formula(yield ~ 1), dataset(:dyestuff)), dsm01)
+```
+
+Thus for any confidence level greater than 97.99%, these confidence intervals on $\sigma_1$ includes zero.
+
+The corresponding density plots are shown in @fig-profile-density-sigma.
+
+```{julia}
+#| code-fold: true
+#| label: fig-profile-density-sigma
+#| fig-cap: Probability density curves corresponding to the profile $\zeta$ values for the $\sigma$ and $\sigma_1$ parameters in model `dsm01`.
+profiledensity!(Figure(; size=(640,270)), dsm01pr; ptyp='σ', share_y_scale=false)
+```
+
+The profile density curve for the parameter $\sigma_1$ goes to zero smoothly as $\sigma_1$ descreases to zero but this is somewhat misleading.
+In the next section we discuss another technique, the `parametric bootstrap`, to assess the variability in parameter estimates.
+The bootstrap samples for the $\sigma_1$ parameter in model `dsm01` have a hybrid probability distribution, consisting of a probability density for $\sigma_1>0$ and a point mass at $\sigma_1=0$.
+The technique for creating the profile density only picks up the continuous probability distribution for $\sigma_1>0$.
+
+The point mass at $\sigma_1=0$ can be inferred from the profile $\zeta$ plot for that parameter, @fig-profile-abs-sigma, because the profile $\zeta$ value is finite and relatively small at $\sigma_1=0$.
+As stated earlier the value $\sigma_1=0$ will be in profile-based confidence intervals for any confidence level above about 98%.
+
+### Parametric bootstrap
+
+Another method of assessing the variability in the parameter estimates is through a [parametric bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Parametric_bootstrap), a process where a large number of data sets are simulated from the assumed model using the estimated parameter values as the "true" parameter values.
 The distribution of the parameter estimators is inferred from the distribution of the parameter estimates from these generated data sets.
 
 This method is well-suited to Julia code because refitting an existing model to a simulated data set can be very fast.
@@ -598,32 +792,22 @@ For methods that involve simulation, it is best to initialize a random number ge
 Beginning with Julia v1.7.0 the default random number generator is the `Xoshiro` generator, which we initialize to an arbitrary, but reproducible, value.
 
 The object returned by a call to `parametricbootstrap` has a somewhat complex internal structure to allow for the ability to simulate from complex models while still maintaining a comparatively small storage footprint.
-To examine the distribution of the parameter estimates we extract a table of all the estimated parameters and convert it to a `DataFrame`.
+To examine the distribution of the parameter estimates we extract a table of all the parameter estimates.
 
 ```{julia}
 #| label: dsm01samp
 #| warning: false
 Random.seed!(4321234)      # random number generator
 dsm01samp = parametricbootstrap(10_000, dsm01; progress=isinteractive())
-dsm01pars = DataFrame(dsm01samp.allpars)
-first(dsm01pars, 7)
+dsm01tbl = Table(dsm01samp.tbl)
 ```
 
-:::{.callout-note}
-
-### Switch to Table(dsm01samp.tbl) formulation
-
-:::
-
-```{julia}
-last(dsm01pars, 7)
-```
-
-Plots of the bootstrap estimates for individual parameters are obtained by extracting subsets of the rows of this dataframe using `subset` methods from the `DataFrames` package or the `@subset` macro from the `DataFramesMacros` package.
+Notice that in some of the bootstrap samples the estimate of $\sigma_1$, the batch-to-batch standard deviation, was zero, as in the `dsm02` model fit to the `dyestuff2` data.
+Plots of the bootstrap estimates for individual parameters are obtained by extracting columns of this table.
 For example,
 
 ```{julia}
-βdf = @subset(dsm01pars, :type == "β")
+βsamp = dsm01tbl.β1
 ```
 
 We begin by examining density plots constructed using the [AlgebraOfGraphics](https://github.com/JuliaGraphics/AlgebraOfGraphics.jl) package.
@@ -636,19 +820,18 @@ You can check the details by clicking on the "Code" button in the HTML version o
 #| label: fig-dsm01_bs_beta_density
 #| warning: false
 draw(
-  data(@subset(dsm01pars, :type == "β")) *
+  data(dsm01tbl) *
   mapping(
-    :value => "Bootstrap samples of β";
-    color=(:names => "Names"),
+    :β1 => "Bootstrap samples of β"
   ) *
   AlgebraOfGraphics.density();
   figure=(; size=(600, 340)),
 )
 ```
 
-The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `{julia} repr(mean(βdf.value), context=:compact=>true)`  which is close to the estimated `β₁` of `{julia} repr(only(dsm01.β), context=:compact=>true)`.
+The distribution of the estimates of `β₁` is more-or-less a Gaussian (or "normal") shape, with a mean value of `{julia} repr(mean(dsm01tbl.β1), context=:compact=>true)`  which is close to the estimated `β₁` of `{julia} repr(only(dsm01.β), context=:compact=>true)`.
 
-Similarly the standard deviation of the simulated β values, `{julia} repr(std(βdf.value), context=:compact=>true)` is close to the standard error of the parameter, `{julia} repr(only(stderror(dsm01)), context=:compact=>true)`.
+Similarly the standard deviation of the simulated β values, `{julia} repr(std(dsm01tbl.β1), context=:compact=>true)`, is close to the standard error of the parameter, `{julia} repr(only(stderror(dsm01)), context=:compact=>true)`.
 
 In other words, the estimator of the fixed-effects parameter in this case behaves as we would expect.
 The estimates are approximately normally distributed centered about the "true" parameter value with a standard deviation given by the standard error of the parameter.
@@ -661,10 +844,10 @@ The situation is different for the estimates of the standard deviation parameter
 #| label: fig-dsm01_bs_sigma_density
 #| warning: false
 draw(
-  data(@subset(dsm01pars, :type == "σ")) *
+  data(dsm01tbl) *
   mapping(
-    :value => "Bootstrap samples of σ";
-    color=(:group => "Group"),
+    [:σ1, :σ];
+    color=dims(1),
   ) *
   AlgebraOfGraphics.density();
   figure=(; size=(600, 340)),
@@ -684,10 +867,10 @@ In this case the distribution of the estimates is a combination of a continuous 
 #| label: fig-dsm01_bs_sigma_hist
 #| warning: false
 draw(
-  data(@subset(dsm01pars, :type == "σ")) *
+  data(dsm01tbl) *
   mapping(
-    :value => "Bootstrap parameter estimates of σ";
-    color=(:group => "Group"),
+    [:σ1, :σ];
+    color=dims(1),
   ) *
   AlgebraOfGraphics.histogram(; bins=80) * visual(alpha = 0.4);
   figure=(; size=(600, 340)),
@@ -715,10 +898,10 @@ In many cases standard errors are quoted for estimates of the variance component
 #| label: fig-dsm01_bs_sigmasqr_hist
 #| warning: false
 draw(
-  data(@transform(@subset(dsm01pars, :type == "σ"), abs2(:value))) *
+  data(select(DataFrame(dsm01tbl), :σ => ByRow(abs2) => :σ², :σ1 => ByRow(abs2) => :σ₁²)) *
   mapping(
-    :value_abs2 => "Bootstrap sample of estimates of σ²",
-    color=:group,
+    [:σ², :σ₁²],
+    color=dims(1),
   ) *
   AlgebraOfGraphics.histogram(; bins=200) * visual(alpha = 0.4);
   figure=(; size=(600, 340)),
@@ -750,22 +933,6 @@ show(only(dsm01.β) .+ [-2, 2] * only(dsm01.stderror))
 
 The interval on the residual standard deviation, $\sigma$, is reasonable, given that there are only 30 observations, but the interval of the standard deviation of the random effects, $\sigma_1$, extends all the way down to zero.
 
-### Tracking the progress of the iterations {#sec-dsm01trace}
-
-By default, the parameter vector and value of the obective at each step of the iterative fitting process are stored in the `fitlog` field of the model's `optsum` property.
-
-```{julia}
-#| label: dsm01trace
-dsm01trace = fit(
-  MixedModel,
-  @formula(yield ~ 1 + (1 | batch)),
-  dyestuff;
-  progress=isinteractive(),
-)
-DataFrame(dsm01trace.optsum.fitlog)
-```
-
-Here the algorithm converges after 18 function evaluations to a profiled deviance of `{julia} repr(dsm01trace.objective, context=:compact=>true)` at θ = `{julia} repr(only(dsm01trace.theta), context=:compact=>true)`.
 
 ## Assessing the random effects {#sec-assessRE}
 
