@@ -16,7 +16,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Check spelling
-        uses: crate-ci/typos@52940116a3ef7d561b8e27ca5b90db8c8c73b2b5  # v1.46.0
+        uses: crate-ci/typos@bbaefadf97b0ec5fdc942684b647f1a6ab250274  # v1.46.0
         # don't fail on typos in files not impacted by this PR
         continue-on-error: true
         with:
