@@ -50,7 +50,7 @@ and defined some constants, if not already defined.
 #| label: constants06
 @isdefined(contrasts) || const contrasts = Dict{Symbol,Any}()
 @isdefined(nAGQ) || const nAGQ = 9
-@isdefined(progress) || const progress = false
+@isdefined(progress) || const progress = isinteractive()
 ```
 
 In this chapter we consider mixed-effects models for data sets in which the response is *binary*, representing  yes/no or true/false or correct/incorrect responses.
@@ -151,8 +151,7 @@ contrasts[:urban] = HelmertCoding()
 com01 =
   let d = contra,
     ds = Bernoulli(),
-    f = @formula(use ~
-      1 + livch + (age + abs2(age)) * urban + (1 | dist))
+    f = @formula(use ~ 1 + livch + age * age * urban + (1 | dist))
 
   fit(MixedModel, f, d, ds; contrasts, nAGQ, progress)
 end
@@ -286,8 +285,7 @@ A series of such model fits led to a model with random effects for the combinati
 
 ```{julia}
 com05 =
-  let f = @formula(use ~
-      1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
+  let f = @formula(use ~ 1 + urban + ch * age + abs2(age) + (1 | dist & urban)),
     d = contra,
     ds = Bernoulli()
 

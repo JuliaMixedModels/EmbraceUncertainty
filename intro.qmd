@@ -237,6 +237,15 @@ end
 
 than we do from numerical summaries.
 
+::: {.callout-note collapse="true"}
+
+### Code for plots
+
+In general we "fold" the code used to generate plots as it tends to have considerable detail that may distract from the plot itself.
+You can check the details by clicking on the "Code" button in the HTML version of the plot or in the quarto files on the [github repository](https://github.com/JuliaMixedModels/EmbraceUncertainty) for this book.
+
+:::
+
 In @fig-dyestuffdata we can see that there is considerable variability in yield, even for preparations from the same batch, but there is also noticeable batch-to-batch variability.
 For example, four of the five preparations from batch F produced lower yields than did any of the preparations from batches B, C, and E.
 
@@ -666,7 +675,7 @@ An alternative presentation of this hypothesis test is
 lrt01 = lrtest(dsm01_1500, dsm01)
 ```
 
-The test statistic, `{julia} repr(abs(only(diff(collect(lrt01.deviance)))); context=:compact=>true)`, which is the difference of the `Deviance` values, is compared to a $\chi^2$ distribution on 1 degree of freedom, producing a p-value of $0.1542$.
+The test statistic, `{julia} repr(abs(only(diff(collect(lrt01.deviance)))); context=:compact=>true)`, which is the difference of the `Deviance` values, is compared to a $\chi^2$ distribution on 1 degree of freedom, producing a p-value of $0.1542$, which is $P(\chi^2_1>2.02981)$.
 Thus $1500$ will be in a 95% confidence interval on $\beta$ formed by "inverting" this test.
 It will also be in a 90% confidence interval and in a 85% confidence interval but not in an 80% interval.
 
@@ -684,14 +693,14 @@ We have selected, using the `filter` function, the rows in which $\beta_1$ is th
 
 The value of $\zeta(\beta_1)$ in this table is plus-or-minus the square root of the likelihood ratio (LR) test statistic,
 where the sign is negative for values of $\beta_1$ less than the estimate and positive for values greater than the estimate.
-By taking the signed square root of the LR test statistic, which is approximately distributed as a $\chi^2$ on 1 degree of freedom (i.e. the square of a standard Gaussian, i.e. "normal", distribution) we obtain a test statistic that can be compared to a standard Gaussian distribution.
+By taking the signed square root of the LR test statistic, which is approximately distributed as a $\chi^2$ on 1 degree of freedom (i.e. the square of a standard Gaussian, or "normal", distribution) we obtain a test statistic that can be compared to a standard Gaussian distribution.
 
 A `zetaplot` of $\zeta(\beta_1)$ versus $\beta_1$, [@fig-profile-beta], shows that the distribution of the estimate of $\beta_1$ is over-dispersed relative to a Gaussian, shown for reference as a dashed straight line in this figure.
 
 That is, the extent to which the line in a plot like @fig-profile-beta deviates from a straight line indicates the extent to which the parameter estimates deviate from a normal distribution, just as a [normal probability plot](https://en.wikipedia.org/wiki/Normal_probability_plot) is applied to a random sample.
 
 Here we see that the estimate of $\beta$ has a symmetric distribution but is over-dispersed relative to a Gaussian distribution (i.e. it has "heavier tails" than a Gaussian).
-This is not surprising in that there are only 30 observations in the `dyestuff` data and estimators based on a small number of data points tend to be over-dispersed.
+This is not surprising in that there are only 30 observations in the `dyestuff` data and estimators based on a small number of data points tend to be over-dispersed relative to a Gaussian.
 
 ```{julia}
 #| label: fig-profile-beta
@@ -725,7 +734,7 @@ profiledensity!(Figure(; size=(600, 340)), dsm01pr; ptyp='β')
 ```
 
 from which we can see that the shape is symmetric like a Gaussian, even though the probability density is over-dispersed relative to a Gaussian.
-It turns out that it is difficult to detect over-dispersion in a density plot, which is why we tend to use normal probability plots to detect this in a sample.
+It is difficult to detect over-dispersion in a density plot, which is why we tend to use normal probability plots to detect this in a sample.
 
 ### Confidence intervals on standard deviations
 
@@ -754,15 +763,16 @@ zetaplot!(Figure(; size=(780,325)), dsm01pr; ptyp='σ', absv=true)
 ```
 
 
-The confidence intervals on $\sigma_1$ are even more unusual.
-The parameter is bounded below at $\sigma_1=0$, which corresponds to a likelihood ratio test p-value of 0.0201
+The confidence intervals on $\sigma_1$ are even more unusual because the lower bound on this parameter, at $\sigma_1=0$ is within a reasonable range for it.
+To perform the likelihood ratio test for $H_0:\sigma_1 = 0$ we compare the fit of a linear model, without random effects, to the alternative model.
 
 ```{julia}
 #| label: zero-sigma-1-lr-test
 MixedModels.likelihoodratiotest(lm(@formula(yield ~ 1), dataset(:dyestuff)), dsm01)
 ```
 
-Thus for any confidence level greater than 97.99%, these confidence intervals on $\sigma_1$ includes zero.
+The p-value for this test is 0.0201.
+Thus, for any confidence level greater than 97.99%, these confidence intervals on $\sigma_1$ include zero.
 
 The corresponding density plots are shown in @fig-profile-density-sigma.
 
@@ -783,7 +793,7 @@ As stated earlier the value $\sigma_1=0$ will be in profile-based confidence int
 
 ### Parametric bootstrap
 
-Another method of assessing the variability in the parameter estimates is through a [parametric bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Parametric_bootstrap), a process where a large number of data sets are simulated from the assumed model using the estimated parameter values as the "true" parameter values.
+Another method of assessing the variability in the parameter estimates is through a [parametric bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)#Parametric_bootstrap), a process where a large number of response vectors are simulated from the assumed model using the estimated parameter values as the "true" parameter values.
 The distribution of the parameter estimators is inferred from the distribution of the parameter estimates from these generated data sets.
 
 This method is well-suited to Julia code because refitting an existing model to a simulated data set can be very fast.
@@ -811,8 +821,7 @@ For example,
 ```
 
 We begin by examining density plots constructed using the [AlgebraOfGraphics](https://github.com/JuliaGraphics/AlgebraOfGraphics.jl) package.
-(In general we "fold" the code used to generate plots as it tends to have considerable detail that may distract from the plot itself.
-You can check the details by clicking on the "Code" button in the HTML version of the plot or in the quarto files on the [github repository](https://github.com/JuliaMixedModels/EmbraceUncertainty) for this book.)
+
 
 ```{julia}
 #| code-fold: true
@@ -933,6 +942,11 @@ show(only(dsm01.β) .+ [-2, 2] * only(dsm01.stderror))
 
 The interval on the residual standard deviation, $\sigma$, is reasonable, given that there are only 30 observations, but the interval of the standard deviation of the random effects, $\sigma_1$, extends all the way down to zero.
 
+For comparison we repeat the 95% confidence intervals on the parameters derived from the profiled log-likelihood.
+
+```{julia}
+confint(dsm01pr)
+```
 
 ## Assessing the random effects {#sec-assessRE}
 
