@@ -141,7 +141,6 @@ using AlgebraOfGraphics
 using BenchmarkTools
 using CairoMakie
 using EmbraceUncertainty: dataset
-using FreqTables
 using LinearAlgebra
 using MixedModels
 using MixedModelsMakie
