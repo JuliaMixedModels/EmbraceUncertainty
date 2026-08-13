@@ -26,6 +26,7 @@ using CSV
 using DataFrames
 using EmbraceUncertainty: dataset, tagpad
 using MixedModels
+using ProgressMeter
 using TypedTables
 
 const MCUTOFFS = (1, 2, 5, 10, 15, 20, 50)
@@ -117,7 +118,7 @@ function main()
   data = ratingstable()
 
   rows = NamedTuple[]
-  for ucutoff in UCUTOFFS, mcutoff in MCUTOFFS
+  @showprogress showspeed=true for ucutoff in UCUTOFFS, mcutoff in MCUTOFFS
     @info "Fitting mc = $mcutoff, uc = $ucutoff"
     row = fitcutoffs(data, mcutoff, ucutoff)
     @info "  " row...

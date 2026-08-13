@@ -1,7 +1,7 @@
 name = "EmbraceUncertainty"
 uuid = "81be8970-b14c-4107-8889-06289fef228c"
-version = "0.1.0"
 authors = ["Phillip Alday <me@phillipalday.com>, Reinhold Kliegl <reinhold.kliegl@gmail.com>, Douglas Bates <dmbates@gmail.com>"]
+version = "0.1.0"
 
 [deps]
 AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
@@ -24,6 +24,7 @@ MixedModelsMakie = "b12ae82c-6730-437f-aff9-d2c38332a376"
 NLopt = "76087f3c-5699-56af-9a33-bf431cd00edd"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 PooledArrays = "2dfb63ee-cc39-5dd5-95bd-886bf059d720"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StandardizedPredictors = "5064a6a7-f8c2-40e2-8bdc-797ec6f1ae18"
 StatsAPI = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
