@@ -22,9 +22,8 @@ Load the packages to be used,
 #| output: false
 using AlgebraOfGraphics
 using CairoMakie
-using CategoricalArrays
 using DataFrames
-using EmbraceUncertainty: dataset
+using EmbraceUncertainty: dataset, tagpad
 using GLM                  # for the lm function
 using MixedModels
 using MixedModelsMakie
@@ -48,11 +47,10 @@ optsumdir(paths::AbstractString...) =
 In the previous chapter we explored and fit models to data from a large-scale designed experiment.
 Here we consider an observational study - ratings of movies by users of [movielens.org](https://movielens.org) made available at the [grouplens.org download site](https://grouplens.org/datasets/movielens) [@Harper2016].
 
-We analyze the *MovieLens 25M Dataset* of roughly 25 million ratings of movies by over 162,000 users of about 59,000 movies.
+We analyze the *MovieLens 32M Dataset* of roughly 32 million ratings of movies by over 200,000 users of about 84,000 movies.
 
-Because of constraints on the redistribution of these data, the first time that `dataset(:ratings)` or `dataset(:movies)` is executed, the 250 Mb zip file is downloaded from the grouplens data site, expanded, and the tables created as Arrow files.
-
-This operation can take a couple of minutes.
+These data are redistributed as Arrow files by the [MixedModelsDatasets](https://github.com/JuliaMixedModels/MixedModelsDatasets.jl) package.
+The first time that `dataset(:ml32_ratings)` is executed, a 151 Mb file is downloaded and cached; subsequent calls read it from the cache.
 
 ## Structure of the data
 
@@ -64,25 +62,54 @@ The `subject` and `item` factors are "incompletely crossed" in that each item oc
 Similarly in the movie ratings, each instance of a rating is associated with a user and with a movie, and these factors are incompletely crossed.
 
 ```{julia}
-ratings = dataset(:ratings)
+ratings = dataset(:ml32_ratings)
 ```
 
-Convert this Arrow table to a `Table` and drop the `timestamp` column, which we won't be using.
-(For small data sets dropping such columns is not important but with over 25 million ratings it does help to drop unnecessary columns to save some memory space.)
+Titles and genres for the movies are in a companion dataset, `ml32_movies`, which is keyed by the same `movieId`.
+Neither table records how many ratings each movie received, so we count them, sort from the most-rated movie to the least, and attach the titles.
+Note that this counts only movies that were actually rated: `ml32_movies` describes a few thousand more movies than appear in `ml32_ratings`.
 
 ```{julia}
-ratings =
-  Table(getproperties(ratings, (:userId, :movieId, :rating)))
+movies = leftjoin!(
+  sort!(
+    combine(
+      groupby(DataFrame((; ratings.movieId)), :movieId),
+      nrow => :nrtngs,
+    ),
+    :nrtngs;
+    rev=true,
+  ),
+  DataFrame(dataset(:ml32_movies));
+  on=:movieId,
+)
+disallowmissing!(movies; error=false)
 ```
 
-Information on the movies is available in the `movies` dataset.
+The `userId` and `movieId` columns are stored as integers.
+We convert them to zero-padded strings tagged with `U` or `M`, both because these are identifiers rather than numbers and because padding them to a constant width makes them sort in the same order as the original integers.
+The result is a `PooledArray`, which stores each distinct level once, so this also uses less memory than the original integer columns.
+
+At the same time we drop the `timestamp` column, which we won't be using.
+(For small data sets dropping such columns is not important but with 32 million ratings it does help to drop unnecessary columns to save some memory space.)
 
 ```{julia}
-movies = Table(dataset(:movies))
+ratings = Table(;
+  userId=tagpad(ratings.userId, "U"),
+  movieId=tagpad(ratings.movieId, "M"),
+  rating=Float32.(ratings.rating),
+)
+```
+
+Because `movies` was built from the ratings, its `movieId` column contains exactly the movie identifiers that occur in `ratings`, so tagging it separately produces the same labels.
+
+```{julia}
+movies = Table(
+  transform!(movies, :movieId => tagpad("M") => :movieId),
+)
 ```
 
 In contrast to data from a designed experiment, like the English Lexicon Project, the data from this observational study are extremely unbalanced with respect to the observational grouping factors, `userId` and `movieId`.
-The `movies` table includes an `nrtngs` column that gives the number of ratings for each movie, which varies from 1 to over 80,000.
+The `nrtngs` column gives the number of ratings for each movie, which varies from 1 to over 100,000.
 
 ```{julia}
 extrema(movies.nrtngs)
@@ -155,7 +182,7 @@ let
 end
 ```
 
-In this collection of about 25 million ratings, nearly 20% of the movies are rated only once and over half of the movies were rated 6 or fewer times.
+In this collection of about 32 million ratings, over 20% of the movies are rated only once and over half of the movies were rated 6 or fewer times.
 
 ```{julia}
 count(≤(6), movies.nrtngs) / length(movies.nrtngs)
@@ -163,7 +190,7 @@ count(≤(6), movies.nrtngs) / length(movies.nrtngs)
 
 The ecdf plot of the number of ratings per user shows a similar pattern to that of the movies --- a few users with a very large number of ratings and many users with just a few ratings.
 
-For example, the minimum number or movies rated is 20 (due to the inclusion constraint); the median number of movies rated is around 70; but the maximum is over 32,000 (which is a lot of movies - over 30 years of 3 movies per day every day - if this user actually watched all of them).
+For example, the minimum number or movies rated is 20 (due to the inclusion constraint); the median number of movies rated is around 70; but the maximum is over 33,000 (which is a lot of movies - over 30 years of 3 movies per day every day - if this user actually watched all of them).
 
 Movies with very few ratings provide little information about overall trends or even about the movie being rated.
 We can imagine that the "shrinkage" of random effects for movies with just a few ratings pulls their adjusted rating strongly towards the overall average.
@@ -254,8 +281,6 @@ The results are summarized in the following table
 ```{julia}
 #| code-fold: true
 sizespeed = DataFrame(dataset(:sizespeed))
-sizespeed.ucutoff = collect(sizespeed.ucutoff)  # temporary fix to get TidierPlots to work
-sizespeed
 ```
 
 In this table, `mc` is the "movie cutoff" (i.e. the threshold on the number of ratings per movie); `uc` is the user cutoff (threshold on the number of ratings per user); `nratings`, `nusers` and `nmvie` are the number of ratings, users and movies in the resulting trimmed data set; `modelsz` is the size (in GiB) of the model fit; `L22sz` is the size of the [2,2] block of the `L` matrix in that model; `fittime` is the time (in seconds) required to fit the model; `nv` is the number of function evaluations until convergence; and `evtime` is the time (s) per function evaluation.
@@ -264,14 +289,13 @@ The "[2,2] block of the `L` matrix" is described in @sec-lrgobsmemprint.
 
 ### Dimensions of the model versus cut-off values
 
-As shown if @fig-nratingsbycutoff, the number of ratings varies from a little over 21 million to 25 million, and is mostly associated with the user cutoff.
+As shown if @fig-nratingsbycutoff, the number of ratings varies from a little over 27 million to 32 million, and is mostly associated with the user cutoff.
 
 ```{julia}
 #| code-fold: true
 #| label: fig-nratingsbycutoff
 #| fig-cap: "Number of ratings in reduced table by movie cutoff value"
 
-sizespeed.ucbak = sizespeed.uc
 sizespeed.uc = nonnumeric.(sizespeed.uc)
 draw(
   data(sizespeed) *
@@ -398,7 +422,7 @@ That is, `L` requires roughly 6 times the amount of storage as does `A`, and tha
 This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as [fill-in](https://en.wikipedia.org/wiki/Sparse_matrix).
 
 Note that although the dimensions of the [2,1] block are larger than those of the [2,2] block its memory footprint is smaller because it is a sparse matrix.
-The matrix is about 98% zeros or, equivalently, a little over 2% nonzeros,
+The matrix is about 98% zeros or, equivalently, a little under 2% nonzeros,
 
 ```{julia}
 let
@@ -448,12 +472,30 @@ draw(
 )
 ```
 
-@fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
-Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` is over 30% of the memory footprint.
+@fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 25 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
+Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` is still close to a third of the memory footprint.
 
 The amount of storage required for the `[2,2]` block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix.
 `MixedModels.jl` since v5.8.0 does this automatically using the [rectangular full packed (RFP) format](https://netlib.org/lapack/lawnspdf/lawn199.pdf) for diagonal blocks whose dimension exceeds `RFPthreshold` (default 1000).
-The `mvm50u80` model already uses RFP storage; to see the savings we can compare it against the same model constructed with dense storage.
+The `L22sz` column of `sizespeed` records the size of the RFP representation.
+The block is square with one row and column per movie, so the storage that the older, dense representation would have required can be computed directly from `nmvie` and compared against it.
+
+```{julia}
+#| code-fold: true
+select(
+  transform(
+    sizespeed,
+    :nmvie => ByRow(n -> Int64(n)^2 * 8 / 2^30) => :L22dense,
+  ),
+  :mc,
+  :uc,
+  :nmvie,
+  :L22sz,
+  :L22dense,
+)
+```
+
+For a single model the saving can be seen directly, by constructing `mvm50u80` again with RFP storage disabled.
 
 ```{julia}
 #| code-fold: true
