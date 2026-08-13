@@ -325,6 +325,7 @@ function ratingsoptsum(
   data=Table(ratings),
   form=@formula(rating ~ 1 + (1 | userId) + (1 | movieId)),
   contrasts=contrasts,
+  kwargs...,
 )
   optsumfnm = optsumdir(
     "mvm$(lpad(mcutoff, 2, '0'))u$(lpad(ucutoff, 2, '0')).json",
@@ -336,6 +337,7 @@ function ratingsoptsum(
         data,
       );
       contrasts,
+      kwargs...,
     )
   isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
 
@@ -449,8 +451,16 @@ draw(
 @fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 20 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
 Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` is over 30% of the memory footprint.
 
-In a sense this is good news because the amount of storage required for the `[2,2]` block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix.
-The [rectangular full packed format](https://netlib.org/lapack/lawnspdf/lawn199.pdf) looks especially promising for this purpose.
+The amount of storage required for the `[2,2]` block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix.
+`MixedModels.jl` since v5.8.0 does this automatically using the [rectangular full packed (RFP) format](https://netlib.org/lapack/lawnspdf/lawn199.pdf) for diagonal blocks whose dimension exceeds `RFPthreshold` (default 1000).
+The `mvm50u80` model already uses RFP storage; to see the savings we can compare it against the same model constructed with dense storage.
+
+```{julia}
+#| code-fold: true
+mvm50u80_dense = ratingsoptsum(50, 80; RFPthreshold=typemax(Int))
+NamedTuple{(:RFP, :dense)}(
+  Base.format_bytes.(Base.summarysize.(getproperty.((mvm50u80, mvm50u80_dense), :L))))
+```
 
 In general, for models with scalar random effects for two incompletely crossed grouping factors, the memory footprint depends strongly on the smaller of the number of levels of the grouping factors, less strongly on the larger number, and almost not at all on the number of observations.
 
