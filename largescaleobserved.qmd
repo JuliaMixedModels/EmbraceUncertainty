@@ -339,7 +339,8 @@ describe(DataFrame(sizespeed), :mean, :min, :median, :max, :nunique, :eltype)
 To explain what "the [2,2] block of the `L` matrix" is and why its size is important, we provide a brief overview of the evaluation of the "profiled" log-likelihood for a `LinearMixedModel` representation.
 
 To make the discussion concrete we consider one of the models represented in this table, with cut-offs of 80 ratings per user and 50 ratings per movie.
-This, and any of the models shown in the table, can be restored in a few minutes from the saved `optsum` values, as opposed to taking up to two hours to perform the fit.
+This model can be restored in a couple of minutes from the saved `optsum` values, as opposed to the twenty minutes needed to perform the fit.
+The larger models in the table are restored the same way, but they are much slower to restore --- and far slower still to fit, with the `mc = 1` fits taking upwards of fourteen hours.
 
 ```{julia}
 #| code-fold: true
@@ -377,7 +378,7 @@ print(mvm50u80)
 
 Creating the model representation and restoring the optimal parameter values can take a couple of minutes because the objective is evaluated twice --- at the initial parameter values and at the final parameter values --- during the call to `restoreoptsum!`.
 
-Each evaluation of the objective, which requires setting the value of the parameter $\bbtheta$ in the numerical representation of the model, updating the blocked Cholesky factor, $\mathbf{L}$, and evaluating the scalar objective value from this factor, takes a little over a minute (71 seconds) on a server node and probably longer on a laptop.
+Each evaluation of the objective, which requires setting the value of the parameter $\bbtheta$ in the numerical representation of the model, updating the blocked Cholesky factor, $\mathbf{L}$, and evaluating the scalar objective value from this factor, takes about 45 seconds on a server node and probably longer on a laptop.
 
 The lower triangular `L` factor is large but sparse.
 It is stored in six blocks of dimensions and types as shown in
@@ -417,7 +418,7 @@ NamedTuple{(:A, :L)}(
 )
 ```
 
-That is, `L` requires roughly 6 times the amount of storage as does `A`, and that difference is entirely due to the different structure of the [2,2] block.
+That is, `L` requires roughly 4 times the amount of storage as does `A`, and that difference is entirely due to the different structure of the [2,2] block.
 
 This phenomenon of the Cholesky factor requiring more storage than the sparse matrix being factored is described as [fill-in](https://en.wikipedia.org/wiki/Sparse_matrix).
 
@@ -472,8 +473,8 @@ draw(
 )
 ```
 
-@fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is over 25 GiB, and nearly 90% of that memory is that required for the `[2,2]` block of `L`.
-Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` is still close to a third of the memory footprint.
+@fig-memoryfootprint shows that when all the movies are included in the data to which the model is fit (i.e. `mc == 1`) the total memory footprint is nearly 30 GiB, and over 90% of that memory is that required for the `[2,2]` block of `L`.
+Even when requiring a minimum of 50 ratings per movie, the `[2,2]` block of `L` is still more than a quarter of the memory footprint.
 
 The amount of storage required for the `[2,2]` block can be nearly cut in half by taking advantage of the fact that it is a triangular matrix.
 `MixedModels.jl` since v5.8.0 does this automatically using the [rectangular full packed (RFP) format](https://netlib.org/lapack/lawnspdf/lawn199.pdf) for diagonal blocks whose dimension exceeds `RFPthreshold` (default 1000).
@@ -514,7 +515,7 @@ Also given is the number of evaluations to convergence, `nv`, and the time to fi
 The reason for considering `evtime` in addition to `fittime` and `nv` is because the `evtime` for one model, relative to other models, is reasonably stable across computers whereas `nv`, and hence, `fittime`, can be affected by seemingly trivial variations in function values resulting from different implementations of low-level calculations, such as the BLAS (Basic Linear Algebra Subroutines).
 
 To reiterate, the number of iterations to convergence, `nv`, is highly variable.
-Most of these models required between 20 and 25 evaluations but some required almost 50 evaluations.
+Most of these models required around 30 evaluations, but the number ranges from 26 to 38.
 Thus we can't expect to reproduce `nv` exactly when fitting the same model on different computers or with slightly different versions of software but the pattern in `evtime` with respect to `uc` and `mc` can be expected to reproducible.
 
 As shown in @fig-evtimevsl22 the evaluation time for the objective is predominantly a function of the size of the `[2, 2]` block of `L`.
