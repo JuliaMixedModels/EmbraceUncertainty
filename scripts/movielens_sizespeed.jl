@@ -34,6 +34,21 @@ const UCUTOFFS = (20, 40, 80)
 
 const FORM = @formula(rating ~ 1 + (1 | userId) + (1 | movieId))
 
+# Optimizer settings for the whole sweep.  These are deliberately looser than
+# the MixedModels defaults (`ftol_rel = 1e-12`, `ftol_abs = 1e-8`,
+# `optimizer = :LN_NEWUOA`): at this scale a single objective evaluation costs
+# between 45 seconds and half an hour, so the last few digits of the
+# convergence criterion are not worth the hours they take.
+#
+# They are also recorded in each saved `optsum` and are restored along with it,
+# so every row of `sizespeed` must be generated with the same values --- mixing
+# settings across the grid would make `nv` and `fittime` incomparable between
+# rows.  The fallback fit in `ratingsoptsum` in @sec-largescaleobserved sets
+# these to match.
+const FTOL_REL = 1.0e-10
+const FTOL_ABS = 1.0e-6
+const OPTIMIZER = :LN_BOBYQA
+
 optsumdir(paths::AbstractString...) =
   joinpath(@__DIR__, "..", "optsums", paths...)
 
@@ -74,6 +89,9 @@ function fitcutoffs(data, mcutoff::Integer, ucutoff::Integer)
   )
   model = LinearMixedModel(FORM, trimmed)
   model.optsum.initial .= 0.5
+  model.optsum.ftol_rel = FTOL_REL
+  model.optsum.ftol_abs = FTOL_ABS
+  model.optsum.optimizer = OPTIMIZER
   fittime = @elapsed fit!(model)
 
   saveoptsum(

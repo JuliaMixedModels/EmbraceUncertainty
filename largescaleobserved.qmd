@@ -367,7 +367,12 @@ function ratingsoptsum(
   isfile(optsumfnm) && return restoreoptsum!(model, optsumfnm)
 
   @warn "File $optsumfnm is not available, fitting model."
+  # these must match scripts/movielens_sizespeed.jl, which generated the
+  # saved `optsum` values for the other cutoff pairs
   model.optsum.initial .= 0.5
+  model.optsum.ftol_rel = 1.0e-10
+  model.optsum.ftol_abs = 1.0e-6
+  model.optsum.optimizer = :LN_BOBYQA
   fit!(model)
   saveoptsum(optsumfnm, model)
   return model
