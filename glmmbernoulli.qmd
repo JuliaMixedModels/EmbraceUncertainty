@@ -114,7 +114,7 @@ as in @fig-contradata,
 draw(
   data(contra) *
   mapping(
-    :age => "Centered age (yr)",
+    :age => Float64 => "Centered age (yr)",
     :use => ==("Y") => "Frequency of contraceptive use";
     col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
     color=:livch,
@@ -250,7 +250,7 @@ A plot of the smoothed observed proportions versus centered age by `urban` and `
 draw(
   data(contra) *
   mapping(
-    :age => "Centered age (yr)",
+    :age => Float64 => "Centered age (yr)",
     :use => ==("Y") => "Frequency of contraceptive use";
     col=:urban => renamer(["N" => "Rural", "Y" => "Urban"]),
     color=:ch => "Children",
